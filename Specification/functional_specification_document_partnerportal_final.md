@@ -422,13 +422,15 @@ The project is functionally acceptable if the following can be demonstrated:
 
 ## 13. Open Questions
 
-- Which optional end-customer fields (beyond mandatory Nachname + address) should the order form offer?
-- Extent of affiliate-link logic visibility in the MVP.
+- Schema management: Hibernate auto-generation vs explicit migrations — resolved 2026-07-01, see below.
 
 ### Resolved (2026-07-01)
 - **Commission percentages:** decided — `Partner.commissionPercent` set by the company via dropdown 5/10/15 + optional custom value. No separate level entity.
 - **Active status:** decided — DB-only flag `Partner.active`, enforced server-side; Keycloak stays simple.
 - **Research question:** decided — reframe toward the internal Partner ↔ Company relationship (partner management, product enablement, partner-driven ordering, commission). The external partner shop + direct end-customer ordering (Endkunde → Partner) is Phase-2 (B-01), mentioned as future. Exact wording still to confirm with the supervisor.
+- **Optional Kunde fields:** decided — order form offers first name, e-mail, phone as optional fields (beyond mandatory Nachname + address), per §8 minimum field expectations.
+- **Affiliate identifier:** decided — deferred, not part of MVP entity/UI.
+- **Schema management:** decided — Hibernate auto-generation (`drop-and-create` for dev/demo), no Flyway migrations for the prototype.
 
 ---
 

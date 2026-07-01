@@ -5,14 +5,14 @@ Phases run top-to-bottom; within a phase, tasks are ordered by dependency.
 
 ## 1. Phase 0 — Foundation & Setup (essential)
 
-- [ ] 1.1 (C+T) Create folder layout inside repo (backend, frontend, docs), README, .gitignore
-- [ ] 1.2 (T) Bootstrap Quarkus project (RESTEasy Reactive, Hibernate ORM Panache, OIDC, JDBC-Postgres)
-- [ ] 1.3 (T) Provision PostgreSQL (container) + local dev config
-- [ ] 1.4 (T) Provision Keycloak (container), create realm, roles `company` + `partner`, commit realm export
-- [ ] 1.5 (T) Wire Quarkus OIDC to Keycloak; smoke-test a protected "hello" endpoint per role
-- [ ] 1.6 (C) Frontend scaffold: static HTML/CSS shell, base layout, routing approach for Web Components
-- [ ] 1.7 (C) Build shared Web Components: data-table, form-field, modal, toast, status-badge, metric-card
-- [ ] 1.8 (C+T) Agree naming/conventions (packages, component names, REST paths); write in docs
+- [x] 1.1 (C+T) Create folder layout inside repo (backend, frontend, docs), README, .gitignore
+- [x] 1.2 (T) Bootstrap Quarkus project (RESTEasy Reactive, Hibernate ORM Panache, OIDC, JDBC-Postgres)
+- [x] 1.3 (T) Provision PostgreSQL (container) + local dev config
+- [x] 1.4 (T) Provision Keycloak (container), create realm, roles `company` + `partner`, commit realm export
+- [x] 1.5 (T) Wire Quarkus OIDC to Keycloak; smoke-test a protected "hello" endpoint per role
+- [x] 1.6 (C) Frontend scaffold: static HTML/CSS shell, base layout, routing approach for Web Components
+- [x] 1.7 (C) Build shared Web Components: data-table, form-field, modal, toast, status-badge, metric-card
+- [x] 1.8 (C+T) Agree naming/conventions (packages, component names, REST paths); write in docs
 
 ## 2. Phase 1 — Data Model & Core CRUD (essential)
 

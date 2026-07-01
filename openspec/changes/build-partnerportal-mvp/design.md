@@ -42,7 +42,9 @@ Greenfield — no data migration. Deployment for the demo: PostgreSQL + Keycloak
 
 ## Open Questions
 
-- Optional Kunde fields to expose on the order form beyond mandatory last name + address.
-- Whether to expose an `affiliate identifier` field in the MVP (FSD open question) or defer.
-- Whether schema is managed by Hibernate auto-generation or explicit migration scripts (Flyway) for the prototype.
 - Exact research-question wording (reframe direction decided; wording to confirm with supervisor).
+
+### Resolved (2026-07-01)
+- Optional Kunde fields: first name, e-mail, phone (optional) alongside mandatory last name + address.
+- Affiliate identifier: deferred, not part of MVP.
+- Schema management: Hibernate auto-generation (`drop-and-create` for dev/demo), no Flyway.
