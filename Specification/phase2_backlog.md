@@ -65,3 +65,7 @@ Last updated: 2026-07-01
 - 2026-07-01: Multiple Artikel per order (Artikel+Menge, plural). Old "one product per order" dead.
 - 2026-07-01: Tech stack FIXED (no alternatives): HTML, CSS, Web Components/Custom Elements (frontend), Quarkus (backend), PostgreSQL (DB), Keycloak (auth).
 - 2026-07-01: FSD rewritten to v2. v1 preserved as functional_specification_document_partnerportal_v1_backup.md.
+- 2026-07-01: Commission = `Partner.commissionPercent` field, company sets via dropdown 5/10/15 + optional custom value. No separate CommissionLevel entity. Auto level-up still B-03.
+- 2026-07-01: Active status = DB-only flag `Partner.active`, enforced server-side after login. Keycloak stays simple (no enabled sync).
+- 2026-07-01: Research question reframed toward internal Partner <-> Company relationship; external shop (Endkunde -> Partner) = Phase-2 (B-01), future only. Exact wording TBD with supervisor.
+- 2026-07-01: Project moved into git repo diplomarbeit-papo/. Specs in Specification/, meetings in Documentation/, IMPLEMENTATION_PLAN.md at root. OpenSpec removed (using flat implementation plan instead).

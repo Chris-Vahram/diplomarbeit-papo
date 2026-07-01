@@ -2,7 +2,8 @@ schema: spec-driven
 
 context: |
   Project: Web-based Partner Portal (HTL Diplomarbeit). Model: Company -> Partner -> End Customer.
-  Authoritative spec: functional_specification_document_partnerportal_final.md (v2).
+  Authoritative spec: Specification/functional_specification_document_partnerportal_final.md (v2).
+  Plan: Specification/IMPLEMENTATION_PLAN.md. Backlog: Specification/phase2_backlog.md.
   MVP = INTERNAL B2B partner-ordering portal (partner logs in, selects/creates Endkunde, places order
   with articles+quantities on the customer's behalf). NOT an external end-customer shop.
 
@@ -13,7 +14,9 @@ context: |
     - Auth: Keycloak (roles: company, partner)
 
   Scale reference: ~200 partners, ~800 articles. Data enters via Excel/CSV import (no BMD interface).
-  Commission: 3 per-partner levels, percentage of total order value, manually assigned, stored as own record.
+  Commission: field on Partner (Partner.commissionPercent), company sets via dropdown 5/10/15 + optional
+  custom value; percentage of total order value; stored as own CommissionRecord. No separate level entity.
+  Active status: DB-only flag Partner.active, enforced server-side after login (Keycloak stays simple).
   Order status: submitted -> reviewed -> fulfilled (company-controlled). Confirmations simulated in-app (no real email).
   Team: Chris + Tobias only (Julian left).
 

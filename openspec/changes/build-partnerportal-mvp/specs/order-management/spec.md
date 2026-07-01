@@ -19,11 +19,11 @@ The system SHALL automatically assign each order to the partner who created it.
 - **THEN** the stored order's assigned partner is that partner, with no manual assignment step
 
 ### Requirement: Order storage
-The system SHALL store per order at least: order identifier, order date, assigned partner, end customer, ordered articles with quantities (order items), order status, and derived order value.
+The system SHALL store per order at least: order identifier, order date, assigned partner, end customer, ordered articles with quantities (order items, with a unit-price snapshot), order status, and derived order value.
 
 #### Scenario: Order record completeness
 - **WHEN** an order is created
-- **THEN** the stored order contains all listed fields
+- **THEN** the stored order contains all listed fields and each order item keeps the unit price at time of order
 
 ### Requirement: Order visibility
 The system SHALL show all orders to the company and only its own orders to each partner.

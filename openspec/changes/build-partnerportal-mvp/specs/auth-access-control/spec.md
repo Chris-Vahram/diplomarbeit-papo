@@ -23,11 +23,15 @@ Protected internal views and endpoints SHALL NOT be reachable via direct URL wit
 - **THEN** the system denies access with an unauthorized response
 
 ### Requirement: Inactive partner blocking
-The system SHALL prevent inactive/disabled partners from logging into the internal area and from creating new orders. Their existing orders remain visible to the company.
+The system SHALL prevent inactive/disabled partners from logging into the internal area and from creating new orders. The active/inactive state is stored solely as the DB flag `Partner.active` and enforced server-side after authentication (Keycloak does not hold this business state). Existing orders of that partner remain visible to the company.
 
 #### Scenario: Inactive partner login attempt
-- **WHEN** a partner whose status is inactive attempts to log in
-- **THEN** the system denies access with a clear message
+- **WHEN** a partner whose `Partner.active` is false authenticates
+- **THEN** the system blocks access to the internal area with a clear message
+
+#### Scenario: Inactive partner order attempt
+- **WHEN** an inactive partner attempts to create an order
+- **THEN** the system rejects the action server-side
 
 #### Scenario: Company still sees inactive partner's orders
 - **WHEN** the company views all orders

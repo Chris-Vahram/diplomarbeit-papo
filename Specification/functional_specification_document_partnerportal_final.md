@@ -202,7 +202,7 @@ The system shall render a simulated order confirmation and shipping confirmation
 The system shall ensure product price and description are controlled by the company; partners may not modify central product master data.
 
 ### FR-19 Per-Partner Commission Calculation
-The system shall calculate a commission per order as a fixed percentage of the total order value, using the assigned partner's commission level, and store it as its own commission record.
+The system shall calculate a commission per order as a percentage of the total order value, using the assigned partner's commission percentage (`Partner.commissionPercent`), and store it as its own commission record. The company sets the percentage via a dropdown with presets 5% / 10% / 15% plus an optional custom value; it is changeable at any time.
 
 ### FR-20 Role Separation and Access Control
 The system shall enforce role-based access (Keycloak) for company and partner roles. Protected views shall not be reachable via direct URL without authorization.
@@ -214,7 +214,7 @@ The system shall validate required partner, product, end-customer, and order fie
 The system shall provide understandable feedback for successful saves, failed validations, unauthorized actions, and invalid order submissions.
 
 ### FR-23 Inactive Partner Protection
-The system shall prevent inactive/disabled partners from logging into the internal area and from placing new orders. Existing orders of that partner remain visible to the company.
+The system shall prevent inactive/disabled partners from logging into the internal area and from placing new orders. The active/inactive state is stored solely as a flag on the Partner record (`Partner.active`) and enforced server-side after authentication (Keycloak is not used to hold this business state). Existing orders of that partner remain visible to the company.
 
 ### FR-24 Unavailable Product Handling
 The system shall prevent adding products marked unavailable to a new order, even if previously enabled for the partner.
@@ -295,7 +295,8 @@ The technology stack is fixed. **No other technologies may be used.**
 - **Order** — created by a partner for a Kunde
 - **OrderItem** — one line of an order (product + quantity)
 - **CommissionRecord** — commission derived from an order
-- **CommissionLevel** — the 3 commission levels and their percentages
+
+> Commission percentage is a field on the Partner record (`Partner.commissionPercent`, dropdown 5/10/15 or custom), not a separate entity.
 
 Main relationships:
 - One company manages many partners and many products.
@@ -304,7 +305,7 @@ Main relationships:
 - One partner creates many orders; one order is assigned to exactly one partner and one Kunde.
 - One order contains one or more order items.
 - One order creates one commission record.
-- One partner has exactly one commission level (manually assigned).
+- One partner has exactly one commission percentage, set by the company (dropdown 5/10/15 or custom value).
 
 ### Minimum Field Expectations
 
@@ -347,7 +348,7 @@ Main relationships:
 - Commission is derived per order from the partner's commission level.
 
 ### Commission Rule
-Commission = fixed percentage of the total order value, where the percentage is the assigned partner's commission level. There are **3 commission levels**, each with a percentage. In the MVP the company assigns and changes a partner's level **manually** at any time. Automatic level-up by sales threshold is deferred (B-03). Each order produces one commission record.
+Commission = percentage of the total order value, where the percentage is the assigned partner's `commissionPercent`. The company sets it on the Partner record via a dropdown with presets **5% / 10% / 15%** plus an optional custom value, and can change it at any time. There is no separate commission-level entity; the preset values act as the "level" label. Automatic level-up by sales threshold is deferred (B-03). Each order produces one commission record.
 
 ### Order Status Rule
 - **submitted:** order created by the partner (on the end customer's behalf)
@@ -421,10 +422,13 @@ The project is functionally acceptable if the following can be demonstrated:
 
 ## 13. Open Questions
 
-- Which exact commission percentages should the 3 levels use?
 - Which optional end-customer fields (beyond mandatory Nachname + address) should the order form offer?
-- The original Zentralforschungsfrage centers on the external partner shop + direct end-customer ordering, now deferred (B-01). The research question / thesis framing should be re-tuned toward the internal partner-driven ordering and coordination chain — to confirm with the supervisor.
 - Extent of affiliate-link logic visibility in the MVP.
+
+### Resolved (2026-07-01)
+- **Commission percentages:** decided — `Partner.commissionPercent` set by the company via dropdown 5/10/15 + optional custom value. No separate level entity.
+- **Active status:** decided — DB-only flag `Partner.active`, enforced server-side; Keycloak stays simple.
+- **Research question:** decided — reframe toward the internal Partner ↔ Company relationship (partner management, product enablement, partner-driven ordering, commission). The external partner shop + direct end-customer ordering (Endkunde → Partner) is Phase-2 (B-01), mentioned as future. Exact wording still to confirm with the supervisor.
 
 ---
 
