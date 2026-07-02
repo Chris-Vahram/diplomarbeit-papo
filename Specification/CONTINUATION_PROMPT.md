@@ -11,8 +11,8 @@ Reference client: PAPO (~200 partners, ~800 articles). HTL diploma demo prototyp
 
 # REPO / FILE LOCATIONS
 Working repo (git): /Users/mitgl/Desktop/Schule/4CHITM/Diplomarbeit/diplomarbeit-papo
-- Specification/functional_specification_document_partnerportal_final.md = authoritative FSD (v2). READ FIRST.
-- Specification/functional_specification_document_partnerportal_v1_backup.md = old v1 (superseded, ignore).
+- Specification/functional_specification_document_partnerportal_final.md = authoritative FSD (v2), MVP-only. READ FIRST.
+- Specification/functional_specification_document_full_vision.md = whole-project vision (MVP + all deferred B-01..B-07 folded into one narrative + roadmap). Reference only, not the build target.
 - Specification/phase2_backlog.md = deferred features B-01..B-07 + decisions log. HONOR THIS.
 - Specification/IMPLEMENTATION_PLAN.md = flat implementation plan (8 sections, WP1-WP13, phases).
 - Specification/CONTINUATION_PROMPT.md = this file.
