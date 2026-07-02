@@ -8,7 +8,7 @@ Status legend:
 - `STUB` = partially in MVP (simulated / manual / mock), full version deferred.
 - `PLANNED` = agreed for later, not started.
 
-Last updated: 2026-07-01
+Last updated: 2026-07-02
 
 ---
 
@@ -64,8 +64,12 @@ Last updated: 2026-07-01
 - 2026-07-01: Endkunde = own Kunde entity (select existing OR create new). Reusable across orders.
 - 2026-07-01: Multiple Artikel per order (Artikel+Menge, plural). Old "one product per order" dead.
 - 2026-07-01: Tech stack FIXED (no alternatives): HTML, CSS, Web Components/Custom Elements (frontend), Quarkus (backend), PostgreSQL (DB), Keycloak (auth).
-- 2026-07-01: FSD rewritten to v2. v1 preserved as functional_specification_document_partnerportal_v1_backup.md.
+- 2026-07-01: FSD rewritten to v2. [Correction 2026-07-02: the v1 backup file was never committed; the v1/full scope lives in functional_specification_document_full_vision.md + git history.]
 - 2026-07-01: Commission = `Partner.commissionPercent` field, company sets via dropdown 5/10/15 + optional custom value. No separate CommissionLevel entity. Auto level-up still B-03.
 - 2026-07-01: Active status = DB-only flag `Partner.active`, enforced server-side after login. Keycloak stays simple (no enabled sync).
 - 2026-07-01: Research question reframed toward internal Partner <-> Company relationship; external shop (Endkunde -> Partner) = Phase-2 (B-01), future only. Exact wording TBD with supervisor.
 - 2026-07-01: Project moved into git repo diplomarbeit-papo/. Specs in Specification/, meetings in Documentation/, IMPLEMENTATION_PLAN.md at root. OpenSpec removed (using flat implementation plan instead).
+- 2026-07-01: OpenSpec re-introduced (supersedes "OpenSpec removed" above). Change `build-partnerportal-mvp` (proposal + design + 9 capability specs + tasks) is the task source of truth; `Specification/IMPLEMENTATION_PLAN.md` stays as the narrative plan, kept in sync. IMPLEMENTATION_PLAN.md lives in Specification/.
+- 2026-07-01: Phase 0 (Foundation & Setup, tasks 1.1–1.8) implemented and committed: Quarkus backend skeleton (REST, Panache, OIDC, Postgres), docker-compose (Postgres + Keycloak + realm export, demo users company-demo/partner-demo), frontend shell (hash router, login, shared Web Components), docs/CONVENTIONS.md.
+- 2026-07-02: Review/pre-mortem pass. Confirmed: import column mapping is MVP-essential (per "real, full" decision above) — tasks.md 6.4 de-optionalized. Decided: Keycloak users are provisioned manually (import creates Partner records only, link via username claim). Dev environment convention: docker-compose Keycloak/Postgres for dev+demo, Dev Services for tests only; schema dev/test = drop-and-create, demo/prod = update.
+- 2026-07-02: Dashboard totals (all own orders vs fulfilled-only) = OPEN, Chris will decide with Tobias. Interim default: all own orders regardless of status. Import column formats: waiting on sample data from the client.

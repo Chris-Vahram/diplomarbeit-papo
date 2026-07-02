@@ -1,6 +1,6 @@
 # Functional Specification Document (v2)
 
-> **Version note:** This v2 reflects the client meetings (17.06.2026 + 24.06.2026), which override the earlier FSD where they conflict (newer = authoritative). The MVP is an **internal B2B partner-ordering portal**. The external end-customer shop from v1 is deferred (see `phase2_backlog.md`, B-01). v1 is preserved as `functional_specification_document_partnerportal_v1_backup.md`.
+> **Version note:** This v2 reflects the client meetings (17.06.2026 + 24.06.2026), which override the earlier FSD where they conflict (newer = authoritative). The MVP is an **internal B2B partner-ordering portal**. The external end-customer shop from v1 is deferred (see `phase2_backlog.md`, B-01). The full original vision (v1 scope incl. external shop) is preserved in `functional_specification_document_full_vision.md`; there is no separate v1 backup file.
 
 ## 1. Project Overview
 
@@ -172,7 +172,7 @@ The system shall provide each partner an internal area containing own master dat
 The system shall allow a partner to edit limited own master data (e.g. contact data) but not commission level, role, or central system data.
 
 ### FR-09 Partner Dashboard
-The system shall provide each partner a dashboard showing at least commission total, revenue, order count, enabled-product count, and latest orders. The dashboard is the partner's landing screen and is kept compact.
+The system shall provide each partner a dashboard showing at least commission total, revenue, order count, enabled-product count, and latest orders. Whether totals count all own orders or only fulfilled ones is an open team decision (see §13); interim default until decided: all own orders regardless of status. The dashboard is the partner's landing screen and is kept compact.
 
 ### FR-10 End-Customer (Kunde) Management
 The system shall allow a partner to select an existing end customer or create a new one. End-customer records are reusable across orders. Mandatory fields: last name (Nachname) and address; other contact fields optional.
@@ -388,9 +388,10 @@ The system shall handle at least:
 - Partners do not control central product master data.
 - End customers do not use the portal in the MVP (partner orders on their behalf).
 - The prototype focuses on the core internal ordering process, not enterprise completeness.
+- **Login provisioning:** the Excel import creates Partner records but no logins. Keycloak users are created manually (demo users in the committed realm export) and linked to their Partner record via the username claim. An imported partner without a Keycloak user simply cannot log in yet.
 
 ### Dependencies
-- Exact commission percentages per level to be finalized (see Open Questions).
+- Import file column sets for partners and articles to be specified (see Open Questions) — needed for default column mapping and import validation rules.
 - External shop and related features tracked in `phase2_backlog.md`.
 
 ---
@@ -422,7 +423,12 @@ The project is functionally acceptable if the following can be demonstrated:
 
 ## 13. Open Questions
 
-- Schema management: Hibernate auto-generation vs explicit migrations — resolved 2026-07-01, see below.
+- **Research-question wording:** direction decided (internal Partner ↔ Company ordering, see below); exact wording still to confirm with the supervisor.
+- **Import file column formats:** the column sets of the real partner and article Excel/CSV files are not yet specified — waiting on sample data from the client. Needed to define the default column mapping and per-column validation rules for FR-04 (blocks final import implementation, not the rest of the MVP).
+- **Dashboard totals (FR-09):** should commission/revenue/order-count totals include **all** own orders or **only fulfilled** ones? To be decided by Chris + Tobias. Interim default until decided: all own orders regardless of status (nothing "disappears" for the partner; the prototype has no cancel status anyway).
+
+### Resolved (2026-07-02)
+- **Keycloak user provisioning:** import creates Partner records only, never Keycloak users; logins are provisioned manually and linked via username claim (see §11 Organizational Assumptions).
 
 ### Resolved (2026-07-01)
 - **Commission percentages:** decided — `Partner.commissionPercent` set by the company via dropdown 5/10/15 + optional custom value. No separate level entity.
@@ -430,7 +436,7 @@ The project is functionally acceptable if the following can be demonstrated:
 - **Research question:** decided — reframe toward the internal Partner ↔ Company relationship (partner management, product enablement, partner-driven ordering, commission). The external partner shop + direct end-customer ordering (Endkunde → Partner) is Phase-2 (B-01), mentioned as future. Exact wording still to confirm with the supervisor.
 - **Optional Kunde fields:** decided — order form offers first name, e-mail, phone as optional fields (beyond mandatory Nachname + address), per §8 minimum field expectations.
 - **Affiliate identifier:** decided — deferred, not part of MVP entity/UI.
-- **Schema management:** decided — Hibernate auto-generation (`drop-and-create` for dev/demo), no Flyway migrations for the prototype.
+- **Schema management:** decided — Hibernate auto-generation, no Flyway migrations for the prototype. Profiles: `drop-and-create` + seed script for dev/test, `update` for the demo/prod profile so demo data survives restarts.
 
 ---
 

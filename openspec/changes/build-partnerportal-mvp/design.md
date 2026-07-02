@@ -18,10 +18,13 @@ HTL Diplomarbeit, 2-person team (Chris, Tobias). Authoritative requirements: `Sp
 
 ## Decisions
 
-- **Backend = Quarkus + Hibernate ORM (Panache) + REST (RESTEasy Reactive).** Rationale: fixed stack; Panache keeps entity/repository code small for a 2-person team. Alternative (plain JDBC) rejected — more boilerplate at ~8-entity scale.
-- **DB = PostgreSQL, normalized.** Entities: `Partner` (incl. `commissionPercent`, `active`), `Product`, `ProductEnablement` (partner×product), `Kunde`, `Order`, `OrderItem`, `CommissionRecord`. Order value derived from OrderItems; **store a unit-price snapshot on OrderItem** so historical orders/commissions keep their value if the central product price later changes. Alternative (recompute from live price) rejected — corrupts historical values.
+- **Backend = Quarkus + Hibernate ORM (Panache) + Quarkus REST (formerly RESTEasy Reactive).** Rationale: fixed stack; Panache keeps entity/repository code small for a 2-person team. Alternative (plain JDBC) rejected — more boilerplate at ~8-entity scale.
+- **DB = PostgreSQL, normalized.** Entities: `Partner` (incl. `commissionPercent`, `active`), `Product`, `ProductEnablement` (partner×product), `Kunde`, `Order`, `OrderItem`, `CommissionRecord`. Order value derived from OrderItems; **store a unit-price snapshot on OrderItem** so historical orders/commissions keep their value if the central product price later changes. Alternative (recompute from live price) rejected — corrupts historical values. **Naming/type conventions:** the `Order` entity maps to table `orders` (`ORDER` is a reserved SQL word); all money fields (price, snapshot, order value, commission) use `BigDecimal` / `numeric`, never floating point.
 - **Commission = field on Partner, not an entity.** `Partner.commissionPercent` set by the company via dropdown 5/10/15 + optional custom value. A separate CommissionLevel table was considered and rejected — the 3 presets act as the "level" label and a custom value must be allowed, so a plain constrained numeric field is simpler. Commission computed once at order creation and persisted as `CommissionRecord`.
 - **Auth = Keycloak, backend-enforced. Active-state = DB.** Roles `company`/`partner` in a Keycloak realm; Quarkus OIDC validates tokens; every endpoint annotated with the required role. Partner identity linked to a `Partner` record via a Keycloak subject/username claim. Business inactivity lives in `Partner.active` and is checked server-side after authentication (login + order creation). Alternative (sync Keycloak `enabled`) rejected — avoids two sources of truth and keeps Keycloak simple.
+- **Keycloak user provisioning = manual.** The Excel import creates `Partner` records only, never Keycloak users. Demo/partner logins are created manually (committed realm export) and linked to their `Partner` record via the username claim; an imported partner without a Keycloak user cannot log in yet. Alternative (auto-provision users on import via Keycloak Admin API) rejected — out of proportion for the MVP demo.
+- **One Keycloak/Postgres topology per mode.** Dev + demo use the docker-compose containers (Keycloak on :8081 with the imported realm, Postgres on :5432) so the frontend's fixed Keycloak URL and the backend validate against the **same issuer**; Quarkus Dev Services provisions throwaway containers for tests only. Alternative (Dev Services in dev too) rejected — its random-port Keycloak has a different issuer than the compose instance the frontend talks to, so every API call would fail with 401. Schema strategy: dev/test `drop-and-create` + `import.sql` seed; prod/demo `update` so demo data survives restarts.
+- **Dashboard totals = all own orders, any status (interim default, decision pending).** Chris + Tobias still have to decide all-orders vs fulfilled-only (see FSD §13). Until then totals include all of the partner's orders regardless of submitted/reviewed/fulfilled — simplest transparent default, nothing disappears for the partner.
 - **Frontend = native Web Components.** A thin set of shared components (data-table, form-field, modal, toast, status-badge, metric-card) reused across company and partner screens; pages call REST endpoints and render. No framework per fixed stack. State kept minimal (per-page fetch).
 - **Import = Apache POI (xlsx) + opencsv (csv) in a dedicated import service.** Parse -> map columns -> validate row-by-row -> collect accepted/rejected -> persist accepted in one transaction, return a report. Alternative (client-side parsing) rejected — validation + dedupe belong server-side near the DB.
 - **Layering per capability:** `resource` (REST) -> `service` (business rules) -> `repository`/entity, one package per capability, so partner/product/order/commission logic stays separable (maintainability NFR).
@@ -29,7 +32,7 @@ HTL Diplomarbeit, 2-person team (Chris, Tobias). Authoritative requirements: `Sp
 ## Risks / Trade-offs
 
 - [Keycloak setup overhead for 2 students] → Use Quarkus Dev Services / a committed realm export; document login users; timebox setup early in Phase 1.
-- [Excel import complexity (mapping, dedupe, validation report) eats time] → Ship a basic-but-real importer first (fixed column order + validation report), add flexible column mapping only if time allows; seed a demo dataset as fallback.
+- [Excel import complexity (mapping, dedupe, validation report) eats time] → Build incrementally: default column mapping + validation report first, then the mapping UI. Column mapping is MVP-essential (decision log: importer = real, full); seed a demo dataset as demo fallback.
 - [Thesis narrative: research question originally leaned on the deferred external shop (B-01)] → Decided: reframe toward the internal Partner ↔ Company relationship; exact wording to confirm with supervisor.
 - [Web Components with no framework can sprawl] → Fix a small shared-component library early; agree naming/conventions before feature work.
 - [Data model owner changed (Julian left)] → Tobias owns schema, both sign off before ordering-core work starts.
@@ -47,4 +50,11 @@ Greenfield — no data migration. Deployment for the demo: PostgreSQL + Keycloak
 ### Resolved (2026-07-01)
 - Optional Kunde fields: first name, e-mail, phone (optional) alongside mandatory last name + address.
 - Affiliate identifier: deferred, not part of MVP.
-- Schema management: Hibernate auto-generation (`drop-and-create` for dev/demo), no Flyway.
+- Schema management: Hibernate auto-generation, no Flyway (`drop-and-create` + seed for dev/test, `update` for demo/prod).
+
+### Resolved (2026-07-02)
+- Keycloak user provisioning: manual (realm export); import creates Partner records only.
+- Dev topology: docker-compose Keycloak/Postgres for dev + demo; Dev Services for tests only.
+
+### Still open (2026-07-02)
+- Dashboard totals: all own orders vs fulfilled-only — Chris + Tobias to decide (interim default: all).

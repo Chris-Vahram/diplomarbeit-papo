@@ -3,209 +3,64 @@
 ## Project owner
 This project belongs to **Chris**.
 
-## Project name
-Webbasiertes Partnerportal zur Verwaltung von Vertriebspartnern, Produkten, Partner-Shops und partnerbezogenen Vertriebsprozessen.
+## Project
+Web-based **internal B2B partner-ordering portal** (Partnerportal) for partner-driven sales models. Chain: **Company -> Partner -> End Customer**. HTL Diplomarbeit (Informatik / IT Medientechnik), team: **Chris + Tobias** (Julian left the project). Reference client: PAPO (~200 partners, ~800 articles; orders today arrive manually by e-mail/phone).
 
-## Project context
-Chris works on this as part of an **HTL Diplomarbeit** in Informatik / IT Medientechnik. No code repo exists yet — this folder holds spec/FSD documents only.
+## Authoritative documents (read in this order for deep work)
+1. `Specification/functional_specification_document_partnerportal_final.md` — **FSD v2, authoritative** for the MVP build (FR-01..FR-25, NFRs, entities, business rules, acceptance criteria, resolved decisions in §13).
+2. `Specification/phase2_backlog.md` — deferred features **B-01..B-07** + append-only decisions log. Honor it; do not rebuild deferred features into the MVP.
+3. `Specification/IMPLEMENTATION_PLAN.md` — narrative plan (WP1–WP13, phases, risks, team split).
+4. `openspec/changes/build-partnerportal-mvp/` — proposal, design, 9 capability specs, **tasks.md = task/progress source of truth**.
+5. `Specification/functional_specification_document_full_vision.md` — whole-project vision incl. deferred features; reference only, not the build target.
+6. `Specification/CONTINUATION_PROMPT.md` — copy-paste context block for fresh sessions.
+7. `Documentation/Besprechungsprotokolle/` — client meeting notes (17.06 + 24.06.2026).
 
-## Official FSD
-The authoritative Functional Specification Document for this project is `functional_specification_document_partnerportal_final.md` (in this folder).
+**Hard rule:** meetings override the FSD when they conflict (newer = authoritative). FSD v2 + backlog already encode the meeting decisions. Do not reintroduce v1 assumptions (external shop as MVP, one-product orders, 3-person team).
 
-For deep work (requirements drafting, data model, acceptance criteria, NFRs), read this file in full — it contains FR-01..FR-27, NFRs, use cases, the full entity model, business rules, error handling, and acceptance criteria.
+## Current status (2026-07-02)
+- OpenSpec change `build-partnerportal-mvp`: **Phase 0 (Foundation & Setup) done** — Quarkus skeleton, docker-compose (Postgres + Keycloak + realm export), frontend shell (hash router, login, shared Web Components), `docs/CONVENTIONS.md`, `docs/SETUP.md`.
+- Next: Phase 1 (data model + core CRUD) via `/opsx:apply`.
 
-## Core model
-Unternehmen → Partner → Endkunde
+## Locked MVP scope
+Core process: partner logs in (Keycloak) -> selects or creates an end customer (Kunde) -> places an order (multiple articles + quantities) on the customer's behalf -> order auto-assigned to the partner -> on-screen confirmation + **simulated** e-mail (no real send) -> company advances status **submitted -> reviewed -> fulfilled** and handles fulfillment.
 
-## Core idea
-The system goes beyond classic PRM. It does not only manage the relationship between company and partners, but also supports product-based and shop-based resale through partners.
+Also in MVP: central partner + product management by the company, Excel/CSV import of partners and articles (column mapping + duplicate detection + validation report — **mapping is essential, not optional**), per-partner product enablement (partner sees/orders only enabled products), partner dashboard (landing screen), per-order commission.
 
-## Goal
-Develop a web-based system that bundles central partner-related sales processes in one platform and closes the gap between classic PRM and product-related partner-shop logic.
+### Key decisions (do not re-litigate; details in FSD §13 + backlog log)
+- Commission = `Partner.commissionPercent` field; company sets via dropdown **5/10/15 + optional custom value**; % of total order value; stored per order as own `CommissionRecord`. **No CommissionLevel entity.** Auto level-up deferred (B-03).
+- Active status = DB-only flag `Partner.active`, enforced server-side after authentication. Keycloak stays simple (no enabled-sync).
+- Kunde = reusable entity (select existing or create new); mandatory **Nachname + address**; optional first name, e-mail, phone.
+- Multiple articles per order; `OrderItem` stores a **unit-price snapshot**.
+- Keycloak users are provisioned **manually** (realm export); import creates Partner records only; link via username claim.
+- Schema: Hibernate auto-generation, no Flyway. dev/test = drop-and-create + seed; demo/prod = update.
+- Affiliate identifier: deferred, not in MVP.
 
-The system should:
-- manage partners centrally
-- manage products/articles centrally
-- allow companies to release products for selected partners
-- give partners their own dashboard and management area
-- allow partners to build an external partner shop from released products
-- allow end customers to order through partner shops
-- assign sales to the correct partner
-- represent commission logic between company and partner
-- make administrative and sales processes more transparent and efficient
+## Fixed tech stack (no alternatives — do not suggest others)
+- **Frontend:** HTML, CSS, native Web Components / Custom Elements (no framework).
+- **Backend:** Quarkus (Java) — Quarkus REST (formerly RESTEasy Reactive), Hibernate ORM Panache, OIDC.
+- **Database:** PostgreSQL.
+- **Auth:** Keycloak (realm `partnerportal`, roles `company` / `partner`).
+- **Import libs:** Apache POI (xlsx) + opencsv (csv).
+
+## Entities
+Partner (commissionPercent, active), Product, ProductEnablement (partner × product), Kunde, Order (table `orders` — `Order` is a reserved SQL word), OrderItem (unit-price snapshot), CommissionRecord. Money = `BigDecimal`.
 
 ## Roles
+- **Company:** manages partners (incl. commission %) and products, imports data, enables products per partner, sees all orders, changes order status, sees all commission records.
+- **Partner:** limited self-edit of own contact data; sees only enabled products; creates orders for Kunden; sees only own orders/commission; dashboard is landing screen.
+- **End customer:** does **not** use the portal in the MVP; receives goods and the (simulated) confirmations.
 
-### Company / manufacturer / operator
-- central instance
-- manages articles/products
-- manages partners
-- releases products for partners
-- defines price, description and availability
-- receives/processes orders from partner shops
-- handles fulfillment/delivery to end customers
-- handles billing/commission assignment
+## Out of scope / deferred (`phase2_backlog.md` — say "implement B-XX" to build)
+B-01 external end-customer shop (CUT) · B-02 shop design customization (CUT) · B-03 auto commission level-up (STUB, manual in MVP) · B-04 real e-mail sending (STUB, simulated in MVP) · B-05 shop inquiry auto-forward (CUT) · B-06 BMD interface (CUT, permanent) · B-07 commission settlement/payout (CUT). Also permanently out: ERP/CRM completeness, real payments, inventory/shipping detail, accounting.
 
-### Partner / sales partner
-- has master data
-- receives released products
-- can build a partner-branded shop from released products
-- may customize design
-- sees relevant data in a dashboard
-- receives orders or requests assigned to their shop
-- receives commission
-- does **not** define central product data or prices
-- does **not** define central descriptions
-- uses company-defined product data
+## Repo layout & conventions
+- `backend/` Quarkus; `frontend/` static Web Components app; `docs/` CONVENTIONS.md + SETUP.md; `Specification/`; `Documentation/`; `openspec/`.
+- Coding/naming/REST conventions: `docs/CONVENTIONS.md`. How to run dev/demo environment: `docs/SETUP.md` (docker-compose Keycloak+Postgres for dev/demo, Dev Services for tests only; demo users `company-demo` / `partner-demo`).
 
-### End customer
-- does not interact with the internal partner portal
-- interacts with the external partner shop
-- sees products
-- orders there
-- is assigned to a partner in the background
-- receives delivery ultimately from the company
-
-## Internal area — Company ↔ Partner
-- part of the partner portal
-- not a full second shop
-- internal catalog, management and release area
-- includes partner management, partner master data, article/product data, product release, dashboard functions, partner-related process visibility, billing/commission reference and internal coordination
-
-## External area — Partner → End customer
-- external partner shop
-- visible to end customers
-- based on centrally maintained products
-- shows only released products
-- customizable in partner design
-- allows direct ordering
-- assigns sales to the partner
-- leads to fulfillment by the company in the background
-
-## Difference from classic PRM
-Classic PRM systems often focus on partner onboarding, deal registration, leads, incentives/commissions, reporting, enablement/training and content sharing.
-
-This project expands the focus with:
-- central article/product management
-- product-based partner releases
-- partner-specific shop creation
-- clear separation between internal partner portal and external partner shop
-- direct connection between partner shop, end customer order and commission assignment
-
-## Core functions
-- article management
-- partner management
-- product release/internal catalog
-- partner dashboard
-- partner shop in partner design
-- order logic
-- commission logic
-
-## Core entities (from FSD)
-- Partner — partner identity and partner-specific data
-- Product — company-managed product information (name, price, description, availability, optional category/image)
-- ProductEnablement — links Products to Partners
-- PartnerShop — shop configuration for a partner (1 partner : 1 shop in prototype)
-- Order — created via a partner shop (id, date, assigned partner, products, quantities, customer name/contact, status)
-- CommissionRecord — derived from an order (related order id, assigned partner, calculation basis, percentage, calculated value)
-
-## Order status model (prototype)
-Prototype order statuses (FR-24): **submitted -> reviewed -> fulfilled**
-
-## Commission rule (prototype)
-Fixed-percentage commission on order value (FR-14, exact percentage TBD — see Open questions). No settlement/payout logic in v1.
-
-## Not primary focus
-- not a full ERP
-- not a general CRM
-- not a pure affiliate tool
-- not a pure e-commerce system without partner logic
-- not a general learning/enablement portal
-- full inventory management
-- full shipping workflow management in detail
-- full accounting / financial bookkeeping
-- recreation of large enterprise platforms (e.g. Salesforce, Magentrix)
-- full payment gateway integration
-- automated email notifications beyond simple prototype feedback
-- advanced commission settlement / payout workflows
-
-## Demo prototype focus
-- role model/login
-- partner management with master data
-- article management
-- product release for partners
-- partner dashboard
-- external partner shop in partner design
-- direct ordering by end customers
-- assignment of orders and commissions to partners
-
-### Explicit prototype boundaries (from FSD)
-- No real payment integration — orders are prototype orders only.
-- Order status limited to submitted / reviewed / fulfilled.
-- Commission = fixed percentage of order value, no settlement workflow.
-- Partner shop shows ALL enabled products by default; partners do NOT curate a subset in v1 (FR-23). Q26 in `fsd_clarification_questions_with_recommendations.md` recommends keeping it this way — but Chris hasn't approved it yet.
-
-## Non-functional requirements (from FSD)
-- Usability: clear UI, simple navigation, visually distinct internal vs. external areas, understandable error/validation messages, clean modern UI/UX appropriate for a school prototype.
-- Performance: typical pages (product list, partner views, dashboard) load in ~2s in a normal demo environment; standard actions feel immediate.
-- Reliability: reliable saves; consistent role-based visibility in all tested scenarios; invalid actions must not silently corrupt data.
-- Maintainability: partner mgmt, product mgmt, shop logic, order logic, commission logic should be separable in the implementation.
-- Security/Access control: role-based access for company/partner/end-customer; protected internal views must not be reachable via direct URL without authorization.
-- Constraints: must remain realistic for an HTL Diplomarbeit; only core-demonstrating functionality in v1.
-
-## Team split
-
-**Chris:**
-- market analysis
-- requirements analysis
-- UI/UX
-- article management
-
-**Julian:**
-- data model
-- partner master data
-- affiliate links / partner-related assignment
-
-**Tobias:**
-- dashboard
-- shop
-- further system-related requirements
-
-## Stakeholders
-Company management/project owner, sales partners, end customers, diploma project team (Chris, Julian, Tobias), supervising teacher/reviewers.
-
-## Market analysis purpose
-- identify relevant market products
-- compare them systematically
-- identify central problems of existing solutions
-- show which products partially solve which problems
-- include prices and review tendencies when useful
-- identify improvement potential in the market
-- justify why this planned system makes sense
-- derive concrete requirements for the own system and demo prototype
-
-## Important market analysis criteria
-- article management/product catalog
-- partner management with master data
-- affiliate links/commission logic
-- partner dashboard
-- internal catalog/release area between company and partner
-- external partner shop/storefront in partner design
-- direct ordering by end customers
-- clean separation between company, partner and end customer
-
-## Central research question
-Wie kann ein webbasiertes System gestaltet werden, das Unternehmen, Partner und Endkunden in einem partnerbasierten Vertriebsmodell sinnvoll verbindet und dabei Partnerverwaltung, Produktfreigabe, Partner-Shop, Bestelllogik und Provisionszuordnung in einer klaren und benutzerfreundlichen Plattform zusammenführt?
-
-## Open questions (need team/Chris decision)
-See `fsd_clarification_questions_with_recommendations.md` (in this folder) — 28 numbered questions across 10 sections (Commission, Shop Customization, Customer Order Data, Billing/Settlement, Order Status/Workflow, Product Availability, Internal Partner Area, Dashboard, Partner Activity/Lifecycle, Small-but-important), each with a recommendation. Chris has not yet approved these recommendations — work through them one section at a time and update the FSD as decisions are made. Frontend/backend/storage tech stack is still separately undecided (not covered by the 28 questions).
-
-Also load on demand: `meta-spec-ausgefüllt.md` (filled-out German Vorbereitungstext that fed this FSD) and `meta-spec-TEST-VORBEREITUNG.md` (the blank template) — ITP `llm-start-package` methodology source documents (meta-spec -> Vorbereitungstext -> AI-FSD -> clarification-questions).
+## Still open (ask, don't assume)
+- Exact research-question wording (direction: internal Partner ↔ Company ordering; confirm with supervisor).
+- Import file column sets for partner/article files — waiting on sample data from the client (blocks final import implementation only).
+- Dashboard totals: all own orders vs fulfilled-only — Chris + Tobias to decide (interim default: all own orders regardless of status).
 
 ## Writing style
-- clear German
-- suitable for an HTL Diplomarbeit
-- avoid exaggerated corporate language
-- precise
-- structured
-- connect market analysis to requirements
+Clear German for thesis documents, suitable for an HTL Diplomarbeit; precise, structured, no exaggerated corporate language. UI texts and validation messages in German, plain language.

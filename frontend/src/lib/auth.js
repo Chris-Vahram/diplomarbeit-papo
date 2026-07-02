@@ -10,9 +10,10 @@ const TOKEN_ENDPOINT = `${KEYCLOAK_BASE}/realms/${REALM}/protocol/openid-connect
 const STORAGE_KEY = "papo.auth";
 
 function decodeJwtPayload(token) {
-  const payload = token.split(".")[1];
-  const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
-  return JSON.parse(json);
+  const payload = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+  // atob alone corrupts non-ASCII claim values (e.g. umlauts in names) — decode as UTF-8.
+  const bytes = Uint8Array.from(atob(payload), (c) => c.charCodeAt(0));
+  return JSON.parse(new TextDecoder().decode(bytes));
 }
 
 export async function login(username, password) {
@@ -48,6 +49,14 @@ export function getSession() {
 
   const tokens = JSON.parse(raw);
   const claims = decodeJwtPayload(tokens.access_token);
+
+  // Expired token = not logged in, otherwise the router guard lets the user
+  // onto a page whose every API call immediately 401s.
+  if (claims.exp && claims.exp * 1000 <= Date.now()) {
+    sessionStorage.removeItem(STORAGE_KEY);
+    return null;
+  }
+
   const roles = claims.realm_access?.roles ?? [];
 
   return {

@@ -34,7 +34,7 @@ The external end-customer shop is **not** part of this MVP (deferred, B-01).
 
 ### WP1 — Project Foundation & Environment
 - **Goal:** A runnable skeleton on the fixed stack.
-- **Tasks:** create repo layout (backend/frontend/docs); generate Quarkus project (RESTEasy Reactive, Hibernate ORM Panache, JDBC-Postgres, OIDC); run PostgreSQL (container) + datasource config; run Keycloak (container), create realm + roles `company`/`partner`, commit realm export; verify a role-protected sample endpoint; scaffold frontend shell + build shared Web Components (data-table, form-field, modal, toast, status-badge, metric-card); write conventions doc.
+- **Tasks:** create repo layout (backend/frontend/docs); generate Quarkus project (Quarkus REST — formerly RESTEasy Reactive, Hibernate ORM Panache, JDBC-Postgres, OIDC); run PostgreSQL (container) + datasource config; run Keycloak (container), create realm + roles `company`/`partner`, commit realm export; verify a role-protected sample endpoint; scaffold frontend shell + build shared Web Components (data-table, form-field, modal, toast, status-badge, metric-card); write conventions doc.
 - **Dependencies:** none.
 - **Deliverables:** `quarkus:dev` runs; Postgres connected; Keycloak login works with per-role access; reusable component set; conventions doc.
 
@@ -141,7 +141,7 @@ WP12, WP13. Harden, verify acceptance criteria, finalize docs.
 ## 5. Technical Considerations
 
 ### Architecture assumptions
-- Layered Quarkus backend (REST -> service -> repository/entity), one package per functional area.
+- Layered Quarkus backend (REST -> service -> repository/entity), one package per functional area. REST layer = Quarkus REST (formerly RESTEasy Reactive).
 - Native Web Components frontend; no framework (fixed stack). Small shared-component library fixed early to prevent sprawl.
 - Keycloak realm export committed; Quarkus OIDC validates tokens; demo users documented.
 - Containers for PostgreSQL + Keycloak for reproducible demo environment.
@@ -199,7 +199,10 @@ WP12, WP13. Harden, verify acceptance criteria, finalize docs.
 
 ### Risks
 - **Keycloak setup overhead** for a 2-person team → front-load in Phase 1; use committed realm export / Dev Services; timebox.
-- **Excel import complexity** (mapping, dedupe, validation report) can consume time → ship basic-but-real importer first (fixed columns + report), add flexible mapping only if time allows; keep seed dataset as demo fallback.
+- **Two Keycloak instances in dev** (docker-compose on :8081 vs Quarkus Dev Services on a random port) issue tokens with different issuers → frontend tokens rejected by the backend (401 everywhere) → convention: dev + demo use the compose Keycloak; Dev Services only for tests (see `docs/SETUP.md`).
+- **Keycloak user provisioning for imported partners:** the Excel import creates Partner records, **not** logins. Keycloak users are created manually (demo users in the committed realm export) and linked to the Partner record via the username claim. Must stay documented, or ordering tests stall in Phase 3.
+- **Excel import complexity** (mapping, dedupe, validation report) can consume time → build incrementally: fixed default mapping + validation report first, then the flexible mapping UI. Column mapping itself is in MVP scope (decision log 2026-07-01: importer = real, full); keep seed dataset as demo fallback.
+- **`Order` is a reserved word in SQL/Postgres** → map the entity to table `orders` (`@Table(name = "orders")`) from the start to avoid schema-generation errors in Phase 1 (WP2).
 - **No-framework Web Components sprawl** → fix a small shared-component library + naming conventions before feature work.
 - **Data-model ownership** shifted after Julian left → Tobias owns schema; both sign off before Phase 4.
 - **Central price change vs historical orders** → unit-price snapshot on OrderItem.
@@ -207,15 +210,18 @@ WP12, WP13. Harden, verify acceptance criteria, finalize docs.
 - **Thesis narrative gap:** the original research question centers on the external shop, now deferred (B-01) → re-tune research question toward internal partner-driven ordering; confirm with supervisor.
 
 ### Open questions (from FSD §13)
-- Exact commission percentages for the 3 levels (blocks final dashboard/commission numbers).
-- Optional Kunde fields on the order form beyond mandatory last name + address.
-- Extent of affiliate-identifier visibility in the MVP.
-- Schema management: Hibernate auto-generation vs explicit migrations (Flyway) for the prototype.
+- Exact research-question wording (direction decided: internal Partner ↔ Company ordering; confirm with supervisor).
+- Import file column sets for the partner and article files — waiting on sample data from the client (needed to define default column mapping and validation rules before WP11).
+- Dashboard totals (WP10): all own orders vs fulfilled-only — Chris + Tobias to decide before WP10; interim default = all own orders regardless of status.
+
+### Resolved (2026-07-01, see FSD §13)
+- Commission percentages: `Partner.commissionPercent`, dropdown 5/10/15 + optional custom value; no separate level entity.
+- Optional Kunde fields on the order form: first name, e-mail, phone (optional) beyond mandatory last name + address.
+- Affiliate identifier: deferred, not part of MVP entity/UI.
+- Schema management: Hibernate auto-generation (drop-and-create for dev/test with seed script; `update` for the demo/prod profile so demo data survives restarts), no Flyway.
 
 ### Missing information from the FSD
-- No concrete commission percentages defined.
 - No fixed acceptance thresholds for the ~2s performance target beyond "demo environment."
-- Import file column formats not yet specified (needed for column mapping).
 
 ## 8. Optional Enhancements
 

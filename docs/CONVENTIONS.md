@@ -26,7 +26,13 @@ Within a capability package: `XxxResource` (REST), `XxxService` (logic), `Xxx` (
 - Standard REST verbs: `GET` (list/read), `POST` (create), `PUT` (update), no `DELETE` unless a capability spec calls for it.
 
 ### Access control
-Every resource method annotated `@RolesAllowed("company")` or `@RolesAllowed("partner")` — no unannotated protected endpoints (FR-20). Partner-scoped endpoints additionally filter by the caller's linked `Partner` id server-side, never trust a client-supplied partner id.
+Every resource method annotated `@RolesAllowed("company")` or `@RolesAllowed("partner")` — no unannotated protected endpoints (FR-20). Partner-scoped endpoints additionally filter by the caller's linked `Partner` id server-side (resolved from the Keycloak username claim), never trust a client-supplied partner id.
+
+### Data conventions
+- **Money** (product price, unit-price snapshot, order value, commission basis/value, `commissionPercent`): `java.math.BigDecimal`, mapped to `numeric` — never `double`/`float`.
+- **`Order` entity maps to table `orders`** via `@Table(name = "orders")` — `ORDER` is a reserved SQL word in PostgreSQL and breaks schema generation otherwise.
+- Timestamps: `java.time` types (`LocalDate`/`Instant`), never `java.util.Date`.
+- Schema: Hibernate auto-generation (no Flyway). dev/test = `drop-and-create` + `import.sql` seed; prod/demo = `update` (demo data must survive restarts).
 
 ## Frontend (native Web Components)
 
@@ -57,6 +63,7 @@ Light DOM (no Shadow DOM) — keeps `base.css` reusable across all components wi
 
 ## Cross-cutting
 
+- **Environments:** dev + demo run against the docker-compose Keycloak (:8081) and PostgreSQL (:5432); Quarkus Dev Services containers are used by tests only. Never mix the two Keycloaks — their token issuers differ. How to run everything: `docs/SETUP.md`.
 - Company vs partner areas are visually distinct: company screens get `.area--company` (blue accent), partner screens `.area--partner` (green accent) — see `base.css`.
 - Validation/error messages: German, plain language, no raw stack traces or HTTP codes shown to the user.
 - Commit realm/schema/seed changes together with the code that needs them (e.g. a new entity field ships with its Hibernate mapping in the same commit).

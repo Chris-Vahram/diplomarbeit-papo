@@ -6,7 +6,7 @@ Phases run top-to-bottom; within a phase, tasks are ordered by dependency.
 ## 1. Phase 0 — Foundation & Setup (essential)
 
 - [x] 1.1 (C+T) Create folder layout inside repo (backend, frontend, docs), README, .gitignore
-- [x] 1.2 (T) Bootstrap Quarkus project (RESTEasy Reactive, Hibernate ORM Panache, OIDC, JDBC-Postgres)
+- [x] 1.2 (T) Bootstrap Quarkus project (Quarkus REST, Hibernate ORM Panache, OIDC, JDBC-Postgres)
 - [x] 1.3 (T) Provision PostgreSQL (container) + local dev config
 - [x] 1.4 (T) Provision Keycloak (container), create realm, roles `company` + `partner`, commit realm export
 - [x] 1.5 (T) Wire Quarkus OIDC to Keycloak; smoke-test a protected "hello" endpoint per role
@@ -52,7 +52,7 @@ Phases run top-to-bottom; within a phase, tasks are ordered by dependency.
 - [ ] 6.1 (C) Import service: parse Excel (Apache POI) + CSV (opencsv)
 - [ ] 6.2 (C) Row validation + duplicate detection; persist accepted rows transactionally — spec: data-import
 - [ ] 6.3 (C) Validation report UI (accepted/rejected rows + reasons) — spec: data-import
-- [ ] 6.4 (C) [opt] Flexible column mapping UI (vs fixed column order) — spec: data-import
+- [ ] 6.4 (C) Column mapping UI (map file columns to system fields; default mapping for known headers) — spec: data-import. Essential per decision log ("importer = real, full"); build after 6.1–6.3 work with the default mapping
 
 ## 7. Phase 6 — Testing (essential)
 

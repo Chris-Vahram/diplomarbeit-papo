@@ -12,4 +12,4 @@ Web-basiertes Partnerportal: Company -> Partner -> Endkunde. Partner-driven orde
 - `openspec/` - Spec-driven change `build-partnerportal-mvp` (proposal, design, specs, tasks)
 
 ## Setup
-Siehe `docs/SETUP.md` (folgt in Phase 0/7).
+Siehe `docs/SETUP.md` (Container, Backend, Frontend, Demo-Logins, Tests). Konventionen: `docs/CONVENTIONS.md`.

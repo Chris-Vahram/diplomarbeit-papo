@@ -17,8 +17,8 @@ Working repo (git): /Users/mitgl/Desktop/Schule/4CHITM/Diplomarbeit/diplomarbeit
 - Specification/IMPLEMENTATION_PLAN.md = flat implementation plan (8 sections, WP1-WP13, phases).
 - Specification/CONTINUATION_PROMPT.md = this file.
 - Documentation/Besprechungsprotokolle/ = client meeting notes (17.06 + 24.06.2026).
-- openspec/ = OpenSpec (schema spec-driven). Change "build-partnerportal-mvp" is PROPOSED (proposal + design + specs + tasks complete, validated). Not yet applied.
-- CLAUDE.md (repo root) = older notes; where it conflicts with FSD v2 / backlog, FSD v2 + backlog win.
+- openspec/ = OpenSpec (schema spec-driven). Change "build-partnerportal-mvp": Phase 0 (Foundation & Setup, tasks 1.1-1.8) is DONE and committed; Phases 1-7 not started. tasks.md checkboxes = progress truth.
+- CLAUDE.md (repo root) = project memory aligned with FSD v2; where anything conflicts, FSD v2 + backlog win.
 Note: .claude and .codex live ONLY inside diplomarbeit-papo/ (outer copies deleted).
 
 # HARD RULE
@@ -35,7 +35,7 @@ Internal B2B partner-ordering portal. Core process = partner logs in (Keycloak) 
 
 # FIXED TECH STACK (NO ALTERNATIVES - do not suggest others)
 Frontend: HTML, CSS, native Web Components / Custom Elements (no framework, no Bootstrap/Angular/React/etc).
-Backend: Quarkus (Java), Hibernate ORM Panache, RESTEasy Reactive, OIDC.
+Backend: Quarkus (Java), Hibernate ORM Panache, Quarkus REST (formerly RESTEasy Reactive), OIDC.
 Database: PostgreSQL.
 Auth: Keycloak.
 Import libs: Apache POI (xlsx) + opencsv (csv).
@@ -58,13 +58,19 @@ To build any later, user says "implement B-XX".
 Chris + Tobias only (Julian left). Split is in IMPLEMENTATION_PLAN.md and tasks.md (C/T tags).
 
 # STILL-OPEN QUESTIONS (do not assume - ask if they block you)
-- Optional Kunde fields on the order form beyond mandatory last name + address.
-- Affiliate-identifier field visibility in the MVP.
 - Research question exact wording (direction decided: reframe toward internal Partner <-> Company chain; confirm with supervisor).
-- Schema management: Hibernate auto-generation vs explicit migrations (Flyway).
+- Import file column formats for the partner + article Excel/CSV files - waiting on sample data from the client (blocks final import implementation only).
+- Dashboard totals: all own orders vs fulfilled-only - Chris + Tobias to decide. Interim default: all own orders regardless of status.
+
+# ALREADY RESOLVED (FSD section 13 - do not reopen)
+- Commission: Partner.commissionPercent, dropdown 5/10/15 + custom. No level entity.
+- Optional Kunde fields on order form: first name, e-mail, phone.
+- Affiliate identifier: deferred, not in MVP.
+- Schema management: Hibernate auto-generation, no Flyway (drop-and-create for dev/test, update for demo/prod).
+- Keycloak user provisioning: import creates Partner records only; logins created manually, linked via username claim.
 
 # OPENSPEC WORKFLOW
-Change "build-partnerportal-mvp" is proposed. To implement: /opsx:apply (works tasks.md top-down by dependency, starting Phase 0). CLI: use "npx --yes @fission-ai/openspec@latest <cmd>". Two plan representations exist (flat IMPLEMENTATION_PLAN.md + OpenSpec change); keep in sync or pick one source of truth.
+Change "build-partnerportal-mvp": Phase 0 done, continue with /opsx:apply (works tasks.md top-down by dependency; next = Phase 1, Data Model & Core CRUD). CLI: use "npx --yes @fission-ai/openspec@latest <cmd>". tasks.md is the task source of truth; IMPLEMENTATION_PLAN.md is the narrative plan and is kept in sync. Dev environment: docker-compose Keycloak+Postgres for dev/demo, Dev Services for tests only - see docs/SETUP.md.
 
 # HOW TO WORK
 - Strict, precise, realistic for a 2-person HTL diploma. No enterprise overkill, no generic PRM filler.
@@ -72,7 +78,7 @@ Change "build-partnerportal-mvp" is proposed. To implement: /opsx:apply (works t
 - Requirements/tasks concrete and testable.
 
 # NEXT STEP
-Read FSD v2 + IMPLEMENTATION_PLAN.md + phase2_backlog.md + openspec change, then tell me: <STATE WHAT YOU WANT NEXT - e.g. /opsx:apply to build WP1 foundation, produce ER diagram for WP2/8.2, build a clickdummy, or refine the plan>.
+Read FSD v2 + IMPLEMENTATION_PLAN.md + phase2_backlog.md + openspec change, then tell me: <STATE WHAT YOU WANT NEXT - e.g. /opsx:apply to build Phase 1 (data model + core CRUD), produce ER diagram for WP2/8.2, or refine the plan>.
 ```
 
 Fill the last line with what you want next.

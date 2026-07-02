@@ -1,6 +1,9 @@
 import { getSession, logout } from "./auth.js";
 
-const API_BASE = "/api";
+// Absolute base: the frontend is served as a separate static site (e.g. :3000),
+// so relative "/api" would hit the static server instead of Quarkus. CORS is
+// enabled in the backend for localhost origins (see docs/SETUP.md).
+const API_BASE = "http://localhost:8080/api";
 
 export async function apiFetch(path, options = {}) {
   const session = getSession();
