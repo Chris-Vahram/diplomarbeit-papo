@@ -73,11 +73,11 @@ Backend: 33/33 tests pass (5 tests added/extended this session covering the iden
 
 ## 8. Phase 7 — Documentation (essential)
 
-- [ ] 8.1 (C+T) Setup/run guide (Postgres + Keycloak + Quarkus + frontend, demo users)
-- [ ] 8.2 (C) Data model documentation (ER diagram + entity descriptions)
-- [ ] 8.3 (T) UI/UX documentation (screens, shared components, flows)
-- [ ] 8.4 (C+T) Diploma writeup: link requirements (FSD) -> implementation -> tests; note deferred B-01..B-07
-- [ ] 8.5 (C+T) Re-tune research question toward internal partner-driven ordering; confirm wording with supervisor
+- [x] 8.1 (C+T) Setup/run guide (Postgres + Keycloak + Quarkus + frontend, demo users) — `docs/SETUP.md` already written in Phase 0 and reviewed this session against the final implementation (ports, demo logins, dev/test/prod profile differences, Excel-import note); still accurate, no changes needed
+- [x] 8.2 (C) Data model documentation (ER diagram + entity descriptions) — new `docs/DATA_MODEL.md`: Mermaid ER diagram (all 7 entities + relationships) + per-entity description covering the key design decisions that affect the schema (unit-price snapshot, no CommissionLevel, active flag not Keycloak-synced, Kunde scoping)
+- [ ] 8.3 (T) UI/UX documentation (screens, shared components, flows) — owner is Tobias alone (T, not C/C+T); not attempted here, left for him
+- [ ] 8.4 (C+T) Diploma writeup: link requirements (FSD) -> implementation -> tests; note deferred B-01..B-07 — thesis-body writing, joint task; paused rather than auto-drafted, see chat for the scope question
+- [ ] 8.5 (C+T) Re-tune research question toward internal partner-driven ordering; confirm wording with supervisor — still blocked on supervisor sign-off per CLAUDE.md "still open" list; not something to finalize unilaterally
 
 ## 9. Phase FD — Frontend Design (async, does NOT block any other phase)
 
