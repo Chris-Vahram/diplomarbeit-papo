@@ -22,6 +22,9 @@ public class CurrentPartner {
         if (partner == null) {
             throw new ApiException(403, "Kein Partnerkonto mit diesem Login verknüpft.");
         }
+        if (!partner.active) {
+            throw new ApiException(403, "Ihr Zugang wurde deaktiviert. Bitte wenden Sie sich an die Firma.");
+        }
         return partner;
     }
 }
