@@ -71,4 +71,38 @@ class EnablementResourceTest {
                 .then().statusCode(200)
                 .body("size()", is(3));
     }
+
+    // product-enablement spec, "No enabled products handling": the endpoint the
+    // order-creation UI reads from must return an empty (not error) list so the
+    // frontend can show its empty-state message.
+    @Test
+    void partnerWithNoEnabledProductsSeesEmptyList() {
+        String companyToken = tokens.tokenFor("company-demo", "company-demo");
+        long partnerId = partner1001Id();
+        String partnerToken = tokens.tokenFor("partner-demo", "partner-demo");
+
+        java.util.List<Integer> enabledProductIds = given().auth().oauth2(partnerToken)
+                .when().get("/api/partner/products")
+                .then().statusCode(200)
+                .extract().jsonPath().getList("id", Integer.class);
+
+        for (int productId : enabledProductIds) {
+            given().auth().oauth2(companyToken)
+                    .when().delete("/api/company/partners/" + partnerId + "/products/" + productId)
+                    .then().statusCode(204);
+        }
+
+        given().auth().oauth2(partnerToken)
+                .when().get("/api/partner/products")
+                .then().statusCode(200)
+                .body("size()", is(0));
+
+        // Restore, so partnerSeesOnlyOwnEnabledProducts and the dashboard tests
+        // keep seeing the seeded 3 enabled products regardless of test order.
+        for (int productId : enabledProductIds) {
+            given().auth().oauth2(companyToken)
+                    .when().put("/api/company/partners/" + partnerId + "/products/" + productId)
+                    .then().statusCode(204);
+        }
+    }
 }
