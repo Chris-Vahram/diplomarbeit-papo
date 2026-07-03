@@ -18,9 +18,9 @@ Phases run top-to-bottom; within a phase, tasks are ordered by dependency. Imple
 
 - [x] 2.1 (C) Define entities: Partner (incl. commissionPercent + active), Product, ProductEnablement, Kunde, Order, OrderItem, CommissionRecord (unit-price snapshot on OrderItem)
 - [x] 2.2 (C) Generate/migrate schema in PostgreSQL; verify relationships
-- [ ] 2.3 (C) Product management: REST + service done, tested; UI (list/create/edit) still open — spec: product-management
-- [ ] 2.4 (C) Partner management: REST + service done, tested; UI (list/create/edit, commissionPercent dropdown, active toggle) still open — spec: partner-management
-- [ ] 2.5 (C) Partner self-edit of limited master data (contact only) — backend done, tested; UI still open — spec: partner-management
+- [x] 2.3 (C) Product management: REST + service + UI (list/create/edit, availability, validation) — spec: product-management. UI not yet manually browser-verified (no browser tool in this environment, no docker-compose port free during this session) — smoke-test before trusting
+- [x] 2.4 (C) Partner management: REST + service + UI (list/create/edit, commissionPercent dropdown 5/10/15+custom, active toggle, validation) — spec: partner-management. UI not yet manually browser-verified, same caveat as 2.3
+- [x] 2.5 (C) Partner self-edit of limited master data (contact only) — spec: partner-management. UI not yet manually browser-verified, same caveat as 2.3
 - [x] 2.6 (C) Seed dataset (sample partners, products) for development/demo — programmatic (DemoDataSeeder), not import.sql, see design.md
 
 ## 3. Phase 2 — Access Control & Enablement (essential)

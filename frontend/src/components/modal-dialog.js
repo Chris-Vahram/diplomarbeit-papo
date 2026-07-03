@@ -1,6 +1,10 @@
 // <modal-dialog title="Partner anlegen"><form>...</form></modal-dialog>
 // Call .open() / .close(); dispatches "modal-close" event on backdrop/×/Escape.
 class ModalDialog extends HTMLElement {
+  static get observedAttributes() {
+    return ["title"];
+  }
+
   connectedCallback() {
     const title = this.getAttribute("title") ?? "";
     const content = this.innerHTML;
@@ -17,6 +21,8 @@ class ModalDialog extends HTMLElement {
       </div>
     `;
 
+    this._titleEl = this.querySelector(".modal-dialog__header h2");
+
     this.querySelector(".modal-dialog__backdrop").addEventListener("click", (e) => {
       if (e.target === e.currentTarget) this.close();
     });
@@ -26,6 +32,12 @@ class ModalDialog extends HTMLElement {
     };
 
     this.hidden = !this.hasAttribute("open");
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (name === "title" && this._titleEl) {
+      this._titleEl.textContent = newValue ?? "";
+    }
   }
 
   open() {
