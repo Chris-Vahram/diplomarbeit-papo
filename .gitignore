@@ -58,3 +58,22 @@ Temporary Items
 *.icloud
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,java
+
+### Quarkus ###
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+backend/*.iml
+backend/*.ipr
+backend/*.iws
+backend/.idea/
+
+### Node (frontend tooling, if any) ###
+frontend/node_modules/
+frontend/dist/
+
+### IDE ###
+.vscode/
+*.iml
+
+### Playwright MCP ###
+.playwright-mcp/
