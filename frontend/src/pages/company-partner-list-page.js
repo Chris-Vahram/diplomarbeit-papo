@@ -37,6 +37,9 @@ class CompanyPartnerListPage extends HTMLElement {
           </div>
         </form>
       </modal-dialog>
+      <modal-dialog id="enablement-modal" title="Produkte freischalten">
+        <data-table id="enablement-table"></data-table>
+      </modal-dialog>
     `;
 
     this.table = this.querySelector("#partner-table");
@@ -54,14 +57,30 @@ class CompanyPartnerListPage extends HTMLElement {
     this.customField = this.querySelector('form-field[name="commissionPercentCustom"]');
     this.presetSelect = this.form.elements.commissionPercentPreset;
 
+    this.enablementModal = this.querySelector("#enablement-modal");
+    this.enablementTable = this.querySelector("#enablement-table");
+    this.enablementTable.columns = [
+      { key: "name", label: "Name" },
+      { key: "priceLabel", label: "Preis (€)" },
+      { key: "category", label: "Kategorie" },
+      { key: "enabledCheckbox", label: "Freigeschaltet" },
+    ];
+    this.enablementTable.emptyMessage = "Noch keine Produkte angelegt.";
+
     this.presetSelect.addEventListener("change", () => this.toggleCustomField());
 
     this.querySelector("#new-partner-btn").addEventListener("click", () => this.openCreate());
     this.table.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-edit-id]");
-      if (button) this.openEdit(button.dataset.editId);
+      const editButton = event.target.closest("[data-edit-id]");
+      if (editButton) this.openEdit(editButton.dataset.editId);
+      const manageButton = event.target.closest("[data-manage-id]");
+      if (manageButton) this.openEnablement(manageButton.dataset.manageId);
     });
     this.form.addEventListener("submit", (event) => this.handleSubmit(event));
+    this.enablementTable.addEventListener("change", (event) => {
+      const checkbox = event.target.closest("[data-toggle-product-id]");
+      if (checkbox) this.toggleEnablement(checkbox.dataset.toggleProductId, checkbox.checked);
+    });
 
     this.toggleCustomField();
     this.load();
@@ -79,7 +98,8 @@ class CompanyPartnerListPage extends HTMLElement {
         name: p.name,
         commissionLabel: `${p.commissionPercent}%`,
         statusBadge: `<status-badge status="${p.active ? "active" : "inactive"}"></status-badge>`,
-        actions: `<button type="button" data-edit-id="${p.id}">Bearbeiten</button>`,
+        actions: `<button type="button" data-edit-id="${p.id}">Bearbeiten</button>
+          <button type="button" data-manage-id="${p.id}">Produkte</button>`,
       }));
     } catch (error) {
       showToast(error.message, "error");
@@ -117,6 +137,41 @@ class CompanyPartnerListPage extends HTMLElement {
 
     this.modal.setAttribute("title", "Partner bearbeiten");
     this.modal.open();
+  }
+
+  async openEnablement(partnerId) {
+    const partner = this.partners.find((p) => String(p.id) === String(partnerId));
+    if (!partner) return;
+    this.enablementPartnerId = partnerId;
+    this.enablementModal.setAttribute("title", `Produkte freischalten – ${partner.name}`);
+    this.enablementModal.open();
+    await this.loadEnablement();
+  }
+
+  async loadEnablement() {
+    try {
+      const products = await apiFetch(`/company/partners/${this.enablementPartnerId}/products`);
+      this.enablementTable.rows = products.map((p) => ({
+        name: p.name,
+        priceLabel: p.price.toFixed(2),
+        category: p.category ?? "–",
+        enabledCheckbox: `<input type="checkbox" data-toggle-product-id="${p.productId}" ${p.enabled ? "checked" : ""} />`,
+      }));
+    } catch (error) {
+      showToast(error.message, "error");
+    }
+  }
+
+  async toggleEnablement(productId, enabled) {
+    try {
+      await apiFetch(`/company/partners/${this.enablementPartnerId}/products/${productId}`, {
+        method: enabled ? "PUT" : "DELETE",
+      });
+      showToast(enabled ? "Produkt freigeschaltet." : "Produkt gesperrt.", "success");
+    } catch (error) {
+      showToast(error.message, "error");
+      await this.loadEnablement();
+    }
   }
 
   async handleSubmit(event) {

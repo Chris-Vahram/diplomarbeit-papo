@@ -25,11 +25,11 @@ Phases run top-to-bottom; within a phase, tasks are ordered by dependency. Imple
 
 ## 3. Phase 2 — Access Control & Enablement (essential)
 
-- [ ] 3.1 (C) Enforce role authorization on all endpoints (company vs partner) — spec: auth-access-control
-- [ ] 3.2 (C) Link Keycloak user to Partner record; server-side inactive-partner block (Partner.active) on login + order create — spec: auth-access-control
-- [ ] 3.3 (C) Deep-link protection: unauthorized/unauthenticated access denied on protected views — spec: auth-access-control
-- [ ] 3.4 (C) Product enablement: company enables/disables products per partner (REST + UI) — spec: product-enablement
-- [ ] 3.5 (C) Partner enabled-products view (only enabled) + no-enabled-products message — spec: product-enablement
+- [x] 3.1 (C) Enforce role authorization on all endpoints (company vs partner) — spec: auth-access-control. Every resource already `@RolesAllowed`; added `quarkus.security.jaxrs.deny-unannotated-endpoints=true` as a fail-closed backstop for future endpoints (required explicit `@PermitAll` on the pre-existing public Phase-0 `/hello` smoke endpoint)
+- [x] 3.2 (C) Link Keycloak user to Partner record; server-side inactive-partner block (Partner.active) on login + order create — spec: auth-access-control. `CurrentPartner.resolve()` (shared by every partner-scoped endpoint) now rejects with 403 if `!partner.active`
+- [x] 3.3 (C) Deep-link protection: unauthorized/unauthenticated access denied on protected views — spec: auth-access-control. Already implemented in `router.js` (Phase 1) and browser-verified again this session for the new `/partner/products` route
+- [x] 3.4 (C) Product enablement: company enables/disables products per partner (REST + UI) — spec: product-enablement. `EnablementResource`/`EnablementService` (`GET/PUT/DELETE /api/company/partners/{id}/products/{productId}`); UI = "Produkte" modal per partner row in company-partner-list-page.js, checkbox toggles call PUT/DELETE. Browser-verified (enable + disable both persist)
+- [x] 3.5 (C) Partner enabled-products view (only enabled) + no-enabled-products message — spec: product-enablement. `PartnerProductResource` (`GET /api/partner/products`, scoped via CurrentPartner); new `partner-product-list-page.js` + nav link, empty-state message via data-table's emptyMessage. Browser-verified end to end (toggle on company side reflected immediately on partner side)
 
 ## 4. Phase 3 — Ordering Core (essential, highest priority)
 

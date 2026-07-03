@@ -8,6 +8,7 @@ const routes = {
   "/company/products": { tag: "company-product-list-page", role: "company", title: "Produkte" },
   "/company/partners": { tag: "company-partner-list-page", role: "company", title: "Partner" },
   "/partner/dashboard": { tag: "partner-dashboard-page", role: "partner", title: "Partner-Dashboard" },
+  "/partner/products": { tag: "partner-product-list-page", role: "partner", title: "Produkte" },
   "/partner/profile": { tag: "partner-profile-page", role: "partner", title: "Mein Profil" },
 };
 
@@ -41,6 +42,7 @@ function renderNav() {
       ]
     : [
         ["#/partner/dashboard", "Dashboard"],
+        ["#/partner/products", "Produkte"],
         ["#/partner/profile", "Mein Profil"],
       ];
 
@@ -101,6 +103,7 @@ window.addEventListener("DOMContentLoaded", () => {
   import("../pages/company-product-list-page.js");
   import("../pages/company-partner-list-page.js");
   import("../pages/partner-dashboard-page.js");
+  import("../pages/partner-product-list-page.js");
   import("../pages/partner-profile-page.js");
   render();
 });

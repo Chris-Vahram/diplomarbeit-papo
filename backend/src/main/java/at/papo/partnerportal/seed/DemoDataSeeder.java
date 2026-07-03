@@ -1,5 +1,6 @@
 package at.papo.partnerportal.seed;
 
+import at.papo.partnerportal.enablement.ProductEnablement;
 import at.papo.partnerportal.partner.Partner;
 import at.papo.partnerportal.product.Product;
 import io.quarkus.runtime.LaunchMode;
@@ -9,6 +10,7 @@ import jakarta.enterprise.event.Observes;
 import jakarta.transaction.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 // Dev/test only (never in the packaged demo run — LaunchMode.NORMAL), matching
 // the drop-and-create schema strategy for those profiles (docs/CONVENTIONS.md,
@@ -29,6 +31,7 @@ public class DemoDataSeeder {
         }
         seedPartners();
         seedProducts();
+        seedEnablements();
     }
 
     private void seedPartners() {
@@ -86,5 +89,18 @@ public class DemoDataSeeder {
         product.available = available;
         product.category = category;
         product.persist();
+    }
+
+    // A few enabled products for "partner-demo" (P-1001) so the enabled-products
+    // view (product-enablement spec) has demo data out of the box.
+    private void seedEnablements() {
+        Partner partnerDemo = Partner.find("partnerNumber", "P-1001").firstResult();
+        for (String productName : List.of("Bohrmaschine Profi 750W", "Akkuschrauber 18V Set", "Schutzhelm gelb")) {
+            Product product = Product.find("name", productName).firstResult();
+            ProductEnablement enablement = new ProductEnablement();
+            enablement.partner = partnerDemo;
+            enablement.product = product;
+            enablement.persist();
+        }
     }
 }
