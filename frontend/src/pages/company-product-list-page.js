@@ -12,7 +12,7 @@ class CompanyProductListPage extends HTMLElement {
         <form id="product-form" class="entity-form">
           <input type="hidden" name="id" />
           <form-field label="Name" name="name" required></form-field>
-          <form-field label="Preis (€)" name="price" type="number" required></form-field>
+          <form-field label="Preis (€)" name="price" type="number" step="0.01" min="0" required></form-field>
           <form-field label="Beschreibung" name="description">
             <textarea name="description"></textarea>
           </form-field>

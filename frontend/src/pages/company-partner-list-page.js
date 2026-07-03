@@ -27,7 +27,7 @@ class CompanyPartnerListPage extends HTMLElement {
               <option value="custom">Individuell</option>
             </select>
           </form-field>
-          <form-field label="Individueller Wert (%)" name="commissionPercentCustom" type="number"></form-field>
+          <form-field label="Individueller Wert (%)" name="commissionPercentCustom" type="number" step="0.01" min="0" max="100"></form-field>
           <label class="checkbox-field">
             <input type="checkbox" name="active" checked />
             Aktiv
