@@ -49,6 +49,10 @@ public class EnablementService {
                 .toList();
     }
 
+    public boolean isEnabledForPartner(Partner partner, Long productId) {
+        return ProductEnablement.count("partner = ?1 and product.id = ?2", partner, productId) > 0;
+    }
+
     private Partner findPartnerOrThrow(Long partnerId) {
         Partner partner = Partner.findById(partnerId);
         if (partner == null) {
