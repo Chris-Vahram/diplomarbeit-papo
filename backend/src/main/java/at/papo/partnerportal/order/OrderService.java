@@ -1,5 +1,7 @@
 package at.papo.partnerportal.order;
 
+import at.papo.partnerportal.commission.CommissionRecord;
+import at.papo.partnerportal.commission.CommissionService;
 import at.papo.partnerportal.common.ApiException;
 import at.papo.partnerportal.customer.Kunde;
 import at.papo.partnerportal.customer.KundeService;
@@ -22,12 +24,19 @@ public class OrderService {
     @Inject
     EnablementService enablementService;
 
+    @Inject
+    CommissionService commissionService;
+
     public List<OrderDto> listForPartner(Partner partner) {
-        return Order.<Order>list("partner", partner).stream().map(OrderDto::from).toList();
+        return Order.<Order>list("partner", partner).stream()
+                .map(order -> OrderDto.from(order, commissionService.findForOrder(order)))
+                .toList();
     }
 
     public List<OrderDto> listAll() {
-        return Order.<Order>listAll().stream().map(OrderDto::from).toList();
+        return Order.<Order>listAll().stream()
+                .map(order -> OrderDto.from(order, commissionService.findForOrder(order)))
+                .toList();
     }
 
     @Transactional
@@ -60,7 +69,13 @@ public class OrderService {
 
         order.orderValue = total;
         order.persist();
-        return OrderDto.from(order);
+
+        // Partner.commissionPercent is @NotNull/non-nullable end to end (PartnerRequest,
+        // Partner entity) - there is no reachable "missing commissionPercent" state to
+        // guard against here (commission spec's "missing" scenario is satisfied by
+        // construction, not by a runtime check).
+        CommissionRecord commission = commissionService.createForOrder(order, partner);
+        return OrderDto.from(order, commission);
     }
 
     @Transactional
@@ -70,7 +85,7 @@ public class OrderService {
             throw new ApiException(404, "Bestellung nicht gefunden.");
         }
         order.status = status;
-        return OrderDto.from(order);
+        return OrderDto.from(order, commissionService.findForOrder(order));
     }
 
     private Kunde resolveKunde(Partner partner, OrderRequest request) {

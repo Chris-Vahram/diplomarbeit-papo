@@ -15,6 +15,7 @@ class PartnerOrderListPage extends HTMLElement {
       { key: "orderDate", label: "Datum" },
       { key: "kundeName", label: "Kunde" },
       { key: "orderValueLabel", label: "Wert (€)" },
+      { key: "commissionLabel", label: "Provision (€)" },
       { key: "statusBadge", label: "Status" },
     ];
     this.table.emptyMessage = "Noch keine Bestellungen vorhanden.";
@@ -29,6 +30,7 @@ class PartnerOrderListPage extends HTMLElement {
         orderDate: o.orderDate,
         kundeName: `${o.kunde.firstName ? o.kunde.firstName + " " : ""}${o.kunde.lastName}`,
         orderValueLabel: o.orderValue.toFixed(2),
+        commissionLabel: o.commissionValue != null ? o.commissionValue.toFixed(2) : "–",
         statusBadge: `<status-badge status="${o.status.toLowerCase()}"></status-badge>`,
       }));
     } catch (error) {

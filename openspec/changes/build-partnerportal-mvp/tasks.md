@@ -44,10 +44,12 @@ Backend: 23/23 tests pass (`OrderResourceTest`, `KundeResourceTest` added). Brow
 
 ## 5. Phase 4 — Commission & Dashboard (essential)
 
-- [ ] 5.1 (C) Compute + persist CommissionRecord on order creation (Partner.commissionPercent × order value) — spec: commission
-- [ ] 5.2 (C) Missing-commissionPercent handling — spec: commission
-- [ ] 5.3 (C) Commission visibility: company all, partner own — spec: commission
-- [ ] 5.4 (C) Partner dashboard as landing screen: commission total, revenue, order count, enabled-product count, latest orders — spec: partner-dashboard
+- [x] 5.1 (C) Compute + persist CommissionRecord on order creation (Partner.commissionPercent × order value) — spec: commission. New `CommissionService.createForOrder` (commission package), called from `OrderService.createForPartner`; basis/percentage/value snapshotted on the record
+- [x] 5.2 (C) Missing-commissionPercent handling — spec: commission. No runtime check added: `Partner.commissionPercent` is `@NotNull` end to end (entity column non-nullable, `PartnerRequest` validated) - the "missing" state is structurally unreachable, so there's no code path to exercise (see tasks.md decision, avoids dead defensive code)
+- [x] 5.3 (C) Commission visibility: company all, partner own — spec: commission. Commission fields folded directly into `OrderDto` (commissionPercentUsed/commissionValue) rather than a separate commission endpoint - visibility is inherited from the already-correct order-list scoping (`OrderResource` own-only vs `CompanyOrderResource` all)
+- [x] 5.4 (C) Partner dashboard as landing screen: commission total, revenue, order count, enabled-product count, latest orders — spec: partner-dashboard. New `dashboard` package (`DashboardService`/`DashboardResource`, `GET /api/partner/dashboard`); totals over fulfilled-only orders per the 2026-07-03 decision, latest-orders (last 5) show any status. `partner-dashboard-page.js` rewritten from placeholder to real metric-cards + table
+
+Backend: 26/26 tests pass (`DashboardResourceTest` added, commission assertions added to `OrderResourceTest`, fixed a test-pollution leak in `OrderResourceTest` that would have skewed the enabled-product count). Browser-verified end-to-end: dashboard starts at zero, order creation + fulfillment raises totals by the exact expected amounts, commission column visible on both partner and company order lists.
 
 ## 6. Phase 5 — Data Import (essential)
 
