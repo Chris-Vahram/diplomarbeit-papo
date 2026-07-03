@@ -33,12 +33,14 @@ Phases run top-to-bottom; within a phase, tasks are ordered by dependency. Imple
 
 ## 4. Phase 3 — Ordering Core (essential, highest priority)
 
-- [ ] 4.1 (C) Customer (Kunde) management: select existing or create new, mandatory last name + address — spec: customer-management
-- [ ] 4.2 (C) Order creation: multi-line (article + quantity), enabled-only, unavailable blocked, order value derived, unit-price snapshot — spec: order-management, product-management
-- [ ] 4.3 (C) Auto-assign order to creating partner; persist Order + OrderItems — spec: order-management
-- [ ] 4.4 (C) On-screen confirmation with summary + simulated confirmation e-mail component — spec: order-management
-- [ ] 4.5 (C) Order visibility: company sees all, partner sees own — spec: order-management
-- [ ] 4.6 (C) Order status workflow submitted -> reviewed -> fulfilled (company-only change, partner read-only) — spec: order-management
+- [x] 4.1 (C) Customer (Kunde) management: select existing or create new, mandatory last name + address — spec: customer-management. `KundeResource`/`KundeService` (`/api/partner/customers`), folded into the order-creation form (no standalone Kunde screen, per design's "company sees Kunde only through order detail")
+- [x] 4.2 (C) Order creation: multi-line (article + quantity), enabled-only, unavailable blocked, order value derived, unit-price snapshot — spec: order-management, product-management. `OrderService.createForPartner` checks `EnablementService.isEnabledForPartner` + `product.available` per line, snapshots unit price, sums order value
+- [x] 4.3 (C) Auto-assign order to creating partner; persist Order + OrderItems — spec: order-management. `OrderResource` (`POST /api/partner/orders`) always uses `CurrentPartner.resolve()`, never a client-supplied partner id
+- [x] 4.4 (C) On-screen confirmation with summary + simulated confirmation e-mail component — spec: order-management. `partner-order-new-page.js` swaps to a confirmation view (line items, total, simulated e-mail block) after successful submit — no backend email service, purely rendered from the returned OrderDto (B-04 stays deferred)
+- [x] 4.5 (C) Order visibility: company sees all, partner sees own — spec: order-management. `CompanyOrderResource` (`GET /api/company/orders`, all) vs `OrderResource` (`GET /api/partner/orders`, own only via CurrentPartner)
+- [x] 4.6 (C) Order status workflow submitted -> reviewed -> fulfilled (company-only change, partner read-only) — spec: order-management. `PUT /api/company/orders/{id}/status` (`@RolesAllowed("company")`); partner order list renders status read-only via `status-badge`
+
+Backend: 23/23 tests pass (`OrderResourceTest`, `KundeResourceTest` added). Browser-verified end-to-end with Playwright: multi-line order creation (new customer), confirmation + simulated e-mail render, partner order list, company order list + status change, deep-link protection on the new partner routes.
 
 ## 5. Phase 4 — Commission & Dashboard (essential)
 

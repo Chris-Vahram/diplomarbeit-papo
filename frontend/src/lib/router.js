@@ -7,8 +7,11 @@ const routes = {
   "/company/dashboard": { tag: "company-dashboard-page", role: "company", title: "Firmen-Dashboard" },
   "/company/products": { tag: "company-product-list-page", role: "company", title: "Produkte" },
   "/company/partners": { tag: "company-partner-list-page", role: "company", title: "Partner" },
+  "/company/orders": { tag: "company-order-list-page", role: "company", title: "Bestellungen" },
   "/partner/dashboard": { tag: "partner-dashboard-page", role: "partner", title: "Partner-Dashboard" },
   "/partner/products": { tag: "partner-product-list-page", role: "partner", title: "Produkte" },
+  "/partner/orders": { tag: "partner-order-list-page", role: "partner", title: "Meine Bestellungen" },
+  "/partner/orders/new": { tag: "partner-order-new-page", role: "partner", title: "Neue Bestellung" },
   "/partner/profile": { tag: "partner-profile-page", role: "partner", title: "Mein Profil" },
 };
 
@@ -39,10 +42,12 @@ function renderNav() {
         ["#/company/dashboard", "Dashboard"],
         ["#/company/products", "Produkte"],
         ["#/company/partners", "Partner"],
+        ["#/company/orders", "Bestellungen"],
       ]
     : [
         ["#/partner/dashboard", "Dashboard"],
         ["#/partner/products", "Produkte"],
+        ["#/partner/orders", "Meine Bestellungen"],
         ["#/partner/profile", "Mein Profil"],
       ];
 
@@ -102,8 +107,11 @@ window.addEventListener("DOMContentLoaded", () => {
   import("../pages/company-dashboard-page.js");
   import("../pages/company-product-list-page.js");
   import("../pages/company-partner-list-page.js");
+  import("../pages/company-order-list-page.js");
   import("../pages/partner-dashboard-page.js");
   import("../pages/partner-product-list-page.js");
+  import("../pages/partner-order-list-page.js");
+  import("../pages/partner-order-new-page.js");
   import("../pages/partner-profile-page.js");
   render();
 });
