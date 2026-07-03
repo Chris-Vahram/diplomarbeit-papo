@@ -39,6 +39,8 @@ class OrderResourceTest {
                 .then().statusCode(200)
                 .body("status", is("SUBMITTED"))
                 .body("orderValue", is(258.0f))
+                .body("commissionPercentUsed", is(10.0f))
+                .body("commissionValue", is(25.8f))
                 .body("kunde.lastName", is("Mustermann"))
                 .body("items.size()", is(1));
     }
@@ -71,6 +73,12 @@ class OrderResourceTest {
                         + "\"items\":[{\"productId\":" + unavailableProductId + ",\"quantity\":1}]}")
                 .when().post("/api/partner/orders")
                 .then().statusCode(400);
+
+        // Restore seeded enablement state so later tests (e.g. dashboard enabled-product count)
+        // aren't polluted by this test's temporary enablement.
+        given().auth().oauth2(companyToken)
+                .when().delete("/api/company/partners/" + partnerId + "/products/" + unavailableProductId)
+                .then().statusCode(204);
     }
 
     @Test

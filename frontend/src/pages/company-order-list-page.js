@@ -18,6 +18,7 @@ class CompanyOrderListPage extends HTMLElement {
       { key: "partnerName", label: "Partner" },
       { key: "kundeName", label: "Kunde" },
       { key: "orderValueLabel", label: "Wert (€)" },
+      { key: "commissionLabel", label: "Provision (€)" },
       { key: "statusSelect", label: "Status" },
     ];
     this.table.emptyMessage = "Noch keine Bestellungen vorhanden.";
@@ -38,6 +39,7 @@ class CompanyOrderListPage extends HTMLElement {
         partnerName: o.partnerName,
         kundeName: `${o.kunde.firstName ? o.kunde.firstName + " " : ""}${o.kunde.lastName}`,
         orderValueLabel: o.orderValue.toFixed(2),
+        commissionLabel: o.commissionValue != null ? o.commissionValue.toFixed(2) : "–",
         statusSelect: `<select data-order-id="${o.id}">${STATUSES.map(
           (s) => `<option value="${s}" ${s === o.status ? "selected" : ""}>${STATUS_LABELS[s]}</option>`
         ).join("")}</select>`,

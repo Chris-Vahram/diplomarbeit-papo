@@ -1,5 +1,6 @@
 package at.papo.partnerportal.order;
 
+import at.papo.partnerportal.commission.CommissionRecord;
 import at.papo.partnerportal.customer.KundeDto;
 
 import java.math.BigDecimal;
@@ -14,11 +15,15 @@ public record OrderDto(
         KundeDto kunde,
         OrderStatus status,
         BigDecimal orderValue,
-        List<OrderItemDto> items
+        List<OrderItemDto> items,
+        BigDecimal commissionPercentUsed,
+        BigDecimal commissionValue
 ) {
-    public static OrderDto from(Order order) {
+    public static OrderDto from(Order order, CommissionRecord commission) {
         return new OrderDto(order.id, order.orderDate, order.partner.id, order.partner.name,
                 KundeDto.from(order.kunde), order.status, order.orderValue,
-                order.items.stream().map(OrderItemDto::from).toList());
+                order.items.stream().map(OrderItemDto::from).toList(),
+                commission != null ? commission.commissionPercentUsed : null,
+                commission != null ? commission.commissionValue : null);
     }
 }

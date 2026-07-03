@@ -53,6 +53,10 @@ public class EnablementService {
         return ProductEnablement.count("partner = ?1 and product.id = ?2", partner, productId) > 0;
     }
 
+    public long countEnabledForPartner(Partner partner) {
+        return ProductEnablement.count("partner", partner);
+    }
+
     private Partner findPartnerOrThrow(Long partnerId) {
         Partner partner = Partner.findById(partnerId);
         if (partner == null) {
