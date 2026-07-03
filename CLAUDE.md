@@ -4,7 +4,7 @@
 This project belongs to **Chris**.
 
 ## Project
-Web-based **internal B2B partner-ordering portal** (Partnerportal) for partner-driven sales models. Chain: **Company -> Partner -> End Customer**. HTL Diplomarbeit (Informatik / IT Medientechnik), team: **Chris + Tobias** (Julian left the project). Reference client: PAPO (~200 partners, ~800 articles; orders today arrive manually by e-mail/phone).
+Web-based **internal B2B partner-ordering portal** (Partnerportal) for partner-driven sales models. Chain: **Company -> Partner -> End Customer**. HTL Diplomarbeit (Informatik / IT Medientechnik), team: **Chris + Tobias** (Julian left the project). Split (2026-07-02): **Chris = implementation** (backend + functional frontend), **Tobias = frontend design** (visual design via Claude design, delivered async as CSS for `base.css` — implementation never waits for it). Reference client: PAPO (~200 partners, ~800 articles; orders today arrive manually by e-mail/phone).
 
 ## Authoritative documents (read in this order for deep work)
 1. `Specification/functional_specification_document_partnerportal_final.md` — **FSD v2, authoritative** for the MVP build (FR-01..FR-25, NFRs, entities, business rules, acceptance criteria, resolved decisions in §13).
@@ -17,9 +17,9 @@ Web-based **internal B2B partner-ordering portal** (Partnerportal) for partner-d
 
 **Hard rule:** meetings override the FSD when they conflict (newer = authoritative). FSD v2 + backlog already encode the meeting decisions. Do not reintroduce v1 assumptions (external shop as MVP, one-product orders, 3-person team).
 
-## Current status (2026-07-02)
-- OpenSpec change `build-partnerportal-mvp`: **Phase 0 (Foundation & Setup) done** — Quarkus skeleton, docker-compose (Postgres + Keycloak + realm export), frontend shell (hash router, login, shared Web Components), `docs/CONVENTIONS.md`, `docs/SETUP.md`.
-- Next: Phase 1 (data model + core CRUD) via `/opsx:apply`.
+## Current status (2026-07-03)
+- OpenSpec change `build-partnerportal-mvp`: **Phase 0 done.** **Phase 1 backend done** (entities, Product/Partner CRUD, partner self-edit, seed data) on branch `phase-1/data-model-crud`; Phase 1 UI pages still open.
+- Next: finish Phase 1 UI, or continue backend-first into Phase 2 (access control + enablement) via `/opsx:apply`.
 
 ## Locked MVP scope
 Core process: partner logs in (Keycloak) -> selects or creates an end customer (Kunde) -> places an order (multiple articles + quantities) on the customer's behalf -> order auto-assigned to the partner -> on-screen confirmation + **simulated** e-mail (no real send) -> company advances status **submitted -> reviewed -> fulfilled** and handles fulfillment.
@@ -32,8 +32,10 @@ Also in MVP: central partner + product management by the company, Excel/CSV impo
 - Kunde = reusable entity (select existing or create new); mandatory **Nachname + address**; optional first name, e-mail, phone.
 - Multiple articles per order; `OrderItem` stores a **unit-price snapshot**.
 - Keycloak users are provisioned **manually** (realm export); import creates Partner records only; link via username claim.
-- Schema: Hibernate auto-generation, no Flyway. dev/test = drop-and-create + seed; demo/prod = update.
+- Schema: Hibernate auto-generation, no Flyway. dev/test = drop-and-create + programmatic seed (`DemoDataSeeder`, dev/test only); demo/prod = update.
 - Affiliate identifier: deferred, not in MVP.
+- Kunde records are scoped to the creating partner — a partner never sees another partner's end customers.
+- Partner dashboard totals (commission/revenue/order count) count only `fulfilled` own orders; latest-orders list shows any status.
 
 ## Fixed tech stack (no alternatives — do not suggest others)
 - **Frontend:** HTML, CSS, native Web Components / Custom Elements (no framework).
@@ -60,7 +62,6 @@ B-01 external end-customer shop (CUT) · B-02 shop design customization (CUT) ·
 ## Still open (ask, don't assume)
 - Exact research-question wording (direction: internal Partner ↔ Company ordering; confirm with supervisor).
 - Import file column sets for partner/article files — waiting on sample data from the client (blocks final import implementation only).
-- Dashboard totals: all own orders vs fulfilled-only — Chris + Tobias to decide (interim default: all own orders regardless of status).
 
 ## Writing style
 Clear German for thesis documents, suitable for an HTL Diplomarbeit; precise, structured, no exaggerated corporate language. UI texts and validation messages in German, plain language.

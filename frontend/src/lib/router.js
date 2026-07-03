@@ -5,7 +5,10 @@ import { isAuthenticated, hasRole, getSession, logout } from "./auth.js";
 const routes = {
   "/login": { tag: "login-page", role: null, title: "Anmeldung" },
   "/company/dashboard": { tag: "company-dashboard-page", role: "company", title: "Firmen-Dashboard" },
+  "/company/products": { tag: "company-product-list-page", role: "company", title: "Produkte" },
+  "/company/partners": { tag: "company-partner-list-page", role: "company", title: "Partner" },
   "/partner/dashboard": { tag: "partner-dashboard-page", role: "partner", title: "Partner-Dashboard" },
+  "/partner/profile": { tag: "partner-profile-page", role: "partner", title: "Mein Profil" },
 };
 
 const appRoot = document.getElementById("app-root");
@@ -30,10 +33,23 @@ function renderNav() {
 
   if (!session) return;
 
-  const dashboardLink = document.createElement("a");
-  dashboardLink.href = session.isCompany ? "#/company/dashboard" : "#/partner/dashboard";
-  dashboardLink.textContent = "Dashboard";
-  appNav.appendChild(dashboardLink);
+  const links = session.isCompany
+    ? [
+        ["#/company/dashboard", "Dashboard"],
+        ["#/company/products", "Produkte"],
+        ["#/company/partners", "Partner"],
+      ]
+    : [
+        ["#/partner/dashboard", "Dashboard"],
+        ["#/partner/profile", "Mein Profil"],
+      ];
+
+  for (const [href, label] of links) {
+    const link = document.createElement("a");
+    link.href = href;
+    link.textContent = label;
+    appNav.appendChild(link);
+  }
 
   const userLabel = document.createElement("span");
   userLabel.textContent = `${session.username} (${session.roles.join(", ")})`;
@@ -82,6 +98,9 @@ window.addEventListener("DOMContentLoaded", () => {
   import("../components/index.js");
   import("../pages/login-page.js");
   import("../pages/company-dashboard-page.js");
+  import("../pages/company-product-list-page.js");
+  import("../pages/company-partner-list-page.js");
   import("../pages/partner-dashboard-page.js");
+  import("../pages/partner-profile-page.js");
   render();
 });

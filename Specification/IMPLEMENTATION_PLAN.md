@@ -133,10 +133,11 @@ WP11. Bulk data path for ~200 partners / ~800 articles.
 ### Phase 7 — Testing & Documentation
 WP12, WP13. Harden, verify acceptance criteria, finalize docs.
 
-### Team split (Chris + Tobias)
-- **Chris:** frontend shell + shared components, UI/UX, Product management (WP3), Partner management (WP4), Enablement UI (WP6), Import (WP11), UI/UX + requirements docs.
-- **Tobias:** Quarkus/Postgres/Keycloak platform (WP1 backend), data model (WP2, owns), Access control (WP5), Kunde + Ordering core (WP7, WP8), Commission (WP9), Dashboard (WP10), data-model docs.
+### Team split (Chris + Tobias — updated 2026-07-02)
+- **Chris:** implementation — backend (data model, CRUD, access control, ordering core, commission, import) and functional frontend wiring (pages built plain with the existing shared components).
+- **Tobias:** frontend design (visual design via Claude design) — delivered as design tokens/CSS for `base.css` + screen polish; UI/UX documentation.
 - **Joint:** conventions, testing (WP12), diploma writeup (WP13). Data model signed off by both before Phase 4.
+- Design arrives asynchronously; implementation does not wait for it (Light-DOM components + central `base.css` make restyling a CSS-level swap, see `docs/CONVENTIONS.md`).
 
 ## 5. Technical Considerations
 
@@ -212,7 +213,9 @@ WP12, WP13. Harden, verify acceptance criteria, finalize docs.
 ### Open questions (from FSD §13)
 - Exact research-question wording (direction decided: internal Partner ↔ Company ordering; confirm with supervisor).
 - Import file column sets for the partner and article files — waiting on sample data from the client (needed to define default column mapping and validation rules before WP11).
-- Dashboard totals (WP10): all own orders vs fulfilled-only — Chris + Tobias to decide before WP10; interim default = all own orders regardless of status.
+
+### Resolved (2026-07-03, see FSD §13)
+- Dashboard totals (WP10): commission/revenue/order-count count only `fulfilled` own orders; latest-orders list shows any status.
 
 ### Resolved (2026-07-01, see FSD §13)
 - Commission percentages: `Partner.commissionPercent`, dropdown 5/10/15 + optional custom value; no separate level entity.

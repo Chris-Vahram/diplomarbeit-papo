@@ -221,6 +221,62 @@ modal-dialog[hidden] { display: none; }
   padding: 1.25rem;
 }
 
+/* --- Functional form/list layout (plain until Tobias' design lands in this file) --- */
+
+.button-primary,
+.entity-form__actions button,
+table button[data-edit-id] {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--color-company);
+  color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.area--partner .button-primary,
+.area--partner .entity-form__actions button {
+  background: var(--color-partner);
+}
+
+table button[data-edit-id] {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8rem;
+}
+
+.entity-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 420px;
+  margin-top: 0.5rem;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.profile-readonly {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 1rem;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+
+.profile-readonly dt {
+  font-weight: 600;
+  color: #64748b;
+}
+
+.profile-readonly dd {
+  margin: 0;
+}
+
 #toast-root {
   position: fixed;
   top: 1rem;

@@ -1,1 +1,5 @@
--- Seed data loaded on dev/test startup (see WP2.6 / task 2.6 for demo dataset).
+-- Intentionally empty. Demo/dev seed data is loaded programmatically by
+-- at.papo.partnerportal.seed.DemoDataSeeder (dev/test only), not via this
+-- script — Hibernate's pooled sequence optimizer (block size 50) would collide
+-- hand-picked ids in raw INSERTs with the first id the app allocates at
+-- runtime. See DemoDataSeeder for the reasoning.

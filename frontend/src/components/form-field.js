@@ -11,6 +11,9 @@ class FormField extends HTMLElement {
     const control = existingControl ?? document.createElement("input");
     if (!existingControl) {
       control.type = this.getAttribute("type") ?? "text";
+      for (const attr of ["step", "min", "max"]) {
+        if (this.hasAttribute(attr)) control.setAttribute(attr, this.getAttribute(attr));
+      }
     }
     control.name = name;
     if (required) control.required = true;
