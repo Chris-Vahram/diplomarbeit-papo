@@ -110,16 +110,23 @@ class OrderResourceTest {
                 .then().statusCode(200)
                 .body("size()", greaterThanOrEqualTo(1));
 
+        given().auth().oauth2(partnerToken).contentType("application/json")
+                .body("{\"status\":\"REVIEWED\"}")
+                .when().put("/api/company/orders/" + orderId + "/status")
+                .then().statusCode(403);
+
+        // Full workflow per order-management spec: submitted -> reviewed -> fulfilled.
         given().auth().oauth2(companyToken).contentType("application/json")
                 .body("{\"status\":\"REVIEWED\"}")
                 .when().put("/api/company/orders/" + orderId + "/status")
                 .then().statusCode(200)
                 .body("status", is("REVIEWED"));
 
-        given().auth().oauth2(partnerToken).contentType("application/json")
+        given().auth().oauth2(companyToken).contentType("application/json")
                 .body("{\"status\":\"FULFILLED\"}")
                 .when().put("/api/company/orders/" + orderId + "/status")
-                .then().statusCode(403);
+                .then().statusCode(200)
+                .body("status", is("FULFILLED"));
     }
 
     @Test
