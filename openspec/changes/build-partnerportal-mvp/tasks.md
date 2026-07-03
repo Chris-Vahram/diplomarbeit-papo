@@ -53,10 +53,12 @@ Backend: 26/26 tests pass (`DashboardResourceTest` added, commission assertions 
 
 ## 6. Phase 5 — Data Import (essential)
 
-- [ ] 6.1 (C) Import service: parse Excel (Apache POI) + CSV (opencsv)
-- [ ] 6.2 (C) Row validation + duplicate detection; persist accepted rows transactionally — spec: data-import
-- [ ] 6.3 (C) Validation report UI (accepted/rejected rows + reasons) — spec: data-import
-- [ ] 6.4 (C) Column mapping UI (map file columns to system fields; default mapping for known headers) — spec: data-import. Essential per decision log ("importer = real, full"); build after 6.1–6.3 work with the default mapping
+- [x] 6.1 (C) Import service: parse Excel (Apache POI) + CSV (opencsv) — spec: data-import. `ImportedFileParser` (new `importer` package): `.xlsx` via POI, `.csv` via opencsv with delimiter sniffing (`,` vs `;` - German-locale exports commonly use `;` since `,` is the decimal separator). Column layout genuinely unknown (client sample file still not provided, see CONTINUATION_PROMPT "still open") - not a blocker, since column mapping (6.4) makes any layout work
+- [x] 6.2 (C) Row validation + duplicate detection; persist accepted rows transactionally — spec: data-import. `ImportService.commit`: validates every row first (in-memory report, no DB writes), then persists only accepted rows in one `@Transactional` call. Duplicate check: partner via `partnerNumber` (existing spec identifier); product has no dedicated identifier field in the locked entity model, so name (case-insensitive) is used as the closest equivalent - both within-file and against the DB
+- [x] 6.3 (C) Validation report UI (accepted/rejected rows + reasons) — spec: data-import. `company-import-page.js` renders a per-row report table (row number/accepted-rejected/reasons) after commit
+- [x] 6.4 (C) Column mapping UI (map file columns to system fields; default mapping for known headers) — spec: data-import. `ImportService.suggestMapping` normalizes headers and matches against per-field key/label/alias lists (`PartnerImportDefinition`/`ProductImportDefinition`); UI shows a dropdown per system field pre-selected with the suggestion, editable before confirming
+
+Backend: 30/30 tests pass (partner + product import preview/commit/role-check tests added). Browser-verified end-to-end with Playwright: CSV upload → correct auto-mapping suggestion → sample-row preview → commit → report showing 1 accepted / 2 rejected with correct reasons ("Existiert bereits.", "Partnernummer fehlt.") → accepted row confirmed present in the company partner list; deep-link protection holds on the new `/company/import` route.
 
 ## 7. Phase 6 — Testing (essential)
 
