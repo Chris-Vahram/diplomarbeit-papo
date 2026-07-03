@@ -172,7 +172,7 @@ The system shall provide each partner an internal area containing own master dat
 The system shall allow a partner to edit limited own master data (e.g. contact data) but not commission level, role, or central system data.
 
 ### FR-09 Partner Dashboard
-The system shall provide each partner a dashboard showing at least commission total, revenue, order count, enabled-product count, and latest orders. Whether totals count all own orders or only fulfilled ones is an open team decision (see §13); interim default until decided: all own orders regardless of status. The dashboard is the partner's landing screen and is kept compact.
+The system shall provide each partner a dashboard showing at least commission total, revenue, order count, enabled-product count, and latest orders. Commission total, revenue, and order count are computed only over the partner's own orders with status **fulfilled** (decided 2026-07-03, see §13); the latest-orders list shows recent orders of any status. The dashboard is the partner's landing screen and is kept compact.
 
 ### FR-10 End-Customer (Kunde) Management
 The system shall allow a partner to select an existing end customer or create a new one. End-customer records are reusable across orders. Mandatory fields: last name (Nachname) and address; other contact fields optional.
@@ -425,7 +425,9 @@ The project is functionally acceptable if the following can be demonstrated:
 
 - **Research-question wording:** direction decided (internal Partner ↔ Company ordering, see below); exact wording still to confirm with the supervisor.
 - **Import file column formats:** the column sets of the real partner and article Excel/CSV files are not yet specified — waiting on sample data from the client. Needed to define the default column mapping and per-column validation rules for FR-04 (blocks final import implementation, not the rest of the MVP).
-- **Dashboard totals (FR-09):** should commission/revenue/order-count totals include **all** own orders or **only fulfilled** ones? To be decided by Chris + Tobias. Interim default until decided: all own orders regardless of status (nothing "disappears" for the partner; the prototype has no cancel status anyway).
+
+### Resolved (2026-07-03)
+- **Dashboard totals (FR-09):** decided — commission/revenue/order-count totals on the partner dashboard count only orders with status **fulfilled**. The latest-orders list still shows recent orders of any status.
 
 ### Resolved (2026-07-02)
 - **Keycloak user provisioning:** import creates Partner records only, never Keycloak users; logins are provisioned manually and linked via username claim (see §11 Organizational Assumptions).

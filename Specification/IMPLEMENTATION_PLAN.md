@@ -213,7 +213,9 @@ WP12, WP13. Harden, verify acceptance criteria, finalize docs.
 ### Open questions (from FSD §13)
 - Exact research-question wording (direction decided: internal Partner ↔ Company ordering; confirm with supervisor).
 - Import file column sets for the partner and article files — waiting on sample data from the client (needed to define default column mapping and validation rules before WP11).
-- Dashboard totals (WP10): all own orders vs fulfilled-only — Chris + Tobias to decide before WP10; interim default = all own orders regardless of status.
+
+### Resolved (2026-07-03, see FSD §13)
+- Dashboard totals (WP10): commission/revenue/order-count count only `fulfilled` own orders; latest-orders list shows any status.
 
 ### Resolved (2026-07-01, see FSD §13)
 - Commission percentages: `Partner.commissionPercent`, dropdown 5/10/15 + optional custom value; no separate level entity.

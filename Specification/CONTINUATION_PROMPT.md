@@ -17,7 +17,7 @@ Working repo (git): /Users/mitgl/Desktop/Schule/4CHITM/Diplomarbeit/diplomarbeit
 - Specification/IMPLEMENTATION_PLAN.md = flat implementation plan (8 sections, WP1-WP13, phases).
 - Specification/CONTINUATION_PROMPT.md = this file.
 - Documentation/Besprechungsprotokolle/ = client meeting notes (17.06 + 24.06.2026).
-- openspec/ = OpenSpec (schema spec-driven). Change "build-partnerportal-mvp": Phase 0 (Foundation & Setup, tasks 1.1-1.8) is DONE and committed; Phases 1-7 not started. tasks.md checkboxes = progress truth.
+- openspec/ = OpenSpec (schema spec-driven). Change "build-partnerportal-mvp": Phase 0 done. Phase 1 backend done (entities, Product/Partner CRUD, self-edit, seed) on branch phase-1/data-model-crud, Phase 1 UI still open. Phases 2-7 not started. tasks.md checkboxes = progress truth.
 - CLAUDE.md (repo root) = project memory aligned with FSD v2; where anything conflicts, FSD v2 + backlog win.
 Note: .claude and .codex live ONLY inside diplomarbeit-papo/ (outer copies deleted).
 
@@ -60,9 +60,8 @@ Chris + Tobias only (Julian left). Split is in IMPLEMENTATION_PLAN.md and tasks.
 # STILL-OPEN QUESTIONS (do not assume - ask if they block you)
 - Research question exact wording (direction decided: reframe toward internal Partner <-> Company chain; confirm with supervisor).
 - Import file column formats for the partner + article Excel/CSV files - waiting on sample data from the client (blocks final import implementation only).
-- Dashboard totals: all own orders vs fulfilled-only - Chris + Tobias to decide. Interim default: all own orders regardless of status.
-
 # ALREADY RESOLVED (FSD section 13 - do not reopen)
+- Dashboard totals: fulfilled orders only (commission/revenue/order count); latest-orders list shows any status.
 - Commission: Partner.commissionPercent, dropdown 5/10/15 + custom. No level entity.
 - Optional Kunde fields on order form: first name, e-mail, phone.
 - Affiliate identifier: deferred, not in MVP.
