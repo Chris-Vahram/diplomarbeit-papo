@@ -5,18 +5,7 @@ import { getSession, logout } from "./auth.js";
 // enabled in the backend for localhost origins (see docs/SETUP.md).
 const API_BASE = "http://localhost:8080/api";
 
-export async function apiFetch(path, options = {}) {
-  const session = getSession();
-  const headers = new Headers(options.headers ?? {});
-  if (session) {
-    headers.set("Authorization", `Bearer ${session.accessToken}`);
-  }
-  if (options.body && !headers.has("Content-Type")) {
-    headers.set("Content-Type", "application/json");
-  }
-
-  const response = await fetch(`${API_BASE}${path}`, { ...options, headers });
-
+async function handleResponse(response) {
   if (response.status === 401) {
     logout();
     location.hash = "#/login";
@@ -30,4 +19,31 @@ export async function apiFetch(path, options = {}) {
 
   if (response.status === 204) return null;
   return response.json();
+}
+
+export async function apiFetch(path, options = {}) {
+  const session = getSession();
+  const headers = new Headers(options.headers ?? {});
+  if (session) {
+    headers.set("Authorization", `Bearer ${session.accessToken}`);
+  }
+  if (options.body && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
+
+  const response = await fetch(`${API_BASE}${path}`, { ...options, headers });
+  return handleResponse(response);
+}
+
+// For multipart/form-data uploads (data import) - the browser must set its own
+// Content-Type with the multipart boundary, so no Content-Type header here.
+export async function apiFetchForm(path, formData) {
+  const session = getSession();
+  const headers = new Headers();
+  if (session) {
+    headers.set("Authorization", `Bearer ${session.accessToken}`);
+  }
+
+  const response = await fetch(`${API_BASE}${path}`, { method: "POST", headers, body: formData });
+  return handleResponse(response);
 }
