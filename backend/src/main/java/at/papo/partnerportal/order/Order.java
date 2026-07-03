@@ -1,0 +1,46 @@
+package at.papo.partnerportal.order;
+
+import at.papo.partnerportal.customer.Kunde;
+import at.papo.partnerportal.partner.Partner;
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
+import jakarta.persistence.Table;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+// "ORDER" is a reserved SQL word in PostgreSQL — mapped to table "orders", see CONVENTIONS.md.
+@Entity
+@Table(name = "orders")
+public class Order extends PanacheEntity {
+
+    @Column(nullable = false)
+    public LocalDate orderDate = LocalDate.now();
+
+    @ManyToOne(optional = false)
+    public Partner partner;
+
+    @ManyToOne(optional = false)
+    public Kunde kunde;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    public OrderStatus status = OrderStatus.SUBMITTED;
+
+    // Derived from order items at creation time, not recomputed later.
+    @Column(nullable = false, precision = 10, scale = 2)
+    public BigDecimal orderValue;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id")
+    public List<OrderItem> items = new ArrayList<>();
+}

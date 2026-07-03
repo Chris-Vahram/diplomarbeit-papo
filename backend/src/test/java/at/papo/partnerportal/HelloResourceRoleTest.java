@@ -1,7 +1,7 @@
 package at.papo.partnerportal;
 
+import at.papo.partnerportal.support.KeycloakTestTokens;
 import io.quarkus.test.junit.QuarkusTest;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.junit.jupiter.api.Test;
 
 import jakarta.inject.Inject;
@@ -14,24 +14,11 @@ import static io.restassured.RestAssured.given;
 class HelloResourceRoleTest {
 
     @Inject
-    @ConfigProperty(name = "quarkus.oidc.auth-server-url")
-    String authServerUrl;
-
-    private String tokenFor(String username, String password) {
-        return given()
-                .contentType("application/x-www-form-urlencoded")
-                .formParam("grant_type", "password")
-                .formParam("client_id", "partnerportal-frontend")
-                .formParam("username", username)
-                .formParam("password", password)
-                .when().post(authServerUrl + "/protocol/openid-connect/token")
-                .then().statusCode(200)
-                .extract().path("access_token");
-    }
+    KeycloakTestTokens tokens;
 
     @Test
     void companyUserCanAccessCompanyEndpointNotPartnerEndpoint() {
-        String token = tokenFor("company-demo", "company-demo");
+        String token = tokens.tokenFor("company-demo", "company-demo");
 
         given().auth().oauth2(token)
                 .when().get("/hello/company")
@@ -44,7 +31,7 @@ class HelloResourceRoleTest {
 
     @Test
     void partnerUserCanAccessPartnerEndpointNotCompanyEndpoint() {
-        String token = tokenFor("partner-demo", "partner-demo");
+        String token = tokens.tokenFor("partner-demo", "partner-demo");
 
         given().auth().oauth2(token)
                 .when().get("/hello/partner")

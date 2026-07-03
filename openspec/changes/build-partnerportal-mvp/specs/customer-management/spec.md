@@ -17,3 +17,14 @@ End-customer records SHALL require at least a last name (Nachname) and an addres
 #### Scenario: Missing mandatory field
 - **WHEN** a partner tries to save an end customer without last name or address
 - **THEN** the system rejects the save and shows an understandable validation message
+
+### Requirement: Customer scoping per partner
+Each Kunde record SHALL be owned by the partner who created it. A partner SHALL only see and select Kunde records they themselves created; partners SHALL NOT see or select another partner's customers.
+
+#### Scenario: Partner selects from own customer list only
+- **WHEN** a partner opens the "select existing customer" list while creating an order
+- **THEN** only Kunde records created by that partner are shown
+
+#### Scenario: Company views a customer via an order
+- **WHEN** the company views an order
+- **THEN** the linked Kunde's data is visible as part of that order's detail (company sees all orders, and therefore all linked Kunden through them)
