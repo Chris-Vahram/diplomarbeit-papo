@@ -52,6 +52,8 @@ class CompanyPartnerListPage extends HTMLElement {
       { key: "actions", label: "", html: true },
     ];
     this.table.emptyMessage = "Noch keine Partner angelegt.";
+    this.table.searchKeys = ["name", "partnerNumber"];
+    this.table.pageSize = 20;
 
     this.modal = this.querySelector("#partner-modal");
     this.form = this.querySelector("#partner-form");
