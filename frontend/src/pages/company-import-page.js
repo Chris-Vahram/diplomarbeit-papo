@@ -1,5 +1,6 @@
 import { apiFetchForm } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
+import { escapeHtml } from "../lib/html.js";
 
 class CompanyImportPage extends HTMLElement {
   connectedCallback() {
@@ -61,7 +62,7 @@ class CompanyImportPage extends HTMLElement {
                 ${preview.headers
                   .map(
                     (header) =>
-                      `<option value="${header}" ${preview.suggestedMapping[field.key] === header ? "selected" : ""}>${header}</option>`
+                      `<option value="${escapeHtml(header)}" ${preview.suggestedMapping[field.key] === header ? "selected" : ""}>${escapeHtml(header)}</option>`
                   )
                   .join("")}
               </select>
@@ -71,9 +72,9 @@ class CompanyImportPage extends HTMLElement {
       )
       .join("");
 
-    const sampleHead = preview.headers.map((h) => `<th>${h}</th>`).join("");
+    const sampleHead = preview.headers.map((h) => `<th>${escapeHtml(h)}</th>`).join("");
     const sampleBody = preview.sampleRows
-      .map((row) => `<tr>${preview.headers.map((h) => `<td>${row[h] ?? ""}</td>`).join("")}</tr>`)
+      .map((row) => `<tr>${preview.headers.map((h) => `<td>${escapeHtml(row[h] ?? "")}</td>`).join("")}</tr>`)
       .join("");
 
     this.content.innerHTML = `

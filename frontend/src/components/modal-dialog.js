@@ -6,14 +6,13 @@ class ModalDialog extends HTMLElement {
   }
 
   connectedCallback() {
-    const title = this.getAttribute("title") ?? "";
     const content = this.innerHTML;
 
     this.innerHTML = `
       <div class="modal-dialog__backdrop">
         <div class="modal-dialog__panel" role="dialog" aria-modal="true">
           <header class="modal-dialog__header">
-            <h2>${title}</h2>
+            <h2></h2>
             <button type="button" class="modal-dialog__close" aria-label="Schließen">×</button>
           </header>
           <div class="modal-dialog__body">${content}</div>
@@ -22,6 +21,7 @@ class ModalDialog extends HTMLElement {
     `;
 
     this._titleEl = this.querySelector(".modal-dialog__header h2");
+    this._titleEl.textContent = this.getAttribute("title") ?? "";
 
     this.querySelector(".modal-dialog__backdrop").addEventListener("click", (e) => {
       if (e.target === e.currentTarget) this.close();

@@ -43,6 +43,11 @@ class DashboardResourceTest {
                 .then().statusCode(200)
                 .extract().path("id");
 
+        // Status changes are forward-only (order-management spec): submitted -> reviewed -> fulfilled.
+        given().auth().oauth2(companyToken).contentType("application/json")
+                .body("{\"status\":\"REVIEWED\"}")
+                .when().put("/api/company/orders/" + orderId + "/status")
+                .then().statusCode(200);
         given().auth().oauth2(companyToken).contentType("application/json")
                 .body("{\"status\":\"FULFILLED\"}")
                 .when().put("/api/company/orders/" + orderId + "/status")

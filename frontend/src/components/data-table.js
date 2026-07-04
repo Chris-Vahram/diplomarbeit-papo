@@ -1,4 +1,9 @@
-// Set .columns = [{ key, label }] and .rows = [{...}] as JS properties (not attributes).
+import { escapeHtml } from "../lib/html.js";
+
+// Set .columns = [{ key, label, html? }] and .rows = [{...}] as JS properties (not attributes).
+// Cell values are HTML-escaped by default (row data may contain partner/Kunde/import-file
+// text); pass `html: true` on a column def for cells that intentionally render markup
+// (action buttons, status selects/badges, checkboxes).
 // Optional .emptyMessage = "..." shown when rows is empty (e.g. FR-25 no-enabled-products case).
 class DataTable extends HTMLElement {
   constructor() {
@@ -37,7 +42,10 @@ class DataTable extends HTMLElement {
     const body = this._rows
       .map((row) => {
         const cells = this._columns
-          .map((c) => `<td>${row[c.key] ?? ""}</td>`)
+          .map((c) => {
+            const value = row[c.key] ?? "";
+            return `<td>${c.html ? value : escapeHtml(value)}</td>`;
+          })
           .join("");
         return `<tr>${cells}</tr>`;
       })

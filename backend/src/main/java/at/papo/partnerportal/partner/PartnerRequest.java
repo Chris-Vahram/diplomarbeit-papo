@@ -1,5 +1,6 @@
 package at.papo.partnerportal.partner;
 
+import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -15,7 +16,11 @@ public record PartnerRequest(
         String email,
         String phone,
         @NotNull(message = "Provision ist erforderlich.")
-        @DecimalMin(value = "0.0", message = "Provision darf nicht negativ sein.") BigDecimal commissionPercent,
-        Boolean active
+        @DecimalMin(value = "0.0", message = "Provision darf nicht negativ sein.")
+        @DecimalMax(value = "100.0", message = "Provision darf 100% nicht überschreiten.") BigDecimal commissionPercent,
+        Boolean active,
+        // Links a manually provisioned Keycloak login to this partner (see partner-management
+        // spec "Company links Keycloak login"). Optional; import never sets this.
+        String keycloakUsername
 ) {
 }

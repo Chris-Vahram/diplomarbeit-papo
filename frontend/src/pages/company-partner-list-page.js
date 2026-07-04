@@ -28,6 +28,7 @@ class CompanyPartnerListPage extends HTMLElement {
             </select>
           </form-field>
           <form-field label="Individueller Wert (%)" name="commissionPercentCustom" type="number" step="0.01" min="0" max="100"></form-field>
+          <form-field label="Keycloak-Benutzername" name="keycloakUsername"></form-field>
           <label class="checkbox-field">
             <input type="checkbox" name="active" checked />
             Aktiv
@@ -47,8 +48,8 @@ class CompanyPartnerListPage extends HTMLElement {
       { key: "partnerNumber", label: "Nr." },
       { key: "name", label: "Name" },
       { key: "commissionLabel", label: "Provision" },
-      { key: "statusBadge", label: "Status" },
-      { key: "actions", label: "" },
+      { key: "statusBadge", label: "Status", html: true },
+      { key: "actions", label: "", html: true },
     ];
     this.table.emptyMessage = "Noch keine Partner angelegt.";
 
@@ -63,7 +64,7 @@ class CompanyPartnerListPage extends HTMLElement {
       { key: "name", label: "Name" },
       { key: "priceLabel", label: "Preis (€)" },
       { key: "category", label: "Kategorie" },
-      { key: "enabledCheckbox", label: "Freigeschaltet" },
+      { key: "enabledCheckbox", label: "Freigeschaltet", html: true },
     ];
     this.enablementTable.emptyMessage = "Noch keine Produkte angelegt.";
 
@@ -87,7 +88,12 @@ class CompanyPartnerListPage extends HTMLElement {
   }
 
   toggleCustomField() {
-    this.customField.hidden = this.presetSelect.value !== "custom";
+    const isCustom = this.presetSelect.value === "custom";
+    this.customField.hidden = !isCustom;
+    // Required only while visible, so an empty custom value can no longer
+    // silently submit as 0% (Number("") === 0) — the browser blocks submit instead.
+    const customInput = this.customField.querySelector("input");
+    if (customInput) customInput.required = isCustom;
   }
 
   async load() {
@@ -124,6 +130,7 @@ class CompanyPartnerListPage extends HTMLElement {
     this.form.elements.address.value = partner.address ?? "";
     this.form.elements.email.value = partner.email ?? "";
     this.form.elements.phone.value = partner.phone ?? "";
+    this.form.elements.keycloakUsername.value = partner.keycloakUsername ?? "";
     this.form.elements.active.checked = partner.active;
 
     const commissionStr = String(partner.commissionPercent);
@@ -189,6 +196,7 @@ class CompanyPartnerListPage extends HTMLElement {
       phone: data.get("phone") || null,
       commissionPercent,
       active: this.form.elements.active.checked,
+      keycloakUsername: data.get("keycloakUsername") || null,
     };
 
     try {

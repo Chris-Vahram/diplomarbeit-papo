@@ -16,7 +16,7 @@ class PartnerOrderListPage extends HTMLElement {
       { key: "kundeName", label: "Kunde" },
       { key: "orderValueLabel", label: "Wert (€)" },
       { key: "commissionLabel", label: "Provision (€)" },
-      { key: "statusBadge", label: "Status" },
+      { key: "statusBadge", label: "Status", html: true },
     ];
     this.table.emptyMessage = "Noch keine Bestellungen vorhanden.";
 

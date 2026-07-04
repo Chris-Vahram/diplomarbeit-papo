@@ -1,5 +1,6 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
+import { escapeHtml } from "../lib/html.js";
 
 class PartnerOrderNewPage extends HTMLElement {
   connectedCallback() {
@@ -29,10 +30,10 @@ class PartnerOrderNewPage extends HTMLElement {
 
   renderForm() {
     const productOptions = this.products
-      .map((p) => `<option value="${p.id}" ${p.available ? "" : "disabled"}>${p.name}${p.available ? "" : " (nicht verfügbar)"}</option>`)
+      .map((p) => `<option value="${p.id}" ${p.available ? "" : "disabled"}>${escapeHtml(p.name)}${p.available ? "" : " (nicht verfügbar)"}</option>`)
       .join("");
     const customerOptions = this.customers
-      .map((c) => `<option value="${c.id}">${c.lastName}${c.firstName ? ", " + c.firstName : ""} – ${c.address}</option>`)
+      .map((c) => `<option value="${c.id}">${escapeHtml(c.lastName)}${c.firstName ? ", " + escapeHtml(c.firstName) : ""} – ${escapeHtml(c.address)}</option>`)
       .join("");
     const hasCustomers = this.customers.length > 0;
 
@@ -142,14 +143,14 @@ class PartnerOrderNewPage extends HTMLElement {
 
   renderConfirmation(order) {
     const rows = order.items
-      .map((item) => `<tr><td>${item.productName}</td><td>${item.quantity}</td><td>${item.unitPriceSnapshot.toFixed(2)}</td><td>${item.lineTotal.toFixed(2)}</td></tr>`)
+      .map((item) => `<tr><td>${escapeHtml(item.productName)}</td><td>${item.quantity}</td><td>${item.unitPriceSnapshot.toFixed(2)}</td><td>${item.lineTotal.toFixed(2)}</td></tr>`)
       .join("");
-    const kundeName = `${order.kunde.firstName ? order.kunde.firstName + " " : ""}${order.kunde.lastName}`;
+    const kundeName = `${order.kunde.firstName ? escapeHtml(order.kunde.firstName) + " " : ""}${escapeHtml(order.kunde.lastName)}`;
 
     this.content.innerHTML = `
       <section class="order-confirmation">
         <h2>Bestellung Nr. ${order.id} bestätigt</h2>
-        <p>Kunde: ${kundeName}, ${order.kunde.address}</p>
+        <p>Kunde: ${kundeName}, ${escapeHtml(order.kunde.address)}</p>
         <table class="data-table">
           <thead><tr><th>Artikel</th><th>Menge</th><th>Preis (€)</th><th>Summe (€)</th></tr></thead>
           <tbody>${rows}</tbody>
@@ -157,7 +158,7 @@ class PartnerOrderNewPage extends HTMLElement {
         <p><strong>Gesamtwert: ${order.orderValue.toFixed(2)} €</strong></p>
         <section class="simulated-email">
           <h3>Simulierte Bestätigungs-E-Mail (nicht wirklich versendet)</h3>
-          <p>An: ${order.kunde.email ?? "keine E-Mail-Adresse hinterlegt"}</p>
+          <p>An: ${escapeHtml(order.kunde.email) || "keine E-Mail-Adresse hinterlegt"}</p>
           <p>Betreff: Ihre Bestellung Nr. ${order.id}</p>
           <p>Sehr geehrte/r ${kundeName}, vielen Dank für Ihre Bestellung über ${order.orderValue.toFixed(2)} €. Wir bearbeiten sie umgehend.</p>
         </section>

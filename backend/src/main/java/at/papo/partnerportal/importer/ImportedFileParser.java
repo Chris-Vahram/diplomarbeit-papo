@@ -14,6 +14,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringReader;
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -42,7 +45,7 @@ public final class ImportedFileParser {
     }
 
     private static ParsedFile parseCsv(byte[] content) {
-        String text = new String(content, StandardCharsets.UTF_8);
+        String text = decodeCsvText(content);
         String firstLine = text.lines().findFirst().orElse("");
         // German-locale spreadsheet exports commonly use ';' - sniff by frequency.
         char separator = countChar(firstLine, ';') > countChar(firstLine, ',') ? ';' : ',';
@@ -98,6 +101,22 @@ public final class ImportedFileParser {
             return new ParsedFile(headers, rows);
         } catch (Exception e) {
             throw new ApiException(400, "Excel-Datei konnte nicht gelesen werden: " + e.getMessage());
+        }
+    }
+
+    // German-locale Excel exports are often ISO-8859-1/windows-1252, not UTF-8.
+    // Strict UTF-8 decode first; on malformed input (typical for umlaut bytes in
+    // a non-UTF-8 file) fall back to ISO-8859-1 rather than silently importing
+    // replacement characters (data-import spec: umlaut/ß correctness).
+    private static String decodeCsvText(byte[] content) {
+        try {
+            return StandardCharsets.UTF_8.newDecoder()
+                    .onMalformedInput(CodingErrorAction.REPORT)
+                    .onUnmappableCharacter(CodingErrorAction.REPORT)
+                    .decode(ByteBuffer.wrap(content))
+                    .toString();
+        } catch (CharacterCodingException e) {
+            return new String(content, StandardCharsets.ISO_8859_1);
         }
     }
 

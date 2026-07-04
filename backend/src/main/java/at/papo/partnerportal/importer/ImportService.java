@@ -91,7 +91,15 @@ public class ImportService {
         return mapping;
     }
 
+    // Transliterate German special characters before stripping non-alphanumerics,
+    // so e.g. header "Straße" matches alias "strasse" and "Verfügbar" matches
+    // "verfuegbar" (data-import spec: Austrian client, umlaut-aware mapping).
     private String normalize(String value) {
-        return value.toLowerCase().replaceAll("[^a-z0-9]", "");
+        String transliterated = value.toLowerCase()
+                .replace("ä", "ae")
+                .replace("ö", "oe")
+                .replace("ü", "ue")
+                .replace("ß", "ss");
+        return transliterated.replaceAll("[^a-z0-9]", "");
     }
 }

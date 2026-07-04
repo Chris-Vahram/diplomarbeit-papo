@@ -10,10 +10,12 @@ public record PartnerDto(
         String email,
         String phone,
         BigDecimal commissionPercent,
-        boolean active
+        boolean active,
+        String keycloakUsername
 ) {
     public static PartnerDto from(Partner partner) {
         return new PartnerDto(partner.id, partner.partnerNumber, partner.name, partner.address,
-                partner.email, partner.phone, partner.commissionPercent, partner.active);
+                partner.email, partner.phone, partner.commissionPercent, partner.active,
+                partner.keycloakUsername);
     }
 }

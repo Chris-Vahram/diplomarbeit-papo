@@ -17,7 +17,7 @@ class PartnerDashboardPage extends HTMLElement {
       { key: "orderDate", label: "Datum" },
       { key: "kundeName", label: "Kunde" },
       { key: "orderValueLabel", label: "Wert (€)" },
-      { key: "statusBadge", label: "Status" },
+      { key: "statusBadge", label: "Status", html: true },
     ];
     this.table.emptyMessage = "Noch keine Bestellungen vorhanden.";
 
