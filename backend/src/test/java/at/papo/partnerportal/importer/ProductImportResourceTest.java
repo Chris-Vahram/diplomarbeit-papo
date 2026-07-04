@@ -41,4 +41,17 @@ class ProductImportResourceTest {
                 .then().statusCode(200)
                 .body("find { it.name == 'Importtestartikel' }.price", is(19.90f));
     }
+
+    @Test
+    void previewSuggestsMappingForUmlautHeader() {
+        String token = tokens.tokenFor("company-demo", "company-demo");
+        // "Verfügbar" must transliterate to "verfuegbar" and match the available field's alias.
+        byte[] csv = "Artikel;Preis;Verfügbar\nTestartikel;9,99;ja\n".getBytes(StandardCharsets.UTF_8);
+
+        given().auth().oauth2(token)
+                .multiPart("file", "products.csv", csv, "text/csv")
+                .when().post("/api/company/import/products/preview")
+                .then().statusCode(200)
+                .body("suggestedMapping.available", is("Verfügbar"));
+    }
 }

@@ -7,6 +7,10 @@ import jakarta.transaction.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class CommissionService {
@@ -29,5 +33,15 @@ public class CommissionService {
 
     public CommissionRecord findForOrder(Order order) {
         return CommissionRecord.find("order", order).firstResult();
+    }
+
+    // Batch variant to avoid an N+1 query when building an order list (order-management
+    // spec) - one query for all the given orders' commission records, mapped by order id.
+    public Map<Long, CommissionRecord> findForOrders(List<Order> orders) {
+        if (orders.isEmpty()) {
+            return Map.of();
+        }
+        List<CommissionRecord> records = CommissionRecord.list("order in ?1", orders);
+        return records.stream().collect(Collectors.toMap(record -> record.order.id, Function.identity()));
     }
 }

@@ -35,7 +35,7 @@ class CompanyProductListPage extends HTMLElement {
       { key: "priceLabel", label: "Preis (€)" },
       { key: "category", label: "Kategorie" },
       { key: "availableLabel", label: "Verfügbar" },
-      { key: "actions", label: "" },
+      { key: "actions", label: "", html: true },
     ];
     this.table.emptyMessage = "Noch keine Produkte angelegt.";
 

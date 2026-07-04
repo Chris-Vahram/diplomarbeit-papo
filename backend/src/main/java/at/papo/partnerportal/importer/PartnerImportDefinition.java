@@ -69,9 +69,11 @@ public class PartnerImportDefinition implements ImportDefinition {
         return mappedValues.get("partnerNumber") != null ? mappedValues.get("partnerNumber").trim() : null;
     }
 
+    // Case-insensitive to match the in-file duplicate check (already lowercased)
+    // and the product definition's lower(name) pattern.
     @Override
     public boolean existsInDb(String identifierValue) {
-        return Partner.count("partnerNumber", identifierValue) > 0;
+        return Partner.count("lower(partnerNumber) = ?1", identifierValue.toLowerCase()) > 0;
     }
 
     @Override

@@ -37,6 +37,49 @@ class PartnerResourceTest {
     }
 
     @Test
+    void companyCreateRejectsCommissionAboveOneHundred() {
+        String token = tokens.tokenFor("company-demo", "company-demo");
+
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"partnerNumber\":\"P-9101\",\"name\":\"Zu hohe Provision\",\"commissionPercent\":150}")
+                .when().post("/api/company/partners")
+                .then().statusCode(400);
+    }
+
+    @Test
+    void companyCanLinkAndUpdateKeycloakUsername() {
+        String token = tokens.tokenFor("company-demo", "company-demo");
+
+        String created = given().auth().oauth2(token).contentType("application/json")
+                .body("{\"partnerNumber\":\"P-9102\",\"name\":\"Login-Test\",\"commissionPercent\":10,"
+                        + "\"keycloakUsername\":\"future-login\"}")
+                .when().post("/api/company/partners")
+                .then().statusCode(200)
+                .body("keycloakUsername", is("future-login"))
+                .extract().asString();
+        long id = io.restassured.path.json.JsonPath.from(created).getLong("id");
+
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"partnerNumber\":\"P-9102\",\"name\":\"Login-Test\",\"commissionPercent\":10,"
+                        + "\"keycloakUsername\":\"future-login-renamed\"}")
+                .when().put("/api/company/partners/" + id)
+                .then().statusCode(200)
+                .body("keycloakUsername", is("future-login-renamed"));
+    }
+
+    @Test
+    void companyCreateRejectsDuplicateKeycloakUsername() {
+        String token = tokens.tokenFor("company-demo", "company-demo");
+        // "partner-demo" is already linked to the seeded P-1001.
+
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"partnerNumber\":\"P-9103\",\"name\":\"Konflikt\",\"commissionPercent\":10,"
+                        + "\"keycloakUsername\":\"partner-demo\"}")
+                .when().post("/api/company/partners")
+                .then().statusCode(409);
+    }
+
+    @Test
     void companyCreateRejectsMissingRequiredFields() {
         String token = tokens.tokenFor("company-demo", "company-demo");
 
@@ -86,12 +129,15 @@ class PartnerResourceTest {
 
     private void setActive(String companyToken, long partnerId, String currentStateJson, boolean active) {
         io.restassured.path.json.JsonPath current = io.restassured.path.json.JsonPath.from(currentStateJson);
+        // PUT is a full replace - every field the DTO carries (incl. keycloakUsername) must be
+        // round-tripped here, or this restore-after-toggle helper silently wipes it.
         String body = String.format(
                 "{\"partnerNumber\":\"%s\",\"name\":\"%s\",\"address\":%s,\"email\":%s,\"phone\":%s,"
-                        + "\"commissionPercent\":%s,\"active\":%s}",
+                        + "\"commissionPercent\":%s,\"active\":%s,\"keycloakUsername\":%s}",
                 current.getString("partnerNumber"), current.getString("name"),
                 quoteOrNull(current.getString("address")), quoteOrNull(current.getString("email")),
-                quoteOrNull(current.getString("phone")), current.getString("commissionPercent"), active);
+                quoteOrNull(current.getString("phone")), current.getString("commissionPercent"), active,
+                quoteOrNull(current.getString("keycloakUsername")));
 
         given().auth().oauth2(companyToken).contentType("application/json")
                 .body(body)

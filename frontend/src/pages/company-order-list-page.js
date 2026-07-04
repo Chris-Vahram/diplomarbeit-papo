@@ -19,7 +19,7 @@ class CompanyOrderListPage extends HTMLElement {
       { key: "kundeName", label: "Kunde" },
       { key: "orderValueLabel", label: "Wert (€)" },
       { key: "commissionLabel", label: "Provision (€)" },
-      { key: "statusSelect", label: "Status" },
+      { key: "statusSelect", label: "Status", html: true },
     ];
     this.table.emptyMessage = "Noch keine Bestellungen vorhanden.";
 

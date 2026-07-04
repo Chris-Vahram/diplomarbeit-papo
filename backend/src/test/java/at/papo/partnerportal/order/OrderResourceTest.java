@@ -130,6 +130,55 @@ class OrderResourceTest {
     }
 
     @Test
+    void companyStatusChangeIsForwardOnly() {
+        String partnerToken = tokens.tokenFor("partner-demo", "partner-demo");
+        long productId = enabledProductId();
+
+        int orderId = given().auth().oauth2(partnerToken).contentType("application/json")
+                .body("{\"newKunde\":{\"lastName\":\"Statustest\",\"address\":\"Teststr. 3\"},"
+                        + "\"items\":[{\"productId\":" + productId + ",\"quantity\":1}]}")
+                .when().post("/api/partner/orders")
+                .then().statusCode(200)
+                .extract().path("id");
+
+        String companyToken = tokens.tokenFor("company-demo", "company-demo");
+
+        // Skip: submitted -> fulfilled directly is rejected, order stays submitted.
+        given().auth().oauth2(companyToken).contentType("application/json")
+                .body("{\"status\":\"FULFILLED\"}")
+                .when().put("/api/company/orders/" + orderId + "/status")
+                .then().statusCode(400);
+
+        given().auth().oauth2(companyToken)
+                .when().get("/api/company/orders")
+                .then().statusCode(200)
+                .body("find { it.id == " + orderId + " }.status", is("SUBMITTED"));
+
+        given().auth().oauth2(companyToken).contentType("application/json")
+                .body("{\"status\":\"REVIEWED\"}")
+                .when().put("/api/company/orders/" + orderId + "/status")
+                .then().statusCode(200)
+                .body("status", is("REVIEWED"));
+
+        given().auth().oauth2(companyToken).contentType("application/json")
+                .body("{\"status\":\"FULFILLED\"}")
+                .when().put("/api/company/orders/" + orderId + "/status")
+                .then().statusCode(200)
+                .body("status", is("FULFILLED"));
+
+        // Revert: fulfilled -> reviewed is rejected, order stays fulfilled.
+        given().auth().oauth2(companyToken).contentType("application/json")
+                .body("{\"status\":\"REVIEWED\"}")
+                .when().put("/api/company/orders/" + orderId + "/status")
+                .then().statusCode(400);
+
+        given().auth().oauth2(companyToken)
+                .when().get("/api/company/orders")
+                .then().statusCode(200)
+                .body("find { it.id == " + orderId + " }.status", is("FULFILLED"));
+    }
+
+    @Test
     void partnerSeesOnlyOwnOrders() {
         String token = tokens.tokenFor("partner-demo", "partner-demo");
 

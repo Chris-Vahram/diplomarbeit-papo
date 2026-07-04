@@ -14,9 +14,18 @@ import jakarta.transaction.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @ApplicationScoped
 public class OrderService {
+
+    // Forward-only: submitted -> reviewed -> fulfilled, no skips or reverts (order-management
+    // spec). Dashboard/settlement totals count fulfilled orders only, so an allowed revert
+    // would retroactively shift already-reported numbers.
+    private static final Map<OrderStatus, OrderStatus> NEXT_STATUS = Map.of(
+            OrderStatus.SUBMITTED, OrderStatus.REVIEWED,
+            OrderStatus.REVIEWED, OrderStatus.FULFILLED
+    );
 
     @Inject
     KundeService kundeService;
@@ -28,14 +37,18 @@ public class OrderService {
     CommissionService commissionService;
 
     public List<OrderDto> listForPartner(Partner partner) {
-        return Order.<Order>list("partner", partner).stream()
-                .map(order -> OrderDto.from(order, commissionService.findForOrder(order)))
+        List<Order> orders = Order.list("partner", partner);
+        Map<Long, CommissionRecord> commissionsByOrderId = commissionService.findForOrders(orders);
+        return orders.stream()
+                .map(order -> OrderDto.from(order, commissionsByOrderId.get(order.id)))
                 .toList();
     }
 
     public List<OrderDto> listAll() {
-        return Order.<Order>listAll().stream()
-                .map(order -> OrderDto.from(order, commissionService.findForOrder(order)))
+        List<Order> orders = Order.listAll();
+        Map<Long, CommissionRecord> commissionsByOrderId = commissionService.findForOrders(orders);
+        return orders.stream()
+                .map(order -> OrderDto.from(order, commissionsByOrderId.get(order.id)))
                 .toList();
     }
 
@@ -83,6 +96,10 @@ public class OrderService {
         Order order = Order.findById(orderId);
         if (order == null) {
             throw new ApiException(404, "Bestellung nicht gefunden.");
+        }
+        if (!status.equals(NEXT_STATUS.get(order.status))) {
+            throw new ApiException(400, "Status kann nur schrittweise vorwärts geändert werden "
+                    + "(Eingereicht → Geprüft → Abgeschlossen).");
         }
         order.status = status;
         return OrderDto.from(order, commissionService.findForOrder(order));
