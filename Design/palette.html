@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Partnerportal — Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="variables.css" />
+  <style>
+    body { padding: 56px 48px; max-width: 960px; margin: 0 auto; background: var(--bg-page); }
+
+    .page-title  { font-size: var(--font-size-4xl); font-weight: var(--font-weight-bold); letter-spacing: var(--letter-spacing-tight); color: var(--text-primary); margin-bottom: 4px; }
+    .page-sub    { font-size: var(--font-size-sm); color: var(--text-secondary); margin-bottom: 64px; }
+
+    .section     { margin-bottom: 56px; }
+    .section-label {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: var(--letter-spacing-wider); color: var(--color-neutral-400);
+      margin-bottom: 16px;
+    }
+
+    hr { border: none; border-top: 1px solid var(--border-default); margin: 56px 0; }
+
+    /* ── Swatches ── */
+    .swatches { display: flex; gap: 6px; flex-wrap: wrap; }
+    .swatch { width: 72px; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid rgba(11,17,12,0.07); }
+    .swatch-color { height: 44px; }
+    .swatch-label { padding: 5px 7px; background: white; font-size: 10px; font-family: var(--font-mono); line-height: 1.4; }
+    .swatch-label .step { font-weight: 600; color: var(--text-primary); }
+    .swatch-label .hex  { color: var(--text-secondary); }
+
+    /* ── Type scale ── */
+    .type-row   { border-bottom: 1px solid var(--border-default); padding: 14px 0; display: flex; align-items: baseline; gap: 20px; }
+    .type-meta  { font-size: 11px; font-family: var(--font-mono); color: var(--text-secondary); min-width: 160px; flex-shrink: 0; }
+
+    /* ── Status chips ── */
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: var(--radius-full);
+      font-size: var(--font-size-sm); font-weight: var(--font-weight-medium);
+    }
+    .chip-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+    /* Commission mono pill */
+    .mono-pill {
+      display: inline-flex; align-items: center;
+      padding: 3px 10px; border-radius: var(--radius-full);
+      font-size: 12px; font-weight: 600; font-family: var(--font-mono);
+      background: var(--color-primary-50);
+      color: var(--color-primary-700);
+      border: 1px solid var(--color-primary-100);
+    }
+  </style>
+</head>
+<body>
+
+<p class="page-title">Partnerportal</p>
+<p class="page-sub">Design System v1.1 · Plus Jakarta Sans + Fira Code</p>
+
+<!-- COLORS -->
+<div class="section">
+  <p class="section-label">Colors — Primary Green</p>
+  <div class="swatches">
+    <div class="swatch"><div class="swatch-color" style="background:#f0f7f1;"></div><div class="swatch-label"><div class="step">50</div><div class="hex">#f0f7f1</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#d8eedb;"></div><div class="swatch-label"><div class="step">100</div><div class="hex">#d8eedb</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#b4dbb8;"></div><div class="swatch-label"><div class="step">200</div><div class="hex">#b4dbb8</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#8dc492;"></div><div class="swatch-label"><div class="step">300</div><div class="hex">#8dc492</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#78b07e;"></div><div class="swatch-label"><div class="step">400</div><div class="hex">#78b07e</div></div></div>
+    <div class="swatch" style="outline:2px solid #689c6d;outline-offset:2px;border-radius:var(--radius-lg);"><div class="swatch-color" style="background:#689c6d;"></div><div class="swatch-label"><div class="step">500 ★</div><div class="hex">#689c6d</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#578462;"></div><div class="swatch-label"><div class="step">600</div><div class="hex">#578462</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#456851;"></div><div class="swatch-label"><div class="step">700</div><div class="hex">#456851</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#344e3d;"></div><div class="swatch-label"><div class="step">800</div><div class="hex">#344e3d</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#223529;"></div><div class="swatch-label"><div class="step">900</div><div class="hex">#223529</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#111a14;"></div><div class="swatch-label"><div class="step">950</div><div class="hex">#111a14</div></div></div>
+  </div>
+</div>
+
+<div class="section">
+  <p class="section-label">Colors — Secondary Teal</p>
+  <div class="swatches">
+    <div class="swatch"><div class="swatch-color" style="background:#f0f5f5;"></div><div class="swatch-label"><div class="step">50</div><div class="hex">#f0f5f5</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#d8eae8;"></div><div class="swatch-label"><div class="step">100</div><div class="hex">#d8eae8</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#bcd8d5;"></div><div class="swatch-label"><div class="step">200</div><div class="hex">#bcd8d5</div></div></div>
+    <div class="swatch" style="outline:2px solid #abc7c4;outline-offset:2px;border-radius:var(--radius-lg);"><div class="swatch-color" style="background:#abc7c4;"></div><div class="swatch-label"><div class="step">300 ★</div><div class="hex">#abc7c4</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#8eb3b0;"></div><div class="swatch-label"><div class="step">400</div><div class="hex">#8eb3b0</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#729f9b;"></div><div class="swatch-label"><div class="step">500</div><div class="hex">#729f9b</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#598c89;"></div><div class="swatch-label"><div class="step">600</div><div class="hex">#598c89</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#456f6d;"></div><div class="swatch-label"><div class="step">700</div><div class="hex">#456f6d</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#345250;"></div><div class="swatch-label"><div class="step">800</div><div class="hex">#345250</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#223534;"></div><div class="swatch-label"><div class="step">900</div><div class="hex">#223534</div></div></div>
+  </div>
+</div>
+
+<div class="section">
+  <p class="section-label">Colors — Accent Blue-Green</p>
+  <div class="swatches">
+    <div class="swatch"><div class="swatch-color" style="background:#eff5f6;"></div><div class="swatch-label"><div class="step">50</div><div class="hex">#eff5f6</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#d4e8eb;"></div><div class="swatch-label"><div class="step">100</div><div class="hex">#d4e8eb</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#b4d4da;"></div><div class="swatch-label"><div class="step">200</div><div class="hex">#b4d4da</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#9ac2c9;"></div><div class="swatch-label"><div class="step">300</div><div class="hex">#9ac2c9</div></div></div>
+    <div class="swatch" style="outline:2px solid #8cacb3;outline-offset:2px;border-radius:var(--radius-lg);"><div class="swatch-color" style="background:#8cacb3;"></div><div class="swatch-label"><div class="step">400 ★</div><div class="hex">#8cacb3</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#7597a0;"></div><div class="swatch-label"><div class="step">500</div><div class="hex">#7597a0</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#5e838d;"></div><div class="swatch-label"><div class="step">600</div><div class="hex">#5e838d</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#4a6870;"></div><div class="swatch-label"><div class="step">700</div><div class="hex">#4a6870</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#374e54;"></div><div class="swatch-label"><div class="step">800</div><div class="hex">#374e54</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#243438;"></div><div class="swatch-label"><div class="step">900</div><div class="hex">#243438</div></div></div>
+  </div>
+</div>
+
+<div class="section">
+  <p class="section-label">Colors — Neutral (green-tinted)</p>
+  <div class="swatches">
+    <div class="swatch" style="outline:2px solid #d6e1d8;outline-offset:2px;border-radius:var(--radius-lg);"><div class="swatch-color" style="background:#f6f9f7;border-bottom:1px solid #d6e1d8;"></div><div class="swatch-label"><div class="step">50 bg</div><div class="hex">#f6f9f7</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#edf2ee;"></div><div class="swatch-label"><div class="step">100</div><div class="hex">#edf2ee</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#d6e1d8;"></div><div class="swatch-label"><div class="step">200</div><div class="hex">#d6e1d8</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#b5c8b9;"></div><div class="swatch-label"><div class="step">300</div><div class="hex">#b5c8b9</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#8ca594;"></div><div class="swatch-label"><div class="step">400</div><div class="hex">#8ca594</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#69836f;"></div><div class="swatch-label"><div class="step">500</div><div class="hex">#69836f</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#52675a;"></div><div class="swatch-label"><div class="step">600</div><div class="hex">#52675a</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#3d4f43;"></div><div class="swatch-label"><div class="step">700</div><div class="hex">#3d4f43</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#2a362e;"></div><div class="swatch-label"><div class="step">800</div><div class="hex">#2a362e</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#182019;"></div><div class="swatch-label"><div class="step">900</div><div class="hex">#182019</div></div></div>
+    <div class="swatch" style="outline:2px solid #0b110c;outline-offset:2px;border-radius:var(--radius-lg);"><div class="swatch-color" style="background:#0b110c;"></div><div class="swatch-label"><div class="step">950 txt</div><div class="hex">#0b110c</div></div></div>
+  </div>
+</div>
+
+<div class="section">
+  <p class="section-label">Colors — Semantic (status indicators)</p>
+  <div class="swatches">
+    <div class="swatch"><div class="swatch-color" style="background:#ecfdf4;"></div><div class="swatch-label"><div class="step">s-50</div><div class="hex">#ecfdf4</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#d0fae5;"></div><div class="swatch-label"><div class="step">s-100</div><div class="hex">#d0fae5</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#22c55e;"></div><div class="swatch-label"><div class="step">s-500</div><div class="hex">#22c55e</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#166534;"></div><div class="swatch-label"><div class="step">s-800</div><div class="hex">#166534</div></div></div>
+    <div class="swatch" style="margin-left:8px;"><div class="swatch-color" style="background:#fffbeb;"></div><div class="swatch-label"><div class="step">w-50</div><div class="hex">#fffbeb</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#fef3c7;"></div><div class="swatch-label"><div class="step">w-100</div><div class="hex">#fef3c7</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#f59e0b;"></div><div class="swatch-label"><div class="step">w-500</div><div class="hex">#f59e0b</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#92400e;"></div><div class="swatch-label"><div class="step">w-800</div><div class="hex">#92400e</div></div></div>
+    <div class="swatch" style="margin-left:8px;"><div class="swatch-color" style="background:#fef2f2;"></div><div class="swatch-label"><div class="step">e-50</div><div class="hex">#fef2f2</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#fee2e2;"></div><div class="swatch-label"><div class="step">e-100</div><div class="hex">#fee2e2</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#ef4444;"></div><div class="swatch-label"><div class="step">e-500</div><div class="hex">#ef4444</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#991b1b;"></div><div class="swatch-label"><div class="step">e-800</div><div class="hex">#991b1b</div></div></div>
+  </div>
+</div>
+
+<hr>
+
+<!-- TYPOGRAPHY -->
+<div class="section">
+  <p class="section-label">Typography — Plus Jakarta Sans</p>
+  <div>
+    <div class="type-row">
+      <span class="type-meta">36px · Bold</span>
+      <span style="font-size:36px;font-weight:700;letter-spacing:-0.025em;line-height:1.2;">Partner Portal</span>
+    </div>
+    <div class="type-row">
+      <span class="type-meta">24px · Semibold</span>
+      <span style="font-size:24px;font-weight:600;">Partner Management</span>
+    </div>
+    <div class="type-row">
+      <span class="type-meta">18px · Medium</span>
+      <span style="font-size:18px;font-weight:500;">Order Overview</span>
+    </div>
+    <div class="type-row">
+      <span class="type-meta">16px · Regular</span>
+      <span style="font-size:16px;">The partner selects an end customer and places an order on their behalf.</span>
+    </div>
+    <div class="type-row">
+      <span class="type-meta">14px · Regular</span>
+      <span style="font-size:14px;color:var(--text-secondary);">Commission is calculated as a fixed percentage of the total order value.</span>
+    </div>
+    <div class="type-row">
+      <span class="type-meta">12px · Medium</span>
+      <span style="font-size:12px;font-weight:500;color:var(--text-secondary);">Last updated: 2026-07-03 · 10:15</span>
+    </div>
+    <div class="type-row">
+      <span class="type-meta">Fira Code · 14px</span>
+      <span style="font-family:var(--font-mono);font-size:14px;color:var(--text-secondary);">PP-2024-0042 · 10% · partner_id: 00192</span>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- BUTTONS -->
+<div class="section">
+  <p class="section-label">Buttons</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+    <button class="btn btn-primary">Save Partner</button>
+    <button class="btn btn-partner">Place Order</button>
+    <button class="btn btn-secondary">Cancel</button>
+    <button class="btn btn-ghost">View Details</button>
+    <button class="btn btn-danger">Deactivate</button>
+    <button class="btn btn-primary btn-sm">Import</button>
+    <button class="btn btn-primary" disabled>Disabled</button>
+  </div>
+</div>
+
+<hr>
+
+<!-- STATUS + BADGES -->
+<div class="section">
+  <p class="section-label">Status — Order</p>
+  <div class="chip-row" style="margin-bottom:16px;">
+    <div class="chip" style="background:var(--status-submitted-bg);color:var(--status-submitted-text);">
+      <div class="chip-dot" style="background:var(--color-warning-600);"></div> Submitted
+    </div>
+    <div class="chip" style="background:var(--status-reviewed-bg);color:var(--status-reviewed-text);">
+      <div class="chip-dot" style="background:var(--color-info-600);"></div> Reviewed
+    </div>
+    <div class="chip" style="background:var(--status-fulfilled-bg);color:var(--status-fulfilled-text);">
+      <div class="chip-dot" style="background:var(--color-success-600);"></div> Fulfilled
+    </div>
+  </div>
+  <p class="section-label">Status — Partner</p>
+  <div class="chip-row" style="margin-bottom:16px;">
+    <div class="chip" style="background:var(--status-active-bg);color:var(--status-active-text);">
+      <div class="chip-dot" style="background:var(--color-success-600);"></div> Active
+    </div>
+    <div class="chip" style="background:var(--status-inactive-bg);color:var(--status-inactive-text);">
+      <div class="chip-dot" style="background:var(--color-neutral-400);"></div> Inactive
+    </div>
+    <span class="mono-pill">10%</span>
+    <span class="mono-pill">15%</span>
+    <span class="mono-pill">5%</span>
+  </div>
+</div>
+
+<hr>
+
+<!-- ALERTS -->
+<div class="section">
+  <p class="section-label">Alerts</p>
+  <div style="display:flex;flex-direction:column;gap:8px;max-width:520px;">
+    <div class="alert alert-success">Order submitted successfully.</div>
+    <div class="alert alert-warning">This partner is currently inactive.</div>
+    <div class="alert alert-error">Required field "Delivery Address" is missing.</div>
+    <div class="alert alert-info">Import complete — 192 accepted, 8 rejected.</div>
+  </div>
+</div>
+
+<hr>
+
+<!-- CARD + TABLE SAMPLE -->
+<div class="section">
+  <p class="section-label">Card</p>
+  <div style="max-width:380px;" class="card">
+    <p style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-secondary);margin-bottom:10px;">Total Commission</p>
+    <p style="font-size:36px;font-weight:700;letter-spacing:-0.025em;color:var(--color-primary-500);line-height:1;">€ 1,240.00</p>
+    <p style="font-size:13px;color:var(--text-secondary);margin-top:6px;">This month · 24 orders</p>
+  </div>
+</div>
+
+<div class="section">
+  <p class="section-label">Table</p>
+  <div class="table-wrapper" style="max-width:640px;">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Partner</th>
+          <th>Status</th>
+          <th>Commission</th>
+          <th>Orders</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="font-semibold">ACME Vertrieb GmbH</td>
+          <td><span class="badge badge-active">Active</span></td>
+          <td><span class="mono-pill">10%</span></td>
+          <td style="color:var(--text-secondary);">24</td>
+        </tr>
+        <tr>
+          <td class="font-semibold">Muster Handel AG</td>
+          <td><span class="badge badge-active">Active</span></td>
+          <td><span class="mono-pill">15%</span></td>
+          <td style="color:var(--text-secondary);">11</td>
+        </tr>
+        <tr>
+          <td class="font-semibold">Alt Supplies KG</td>
+          <td><span class="badge badge-inactive">Inactive</span></td>
+          <td><span class="mono-pill">5%</span></td>
+          <td style="color:var(--text-secondary);">0</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div style="margin-top:48px;padding-top:20px;border-top:1px solid var(--border-default);">
+  <p style="font-size:11px;color:var(--text-secondary);font-family:var(--font-mono);">Partnerportal Design System v1.1 · PAPO Diplomarbeit 2026</p>
+</div>
+
+</body>
+</html>
