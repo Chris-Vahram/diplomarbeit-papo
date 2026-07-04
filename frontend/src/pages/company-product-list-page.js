@@ -38,6 +38,8 @@ class CompanyProductListPage extends HTMLElement {
       { key: "actions", label: "", html: true },
     ];
     this.table.emptyMessage = "Noch keine Produkte angelegt.";
+    this.table.searchKeys = ["name"];
+    this.table.pageSize = 20;
 
     this.modal = this.querySelector("#product-modal");
     this.form = this.querySelector("#product-form");

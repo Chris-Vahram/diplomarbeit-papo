@@ -5,12 +5,19 @@ import { escapeHtml } from "../lib/html.js";
 // text); pass `html: true` on a column def for cells that intentionally render markup
 // (action buttons, status selects/badges, checkboxes).
 // Optional .emptyMessage = "..." shown when rows is empty (e.g. FR-25 no-enabled-products case).
+// Optional .searchKeys = [key, ...] + .pageSize = n opt this table into a client-side search
+// input + pager. Search matches raw values at .searchKeys (never rendered cell HTML), so it
+// never hits markup like action buttons or status selects. Both unset = identical to before.
 class DataTable extends HTMLElement {
   constructor() {
     super();
     this._columns = [];
     this._rows = [];
     this._emptyMessage = "Keine Daten vorhanden.";
+    this._searchKeys = null;
+    this._pageSize = null;
+    this._searchQuery = "";
+    this._page = 1;
   }
 
   set columns(cols) {
@@ -20,6 +27,7 @@ class DataTable extends HTMLElement {
 
   set rows(rows) {
     this._rows = rows ?? [];
+    this._page = 1;
     this.render();
   }
 
@@ -28,8 +36,47 @@ class DataTable extends HTMLElement {
     this.render();
   }
 
-  connectedCallback() {
+  set searchKeys(keys) {
+    this._searchKeys = keys ?? null;
     this.render();
+  }
+
+  set pageSize(size) {
+    this._pageSize = size ?? null;
+    this.render();
+  }
+
+  connectedCallback() {
+    this.addEventListener("input", (event) => {
+      if (!event.target.matches("[data-table-search]")) return;
+      this._searchQuery = event.target.value;
+      this._page = 1;
+      const caret = event.target.selectionStart;
+      this.render();
+      const input = this.querySelector("[data-table-search]");
+      if (input) {
+        input.focus();
+        input.setSelectionRange(caret, caret);
+      }
+    });
+    this.addEventListener("click", (event) => {
+      if (event.target.closest("[data-table-prev]")) {
+        this._page = Math.max(1, this._page - 1);
+        this.render();
+      } else if (event.target.closest("[data-table-next]")) {
+        this._page = this._page + 1;
+        this.render();
+      }
+    });
+    this.render();
+  }
+
+  _filteredRows() {
+    const query = this._searchQuery.trim().toLowerCase();
+    if (!this._searchKeys || !query) return this._rows;
+    return this._rows.filter((row) =>
+      this._searchKeys.some((key) => String(row[key] ?? "").toLowerCase().includes(query)),
+    );
   }
 
   render() {
@@ -38,8 +85,28 @@ class DataTable extends HTMLElement {
       return;
     }
 
+    const searchHtml = this._searchKeys
+      ? `<input type="search" class="data-table__search" data-table-search
+          placeholder="Suchen…" value="${escapeHtml(this._searchQuery)}" />`
+      : "";
+
+    const filtered = this._filteredRows();
+    if (filtered.length === 0) {
+      this.innerHTML = `${searchHtml}<p class="data-table__empty">Keine Treffer.</p>`;
+      return;
+    }
+
+    let pageRows = filtered;
+    let totalPages = 1;
+    if (this._pageSize) {
+      totalPages = Math.max(1, Math.ceil(filtered.length / this._pageSize));
+      if (this._page > totalPages) this._page = totalPages;
+      const start = (this._page - 1) * this._pageSize;
+      pageRows = filtered.slice(start, start + this._pageSize);
+    }
+
     const head = this._columns.map((c) => `<th>${c.label}</th>`).join("");
-    const body = this._rows
+    const body = pageRows
       .map((row) => {
         const cells = this._columns
           .map((c) => {
@@ -51,11 +118,22 @@ class DataTable extends HTMLElement {
       })
       .join("");
 
+    const pagerHtml =
+      this._pageSize && totalPages > 1
+        ? `<div class="data-table__pager">
+            <button type="button" data-table-prev ${this._page <= 1 ? "disabled" : ""}>&laquo; Zurück</button>
+            <span>Seite ${this._page} von ${totalPages}</span>
+            <button type="button" data-table-next ${this._page >= totalPages ? "disabled" : ""}>Weiter &raquo;</button>
+          </div>`
+        : "";
+
     this.innerHTML = `
+      ${searchHtml}
       <table class="data-table">
         <thead><tr>${head}</tr></thead>
         <tbody>${body}</tbody>
       </table>
+      ${pagerHtml}
     `;
   }
 }

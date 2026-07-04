@@ -16,6 +16,8 @@ class PartnerProductListPage extends HTMLElement {
       { key: "category", label: "Kategorie" },
     ];
     this.table.emptyMessage = "Noch keine Produkte für Sie freigeschaltet.";
+    this.table.searchKeys = ["name"];
+    this.table.pageSize = 20;
 
     this.load();
   }
