@@ -10,11 +10,12 @@ import org.junit.jupiter.api.Test;
 import jakarta.inject.Inject;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
 class CsvExportResourceTest {
@@ -43,8 +44,13 @@ class CsvExportResourceTest {
         List<String> lines = decodeCsvLines(csv);
         assertEquals("\"Datum\";\"Partner\";\"Kunde\";\"Wert\";\"Provision %\";\"Provision\";\"Status\"", lines.get(0));
         assertEquals(Order.count() + 1, lines.size());
-        assertTrue(lines.stream().anyMatch(line -> line.contains("Müller")),
-                "erwartete Umlaut-Zeile (Müller) nicht in Export gefunden");
+
+        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        String mullerLine = lines.stream().filter(line -> line.contains("Müller")).findFirst()
+                .orElseThrow(() -> new AssertionError("erwartete Umlaut-Zeile (Müller) nicht in Export gefunden"));
+        // German-locale Excel: decimal comma, dd.MM.yyyy - not the raw dot-decimal/ISO form.
+        assertEquals("\"" + today + "\";\"Elektro Huber GmbH\";\"Müller\";\"89,90\";\"10,00\";\"8,99\";\"Eingereicht\"",
+                mullerLine);
     }
 
     // The order-creation path always attaches a CommissionRecord (OrderService.createForPartner

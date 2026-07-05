@@ -1,5 +1,6 @@
 import { apiFetch, apiDownload } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
+import { formatNumber, formatDate } from "../lib/format.js";
 
 const STATUSES = ["SUBMITTED", "REVIEWED", "FULFILLED"];
 const STATUS_LABELS = { SUBMITTED: "Eingereicht", REVIEWED: "Geprüft", FULFILLED: "Abgeschlossen" };
@@ -42,11 +43,11 @@ class CompanyOrderListPage extends HTMLElement {
     try {
       this.orders = await apiFetch("/company/orders");
       this.table.rows = this.orders.map((o) => ({
-        orderDate: o.orderDate,
+        orderDate: formatDate(o.orderDate),
         partnerName: o.partnerName,
         kundeName: `${o.kunde.firstName ? o.kunde.firstName + " " : ""}${o.kunde.lastName}`,
-        orderValueLabel: o.orderValue.toFixed(2),
-        commissionLabel: o.commissionValue != null ? o.commissionValue.toFixed(2) : "–",
+        orderValueLabel: formatNumber(o.orderValue),
+        commissionLabel: o.commissionValue != null ? formatNumber(o.commissionValue) : "–",
         statusSelect: `<select data-order-id="${o.id}">${STATUSES.map(
           (s) => `<option value="${s}" ${s === o.status ? "selected" : ""}>${STATUS_LABELS[s]}</option>`
         ).join("")}</select>`,

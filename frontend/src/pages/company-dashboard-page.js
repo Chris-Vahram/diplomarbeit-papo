@@ -1,5 +1,6 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
+import { formatEuro, formatNumber } from "../lib/format.js";
 
 const eur = new Intl.NumberFormat("de-AT", { style: "currency", currency: "EUR" });
 const dateLabel = new Intl.DateTimeFormat("de-AT", { day: "2-digit", month: "2-digit", year: "numeric" });
@@ -190,10 +191,10 @@ class CompanyDashboardPage extends HTMLElement {
       const avgOrderValueTrend = prevAvgOrderValue !== null ? trendAttrs(avgOrderValue, prevAvgOrderValue) : { trend: "", label: "" };
 
       this.metricRow.innerHTML = `
-        <metric-card label="Umsatz (abgeschlossen)" value="${eur.format(dashboard.totalRevenue)}" icon="trending-up" tone="positive" trend="${revenueTrend.trend}" trend-label="${revenueTrend.label}"></metric-card>
-        <metric-card label="Provision (abgeschlossen)" value="${eur.format(dashboard.totalCommission)}" icon="percent" tone="positive" trend="${commissionTrend.trend}" trend-label="${commissionTrend.label}"></metric-card>
+        <metric-card label="Umsatz (abgeschlossen)" value="${formatEuro(dashboard.totalRevenue)}" icon="trending-up" tone="positive" trend="${revenueTrend.trend}" trend-label="${revenueTrend.label}"></metric-card>
+        <metric-card label="Provision (abgeschlossen)" value="${formatEuro(dashboard.totalCommission)}" icon="percent" tone="positive" trend="${commissionTrend.trend}" trend-label="${commissionTrend.label}"></metric-card>
         <metric-card label="Abgeschlossene Bestellungen" value="${dashboard.fulfilledOrderCount}" icon="check-circle" tone="positive" trend="${ordersTrend.trend}" trend-label="${ordersTrend.label}"></metric-card>
-        <metric-card label="Ø Bestellwert" value="${eur.format(avgOrderValue)}" icon="receipt" tone="positive" trend="${avgOrderValueTrend.trend}" trend-label="${avgOrderValueTrend.label}"></metric-card>
+        <metric-card label="Ø Bestellwert" value="${formatEuro(avgOrderValue)}" icon="receipt" tone="positive" trend="${avgOrderValueTrend.trend}" trend-label="${avgOrderValueTrend.label}"></metric-card>
         ${renderMonthChart("Umsatz nach Monat", dashboard.monthLabels ?? [], monthlyRevenue)}
       `;
 
@@ -203,8 +204,8 @@ class CompanyDashboardPage extends HTMLElement {
       this.table.rows = dashboard.settlement.map((s) => ({
         partnerName: s.partnerName,
         fulfilledOrderCount: s.fulfilledOrderCount,
-        revenueLabel: eur.format(s.revenue),
-        commissionLabel: eur.format(s.commission),
+        revenueLabel: formatNumber(s.revenue),
+        commissionLabel: formatNumber(s.commission),
       }));
     } catch (error) {
       showToast(error.message, "error");

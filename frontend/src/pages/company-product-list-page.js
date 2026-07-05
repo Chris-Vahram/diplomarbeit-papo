@@ -1,5 +1,6 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
+import { formatNumber } from "../lib/format.js";
 
 class CompanyProductListPage extends HTMLElement {
   connectedCallback() {
@@ -61,7 +62,7 @@ class CompanyProductListPage extends HTMLElement {
       this.products = await apiFetch("/company/products");
       this.table.rows = this.products.map((p) => ({
         name: p.name,
-        priceLabel: p.price.toFixed(2),
+        priceLabel: formatNumber(p.price),
         category: p.category ?? "–",
         availableLabel: p.available ? "Ja" : "Nein",
         actions: `<button type="button" data-edit-id="${p.id}">Bearbeiten</button>`,

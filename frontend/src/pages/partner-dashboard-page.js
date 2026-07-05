@@ -1,5 +1,6 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
+import { formatEuro, formatNumber, formatDate } from "../lib/format.js";
 
 const eur = new Intl.NumberFormat("de-AT", { style: "currency", currency: "EUR" });
 const dateLabel = new Intl.DateTimeFormat("de-AT", { day: "2-digit", month: "2-digit", year: "numeric" });
@@ -184,8 +185,8 @@ class PartnerDashboardPage extends HTMLElement {
       const ordersTrend = prev ? trendAttrs(dashboard.fulfilledOrderCount, prev.fulfilledOrderCount) : { trend: "", label: "" };
 
       this.metricRow.innerHTML = `
-        <metric-card label="Provision (abgeschlossen)" value="${eur.format(dashboard.totalCommission)}" icon="percent" trend="${commissionTrend.trend}" trend-label="${commissionTrend.label}"></metric-card>
-        <metric-card label="Umsatz (abgeschlossen)" value="${eur.format(dashboard.totalRevenue)}" icon="trending-up" trend="${revenueTrend.trend}" trend-label="${revenueTrend.label}"></metric-card>
+        <metric-card label="Provision (abgeschlossen)" value="${formatEuro(dashboard.totalCommission)}" icon="percent" trend="${commissionTrend.trend}" trend-label="${commissionTrend.label}"></metric-card>
+        <metric-card label="Umsatz (abgeschlossen)" value="${formatEuro(dashboard.totalRevenue)}" icon="trending-up" trend="${revenueTrend.trend}" trend-label="${revenueTrend.label}"></metric-card>
         <metric-card label="Abgeschlossene Bestellungen" value="${dashboard.fulfilledOrderCount}" icon="check-circle" trend="${ordersTrend.trend}" trend-label="${ordersTrend.label}"></metric-card>
         <metric-card label="Freigeschaltete Produkte" value="${dashboard.enabledProductCount}" ring="${Math.round((dashboard.enabledProductCount / dashboard.totalProductCount) * 100)}" ring-layout="full" ring-caption="von ${dashboard.totalProductCount} Produkten"></metric-card>
         ${renderMonthChart("Umsatz nach Monat", dashboard.monthLabels ?? [], dashboard.monthlyRevenue ?? [])}
@@ -195,9 +196,9 @@ class PartnerDashboardPage extends HTMLElement {
       window.lucide?.createIcons();
 
       this.table.rows = dashboard.latestOrders.map((o) => ({
-        orderDate: o.orderDate,
+        orderDate: formatDate(o.orderDate),
         kundeName: `${o.kunde.firstName ? o.kunde.firstName + " " : ""}${o.kunde.lastName}`,
-        orderValueLabel: eur.format(o.orderValue),
+        orderValueLabel: formatNumber(o.orderValue),
         statusBadge: `<status-badge status="${o.status.toLowerCase()}"></status-badge>`,
       }));
     } catch (error) {
