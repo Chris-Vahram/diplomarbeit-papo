@@ -1,5 +1,6 @@
 package at.papo.partnerportal.order;
 
+import at.papo.partnerportal.export.CsvExportService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -24,9 +25,19 @@ public class CompanyOrderResource {
     @Inject
     OrderService orderService;
 
+    @Inject
+    CsvExportService csvExportService;
+
     @GET
     public List<OrderDto> list() {
         return orderService.listAll();
+    }
+
+    @GET
+    @Path("/export")
+    @Produces("text/csv;charset=UTF-8")
+    public byte[] exportCsv() {
+        return csvExportService.exportOrders();
     }
 
     @PUT
