@@ -5,18 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Partnerportal</title>
   <link rel="stylesheet" href="/src/styles/base.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script type="module" src="/src/lib/router.js"></script>
 </head>
 <body>
-  <header class="app-header">
-    <div class="app-header__brand">Partnerportal</div>
-    <nav id="app-nav" class="app-header__nav"></nav>
-    <div id="app-user" class="app-header__user"></div>
-  </header>
-
-  <main id="app-root" class="app-root">
-    <!-- router mounts the current page's Web Component here -->
-  </main>
+  <div class="app-shell app-shell--bare" id="app-shell">
+    <aside class="app-sidebar">
+      <div class="app-sidebar__brand">
+        <div class="app-sidebar__wordmark">PAPO</div>
+        <div class="app-sidebar__role" id="app-role"></div>
+      </div>
+      <nav class="app-sidebar__nav" id="app-nav"></nav>
+    </aside>
+    <div class="app-main">
+      <header class="app-topbar">
+        <div id="app-user"></div>
+      </header>
+      <main class="app-root" id="app-root">
+        <!-- router mounts the current page's Web Component here -->
+      </main>
+    </div>
+  </div>
 
   <div id="toast-root"></div>
 </body>

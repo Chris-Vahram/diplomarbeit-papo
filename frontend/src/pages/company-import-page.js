@@ -19,7 +19,7 @@ class CompanyImportPage extends HTMLElement {
           Datei (.csv oder .xlsx)
           <input type="file" id="file-input" accept=".csv,.xlsx" />
         </label>
-        <button type="button" id="preview-btn">Vorschau laden</button>
+        <button type="button" id="preview-btn" class="button-primary">Vorschau laden</button>
       </div>
       <div id="import-content"></div>
     `;

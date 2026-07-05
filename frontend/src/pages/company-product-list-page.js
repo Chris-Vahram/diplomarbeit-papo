@@ -5,15 +5,17 @@ class CompanyProductListPage extends HTMLElement {
   connectedCallback() {
     this.classList.add("area--company");
     this.innerHTML = `
-      <h1>Produkte</h1>
-      <button type="button" class="button-primary" id="new-product-btn">Neues Produkt</button>
+      <div class="list-header">
+        <h1>Produkte</h1>
+        <button type="button" class="button-primary" id="new-product-btn">Neues Produkt</button>
+      </div>
       <data-table id="product-table"></data-table>
       <modal-dialog id="product-modal" title="Neues Produkt">
-        <form id="product-form" class="entity-form">
+        <form id="product-form" class="entity-form entity-form--grid">
           <input type="hidden" name="id" />
           <form-field label="Name" name="name" required></form-field>
           <form-field label="Preis (€)" name="price" type="number" step="0.01" min="0" required></form-field>
-          <form-field label="Beschreibung" name="description">
+          <form-field class="form-field--wide" label="Beschreibung" name="description">
             <textarea name="description"></textarea>
           </form-field>
           <form-field label="Kategorie" name="category"></form-field>

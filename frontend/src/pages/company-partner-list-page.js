@@ -8,15 +8,17 @@ class CompanyPartnerListPage extends HTMLElement {
   connectedCallback() {
     this.classList.add("area--company");
     this.innerHTML = `
-      <h1>Partner</h1>
-      <button type="button" class="button-primary" id="new-partner-btn">Neuer Partner</button>
+      <div class="list-header">
+        <h1>Partner</h1>
+        <button type="button" class="button-primary" id="new-partner-btn">Neuer Partner</button>
+      </div>
       <data-table id="partner-table"></data-table>
       <modal-dialog id="partner-modal" title="Neuer Partner">
-        <form id="partner-form" class="entity-form">
+        <form id="partner-form" class="entity-form entity-form--grid">
           <input type="hidden" name="id" />
           <form-field label="Partnernummer" name="partnerNumber" required></form-field>
           <form-field label="Name" name="name" required></form-field>
-          <form-field label="Adresse" name="address"></form-field>
+          <form-field class="form-field--wide" label="Adresse" name="address"></form-field>
           <form-field label="E-Mail" name="email" type="email"></form-field>
           <form-field label="Telefon" name="phone"></form-field>
           <form-field label="Provision" name="commissionPercentPreset">
@@ -28,7 +30,7 @@ class CompanyPartnerListPage extends HTMLElement {
             </select>
           </form-field>
           <form-field label="Individueller Wert (%)" name="commissionPercentCustom" type="number" step="0.01" min="0" max="100"></form-field>
-          <form-field label="Keycloak-Benutzername" name="keycloakUsername"></form-field>
+          <form-field class="form-field--wide" label="Keycloak-Benutzername" name="keycloakUsername"></form-field>
           <label class="checkbox-field">
             <input type="checkbox" name="active" checked />
             Aktiv
@@ -106,8 +108,10 @@ class CompanyPartnerListPage extends HTMLElement {
         name: p.name,
         commissionLabel: `${p.commissionPercent}%`,
         statusBadge: `<status-badge status="${p.active ? "active" : "inactive"}"></status-badge>`,
-        actions: `<button type="button" data-edit-id="${p.id}">Bearbeiten</button>
-          <button type="button" data-manage-id="${p.id}">Produkte</button>`,
+        actions: `<div class="row-actions">
+          <button type="button" data-edit-id="${p.id}">Bearbeiten</button>
+          <button type="button" class="row-actions__secondary" data-manage-id="${p.id}">Produkte</button>
+        </div>`,
       }));
     } catch (error) {
       showToast(error.message, "error");
