@@ -1,6 +1,6 @@
 # Partnerportal — Design System
 
-**Version:** 1.0  
+**Version:** 1.1  
 **Project:** Web-Based Partner Portal (PAPO Diplomarbeit)  
 **Stack target:** Web Components + Quarkus backend
 
@@ -27,7 +27,7 @@
 
 **Data-forward.** Tables, forms, and status badges are the primary UI primitives. Visual hierarchy serves data density, not aesthetics.
 
-**Accessible.** All color combinations meet WCAG AA (4.5:1 text, 3:1 UI). Focus states are always visible.
+**Accessible.** Most color combinations meet WCAG AA (4.5:1 text, 3:1 UI); one known exception — see `guidelines/colors.md` § Contrast Ratios. Focus states are always visible.
 
 ---
 
@@ -35,10 +35,10 @@
 
 | Area | Users | Accent Color |
 |------|-------|-------------|
-| Company Admin | Company / Operator | Blue — `#2563EB` |
-| Partner Area | Sales Partners | Teal — `#0D9488` |
+| Company Admin | Company / Operator | Green — `#689C6D` (`--color-primary-500`) |
+| Partner Area | Sales Partners | Blue — `#5E838D` (`--color-accent-600`) |
 
-Both share the same neutral shell (Slate sidebar on dark, white content area). Only the accent color changes.
+Both share the same neutral shell (green-tinted Slate sidebar on dark, white content area). Only the accent color changes — driven by `.context-company` / `.context-partner` on the shell root, never hardcoded per component.
 
 ---
 
@@ -48,10 +48,10 @@ Both share the same neutral shell (Slate sidebar on dark, white content area). O
 <link rel="stylesheet" href="Design/variables.css" />
 ```
 
-Then use tokens:
+Then use tokens — role-aware components read `var(--color-accent)`, never a raw palette step:
 ```css
 .button-primary {
-  background: var(--color-brand-600);
+  background: var(--color-accent);   /* green in .context-company, blue in .context-partner */
   color: var(--color-white);
   border-radius: var(--radius-md);
   padding: var(--spacing-2) var(--spacing-4);
