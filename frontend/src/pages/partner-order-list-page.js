@@ -1,5 +1,6 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
+import { formatNumber, formatDate } from "../lib/format.js";
 
 class PartnerOrderListPage extends HTMLElement {
   connectedCallback() {
@@ -27,10 +28,10 @@ class PartnerOrderListPage extends HTMLElement {
     try {
       const orders = await apiFetch("/partner/orders");
       this.table.rows = orders.map((o) => ({
-        orderDate: o.orderDate,
+        orderDate: formatDate(o.orderDate),
         kundeName: `${o.kunde.firstName ? o.kunde.firstName + " " : ""}${o.kunde.lastName}`,
-        orderValueLabel: o.orderValue.toFixed(2),
-        commissionLabel: o.commissionValue != null ? o.commissionValue.toFixed(2) : "–",
+        orderValueLabel: formatNumber(o.orderValue),
+        commissionLabel: o.commissionValue != null ? formatNumber(o.commissionValue) : "–",
         statusBadge: `<status-badge status="${o.status.toLowerCase()}"></status-badge>`,
       }));
     } catch (error) {

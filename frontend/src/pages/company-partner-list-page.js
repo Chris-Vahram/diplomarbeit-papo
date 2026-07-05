@@ -1,5 +1,6 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
+import { formatNumber } from "../lib/format.js";
 
 // Commission dropdown presets per FSD FR-19/partner-management spec: 5/10/15 or a custom value.
 const COMMISSION_PRESETS = ["5", "10", "15"];
@@ -162,7 +163,7 @@ class CompanyPartnerListPage extends HTMLElement {
       const products = await apiFetch(`/company/partners/${this.enablementPartnerId}/products`);
       this.enablementTable.rows = products.map((p) => ({
         name: p.name,
-        priceLabel: p.price.toFixed(2),
+        priceLabel: formatNumber(p.price),
         category: p.category ?? "–",
         enabledCheckbox: `<input type="checkbox" data-toggle-product-id="${p.productId}" ${p.enabled ? "checked" : ""} />`,
       }));

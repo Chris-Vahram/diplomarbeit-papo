@@ -1,5 +1,6 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
+import { formatNumber } from "../lib/format.js";
 
 class PartnerProductListPage extends HTMLElement {
   connectedCallback() {
@@ -27,7 +28,7 @@ class PartnerProductListPage extends HTMLElement {
       const products = await apiFetch("/partner/products");
       this.table.rows = products.map((p) => ({
         name: p.name,
-        priceLabel: p.price.toFixed(2),
+        priceLabel: formatNumber(p.price),
         category: p.category ?? "–",
       }));
     } catch (error) {
