@@ -1,4 +1,4 @@
-import { apiFetch } from "../lib/api.js";
+import { apiFetch, apiDownload } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 
 const STATUSES = ["SUBMITTED", "REVIEWED", "FULFILLED"];
@@ -9,8 +9,11 @@ class CompanyOrderListPage extends HTMLElement {
     this.classList.add("area--company");
     this.innerHTML = `
       <h1>Bestellungen</h1>
+      <button type="button" id="export-btn">CSV exportieren</button>
       <data-table id="order-table"></data-table>
     `;
+
+    this.querySelector("#export-btn").addEventListener("click", () => this.exportCsv());
 
     this.table = this.querySelector("#order-table");
     this.table.columns = [
@@ -56,6 +59,14 @@ class CompanyOrderListPage extends HTMLElement {
     } catch (error) {
       showToast(error.message, "error");
       this.load();
+    }
+  }
+
+  async exportCsv() {
+    try {
+      await apiDownload("/company/orders/export", "bestellungen.csv");
+    } catch (error) {
+      showToast(error.message, "error");
     }
   }
 }

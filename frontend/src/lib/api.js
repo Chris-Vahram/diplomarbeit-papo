@@ -47,3 +47,33 @@ export async function apiFetchForm(path, formData) {
   const response = await fetch(`${API_BASE}${path}`, { method: "POST", headers, body: formData });
   return handleResponse(response);
 }
+
+// A plain <a href>/window.location download sends no Authorization header and
+// would 401 (data-export spec) - fetch the blob with the Bearer token ourselves
+// and trigger the save via a temporary object URL instead.
+export async function apiDownload(path, filename) {
+  const session = getSession();
+  const headers = new Headers();
+  if (session) {
+    headers.set("Authorization", `Bearer ${session.accessToken}`);
+  }
+
+  const response = await fetch(`${API_BASE}${path}`, { headers });
+  if (response.status === 401) {
+    logout();
+    location.hash = "#/login";
+    throw new Error("Sitzung abgelaufen. Bitte erneut anmelden.");
+  }
+  if (!response.ok) {
+    const message = await response.text().catch(() => response.statusText);
+    throw new Error(message || `Anfrage fehlgeschlagen (${response.status})`);
+  }
+
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}

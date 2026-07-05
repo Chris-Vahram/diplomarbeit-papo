@@ -1,4 +1,4 @@
-import { apiFetch } from "../lib/api.js";
+import { apiFetch, apiDownload } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 
 class CompanyDashboardPage extends HTMLElement {
@@ -8,8 +8,11 @@ class CompanyDashboardPage extends HTMLElement {
       <h1>Firmen-Dashboard</h1>
       <div class="metric-row" id="metric-row"></div>
       <h2>Provisionsabrechnung nach Partner</h2>
+      <button type="button" id="export-btn">CSV exportieren</button>
       <data-table id="settlement-table"></data-table>
     `;
+
+    this.querySelector("#export-btn").addEventListener("click", () => this.exportCsv());
 
     this.metricRow = this.querySelector("#metric-row");
     this.table = this.querySelector("#settlement-table");
@@ -41,6 +44,14 @@ class CompanyDashboardPage extends HTMLElement {
         revenueLabel: s.revenue.toFixed(2),
         commissionLabel: s.commission.toFixed(2),
       }));
+    } catch (error) {
+      showToast(error.message, "error");
+    }
+  }
+
+  async exportCsv() {
+    try {
+      await apiDownload("/company/commissions/export", "provisionen.csv");
     } catch (error) {
       showToast(error.message, "error");
     }

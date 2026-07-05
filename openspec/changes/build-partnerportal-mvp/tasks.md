@@ -90,10 +90,10 @@ Tobias produces the visual design (Claude design) in parallel; screens are built
 
 ## 10. Optional Enhancements (only if time allows) — do NOT block MVP
 
-- [ ] 9.1 [opt] Company overview dashboard (totals across partners)
-- [ ] 9.2 [opt] Per-partner settlement overview (sales count, revenue, total commission)
+- [x] 9.1 [opt] Company overview dashboard (totals across partners) — done via `add-company-dashboard`
+- [x] 9.2 [opt] Per-partner settlement overview (sales count, revenue, total commission) — done via `add-company-dashboard`
 - [ ] 9.3 [opt] Product category/image support in UI
-- [ ] 9.4 [opt] Search/filter/pagination on large product/partner lists (~800 articles)
-- [ ] 9.5 [opt] Export order/commission lists (CSV)
+- [x] 9.4 [opt] Search/filter/pagination on large product/partner lists (~800 articles) — done via `add-list-search-pagination`
+- [x] 9.5 [opt] Export order/commission lists (CSV) — done via `add-csv-export`
 
 > Deferred to Phase-2 backlog (NOT part of this change): external shop (B-01), shop customization (B-02), auto level-up (B-03), real e-mail (B-04), shop inquiry forward (B-05), BMD (B-06), payout (B-07).
