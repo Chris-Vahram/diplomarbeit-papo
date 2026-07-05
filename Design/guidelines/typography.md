@@ -2,24 +2,24 @@
 
 ## Fonts
 
-### Primary — Inter
+### Primary — Plus Jakarta Sans
 Google Fonts, free, variable weight. Excellent legibility at small sizes (data tables, forms).
 
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 ```
 
 CSS token: `var(--font-sans)`
 
 **Load weights:** 400, 500, 600, 700 only — no extras.
 
-### Monospace — JetBrains Mono
-Used for: order IDs, partner IDs, codes, import validation reports.
+### Monospace — Fira Code
+Used for: order IDs, partner IDs, codes, import validation reports. Falls back to JetBrains Mono, then `ui-monospace`.
 
 ```html
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 ```
 
 CSS token: `var(--font-mono)`
@@ -168,8 +168,8 @@ Never skip levels (e.g. heading-xl directly to body-sm with nothing in between).
 | Body | `var(--text-primary)` — neutral-900 |
 | Supporting / secondary | `var(--text-secondary)` — neutral-600 |
 | Disabled / placeholder | `var(--text-disabled)` — neutral-400 |
-| Links / brand actions | `var(--text-brand)` — brand-600 |
-| Partner links | `var(--text-partner)` — partner-600 |
+| Links / brand actions | `var(--text-brand)` — context-aware: primary-500 in `.context-company`, accent-600 in `.context-partner` |
+| Partner links (explicit, any context) | `var(--text-partner)` — accent-600, always |
 
 ### Don'ts
 
@@ -178,7 +178,7 @@ Never skip levels (e.g. heading-xl directly to body-sm with nothing in between).
 - Don't use all-caps for text longer than 4 words
 - Don't use letter-spacing on body text (only headers and labels)
 - Don't rely on italic for emphasis in data-dense UIs — use color or weight instead
-- Don't mix Inter and JetBrains Mono casually — mono signals a code/ID value
+- Don't mix Plus Jakarta Sans and Fira Code casually — mono signals a code/ID value
 
 ---
 

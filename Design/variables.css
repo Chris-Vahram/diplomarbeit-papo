@@ -224,10 +224,17 @@
   --content-padding:           32px;
 }
 
-/* ─── Role context: Company (default — primary green) ─── */
+/* ─── Role context: Company (default — Primary Green) ───
+   Single source of truth for role color. Every component that
+   needs to change color between Company and Partner MUST read
+   --color-accent (and its -hover/-active/-light/-medium siblings)
+   instead of hardcoding --color-primary-* or --color-accent-*
+   directly. Apply .context-company / .context-partner on the app
+   shell root — never re-declare role colors inside a component. ─── */
 .context-company {
   --color-accent:        var(--color-primary-500);
   --color-accent-hover:  var(--color-primary-600);
+  --color-accent-active: var(--color-primary-700);
   --color-accent-light:  var(--color-primary-50);
   --color-accent-medium: var(--color-primary-100);
   --border-focus:        var(--color-primary-500);
@@ -235,10 +242,11 @@
   --text-brand:          var(--color-primary-500);
 }
 
-/* ─── Role context: Partner (accent blue-green) ─── */
+/* ─── Role context: Partner (Accent Blue) ─── */
 .context-partner {
   --color-accent:        var(--color-accent-600);
   --color-accent-hover:  var(--color-accent-700);
+  --color-accent-active: var(--color-accent-800);
   --color-accent-light:  var(--color-accent-50);
   --color-accent-medium: var(--color-accent-100);
   --border-focus:        var(--color-accent-600);
@@ -293,14 +301,21 @@ html {
 }
 .btn:focus-visible { box-shadow: var(--shadow-focus-ring); outline: none; }
 
+/* Context-aware CTA: green in .context-company, blue in .context-partner.
+   Color comes ONLY from --color-accent* (set by the context class) —
+   never hardcode --color-primary-*/--color-accent-* on a component. */
 .btn-primary {
-  background: var(--color-primary-500);
+  background: var(--color-accent);
   color: var(--color-white);
-  border-color: var(--color-primary-500);
+  border-color: var(--color-accent);
 }
-.btn-primary:hover  { background: var(--color-primary-600); border-color: var(--color-primary-600); }
-.btn-primary:active { background: var(--color-primary-700); }
+.btn-primary:hover  { background: var(--color-accent-hover);  border-color: var(--color-accent-hover); }
+.btn-primary:active { background: var(--color-accent-active); }
 
+/* Explicit partner-blue override — use ONLY to render a partner-owned
+   action inside a .context-company screen (e.g. a partner action shown
+   on a company-side detail view). Do not use this for a normal partner
+   CTA — .btn-primary already renders blue inside .context-partner. */
 .btn-partner {
   background: var(--color-accent-600);
   color: var(--color-white);

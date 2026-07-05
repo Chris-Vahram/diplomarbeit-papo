@@ -10,11 +10,11 @@ All components use tokens from `variables.css`. The `.btn`, `.input`, `.card`, `
 
 | Variant | Token class | Use |
 |---------|------------|-----|
-| Primary (company) | `.btn .btn-primary` | Main CTA in company context |
-| Primary (partner)  | `.btn .btn-partner` | Main CTA in partner context |
+| Primary | `.btn .btn-primary` | Main CTA — **context-aware**: green in `.context-company`, blue in `.context-partner`. This is the only button class you need on either side; it reads `var(--color-accent)`, never a role color directly. |
 | Secondary | `.btn .btn-secondary` | Cancel, back, secondary actions |
 | Ghost | `.btn .btn-ghost` | Toolbar actions, low-priority |
 | Danger | `.btn .btn-danger` | Destructive actions (delete, deactivate) |
+| Partner (explicit) | `.btn .btn-partner` | **Rare override, not a normal role button.** Always renders partner-blue regardless of context — only for a partner-owned action surfaced on a company screen. If you're building an ordinary partner-side CTA, use `.btn-primary`, not this. |
 
 ### Sizes
 
@@ -272,7 +272,7 @@ padding: 16px 12px
   color: white
 
 .nav-item.active:
-  background: var(--color-accent)    /* brand-600 or partner-600 */
+  background: var(--color-accent)    /* primary-500 in .context-company, accent-600 in .context-partner */
   color: white
 ```
 

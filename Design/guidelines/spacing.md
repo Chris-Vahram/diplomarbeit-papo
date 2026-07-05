@@ -66,7 +66,7 @@ Base unit: **4px**. All spacing is a multiple of 4.
 - Width: 240px expanded, 64px icon-only collapsed
 - z-index: `var(--z-sticky)` = 200
 - Nav item: 44px height, 12px horizontal padding, 6px border-radius
-- Active state: `bg: var(--color-accent)` (brand-600 in company, partner-600 in partner)
+- Active state: `bg: var(--color-accent)` — resolves to `primary-500` in `.context-company`, `accent-600` in `.context-partner`. Never hardcode the hex/step here; the context class on the shell root is what makes it switch.
 - Hover state: `bg: rgba(255,255,255,0.07)`
 - Nav text: `var(--color-neutral-300)` inactive, `white` active
 
