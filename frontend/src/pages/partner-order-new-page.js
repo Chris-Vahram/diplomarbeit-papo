@@ -1,6 +1,7 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import { escapeHtml } from "../lib/html.js";
+import { formatEuro, formatNumber } from "../lib/format.js";
 
 class PartnerOrderNewPage extends HTMLElement {
   connectedCallback() {
@@ -89,6 +90,7 @@ class PartnerOrderNewPage extends HTMLElement {
     });
     this.form.addEventListener("submit", (event) => this.handleSubmit(event));
 
+    this.toggleKundeMode();
     this.addLine();
   }
 
@@ -96,6 +98,11 @@ class PartnerOrderNewPage extends HTMLElement {
     const mode = this.form.elements.kundeMode.value;
     this.existingBlock.hidden = mode !== "existing";
     this.newBlock.hidden = mode !== "new";
+    // Required only while visible, so the browser doesn't block submit on hidden
+    // "neuer Kunde" fields when "bestehenden Kunden wählen" is selected.
+    const isNew = mode === "new";
+    this.form.elements.newLastName.required = isNew;
+    this.form.elements.newAddress.required = isNew;
   }
 
   addLine() {
@@ -143,7 +150,7 @@ class PartnerOrderNewPage extends HTMLElement {
 
   renderConfirmation(order) {
     const rows = order.items
-      .map((item) => `<tr><td>${escapeHtml(item.productName)}</td><td>${item.quantity}</td><td>${item.unitPriceSnapshot.toFixed(2)}</td><td>${item.lineTotal.toFixed(2)}</td></tr>`)
+      .map((item) => `<tr><td>${escapeHtml(item.productName)}</td><td>${item.quantity}</td><td>${formatNumber(item.unitPriceSnapshot)}</td><td>${formatNumber(item.lineTotal)}</td></tr>`)
       .join("");
     const kundeName = `${order.kunde.firstName ? escapeHtml(order.kunde.firstName) + " " : ""}${escapeHtml(order.kunde.lastName)}`;
 
@@ -155,12 +162,12 @@ class PartnerOrderNewPage extends HTMLElement {
           <thead><tr><th>Artikel</th><th>Menge</th><th>Preis (€)</th><th>Summe (€)</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
-        <p><strong>Gesamtwert: ${order.orderValue.toFixed(2)} €</strong></p>
+        <p><strong>Gesamtwert: ${formatEuro(order.orderValue)}</strong></p>
         <section class="simulated-email">
           <h3>Simulierte Bestätigungs-E-Mail (nicht wirklich versendet)</h3>
           <p>An: ${escapeHtml(order.kunde.email) || "keine E-Mail-Adresse hinterlegt"}</p>
           <p>Betreff: Ihre Bestellung Nr. ${order.id}</p>
-          <p>Sehr geehrte/r ${kundeName}, vielen Dank für Ihre Bestellung über ${order.orderValue.toFixed(2)} €. Wir bearbeiten sie umgehend.</p>
+          <p>Sehr geehrte/r ${kundeName}, vielen Dank für Ihre Bestellung über ${formatEuro(order.orderValue)}. Wir bearbeiten sie umgehend.</p>
         </section>
         <button type="button" id="new-order-btn">Neue Bestellung</button>
       </section>

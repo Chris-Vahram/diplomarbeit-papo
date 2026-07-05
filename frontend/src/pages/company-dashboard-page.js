@@ -1,5 +1,6 @@
 import { apiFetch, apiDownload } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
+import { formatEuro, formatNumber } from "../lib/format.js";
 
 class CompanyDashboardPage extends HTMLElement {
   connectedCallback() {
@@ -33,16 +34,16 @@ class CompanyDashboardPage extends HTMLElement {
     try {
       const dashboard = await apiFetch("/company/dashboard");
       this.metricRow.innerHTML = `
-        <metric-card label="Umsatz (abgeschlossen)" value="${dashboard.totalRevenue.toFixed(2)} €"></metric-card>
-        <metric-card label="Provision (abgeschlossen)" value="${dashboard.totalCommission.toFixed(2)} €"></metric-card>
+        <metric-card label="Umsatz (abgeschlossen)" value="${formatEuro(dashboard.totalRevenue)}"></metric-card>
+        <metric-card label="Provision (abgeschlossen)" value="${formatEuro(dashboard.totalCommission)}"></metric-card>
         <metric-card label="Abgeschlossene Bestellungen" value="${dashboard.fulfilledOrderCount}"></metric-card>
         <metric-card label="Partner" value="${dashboard.partnerCount}"></metric-card>
       `;
       this.table.rows = dashboard.settlement.map((s) => ({
         partnerName: s.partnerName,
         fulfilledOrderCount: s.fulfilledOrderCount,
-        revenueLabel: s.revenue.toFixed(2),
-        commissionLabel: s.commission.toFixed(2),
+        revenueLabel: formatNumber(s.revenue),
+        commissionLabel: formatNumber(s.commission),
       }));
     } catch (error) {
       showToast(error.message, "error");

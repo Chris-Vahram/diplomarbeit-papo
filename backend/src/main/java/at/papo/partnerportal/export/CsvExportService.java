@@ -12,7 +12,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UncheckedIOException;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -31,6 +34,8 @@ public class CsvExportService {
             OrderStatus.FULFILLED, "Abgeschlossen"
     );
 
+    private static final DateTimeFormatter GERMAN_DATE = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+
     @Inject
     CommissionService commissionService;
 
@@ -42,12 +47,12 @@ public class CsvExportService {
                 orders, order -> {
                     CommissionRecord commission = commissionsByOrderId.get(order.id);
                     return new String[] {
-                            order.orderDate.toString(),
+                            formatDate(order.orderDate),
                             order.partner.name,
                             kundeName(order),
-                            order.orderValue.toString(),
-                            commission != null ? commission.commissionPercentUsed.toString() : "",
-                            commission != null ? commission.commissionValue.toString() : "",
+                            formatMoney(order.orderValue),
+                            commission != null ? formatMoney(commission.commissionPercentUsed) : "",
+                            commission != null ? formatMoney(commission.commissionValue) : "",
                             STATUS_LABELS.get(order.status),
                     };
                 });
@@ -61,15 +66,25 @@ public class CsvExportService {
                 records, record -> new String[] {
                         record.partner.name,
                         String.valueOf(record.order.id),
-                        record.orderValue.toString(),
-                        record.commissionPercentUsed.toString(),
-                        record.commissionValue.toString(),
+                        formatMoney(record.orderValue),
+                        formatMoney(record.commissionPercentUsed),
+                        formatMoney(record.commissionValue),
                 });
     }
 
     private static String kundeName(Order order) {
         String firstName = order.kunde.firstName;
         return (firstName != null && !firstName.isBlank() ? firstName + " " : "") + order.kunde.lastName;
+    }
+
+    // German-locale Excel expects a decimal comma; no thousands grouping (BigDecimal
+    // plain string, so scale/precision from the entity column is preserved exactly).
+    private static String formatMoney(BigDecimal value) {
+        return value.toPlainString().replace('.', ',');
+    }
+
+    private static String formatDate(LocalDate date) {
+        return date.format(GERMAN_DATE);
     }
 
     private <T> byte[] writeCsv(String[] header, List<T> rows, Function<T, String[]> toRow) {

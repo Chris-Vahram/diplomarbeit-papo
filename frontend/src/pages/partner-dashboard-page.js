@@ -1,5 +1,6 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
+import { formatEuro, formatNumber, formatDate } from "../lib/format.js";
 
 class PartnerDashboardPage extends HTMLElement {
   connectedCallback() {
@@ -28,15 +29,15 @@ class PartnerDashboardPage extends HTMLElement {
     try {
       const dashboard = await apiFetch("/partner/dashboard");
       this.metricRow.innerHTML = `
-        <metric-card label="Provision (abgeschlossen)" value="${dashboard.totalCommission.toFixed(2)} €"></metric-card>
-        <metric-card label="Umsatz (abgeschlossen)" value="${dashboard.totalRevenue.toFixed(2)} €"></metric-card>
+        <metric-card label="Provision (abgeschlossen)" value="${formatEuro(dashboard.totalCommission)}"></metric-card>
+        <metric-card label="Umsatz (abgeschlossen)" value="${formatEuro(dashboard.totalRevenue)}"></metric-card>
         <metric-card label="Abgeschlossene Bestellungen" value="${dashboard.fulfilledOrderCount}"></metric-card>
         <metric-card label="Freigeschaltete Produkte" value="${dashboard.enabledProductCount}"></metric-card>
       `;
       this.table.rows = dashboard.latestOrders.map((o) => ({
-        orderDate: o.orderDate,
+        orderDate: formatDate(o.orderDate),
         kundeName: `${o.kunde.firstName ? o.kunde.firstName + " " : ""}${o.kunde.lastName}`,
-        orderValueLabel: o.orderValue.toFixed(2),
+        orderValueLabel: formatNumber(o.orderValue),
         statusBadge: `<status-badge status="${o.status.toLowerCase()}"></status-badge>`,
       }));
     } catch (error) {
