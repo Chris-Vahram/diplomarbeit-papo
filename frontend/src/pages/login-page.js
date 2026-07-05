@@ -13,6 +13,7 @@ class LoginPage extends HTMLElement {
           Passwort
           <input name="password" type="password" required autocomplete="current-password" />
         </label>
+        <p class="login-form__hint">Demo-Logins: <code>company-demo</code> / <code>partner-demo</code> (Passwort = Benutzername)</p>
         <p class="login-form__error" hidden></p>
         <button type="submit">Anmelden</button>
       </form>

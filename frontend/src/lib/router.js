@@ -16,9 +16,23 @@ const routes = {
   "/partner/profile": { tag: "partner-profile-page", role: "partner", title: "Mein Profil" },
 };
 
+const NAV_ICONS = {
+  "/company/dashboard": "layout-dashboard",
+  "/company/products": "package",
+  "/company/partners": "users",
+  "/company/orders": "shopping-cart",
+  "/company/import": "upload",
+  "/partner/dashboard": "layout-dashboard",
+  "/partner/products": "package",
+  "/partner/orders": "shopping-cart",
+  "/partner/profile": "circle-user",
+};
+
+const appShell = document.getElementById("app-shell");
 const appRoot = document.getElementById("app-root");
 const appNav = document.getElementById("app-nav");
 const appUser = document.getElementById("app-user");
+const appRole = document.getElementById("app-role");
 
 function currentPath() {
   return location.hash.replace(/^#/, "") || "/login";
@@ -31,46 +45,97 @@ function resolveDefaultRoute() {
   return "/partner/dashboard";
 }
 
+function initials(username) {
+  const parts = String(username ?? "").split(/[.\s_-]+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+}
+
+function closeProfileMenu() {
+  const panel = appUser?.querySelector(".profile-menu__panel");
+  const button = appUser?.querySelector(".profile-menu__button");
+  if (panel) panel.hidden = true;
+  if (button) button.setAttribute("aria-expanded", "false");
+}
+
+document.addEventListener("click", () => closeProfileMenu());
+
 function renderNav() {
   const session = getSession();
+  appShell.classList.remove("context-company", "context-partner");
   appNav.innerHTML = "";
   appUser.innerHTML = "";
+  appRole.textContent = "";
 
   if (!session) return;
 
+  appShell.classList.add(session.isCompany ? "context-company" : "context-partner");
+  appRole.textContent = session.isCompany ? "Firmenbereich" : "Partnerbereich";
+
   const links = session.isCompany
     ? [
-        ["#/company/dashboard", "Dashboard"],
-        ["#/company/products", "Produkte"],
-        ["#/company/partners", "Partner"],
-        ["#/company/orders", "Bestellungen"],
-        ["#/company/import", "Datenimport"],
+        ["/company/dashboard", "Dashboard"],
+        ["/company/products", "Produkte"],
+        ["/company/partners", "Partner"],
+        ["/company/orders", "Bestellungen"],
+        ["/company/import", "Datenimport"],
       ]
     : [
-        ["#/partner/dashboard", "Dashboard"],
-        ["#/partner/products", "Produkte"],
-        ["#/partner/orders", "Meine Bestellungen"],
-        ["#/partner/profile", "Mein Profil"],
+        ["/partner/dashboard", "Dashboard"],
+        ["/partner/products", "Produkte"],
+        ["/partner/orders", "Meine Bestellungen"],
       ];
 
+  const path = currentPath();
   for (const [href, label] of links) {
     const link = document.createElement("a");
-    link.href = href;
-    link.textContent = label;
+    link.href = `#${href}`;
+    link.className = href === path ? "is-active" : "";
+    link.innerHTML = `<i data-lucide="${NAV_ICONS[href]}"></i><span>${label}</span>`;
     appNav.appendChild(link);
   }
 
-  const userLabel = document.createElement("span");
-  userLabel.textContent = `${session.username} (${session.roles.join(", ")})`;
-  appUser.appendChild(userLabel);
+  const menu = document.createElement("div");
+  menu.className = "profile-menu";
+  menu.innerHTML = `
+    <button type="button" class="profile-menu__button" aria-haspopup="true" aria-expanded="false">
+      <span class="profile-menu__avatar">${initials(session.username)}</span>
+      <i data-lucide="chevron-down" class="profile-menu__caret"></i>
+    </button>
+    <div class="profile-menu__panel" hidden>
+      <div class="profile-menu__identity">
+        <div class="profile-menu__name">${session.username}</div>
+        <div class="profile-menu__role">${session.isCompany ? "Firma" : "Partner"}</div>
+      </div>
+      <button type="button" data-action="profile" class="profile-menu__item">
+        <i data-lucide="settings"></i><span>Einstellungen</span>
+      </button>
+      <button type="button" data-action="logout" class="profile-menu__item profile-menu__item--danger">
+        <i data-lucide="log-out"></i><span>Abmelden</span>
+      </button>
+    </div>
+  `;
+  appUser.appendChild(menu);
 
-  const logoutButton = document.createElement("button");
-  logoutButton.textContent = "Abmelden";
-  logoutButton.addEventListener("click", () => {
+  const button = menu.querySelector(".profile-menu__button");
+  const panel = menu.querySelector(".profile-menu__panel");
+  button.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const isOpen = !panel.hidden;
+    panel.hidden = isOpen;
+    button.setAttribute("aria-expanded", String(!isOpen));
+  });
+  menu.querySelector('[data-action="logout"]').addEventListener("click", () => {
     logout();
     location.hash = "#/login";
   });
-  appUser.appendChild(logoutButton);
+  menu.querySelector('[data-action="profile"]').addEventListener("click", () => {
+    closeProfileMenu();
+    location.hash = session.isCompany ? "#/company/dashboard" : "#/partner/profile";
+  });
+
+  window.lucide?.createIcons();
 }
 
 function render() {
@@ -97,6 +162,7 @@ function render() {
   }
 
   document.title = `Partnerportal – ${route.title}`;
+  appShell.classList.toggle("app-shell--bare", path === "/login");
   appRoot.innerHTML = "";
   appRoot.appendChild(document.createElement(route.tag));
   renderNav();

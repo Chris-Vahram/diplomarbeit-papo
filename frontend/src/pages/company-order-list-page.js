@@ -9,8 +9,10 @@ class CompanyOrderListPage extends HTMLElement {
   connectedCallback() {
     this.classList.add("area--company");
     this.innerHTML = `
-      <h1>Bestellungen</h1>
-      <button type="button" id="export-btn">CSV exportieren</button>
+      <div class="list-header">
+        <h1>Bestellungen</h1>
+        <button type="button" id="export-btn" class="button-primary">CSV exportieren</button>
+      </div>
       <data-table id="order-table"></data-table>
     `;
 
@@ -26,6 +28,8 @@ class CompanyOrderListPage extends HTMLElement {
       { key: "statusSelect", label: "Status", html: true },
     ];
     this.table.emptyMessage = "Noch keine Bestellungen vorhanden.";
+    this.table.searchKeys = ["partnerName", "kundeName"];
+    this.table.pageSize = 20;
 
     this.table.addEventListener("change", (event) => {
       const select = event.target.closest("[data-order-id]");
@@ -57,6 +61,7 @@ class CompanyOrderListPage extends HTMLElement {
     try {
       await apiFetch(`/company/orders/${orderId}/status`, { method: "PUT", body: JSON.stringify({ status }) });
       showToast("Status aktualisiert.", "success");
+      this.load();
     } catch (error) {
       showToast(error.message, "error");
       this.load();
