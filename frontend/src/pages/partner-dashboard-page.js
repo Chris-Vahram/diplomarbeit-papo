@@ -1,6 +1,7 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import { formatEuro, formatNumber, formatDate } from "../lib/format.js";
+import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue } from "../lib/dashboard-data.js";
 
 const eur = new Intl.NumberFormat("de-AT", { style: "currency", currency: "EUR" });
 const dateLabel = new Intl.DateTimeFormat("de-AT", { day: "2-digit", month: "2-digit", year: "numeric" });
@@ -16,27 +17,20 @@ function toIsoDate(date) {
 }
 
 function defaultPeriod() {
+  // Trailing 6 months so the headline KPIs cover the same window as the month
+  // chart and the dashboard is populated by default. The picker narrows from here.
   const now = new Date();
   const to = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-  const from = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6, 0, 0, 0, 0);
+  const from = new Date(now.getFullYear(), now.getMonth() - 5, 1, 0, 0, 0, 0);
   return { from, to };
-}
-
-function pctDelta(current, previous) {
-  if (previous === 0) return current === 0 ? 0 : null;
-  return ((current - previous) / previous) * 100;
-}
-
-function trendAttrs(current, previous) {
-  const delta = pctDelta(current, previous);
-  if (delta === null) return { trend: "", label: "" };
-  const direction = delta >= 0 ? "up" : "down";
-  const sign = delta >= 0 ? "+" : "";
-  return { trend: direction, label: `${sign}${delta.toFixed(1)}% ggü. Vorperiode` };
 }
 
 function formatCompactEur(value) {
   return value >= 1000 ? `${(value / 1000).toFixed(1).replace(".", ",")} T€` : eur.format(value);
+}
+
+function kundeName(kunde) {
+  return `${kunde.firstName ? kunde.firstName + " " : ""}${kunde.lastName}`;
 }
 
 function renderMonthChart(title, monthLabels, monthlyValues) {
@@ -154,14 +148,14 @@ class PartnerDashboardPage extends HTMLElement {
       this.period = { from, to };
       this.periodPanel.classList.add("is-closed");
       this.updatePeriodUi();
-      this.load();
+      this.render();
     });
 
     this.querySelector("#period-reset").addEventListener("click", () => {
       this.period = defaultPeriod();
       this.periodPanel.classList.add("is-closed");
       this.updatePeriodUi();
-      this.load();
+      this.render();
     });
   }
 
@@ -174,40 +168,65 @@ class PartnerDashboardPage extends HTMLElement {
 
   async load() {
     try {
-      const params = new URLSearchParams({
-        from: toIsoDate(this.period.from),
-        to: toIsoDate(this.period.to),
-      });
-      const dashboard = await apiFetch(`/partner/dashboard?${params}`);
-      const prev = dashboard.previous;
-      const revenueTrend = prev ? trendAttrs(dashboard.totalRevenue, prev.totalRevenue) : { trend: "", label: "" };
-      const commissionTrend = prev ? trendAttrs(dashboard.totalCommission, prev.totalCommission) : { trend: "", label: "" };
-      const ordersTrend = prev ? trendAttrs(dashboard.fulfilledOrderCount, prev.fulfilledOrderCount) : { trend: "", label: "" };
-
-      this.metricRow.innerHTML = `
-        <metric-card label="Provision (abgeschlossen)" value="${formatEuro(dashboard.totalCommission)}" icon="percent" trend="${commissionTrend.trend}" trend-label="${commissionTrend.label}"></metric-card>
-        <metric-card label="Umsatz (abgeschlossen)" value="${formatEuro(dashboard.totalRevenue)}" icon="trending-up" trend="${revenueTrend.trend}" trend-label="${revenueTrend.label}"></metric-card>
-        <metric-card label="Abgeschlossene Bestellungen" value="${dashboard.fulfilledOrderCount}" icon="check-circle" trend="${ordersTrend.trend}" trend-label="${ordersTrend.label}"></metric-card>
-        <metric-card label="Freigeschaltete Produkte" value="${dashboard.enabledProductCount}" ring="${Math.round((dashboard.enabledProductCount / dashboard.totalProductCount) * 100)}" ring-layout="full" ring-caption="von ${dashboard.totalProductCount} Produkten"></metric-card>
-        ${renderMonthChart("Umsatz nach Monat", dashboard.monthLabels ?? [], dashboard.monthlyRevenue ?? [])}
-      `;
-
-      this.chartRow.innerHTML = this.renderCharts(dashboard);
-      window.lucide?.createIcons();
-
-      this.table.rows = dashboard.latestOrders.map((o) => ({
-        orderDate: formatDate(o.orderDate),
-        kundeName: `${o.kunde.firstName ? o.kunde.firstName + " " : ""}${o.kunde.lastName}`,
-        orderValueLabel: formatNumber(o.orderValue),
-        statusBadge: `<status-badge status="${o.status.toLowerCase()}"></status-badge>`,
-      }));
+      // /partner/dashboard for enabled/total product counts; /partner/orders for
+      // the per-order data the charts + period filter run on.
+      const [base, orders] = await Promise.all([
+        apiFetch("/partner/dashboard"),
+        apiFetch("/partner/orders"),
+      ]);
+      this.base = base;
+      this.orders = orders;
+      this.render();
     } catch (error) {
       showToast(error.message, "error");
     }
   }
 
-  renderCharts(dashboard) {
-    const topClients = dashboard.topClients.slice(0, 6);
+  render() {
+    if (!this.orders) return;
+    const fromIso = toIsoDate(this.period.from);
+    const toIso = toIsoDate(this.period.to);
+    const inRange = filterByPeriod(this.orders, fromIso, toIso);
+    const { revenue, commission, count } = fulfilledTotals(inRange);
+
+    const total = this.base.totalProductCount ?? 0;
+    const ringPct = total > 0 ? Math.round((this.base.enabledProductCount / total) * 100) : 0;
+
+    // Monthly chart: trailing 6 months (stable trend), independent of the picker.
+    const { labels, keys } = trailingMonths(6);
+    const monthly = monthlyRevenue(this.orders, keys);
+
+    this.metricRow.innerHTML = `
+      <metric-card label="Provision (abgeschlossen)" value="${formatEuro(commission)}" icon="percent"></metric-card>
+      <metric-card label="Umsatz (abgeschlossen)" value="${formatEuro(revenue)}" icon="trending-up"></metric-card>
+      <metric-card label="Abgeschlossene Bestellungen" value="${count}" icon="check-circle"></metric-card>
+      <metric-card label="Freigeschaltete Produkte" value="${this.base.enabledProductCount}" ring="${ringPct}" ring-layout="full" ring-caption="von ${total} Produkten"></metric-card>
+      ${renderMonthChart("Umsatz nach Monat", labels, monthly)}
+    `;
+
+    this.chartRow.innerHTML = this.renderCharts(inRange);
+    window.lucide?.createIcons();
+
+    // Newest 5 orders in the period (any status), matching the latest-orders convention.
+    const latest = [...inRange].sort((a, b) => b.orderDate.localeCompare(a.orderDate)).slice(0, 5);
+    this.table.rows = latest.map((o) => ({
+      orderDate: formatDate(o.orderDate),
+      kundeName: kundeName(o.kunde),
+      orderValueLabel: formatNumber(o.orderValue),
+      statusBadge: `<status-badge status="${o.status.toLowerCase()}"></status-badge>`,
+    }));
+  }
+
+  renderCharts(inRange) {
+    // Top-Kunden: group the in-range orders by Kunde, sum order value, top 6.
+    const byKunde = new Map();
+    for (const o of inRange) {
+      const key = o.kunde.id;
+      const entry = byKunde.get(key) ?? { name: kundeName(o.kunde), value: 0 };
+      entry.value += o.orderValue;
+      byKunde.set(key, entry);
+    }
+    const topClients = [...byKunde.values()].sort((a, b) => b.value - a.value).slice(0, 6);
     const maxValue = Math.max(1, ...topClients.map((c) => c.value));
 
     const bars = topClients
@@ -223,13 +242,13 @@ class PartnerDashboardPage extends HTMLElement {
       })
       .join("");
 
-    const orders = dashboard.latestOrders;
+    // Bestellstatus donut: count the in-range orders by status.
     const counts = { submitted: 0, reviewed: 0, fulfilled: 0 };
-    for (const o of orders) {
+    for (const o of inRange) {
       const key = o.status.toLowerCase();
       if (key in counts) counts[key] += 1;
     }
-    const total = Math.max(1, orders.length);
+    const total = Math.max(1, inRange.length);
 
     let cumulative = 0;
     const gradientStops = Object.entries(counts)
@@ -261,7 +280,7 @@ class PartnerDashboardPage extends HTMLElement {
       </div>
       <div class="chart-card">
         <h3 class="chart-card__title">Bestellstatus</h3>
-        <p class="status-donut__headline">${orders.length > 0 ? `${completionRate}% bereits abgeschlossen` : "Keine Daten im Zeitraum"}</p>
+        <p class="status-donut__headline">${inRange.length > 0 ? `${completionRate}% bereits abgeschlossen` : "Keine Daten im Zeitraum"}</p>
         <div class="status-donut">
           <div class="status-donut__circle" style="background:conic-gradient(${gradientStops})"></div>
           <div class="status-donut__legend">${legend}</div>

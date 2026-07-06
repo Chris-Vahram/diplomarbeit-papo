@@ -1,47 +1,49 @@
 ## Context
 
-`76bbe40 Frontend Design` is already on `main`. It is a large, working redesign (Light-DOM components preserved, as agreed), but built against an imagined richer dashboard API. The current backend DTOs are `CompanyDashboardDto(totalRevenue, totalCommission, fulfilledOrderCount, partnerCount, settlement)` and `PartnerDashboardDto(totalCommission, totalRevenue, fulfilledOrderCount, enabledProductCount, latestOrders)`. The order-list endpoints already return per-order `orderDate/orderValue/commissionValue/status`, so some widgets are client-side-derivable; others genuinely need new backend aggregation.
+`76bbe40 Frontend Design` is already merged on `main`. It's a large working redesign (Light-DOM components preserved), but built against an imagined richer dashboard API. Current DTOs: `CompanyDashboardDto(totalRevenue, totalCommission, fulfilledOrderCount, partnerCount, settlement)`, `PartnerDashboardDto(totalCommission, totalRevenue, fulfilledOrderCount, enabledProductCount, latestOrders)`. The order-list endpoints already return per-order `orderDate/orderValue/commissionValue/status/kunde`, so most "missing" widgets are actually client-side-derivable from a list the dashboard can fetch itself — the same pattern the superseded `add-dashboard-date-filter` used.
 
 ## Goals / Non-Goals
 
 **Goals:**
-- Demo-safe dashboards: nothing renders `NaN`/blank against the real backend.
-- Keep Tobias's visual design and the period-picker.
-- No new external runtime dependency on a live CDN.
-- Reuse `lib/format.js` (de-AT) rather than re-hardcoded formatting.
+- Demo-safe dashboards: no `NaN`/blank widget against the real backend.
+- Keep Tobias's visuals, including the charts, by feeding them client-side.
+- No live-CDN runtime dependency.
+- Dashboards that actually show data in a demo (seeded historical orders).
 
 **Non-Goals:**
-- No redesign of the design — Tobias owns the visuals; this is reconciliation.
-- No new deferred-feature backend work unless a widget is explicitly chosen BUILD.
+- No redesign of the visuals (Tobias owns them).
+- No new deferred-feature backend aggregation. Everything kept is computed from the existing order list.
 - Not re-implementing the period-picker (adopt Tobias's).
 
 ## Decisions
 
-**Per-widget CUT/BUILD matrix (the decision this change exists to record).** Each row is a team call; the "lean" column is the recommendation.
+**Resolved widget matrix (Chris, 2026-07-06):**
 
-| Widget | Needs | Client-side possible? | Lean |
-|---|---|---|---|
-| Period-picker (Von/Bis) | order list (already fetched) | yes | **KEEP** |
-| Bestellstatus breakdown/donut | order statuses | yes (count from orders) | **KEEP** (wire to client data) |
-| "ggü. Vorperiode" trend | previous-period totals | only if client computes both periods from orders | CUT (or client-compute) |
-| Top-Kunden | per-Kunde revenue aggregation | yes for partner (own orders) | CUT for MVP; optional client-side |
-| Monthly revenue/order sparklines | monthly buckets | yes (bucket the order list client-side) | CUT (or client-compute) |
-| Enabled-vs-total-products ring | `totalProductCount` | needs backend (partner doesn't get full catalog count) | CUT |
+| Widget | Data source | Verdict |
+|---|---|---|
+| Period-picker (Von/Bis) | order list (client) | KEEP as delivered; verify it filters |
+| Monthly revenue/orders chart | bucket order list by `orderDate` (client) | KEEP, wire client-side |
+| Bestellstatus-Donut | count order list by `status` (client) | KEEP, wire client-side |
+| Top-Kunden (partner) | group partner's orders by Kunde (client) | KEEP, wire client-side |
+| Enabled-vs-total products ring | needs a catalog total | OPTIONAL: keep only if `totalProductCount` added (trivial `Product.count()`), else drop the ratio |
+| "ggü. Vorperiode" trend | previous-period compare | **DEFER → B-08** (remove from cards for now) |
 
-Note several "needs backend" widgets are actually client-side-derivable from the order list the dashboard can already fetch (same approach the superseded `add-dashboard-date-filter` used). So a middle path exists: **KEEP the widget but feed it client-side** instead of adding backend fields. The matrix should be resolved widget-by-widget with that third option in mind.
+**Client-side aggregation, not new backend fields.** Each kept chart is computed in JS from the order list the dashboard fetches (company: `/company/orders`; partner: `/partner/orders`). Rationale: zero backend/DTO churn, no N+1, data volume is trivial at demo scale, and it matches the already-accepted client-side approach. The backend DTOs stay as they are (the only optional exception is `totalProductCount` if the products-ring is kept).
 
-**Lucide: vendor + pin.** Replace `<script src="https://unpkg.com/lucide@latest">` with a locally committed, version-pinned Lucide (or inline the ~20 SVGs actually used — the icon set is small and fixed). No live-CDN dependency in a demo that must survive offline. Aligns with the same offline-safety rule chosen for product images.
+**Lucide: vendor + pin.** Replace the `unpkg.com/lucide@latest` script with a locally committed pinned build, or inline the fixed ~20-icon set. Offline-safe, reproducible — same offline-safety rule chosen for product images.
 
-**Supersede `add-dashboard-date-filter`.** Tobias's period-picker covers it. Archive that change as superseded; do not implement its tasks. Any correctness gap in his picker is folded into this change's verification.
+**Demo orders in `DemoDataSeeder`.** Seed ~30 orders across the seeded partners, several Kunden, spread over recent months, mixed statuses (some fulfilled). Dev/test only (existing `LaunchMode.NORMAL` guard). Makes the whole company side + charts demoable; without it the monthly chart is a single bar and settlement is all zeros.
 
-**base.css kept as delivered.** The +2024-line design system is Tobias's deliverable; this change does not rewrite it, only removes rules for any widget that is CUT if they'd otherwise dangle.
+**Supersede `add-dashboard-date-filter`.** Tobias's period-picker covers it; archive as superseded, don't implement. Any correctness gap folds into this change's verification.
+
+**base.css kept as delivered.** Only remove rules that dangle after the Vorperiode trend (and optionally the products-ring) are stripped.
 
 ## Risks / Trade-offs
 
-- **[Risk]** Choosing BUILD for several widgets reopens deferred B-scope and adds backend work near the deadline → **Mitigation**: the matrix's lean is CUT/client-side; BUILD only by explicit team choice.
-- **[Risk]** Cutting widgets Tobias built feels like wasted work → **Mitigation**: frame as MVP-now / Phase-2-later; the CSS/components stay, only the data wiring is deferred.
-- **[Trade-off]** Vendoring Lucide adds a committed asset → acceptable and required for offline demo.
+- **[Risk]** Client-side charts drift from server aggregates → **Mitigation**: the headline metric cards (revenue/commission/counts) stay server-DTO-driven; only the extra charts are client-computed, and the fulfilled-only convention is reused where relevant.
+- **[Trade-off]** Seeding historical orders adds seed code → accepted; it's the single highest-value thing for the diploma demo.
+- **[Trade-off]** Vendoring Lucide commits an asset → required for offline demo.
 
 ## Open Questions
 
-1. **The CUT/BUILD/client-side call per widget row above — needs Chris + Tobias (Mo 2026-07-06 / at the Di client meeting).** Everything else in this change (Lucide, format reuse, period-picker verification, ensuring no `NaN`) proceeds regardless.
+None (matrix resolved). One small pick left to implementation time: keep the products-ring (add trivial `totalProductCount`) or drop its ratio.

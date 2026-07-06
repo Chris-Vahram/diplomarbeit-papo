@@ -10,6 +10,7 @@ public record PartnerDashboardDto(
         BigDecimal totalRevenue,
         long fulfilledOrderCount,
         long enabledProductCount,
+        long totalProductCount,
         List<OrderDto> latestOrders
 ) {
 }

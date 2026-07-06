@@ -52,6 +52,12 @@ Last updated: 2026-07-02
 **Why cut:** Out of scope all versions per FSD. MVP only shows commission transparently (own datensatz + dashboard sums).
 **Trigger:** "implement B-07".
 
+## B-08 — Dashboard "ggü. Vorperiode" trend indicators  `CUT`
+**What full version is:** Metric cards show a +/-x% delta vs the previous equal-length period (e.g. "+4.6% ggü. Vorperiode"), red/green trend arrow.
+**Why cut:** Tobias's redesign (`76bbe40 Frontend Design`) built the UI for it, but it needs period-over-period comparison logic and enough historical order data to be meaningful — marginal value for an internal ordering tool, not MVP. The frontend reads `dashboard.previous` which the backend does not provide.
+**MVP replacement:** metric cards show the current-period value only, no trend.
+**Trigger:** "implement B-08". Cheapest path: compute both periods client-side from the order list (no backend change).
+
 ---
 
 ## Decisions log (so we don't re-litigate)
@@ -75,3 +81,4 @@ Last updated: 2026-07-02
 - 2026-07-02: Dashboard totals (all own orders vs fulfilled-only) = OPEN, Chris will decide with Tobias. Interim default: all own orders regardless of status. Import column formats: waiting on sample data from the client.
 - 2026-07-03: Dashboard totals decided — commission/revenue/order count on the partner dashboard count only `fulfilled` own orders; latest-orders list still shows any status.
 - 2026-07-03: Phase 1 backend implemented on branch `phase-1/data-model-crud` (entities, Product/Partner CRUD + self-edit, programmatic dev/test seeder). Kunde records decided to be scoped to the creating partner (new requirement, was an unspecified gap).
+- 2026-07-06: Tobias pushed the visual design as working code (`76bbe40 Frontend Design`), which rewrote both dashboards and added widgets referencing backend data that doesn't exist. Scope call (Chris): reconcile via OpenSpec change `integrate-frontend-design` — keep the period-picker + the cheap client-side-derivable widgets (monthly chart, Bestellstatus-Donut, Top-Kunden — all computable from the order list), vendor+pin the Lucide icon dependency (was `unpkg.com/lucide@latest`), seed historical demo orders so the dashboards demo well. Only the "ggü. Vorperiode" trend is fully deferred → B-08. The planned change `add-dashboard-date-filter` is superseded by Tobias's period-picker (do not implement).
