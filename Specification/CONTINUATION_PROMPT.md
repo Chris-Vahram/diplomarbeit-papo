@@ -73,9 +73,11 @@ Branch history: everything above is merged to `main` via --no-ff merges, main ==
 - 8.4 (C+T) Diploma writeup linking FSD requirements -> implementation -> tests, noting deferred
   B-01..B-09 - thesis-body writing in Chris's voice. Chris wants this THOROUGH (more effort, real
   prose + a mapping table, not just a checklist) - his explicit call 2026-07-05. Not started.
-- 8.5 (C+T) Research question wording - a concrete German draft sentence was proposed to Chris to send
-  his supervisor for sign-off (not something to finalize unilaterally); status of that send = unknown,
-  ask Chris.
+- 8.5 (C+T) Research question wording - Chris approved this wording on 2026-07-07 for supervisor review:
+  "Wie kann ein webbasiertes Partnerportal gestaltet werden, das Unternehmen, Vertriebspartner und Endkunden
+  in einem partnerbasierten Vertriebsmodell schrittweise verbindet und dabei Partnerverwaltung, Produktfreigabe,
+  Bestellabwicklung, Provisionszuordnung und Auswertungen in einer benutzerfreundlichen und erweiterbaren
+  Plattform zusammenfuehrt?" Supervisor sign-off is still pending.
 - FD.1-FD.4 Frontend visual design - Tobias's core deliverable already landed + reconciled (see STATUS
   above). Any further visual polish passes from Tobias would still need the same reconciliation pattern
   (check for missing-backend-field references before trusting a new page redesign renders correctly).
@@ -130,8 +132,8 @@ code directly into frontend/ (not just CSS tokens as originally planned) - see S
 that was needed. Julian left the project.
 
 # STILL-OPEN QUESTIONS (do not assume - ask if they block you)
-- Research question exact wording - a draft was proposed to send the supervisor for sign-off; confirm with
-  Chris whether that happened and what the supervisor said.
+- Research question supervisor sign-off - wording is approved by Chris (2026-07-07); confirm whether the
+  supervisor accepted it.
 - Import file column formats for the partner + article Excel/CSV files - client sample data status unknown
   (client meeting was scheduled 2026-07-07). Not a blocker: the import UI's column-mapping step handles any
   layout, with a best-guess default mapping based on known German header aliases.

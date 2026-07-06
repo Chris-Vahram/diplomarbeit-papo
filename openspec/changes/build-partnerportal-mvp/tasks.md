@@ -77,7 +77,7 @@ Backend: 33/33 tests pass (5 tests added/extended this session covering the iden
 - [x] 8.2 (C) Data model documentation (ER diagram + entity descriptions) — new `docs/DATA_MODEL.md`: Mermaid ER diagram (all 7 entities + relationships) + per-entity description covering the key design decisions that affect the schema (unit-price snapshot, no CommissionLevel, active flag not Keycloak-synced, Kunde scoping)
 - [ ] 8.3 (T) UI/UX documentation (screens, shared components, flows) — owner is Tobias alone (T, not C/C+T); not attempted here, left for him
 - [ ] 8.4 (C+T) Diploma writeup: link requirements (FSD) -> implementation -> tests; note deferred B-01..B-07 — thesis-body writing, joint task; paused rather than auto-drafted, see chat for the scope question
-- [ ] 8.5 (C+T) Re-tune research question toward internal partner-driven ordering; confirm wording with supervisor — still blocked on supervisor sign-off per CLAUDE.md "still open" list; not something to finalize unilaterally
+- [ ] 8.5 (C+T) Re-tune research question toward internal partner-driven ordering; confirm wording with supervisor — wording approved by Chris on 2026-07-07 and ready to send; still open until supervisor sign-off
 
 ## 9. Phase FD — Frontend Design (async, does NOT block any other phase)
 

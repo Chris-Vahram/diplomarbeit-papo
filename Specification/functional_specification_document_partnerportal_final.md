@@ -423,7 +423,7 @@ The project is functionally acceptable if the following can be demonstrated:
 
 ## 13. Open Questions
 
-- **Research-question wording:** direction decided (internal Partner ↔ Company ordering, see below); exact wording still to confirm with the supervisor.
+- **Research-question supervisor sign-off:** wording approved by Chris on 2026-07-07 and ready to send to the supervisor; final supervisor confirmation still pending.
 - **Import file column formats:** the column sets of the real partner and article Excel/CSV files are not yet specified — waiting on sample data from the client. Needed to define the default column mapping and per-column validation rules for FR-04 (blocks final import implementation, not the rest of the MVP).
 
 ### Resolved (2026-07-03)
@@ -435,10 +435,14 @@ The project is functionally acceptable if the following can be demonstrated:
 ### Resolved (2026-07-01)
 - **Commission percentages:** decided — `Partner.commissionPercent` set by the company via dropdown 5/10/15 + optional custom value. No separate level entity.
 - **Active status:** decided — DB-only flag `Partner.active`, enforced server-side; Keycloak stays simple.
-- **Research question:** decided — reframe toward the internal Partner ↔ Company relationship (partner management, product enablement, partner-driven ordering, commission). The external partner shop + direct end-customer ordering (Endkunde → Partner) is Phase-2 (B-01), mentioned as future. Exact wording still to confirm with the supervisor.
+- **Research question direction:** decided — reframe toward the internal Partner ↔ Company relationship (partner management, product enablement, partner-driven ordering, commission). The external partner shop + direct end-customer ordering (Endkunde → Partner) is Phase-2 (B-01), mentioned as future.
 - **Optional Kunde fields:** decided — order form offers first name, e-mail, phone as optional fields (beyond mandatory Nachname + address), per §8 minimum field expectations.
 - **Affiliate identifier:** decided — deferred, not part of MVP entity/UI.
 - **Schema management:** decided — Hibernate auto-generation, no Flyway migrations for the prototype. Profiles: `drop-and-create` + seed script for dev/test, `update` for the demo/prod profile so demo data survives restarts.
+
+### Resolved (2026-07-07)
+- **Research question wording:** approved by Chris for supervisor review:
+  > Wie kann ein webbasiertes Partnerportal gestaltet werden, das Unternehmen, Vertriebspartner und Endkunden in einem partnerbasierten Vertriebsmodell schrittweise verbindet und dabei Partnerverwaltung, Produktfreigabe, Bestellabwicklung, Provisionszuordnung und Auswertungen in einer benutzerfreundlichen und erweiterbaren Plattform zusammenfuehrt?
 
 ---
 

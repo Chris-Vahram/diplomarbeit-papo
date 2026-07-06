@@ -86,6 +86,8 @@ Wichtig: Das langfristige Ziel enthaelt weiterhin einen Endkundenshop. Der aktue
 
 ### Empfohlene Formulierung
 
+Status: von Chris am 2026-07-07 genehmigt; zur Abstimmung mit dem Betreuer verwenden.
+
 > Wie kann ein webbasiertes Partnerportal gestaltet werden, das Unternehmen, Vertriebspartner und Endkunden in einem partnerbasierten Vertriebsmodell schrittweise verbindet und dabei Partnerverwaltung, Produktfreigabe, Bestellabwicklung, Provisionszuordnung und Auswertungen in einer benutzerfreundlichen und erweiterbaren Plattform zusammenfuehrt?
 
 ### Verstaendlich gesagt

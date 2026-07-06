@@ -208,10 +208,10 @@ WP12, WP13. Harden, verify acceptance criteria, finalize docs.
 - **Data-model ownership** shifted after Julian left → Tobias owns schema; both sign off before Phase 4.
 - **Central price change vs historical orders** → unit-price snapshot on OrderItem.
 - **Two-person scope** → optional enhancements strictly deferred; ordering core protected as must-have.
-- **Thesis narrative gap:** the original research question centers on the external shop, now deferred (B-01) → re-tune research question toward internal partner-driven ordering; confirm with supervisor.
+- **Thesis narrative gap:** the original research question centers on the external shop, now deferred (B-01) → research-question wording was re-tuned toward an extensible Partnerportal with the internal ordering core first; Chris approved the wording on 2026-07-07, supervisor sign-off still pending.
 
 ### Open questions (from FSD §13)
-- Exact research-question wording (direction decided: internal Partner ↔ Company ordering; confirm with supervisor).
+- Supervisor sign-off for the Chris-approved research-question wording.
 - Import file column sets for the partner and article files — waiting on sample data from the client (needed to define default column mapping and validation rules before WP11).
 
 ### Resolved (2026-07-03, see FSD §13)
