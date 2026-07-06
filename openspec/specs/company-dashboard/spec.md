@@ -14,3 +14,36 @@ The company SHALL be able to restrict the dashboard totals and the per-partner s
 - **WHEN** the company resets the range
 - **THEN** the dashboard shows the all-time values again
 
+### Requirement: Company dashboard renders only backend-backed data
+The redesigned company dashboard SHALL render only values the backend actually provides; no metric, chart, or ring may display `NaN`, `undefined`, or an empty chart caused by a missing DTO field. Widgets whose data the backend does not provide SHALL either be removed or fed from data already available client-side.
+
+#### Scenario: Dashboard opened against the real backend
+- **WHEN** the company opens the redesigned dashboard
+- **THEN** every visible metric and chart shows a real value (or an explicit empty-state), never `NaN` or a broken chart
+
+#### Scenario: Money and dates use the German formatter
+- **WHEN** the dashboard shows money or dates
+- **THEN** they use the shared de-AT formatter (`lib/format.js`), consistent with the rest of the app
+
+### Requirement: Company-wide dashboard totals
+The company SHALL see aggregate totals across all partners: total revenue, total commission, total fulfilled-order count, and total partner count. Totals SHALL count only fulfilled orders, consistent with the partner dashboard convention.
+
+#### Scenario: Company views dashboard totals
+- **WHEN** the company opens the company dashboard
+- **THEN** the system shows total revenue, total commission, and total fulfilled-order count summed across all partners' fulfilled orders
+
+#### Scenario: Non-fulfilled orders excluded from totals
+- **WHEN** a partner has orders in `submitted` or `reviewed` status
+- **THEN** those orders are not counted in the company dashboard totals
+
+### Requirement: Per-partner settlement breakdown
+The company SHALL see, per partner, the fulfilled-order count, revenue, and total commission for that partner.
+
+#### Scenario: Company views settlement breakdown
+- **WHEN** the company opens the settlement view
+- **THEN** the system shows one row per partner with that partner's fulfilled-order count, revenue, and total commission
+
+#### Scenario: Partner with no fulfilled orders
+- **WHEN** a partner has no fulfilled orders
+- **THEN** the settlement view shows that partner with zero order count, zero revenue, and zero commission
+
