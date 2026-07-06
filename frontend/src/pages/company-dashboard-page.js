@@ -1,6 +1,7 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import { formatEuro, formatNumber } from "../lib/format.js";
+import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue } from "../lib/dashboard-data.js";
 
 const eur = new Intl.NumberFormat("de-AT", { style: "currency", currency: "EUR" });
 const dateLabel = new Intl.DateTimeFormat("de-AT", { day: "2-digit", month: "2-digit", year: "numeric" });
@@ -10,23 +11,13 @@ function toIsoDate(date) {
 }
 
 function defaultPeriod() {
+  // Trailing 6 months so the headline KPIs cover the same window as the month
+  // chart and the dashboard is populated by default (not scoped to an often-empty
+  // current month). The picker narrows from here.
   const now = new Date();
   const to = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-  const from = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+  const from = new Date(now.getFullYear(), now.getMonth() - 5, 1, 0, 0, 0, 0);
   return { from, to };
-}
-
-function pctDelta(current, previous) {
-  if (previous === 0) return current === 0 ? 0 : null;
-  return ((current - previous) / previous) * 100;
-}
-
-function trendAttrs(current, previous) {
-  const delta = pctDelta(current, previous);
-  if (delta === null) return { trend: "", label: "" };
-  const direction = delta >= 0 ? "up" : "down";
-  const sign = delta >= 0 ? "+" : "";
-  return { trend: direction, label: `${sign}${delta.toFixed(1)}% ggü. Vorperiode` };
 }
 
 function formatCompactEur(value) {
@@ -150,14 +141,14 @@ class CompanyDashboardPage extends HTMLElement {
       this.period = { from, to };
       this.periodPanel.classList.add("is-closed");
       this.updatePeriodUi();
-      this.load();
+      this.render();
     });
 
     this.querySelector("#period-reset").addEventListener("click", () => {
       this.period = defaultPeriod();
       this.periodPanel.classList.add("is-closed");
       this.updatePeriodUi();
-      this.load();
+      this.render();
     });
   }
 
@@ -170,50 +161,75 @@ class CompanyDashboardPage extends HTMLElement {
 
   async load() {
     try {
-      const params = new URLSearchParams({
-        from: toIsoDate(this.period.from),
-        to: toIsoDate(this.period.to),
-      });
-      const dashboard = await apiFetch(`/company/dashboard?${params}`);
-
-      const monthlyRevenue = dashboard.monthlyRevenue ?? [];
-      const monthlyOrderCount = dashboard.monthlyOrderCount ?? [];
-      const prevRevenue = monthlyRevenue.length > 1 ? monthlyRevenue[monthlyRevenue.length - 2] : null;
-      const prevOrderCount = monthlyOrderCount.length > 1 ? monthlyOrderCount[monthlyOrderCount.length - 2] : null;
-      const prevCommission = prevRevenue !== null ? prevRevenue * (dashboard.totalCommission / dashboard.totalRevenue) : null;
-
-      const revenueTrend = prevRevenue !== null ? trendAttrs(dashboard.totalRevenue, prevRevenue) : { trend: "", label: "" };
-      const commissionTrend = prevCommission !== null ? trendAttrs(dashboard.totalCommission, prevCommission) : { trend: "", label: "" };
-      const ordersTrend = prevOrderCount !== null ? trendAttrs(dashboard.fulfilledOrderCount, prevOrderCount) : { trend: "", label: "" };
-
-      const avgOrderValue = dashboard.fulfilledOrderCount > 0 ? dashboard.totalRevenue / dashboard.fulfilledOrderCount : 0;
-      const prevAvgOrderValue = prevRevenue !== null && prevOrderCount ? prevRevenue / prevOrderCount : null;
-      const avgOrderValueTrend = prevAvgOrderValue !== null ? trendAttrs(avgOrderValue, prevAvgOrderValue) : { trend: "", label: "" };
-
-      this.metricRow.innerHTML = `
-        <metric-card label="Umsatz (abgeschlossen)" value="${formatEuro(dashboard.totalRevenue)}" icon="trending-up" tone="positive" trend="${revenueTrend.trend}" trend-label="${revenueTrend.label}"></metric-card>
-        <metric-card label="Provision (abgeschlossen)" value="${formatEuro(dashboard.totalCommission)}" icon="percent" tone="positive" trend="${commissionTrend.trend}" trend-label="${commissionTrend.label}"></metric-card>
-        <metric-card label="Abgeschlossene Bestellungen" value="${dashboard.fulfilledOrderCount}" icon="check-circle" tone="positive" trend="${ordersTrend.trend}" trend-label="${ordersTrend.label}"></metric-card>
-        <metric-card label="Ø Bestellwert" value="${formatEuro(avgOrderValue)}" icon="receipt" tone="positive" trend="${avgOrderValueTrend.trend}" trend-label="${avgOrderValueTrend.label}"></metric-card>
-        ${renderMonthChart("Umsatz nach Monat", dashboard.monthLabels ?? [], monthlyRevenue)}
-      `;
-
-      this.chartRow.innerHTML = this.renderCharts(dashboard);
-      window.lucide?.createIcons();
-
-      this.table.rows = dashboard.settlement.map((s) => ({
-        partnerName: s.partnerName,
-        fulfilledOrderCount: s.fulfilledOrderCount,
-        revenueLabel: formatNumber(s.revenue),
-        commissionLabel: formatNumber(s.commission),
-      }));
+      // /company/dashboard for the full partner roster (incl. zero-order partners);
+      // /company/orders for the per-order data the charts + period filter run on.
+      const [roster, orders] = await Promise.all([
+        apiFetch("/company/dashboard"),
+        apiFetch("/company/orders"),
+      ]);
+      this.roster = roster;
+      this.orders = orders;
+      this.render();
     } catch (error) {
       showToast(error.message, "error");
     }
   }
 
-  renderCharts(dashboard) {
-    const topPartners = [...dashboard.settlement].sort((a, b) => b.revenue - a.revenue).slice(0, 5);
+  render() {
+    if (!this.orders) return;
+    const fromIso = toIsoDate(this.period.from);
+    const toIso = toIsoDate(this.period.to);
+    const inRange = filterByPeriod(this.orders, fromIso, toIso);
+    const { revenue, commission, count } = fulfilledTotals(inRange);
+    const avgOrderValue = count > 0 ? revenue / count : 0;
+
+    // Monthly chart: trailing 6 months (stable trend), independent of the picker.
+    const { labels, keys } = trailingMonths(6);
+    const monthly = monthlyRevenue(this.orders, keys);
+
+    this.metricRow.innerHTML = `
+      <metric-card label="Umsatz (abgeschlossen)" value="${formatEuro(revenue)}" icon="trending-up" tone="positive"></metric-card>
+      <metric-card label="Provision (abgeschlossen)" value="${formatEuro(commission)}" icon="percent" tone="positive"></metric-card>
+      <metric-card label="Abgeschlossene Bestellungen" value="${count}" icon="check-circle" tone="positive"></metric-card>
+      <metric-card label="Ø Bestellwert" value="${formatEuro(avgOrderValue)}" icon="receipt" tone="positive"></metric-card>
+      ${renderMonthChart("Umsatz nach Monat", labels, monthly)}
+    `;
+
+    const settlement = this.buildSettlement(inRange);
+    this.chartRow.innerHTML = this.renderCharts(settlement, revenue, commission);
+    window.lucide?.createIcons();
+
+    this.table.rows = settlement.map((s) => ({
+      partnerName: s.partnerName,
+      fulfilledOrderCount: s.fulfilledOrderCount,
+      revenueLabel: formatNumber(s.revenue),
+      commissionLabel: formatNumber(s.commission),
+    }));
+  }
+
+  // Per-partner settlement over the in-range fulfilled orders. Seeds every partner
+  // from the roster so partners with no orders in the period still show a zero row.
+  buildSettlement(inRange) {
+    const byId = new Map();
+    for (const s of this.roster.settlement) {
+      byId.set(s.partnerId, { partnerName: s.partnerName, fulfilledOrderCount: 0, revenue: 0, commission: 0 });
+    }
+    for (const o of inRange) {
+      if (o.status !== "FULFILLED") continue;
+      let row = byId.get(o.partnerId);
+      if (!row) {
+        row = { partnerName: o.partnerName, fulfilledOrderCount: 0, revenue: 0, commission: 0 };
+        byId.set(o.partnerId, row);
+      }
+      row.fulfilledOrderCount += 1;
+      row.revenue += o.orderValue;
+      row.commission += o.commissionValue ?? 0;
+    }
+    return [...byId.values()];
+  }
+
+  renderCharts(settlement, totalRevenue, totalCommission) {
+    const topPartners = [...settlement].sort((a, b) => b.revenue - a.revenue).slice(0, 5);
     const maxRevenue = Math.max(1, ...topPartners.map((p) => p.revenue));
 
     const bars = topPartners
@@ -228,7 +244,7 @@ class CompanyDashboardPage extends HTMLElement {
       )
       .join("");
 
-    const rate = dashboard.totalRevenue > 0 ? (dashboard.totalCommission / dashboard.totalRevenue) * 100 : 0;
+    const rate = totalRevenue > 0 ? (totalCommission / totalRevenue) * 100 : 0;
 
     return `
       <div class="chart-card">
@@ -242,7 +258,7 @@ class CompanyDashboardPage extends HTMLElement {
             <div class="donut-ring" style="--pct:${rate.toFixed(1)}">
               <span class="donut-ring__label">${rate.toFixed(1)}%</span>
             </div>
-            <p class="donut-ring__figure">${eur.format(dashboard.totalCommission)} von ${eur.format(dashboard.totalRevenue)}</p>
+            <p class="donut-ring__figure">${eur.format(totalCommission)} von ${eur.format(totalRevenue)}</p>
           </div>
           <p class="donut-ring__caption">Anteil der Provision am abgeschlossenen Gesamtumsatz.</p>
         </div>

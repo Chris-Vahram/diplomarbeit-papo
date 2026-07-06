@@ -1,20 +1,26 @@
-## 0. Decision gate (blocks group 2)
+## 1. Demo-safety + hygiene (MVP-critical)
 
-- [ ] 0.1 Chris + Tobias resolve the CUT / BUILD / client-side call per widget row in `design.md` (Vorperiode trend, Top-Kunden, monthly sparklines, products ring, status donut). Record the outcome in this change before implementing group 2.
+- [x] 1.1 Vendor + pin Lucide: replace `https://unpkg.com/lucide@latest` in `index.html` with a locally committed, version-pinned copy (or inline the ~20 SVGs actually used); confirm icons render with no network
+- [x] 1.2 Remove the "ggü. Vorperiode" trend from both dashboards' metric cards (defer → B-08); drop the now-unused `dashboard.previous` reads and any dangling `base.css`/`metric-card` trend rules
+- [x] 1.3 Sweep both redesigned dashboards + `partner-order-list-page.js` for hardcoded `toFixed`/ISO dates → route through `lib/format.js` (de-AT)
+- [x] 1.4 Verify Tobias's period-picker actually filters totals/lists (Von/Bis inclusive, reset restores all-time); fix if it only styles
 
-## 1. Integration hygiene (proceeds regardless of the decision)
+## 2. Wire the kept charts client-side (keeps Tobias's visuals, no backend change)
 
-- [ ] 1.1 Vendor + pin Lucide: replace `https://unpkg.com/lucide@latest` in `index.html` with a locally committed, version-pinned copy (or inline the ~20 SVGs actually used); verify icons render offline
-- [ ] 1.2 Audit both redesigned dashboards + `partner-order-list-page.js` for hardcoded `toFixed`/ISO dates; route money/dates through `lib/format.js` (de-AT)
-- [ ] 1.3 Verify Tobias's period-picker actually filters totals/lists correctly against real orders (Von/Bis inclusive, reset restores all-time); fix if it only styles without filtering
+- [x] 2.1 Company dashboard: fetch `/company/orders`; compute monthly revenue/orders buckets (by `orderDate`) + Bestellstatus-Donut (count by `status`) from it; feed the existing chart markup
+- [x] 2.2 Partner dashboard: fetch `/partner/orders`; compute monthly chart, status donut, and Top-Kunden (group own orders by Kunde, sum `orderValue`, top N) from it
+- [x] 2.3 Products-ring pick: either drop the enabled-vs-total ratio, or add a trivial `totalProductCount` (`Product.count()`) to `PartnerDashboardDto` + `DashboardService` and keep the ring
+- [x] 2.4 Confirm no dashboard reads a non-existent DTO field anymore (grep `monthLabels|monthlyRevenue|monthlyOrderCount|previous|topClients|totalProductCount`)
 
-## 2. Reconcile widgets to backend (per the group-0 decision)
+## 3. Demo data
 
-- [ ] 2.1 For each CUT widget: remove it from the dashboard JS and any dangling `base.css`/`metric-card` rules; confirm no remaining reference to the missing DTO field
-- [ ] 2.2 For each KEEP-client-side widget: feed it from the already-fetched order list (no backend change); e.g. Bestellstatus breakdown counted from order statuses, monthly buckets from `orderDate`
-- [ ] 2.3 For each BUILD widget (only if chosen): extend the relevant DTO + `DashboardService` aggregation and add a backend test; no N+1
+- [x] 3.1 `DemoDataSeeder`: seed ~30 orders across the seeded partners + several Kunden, spread over recent months, mixed statuses (enough fulfilled to populate settlement/charts); dev/test only (existing `LaunchMode.NORMAL` guard); reuse `OrderService`/commission creation so `CommissionRecord`s exist
 
-## 3. Verification
+## 4. Verification
 
-- [ ] 3.1 Browser-verify both dashboards against the seeded/real backend: no `NaN`/blank charts, period-picker filters correctly, umlaut names render, German number/date formatting throughout
-- [ ] 3.2 Confirm no live-CDN request on load (offline check); full backend test suite green
+- [x] 4.1 Browser-verify both dashboards against the seeded backend: no `NaN`/blank; monthly chart + status donut + Top-Kunden populated; period-picker filters; umlaut names + de-AT formatting throughout
+- [x] 4.2 Offline check: no live-CDN request on load; full backend test suite green (add a test only if 2.3 adds `totalProductCount`)
+
+## 5. Bookkeeping
+
+- [x] 5.1 Archive `add-dashboard-date-filter` as superseded by the period-picker (do not implement its tasks)
