@@ -81,7 +81,7 @@ class CompanyImportPage extends HTMLElement {
       <h2>Spaltenzuordnung (${preview.totalRows} Zeile${preview.totalRows === 1 ? "" : "n"} erkannt)</h2>
       <div id="mapping-fields">${fieldRows}</div>
       <h3>Beispieldaten</h3>
-      <table class="data-table"><thead><tr>${sampleHead}</tr></thead><tbody>${sampleBody}</tbody></table>
+      <div class="data-table__scroll"><table class="data-table"><thead><tr>${sampleHead}</tr></thead><tbody>${sampleBody}</tbody></table></div>
       <button type="button" id="commit-btn" class="button-primary">Import bestätigen</button>
     `;
     this.querySelector("#commit-btn").addEventListener("click", () => this.commitImport());
@@ -122,10 +122,12 @@ class CompanyImportPage extends HTMLElement {
     this.content.innerHTML = `
       <h2>Ergebnis</h2>
       <p>${report.acceptedCount} von ${report.totalRows} Zeilen importiert, ${report.rejectedCount} abgelehnt.</p>
-      <table class="data-table">
-        <thead><tr><th>Zeile</th><th>Status</th><th>Fehler</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
+      <div class="data-table__scroll">
+        <table class="data-table">
+          <thead><tr><th>Zeile</th><th>Status</th><th>Fehler</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
     `;
   }
 }

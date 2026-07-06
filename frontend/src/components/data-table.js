@@ -149,10 +149,12 @@ class DataTable extends HTMLElement {
 
     this.innerHTML = `
       ${searchHtml}
-      <table class="data-table">
-        <thead><tr>${head}</tr></thead>
-        <tbody>${body}</tbody>
-      </table>
+      <div class="data-table__scroll">
+        <table class="data-table">
+          <thead><tr>${head}</tr></thead>
+          <tbody>${body}</tbody>
+        </table>
+      </div>
       ${pagerHtml}
     `;
   }
