@@ -92,7 +92,7 @@ Tobias produces the visual design (Claude design) in parallel; screens are built
 
 - [x] 9.1 [opt] Company overview dashboard (totals across partners) — done via `add-company-dashboard`
 - [x] 9.2 [opt] Per-partner settlement overview (sales count, revenue, total commission) — done via `add-company-dashboard`
-- [ ] 9.3 [opt] Product category/image support in UI
+- [x] 9.3 [opt] Product category/image support in UI — done via `add-product-category-image`
 - [x] 9.4 [opt] Search/filter/pagination on large product/partner lists (~800 articles) — done via `add-list-search-pagination`
 - [x] 9.5 [opt] Export order/commission lists (CSV) — done via `add-csv-export`
 

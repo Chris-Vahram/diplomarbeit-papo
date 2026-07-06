@@ -18,8 +18,7 @@ Working repo (git): /Users/mitgl/Desktop/Schule/4CHITM/Diplomarbeit/diplomarbeit
 - Specification/CONTINUATION_PROMPT.md = this file.
 - Documentation/Besprechungsprotokolle/ = client meeting notes (17.06 + 24.06.2026).
 - openspec/changes/build-partnerportal-mvp/ = MVP OpenSpec change (schema spec-driven), NOT archived yet (8.3-8.5/FD.x still open, see WHAT'S LEFT). tasks.md checkboxes = progress truth.
-- openspec/changes/archive/ = 7 archived changes: 2026-07-04-fix-audit-hardening, 2026-07-05-add-german-locale-formatting, 2026-07-06-add-dashboard-date-filter (superseded, not built - see below), 2026-07-06-integrate-frontend-design, 2026-07-06-add-company-dashboard, 2026-07-06-add-csv-export, 2026-07-06-add-list-search-pagination.
-- openspec/changes/add-product-category-image/ = the ONLY planned-but-not-implemented change left (9.3, optional product category/image UI). 0/8 tasks. Build via `/opsx:apply add-product-category-image` when Chris wants it.
+- openspec/changes/archive/ = 8 archived changes: 2026-07-04-fix-audit-hardening, 2026-07-05-add-german-locale-formatting, 2026-07-06-add-dashboard-date-filter (superseded, not built - see below), 2026-07-06-integrate-frontend-design, 2026-07-06-add-company-dashboard, 2026-07-06-add-csv-export, 2026-07-06-add-list-search-pagination, 2026-07-06-add-product-category-image.
 - openspec/specs/ = published capability specs (company-dashboard, partner-dashboard, data-export, locale-formatting, partner-management, product-management, product-enablement) - source of truth for what's actually built, kept in sync on each archive.
 - CLAUDE.md (repo root) = project memory aligned with FSD v2; where anything conflicts, FSD v2 + backlog win.
 - docs/SETUP.md = how to run everything (docker compose, quarkus:dev, static frontend server, demo users).
@@ -35,11 +34,12 @@ Note: .claude and .codex live ONLY inside diplomarbeit-papo/ (outer copies delet
 - Git commit/push/merge: Chris runs these himself, always - just hand him a ready-to-use commit message and which branch to act on. Do not run commit/push/merge yourself even mid-implementation, even if asked to "continue" - only on an explicit in-the-moment ask (e.g. "commit this", "merge now").
 - End every implementation turn by stating the branch name + a ready commit message, unprompted (Chris juggles multiple parallel change branches).
 
-# STATUS (2026-07-06, verify against `openspec list --json` before trusting)
-MVP core (Phases 0-6, build-partnerportal-mvp: 45/53) is DONE and merged to main.
+# STATUS (2026-07-07, verify against `openspec list --json` before trusting)
+MVP core (Phases 0-6, build-partnerportal-mvp: 46/53) is DONE and merged to main.
 Post-MVP work also DONE and merged: fix-audit-hardening (security/robustness), add-list-search-pagination,
 add-company-dashboard, add-csv-export, add-german-locale-formatting (de-AT money/date formatting incl. CSV),
-a small order-form bugfix (hidden "neuer Kunde" fields kept `required`, blocked submit - fixed), and the big one:
+add-product-category-image (product image thumbnails), a small order-form bugfix (hidden "neuer Kunde" fields kept
+`required`, blocked submit - fixed), and the big one:
 
 **Tobias pushed the full visual design as working code** (`76bbe40 Frontend Design`, 2026-07-05/06) - not just
 tokens, a full rewrite of both dashboards, metric-card, router, base.css (+2024 lines), and a period-picker.
@@ -59,12 +59,16 @@ Lucide CDN. Change `integrate-frontend-design` (IMPLEMENTED, ARCHIVED 2026-07-06
 - Backend 46/46 tests green throughout. Both dashboards browser-verified: no NaN, umlauts render, period
   filter proven to change totals live.
 
+Product image thumbnails (9.3, IMPLEMENTED, ARCHIVED 2026-07-06):
+- `data-table` supports an opt-in `image: true` column type; image URLs are escaped into `src`, never rendered as raw HTML.
+- Company product list and partner enabled-products list show a `Bild` thumbnail column.
+- Empty or failed images fall back to a neutral placeholder via a capture-phase `error` listener, with no inline JS.
+- Demo products use local SVG assets in `frontend/assets/products/`; "Wasserwaage 100cm" intentionally has no image to exercise the placeholder path.
+- Browser-verified after merging Tobias's responsive layout changes: company + partner thumbnails load locally, no external image requests, dead URL falls back, malicious `imageUrl` does not execute, umlauts render.
+
 Branch history: everything above is merged to `main` via --no-ff merges, main == origin/main, fully pushed.
 
 # WHAT'S LEFT
-- `add-product-category-image` (9.3, optional) - product image thumbnail + category in both product lists.
-  Planned (proposal/design/specs/tasks all written, 0/8 done), not yet implemented. Ask Chris if he still
-  wants it before building - it was optional and never explicitly greenlit for a build session.
 - 8.3 (T) UI/UX documentation - Tobias's task alone (T, not C/C+T). Not attempted by Chris/Claude.
 - 8.4 (C+T) Diploma writeup linking FSD requirements -> implementation -> tests, noting deferred
   B-01..B-09 - thesis-body writing in Chris's voice. Chris wants this THOROUGH (more effort, real
@@ -80,8 +84,8 @@ Branch history: everything above is merged to `main` via --no-ff merges, main ==
   blocker, the import UI's column-mapping handles any layout regardless).
 
 # HOW TO RESUME
-Ask Chris what he wants next rather than assuming: `add-product-category-image` build, the diploma
-writeup (8.4), or something new entirely. Do not default into building 9.3 without an explicit go-ahead.
+Ask Chris what he wants next rather than assuming: diploma writeup (8.4), UI/UX docs coordination
+(8.3, Tobias-owned), research-question follow-up (8.5), client import-sample follow-up, or something new entirely.
 
 # HARD RULE
 Meetings override the FSD when they conflict (newer = authoritative). FSD v2 + phase2_backlog.md already encode the meeting decisions. Do not reintroduce v1 assumptions.
@@ -131,7 +135,6 @@ that was needed. Julian left the project.
 - Import file column formats for the partner + article Excel/CSV files - client sample data status unknown
   (client meeting was scheduled 2026-07-07). Not a blocker: the import UI's column-mapping step handles any
   layout, with a best-guess default mapping based on known German header aliases.
-- Whether Chris still wants `add-product-category-image` (9.3) built.
 
 # ALREADY RESOLVED (do not reopen)
 - Dashboard totals: fulfilled orders only (commission/revenue/order count); latest-orders list shows any status. Both dashboards additionally support a client-side Von/Bis period filter.
