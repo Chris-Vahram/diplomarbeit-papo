@@ -7,6 +7,7 @@ import at.papo.partnerportal.order.Order;
 import at.papo.partnerportal.order.OrderDto;
 import at.papo.partnerportal.order.OrderStatus;
 import at.papo.partnerportal.partner.Partner;
+import at.papo.partnerportal.product.Product;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -48,7 +49,7 @@ public class DashboardService {
                 .toList();
 
         return new PartnerDashboardDto(totalCommission, totalRevenue, fulfilledOrders.size(),
-                enablementService.countEnabledForPartner(partner), latestOrders);
+                enablementService.countEnabledForPartner(partner), Product.count(), latestOrders);
     }
 
     // Two list queries + a batch commission lookup (same pattern as OrderService.listAll)
