@@ -34,6 +34,7 @@ class CompanyProductListPage extends HTMLElement {
 
     this.table = this.querySelector("#product-table");
     this.table.columns = [
+      { key: "imageUrl", label: "Bild", image: true },
       { key: "name", label: "Name" },
       { key: "priceLabel", label: "Preis (€)" },
       { key: "category", label: "Kategorie" },
@@ -61,6 +62,7 @@ class CompanyProductListPage extends HTMLElement {
     try {
       this.products = await apiFetch("/company/products");
       this.table.rows = this.products.map((p) => ({
+        imageUrl: p.imageUrl ?? "",
         name: p.name,
         priceLabel: formatNumber(p.price),
         category: p.category ?? "–",

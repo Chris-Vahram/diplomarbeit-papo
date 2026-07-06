@@ -1,9 +1,12 @@
 import { escapeHtml } from "../lib/html.js";
 
-// Set .columns = [{ key, label, html? }] and .rows = [{...}] as JS properties (not attributes).
-// Cell values are HTML-escaped by default (row data may contain partner/Kunde/import-file
-// text); pass `html: true` on a column def for cells that intentionally render markup
-// (action buttons, status selects/badges, checkboxes).
+// Set .columns = [{ key, label, html?, image? }] and .rows = [{...}] as JS properties (not
+// attributes). Cell values are HTML-escaped by default (row data may contain partner/Kunde/
+// import-file text); pass `html: true` on a column def for cells that intentionally render
+// markup (action buttons, status selects/badges, checkboxes). Pass `image: true` for a
+// thumbnail cell — the raw value is treated as a URL, escaped into `src`, never as markup;
+// `image` wins over `html` if both are set. Empty value or a failed image load renders a
+// neutral `.data-table__thumb--empty` placeholder instead of a broken-image glyph.
 // Optional .emptyMessage = "..." shown when rows is empty (e.g. FR-25 no-enabled-products case).
 // Optional .searchKeys = [key, ...] + .pageSize = n opt this table into a client-side search
 // input + pager. Search matches raw values at .searchKeys (never rendered cell HTML), so it
@@ -68,7 +71,23 @@ class DataTable extends HTMLElement {
         this.render();
       }
     });
+    this.addEventListener(
+      "error",
+      (event) => {
+        const img = event.target;
+        if (!(img instanceof HTMLImageElement) || !img.classList.contains("data-table__thumb")) return;
+        const placeholder = document.createElement("span");
+        placeholder.className = "data-table__thumb data-table__thumb--empty";
+        img.replaceWith(placeholder);
+      },
+      true,
+    );
     this.render();
+  }
+
+  _renderImageCell(value) {
+    if (!value) return `<span class="data-table__thumb data-table__thumb--empty"></span>`;
+    return `<img class="data-table__thumb" src="${escapeHtml(value)}" alt="" loading="lazy">`;
   }
 
   _filteredRows() {
@@ -111,6 +130,7 @@ class DataTable extends HTMLElement {
         const cells = this._columns
           .map((c) => {
             const value = row[c.key] ?? "";
+            if (c.image) return `<td>${this._renderImageCell(value)}</td>`;
             return `<td>${c.html ? value : escapeHtml(value)}</td>`;
           })
           .join("");

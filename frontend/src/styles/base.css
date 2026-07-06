@@ -1113,6 +1113,19 @@ data-table {
   vertical-align: middle;
 }
 
+.data-table__thumb {
+  display: block;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+}
+
+.data-table__thumb--empty {
+  background: var(--color-neutral-100);
+  border: 1px solid var(--border-default);
+}
+
 .data-table tbody tr {
   transition: background var(--duration-fast) var(--ease-in-out);
 }

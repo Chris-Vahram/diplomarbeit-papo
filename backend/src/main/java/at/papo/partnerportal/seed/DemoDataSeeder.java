@@ -77,32 +77,41 @@ public class DemoDataSeeder {
 
     private void seedProducts() {
         persistProduct("Bohrmaschine Profi 750W", "89.90",
-                "Schlagbohrmaschine mit 750 Watt, inkl. Koffer.", true, "Werkzeug");
+                "Schlagbohrmaschine mit 750 Watt, inkl. Koffer.", true, "Werkzeug",
+                "/assets/products/werkzeug.svg");
         persistProduct("Akkuschrauber 18V Set", "129.00",
-                "Akkuschrauber mit zwei Akkus und Ladegerät.", true, "Werkzeug");
+                "Akkuschrauber mit zwei Akkus und Ladegerät.", true, "Werkzeug",
+                "/assets/products/werkzeug.svg");
         persistProduct("Malerpinsel-Set 5-teilig", "14.50",
-                "Fünf Pinselgrößen für Innen- und Außenanstrich.", true, "Malerbedarf");
+                "Fünf Pinselgrößen für Innen- und Außenanstrich.", true, "Malerbedarf",
+                "/assets/products/malerbedarf.svg");
         persistProduct("Silikon transparent 300ml", "6.90",
-                "Sanitärsilikon, schimmelresistent.", true, "Baustoffe");
+                "Sanitärsilikon, schimmelresistent.", true, "Baustoffe",
+                "/assets/products/baustoffe.svg");
         persistProduct("Schutzhelm gelb", "12.30",
-                "Bauhelm nach EN 397.", true, "Arbeitsschutz");
+                "Bauhelm nach EN 397.", true, "Arbeitsschutz",
+                "/assets/products/arbeitsschutz.svg");
         // Unavailable — for FR-24 (unavailable-product) testing (Phase 3).
+        // Also the deliberate no-image product, exercising the thumbnail placeholder path.
         persistProduct("Wasserwaage 100cm", "24.90",
-                "Aluminium-Wasserwaage, 3 Libellen.", false, "Werkzeug");
+                "Aluminium-Wasserwaage, 3 Libellen.", false, "Werkzeug", null);
         persistProduct("Handschuhe Gr. L (Set 10 Paar)", "18.00",
-                "Arbeitshandschuhe, beschichtet.", true, "Arbeitsschutz");
+                "Arbeitshandschuhe, beschichtet.", true, "Arbeitsschutz",
+                "/assets/products/arbeitsschutz.svg");
         persistProduct("Kabeltrommel 25m", "39.90",
-                "Kabeltrommel mit Überlastschutz.", true, "Elektro");
+                "Kabeltrommel mit Überlastschutz.", true, "Elektro",
+                "/assets/products/elektro.svg");
     }
 
     private void persistProduct(String name, String price, String description, boolean available,
-            String category) {
+            String category, String imageUrl) {
         Product product = new Product();
         product.name = name;
         product.price = new BigDecimal(price);
         product.description = description;
         product.available = available;
         product.category = category;
+        product.imageUrl = imageUrl;
         product.persist();
     }
 
