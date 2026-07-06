@@ -205,10 +205,12 @@ class PartnerOrderListPage extends HTMLElement {
     this.modalContent.innerHTML = `
       <section class="order-confirmation order-confirmation--modal">
         <p>Kunde: ${kundeName}, ${escapeHtml(order.kunde.address)}</p>
-        <table class="data-table">
-          <thead><tr><th>Artikel</th><th>Menge</th><th>Preis (€)</th><th>Summe (€)</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
+        <div class="data-table__scroll">
+          <table class="data-table">
+            <thead><tr><th>Artikel</th><th>Menge</th><th>Preis (€)</th><th>Summe (€)</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
         <p><strong>Gesamtwert: ${formatEuro(order.orderValue)}</strong></p>
         <section class="simulated-email">
           <h3>Simulierte Bestätigungs-E-Mail (nicht wirklich versendet)</h3>

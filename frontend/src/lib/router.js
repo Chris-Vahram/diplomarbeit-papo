@@ -33,6 +33,28 @@ const appRoot = document.getElementById("app-root");
 const appNav = document.getElementById("app-nav");
 const appUser = document.getElementById("app-user");
 const appRole = document.getElementById("app-role");
+const appBackdrop = document.getElementById("app-backdrop");
+const navToggle = document.getElementById("nav-toggle");
+
+// Off-canvas sidebar (narrow viewports only — see base.css breakpoint). Closing
+// on every navigation/backdrop-click/Escape means the mobile state never
+// leaks into a desktop resize or the next route.
+function closeMobileNav() {
+  appShell.classList.remove("nav-open");
+  navToggle?.setAttribute("aria-expanded", "false");
+}
+
+navToggle?.addEventListener("click", () => {
+  const isOpen = appShell.classList.toggle("nav-open");
+  navToggle.setAttribute("aria-expanded", String(isOpen));
+});
+appBackdrop?.addEventListener("click", closeMobileNav);
+appNav.addEventListener("click", (event) => {
+  if (event.target.closest("a")) closeMobileNav();
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeMobileNav();
+});
 
 function currentPath() {
   return location.hash.replace(/^#/, "") || "/login";
@@ -139,6 +161,7 @@ function renderNav() {
 }
 
 function render() {
+  closeMobileNav();
   const path = currentPath();
   const route = routes[path];
 
