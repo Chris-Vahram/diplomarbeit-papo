@@ -24,13 +24,16 @@ Firmenbereich:
 
 	Dann in Menü: Partnerverwaltung und Produktverwaltung
 
+	Manuelle Bestellung hinzufügen(wenn z.b. über email gekommen ist)
 
 Partnerbereich:
 	Bei neuer Bestellung: "Endkunde" statt "Kunde" hinschreiben
 	Bei Dashboard: ganz groß "Neue Bestellung" - Button (Bestellungenn aufgeben ist das wichtigste)
 	Bestellungsliste: bei klick auf Bestellung Details anzeigen (Produkte,...)
 
+Am wichtigsten sind neue Bestellungen: Indicator (wie Notifications) bei Menü Items
 
+User wird ausgelogged bei Seitenwechsel
 
 
 Powerpoint für Userstories + wie umgesetzt + Techfolie (ist schon für DA Präsentation)
