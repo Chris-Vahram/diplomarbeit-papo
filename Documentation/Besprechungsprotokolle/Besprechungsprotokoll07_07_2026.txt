@@ -1,0 +1,41 @@
+Besprechung 7.07.2026, 9:05 Uhr
+anwesend: Prof. Hammer, Chris, Tobias
+
+MVP-Stand herzeigen
+In Zukunft: mit PowerPoint umgesetzte Userstories herzeigen
+
+Firmenbereich:
+	Bestellungsliste Stati anpassen
+	Bestellungsliste: Details bei Klick auf Bestellung (bestellte Produkte, etc)
+	Menüpunkt "Partner" soll "Partnerverwaltung" heißen
+	Partner bearbeiten: passt?
+	Partner anlegen: Felder für Adresse aufteilen, Keycloak Feld weg
+	Produkte: passt?
+	Produkt anlegen: 
+	Menübenennung: Partnerportal unter PAPO schreiben; Firmenbereich -> Bezeichnung irreführend (Partner ist auch Firma)
+	
+		
+	Dashboard: muss man fragen wie sie haben wollen, ist kundenspezifisch
+
+	Bestellungen in Menü direkt nach Dashboard
+
+	Suchfelder bei Tabellen anpassen (Abstände)
+	Bestellliste: Filter wichtig! (v.A. Zeitlich)
+
+	Dann in Menü: Partnerverwaltung und Produktverwaltung
+
+
+Partnerbereich:
+	Bei neuer Bestellung: "Endkunde" statt "Kunde" hinschreiben
+	Bei Dashboard: ganz groß "Neue Bestellung" - Button (Bestellungenn aufgeben ist das wichtigste)
+	Bestellungsliste: bei klick auf Bestellung Details anzeigen (Produkte,...)
+
+
+
+
+Powerpoint für Userstories + wie umgesetzt + Techfolie (ist schon für DA Präsentation)
+
+Hosten (vercel)
+
+Besprechung angesetzt mit Kunde für Freitag, 10.07.2026 11:00 Uhr Online
+
