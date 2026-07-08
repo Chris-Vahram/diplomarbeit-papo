@@ -27,6 +27,10 @@ class PartnerProductListPage extends HTMLElement {
   async load() {
     try {
       const products = await apiFetch("/partner/products");
+      const categories = [...new Set(products.map((p) => p.category).filter(Boolean))].sort();
+      this.table.filters = [
+        { key: "category", type: "select", label: "Kategorie", options: categories.map((c) => ({ value: c, label: c })) },
+      ];
       this.table.rows = products.map((p) => ({
         imageUrl: p.imageUrl ?? "",
         name: p.name,

@@ -17,6 +17,13 @@ export function formatNumber(value) {
   }).format(value);
 }
 
+// Composes a structured Address (street/houseNumber/postalCode/city/country) back
+// into one display string for read-only contexts (dropdowns, confirmations, details).
+export function formatAddress(address) {
+  if (!address) return "";
+  return `${address.street} ${address.houseNumber}, ${address.postalCode} ${address.city}, ${address.country}`;
+}
+
 // ISO "YYYY-MM-DD" -> "dd.MM.yyyy" (zero-padded). Parses the parts manually and
 // builds a local Date (not `new Date(isoString)`, which parses as UTC midnight
 // and can shift the displayed calendar day in negative-UTC-offset timezones).

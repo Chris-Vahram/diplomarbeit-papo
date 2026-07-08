@@ -61,6 +61,19 @@ class CompanyProductListPage extends HTMLElement {
   async load() {
     try {
       this.products = await apiFetch("/company/products");
+      const categories = [...new Set(this.products.map((p) => p.category).filter(Boolean))].sort();
+      this.table.filters = [
+        { key: "category", type: "select", label: "Kategorie", options: categories.map((c) => ({ value: c, label: c })) },
+        {
+          key: "availableLabel",
+          type: "select",
+          label: "Verfügbar",
+          options: [
+            { value: "Ja", label: "Verfügbar" },
+            { value: "Nein", label: "Nicht verfügbar" },
+          ],
+        },
+      ];
       this.table.rows = this.products.map((p) => ({
         imageUrl: p.imageUrl ?? "",
         name: p.name,

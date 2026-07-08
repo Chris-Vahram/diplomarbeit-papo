@@ -1,6 +1,7 @@
 package at.papo.partnerportal.seed;
 
 import at.papo.partnerportal.commission.CommissionService;
+import at.papo.partnerportal.common.Address;
 import at.papo.partnerportal.customer.Kunde;
 import at.papo.partnerportal.enablement.ProductEnablement;
 import at.papo.partnerportal.order.Order;
@@ -51,17 +52,22 @@ public class DemoDataSeeder {
 
     private void seedPartners() {
         // Matches the Keycloak demo user "partner-demo" so login -> dashboard works out of the box.
-        persistPartner("P-1001", "Elektro Huber GmbH", "Hauptstraße 12, 4020 Linz",
+        persistPartner("P-1001", "Elektro Huber GmbH", address("Hauptstraße", "12", "4020", "Linz"),
                 "partner-demo@example.at", "+43 660 1234567", "10.00", true, "partner-demo");
         // No linked Keycloak user yet — demonstrates the manual-provisioning gap (design.md).
-        persistPartner("P-1002", "Sanitär Bauer KG", "Ringstraße 5, 8010 Graz",
+        persistPartner("P-1002", "Sanitär Bauer KG", address("Ringstraße", "5", "8010", "Graz"),
                 "office@sanitaer-bauer.example.at", "+43 664 2345678", "5.00", true, null);
         // Inactive — for FR-23 inactive-partner testing (Phase 2).
-        persistPartner("P-1003", "Baumarkt Weber e.U.", "Industriezeile 3, 6020 Innsbruck",
+        persistPartner("P-1003", "Baumarkt Weber e.U.", address("Industriezeile", "3", "6020", "Innsbruck"),
                 "info@weber-baumarkt.example.at", "+43 512 3456789", "15.00", false, null);
     }
 
-    private void persistPartner(String partnerNumber, String name, String address, String email,
+    // Every seed address is in Austria; the country part is fixed here.
+    private Address address(String street, String houseNumber, String postalCode, String city) {
+        return new Address(street, houseNumber, postalCode, city, "Österreich");
+    }
+
+    private void persistPartner(String partnerNumber, String name, Address address, String email,
             String phone, String commissionPercent, boolean active, String keycloakUsername) {
         Partner partner = new Partner();
         partner.partnerNumber = partnerNumber;
@@ -137,14 +143,14 @@ public class DemoDataSeeder {
         Partner p3 = Partner.find("partnerNumber", "P-1003").firstResult();
 
         // Kunde names mirror Tobias's dashboard mockup. Scoped to the creating partner.
-        Kunde fischer = persistKunde(p1, "Fischer GmbH", null, "Marktplatz 1, 4020 Linz");
-        Kunde berger = persistKunde(p1, "Berger", "Anna", "Lindengasse 8, 4040 Linz");
-        Kunde mueller = persistKunde(p1, "Müller", "Max", "Bahnhofstraße 22, 4600 Wels");
-        Kunde hofer = persistKunde(p1, "Hofer", "Thomas", "Feldweg 3, 4030 Linz");
-        Kunde koller = persistKunde(p1, "Koller", "Sabine", "Seestraße 14, 4810 Gmunden");
-        Kunde gruber = persistKunde(p2, "Gruber & Söhne GmbH", null, "Industriestraße 7, 8010 Graz");
-        Kunde steiner = persistKunde(p2, "Steiner", "Julia", "Murgasse 5, 8020 Graz");
-        Kunde leitner = persistKunde(p3, "Leitner Vertrieb GmbH", null, "Dorfplatz 2, 6020 Innsbruck");
+        Kunde fischer = persistKunde(p1, "Fischer GmbH", null, address("Marktplatz", "1", "4020", "Linz"));
+        Kunde berger = persistKunde(p1, "Berger", "Anna", address("Lindengasse", "8", "4040", "Linz"));
+        Kunde mueller = persistKunde(p1, "Müller", "Max", address("Bahnhofstraße", "22", "4600", "Wels"));
+        Kunde hofer = persistKunde(p1, "Hofer", "Thomas", address("Feldweg", "3", "4030", "Linz"));
+        Kunde koller = persistKunde(p1, "Koller", "Sabine", address("Seestraße", "14", "4810", "Gmunden"));
+        Kunde gruber = persistKunde(p2, "Gruber & Söhne GmbH", null, address("Industriestraße", "7", "8010", "Graz"));
+        Kunde steiner = persistKunde(p2, "Steiner", "Julia", address("Murgasse", "5", "8020", "Graz"));
+        Kunde leitner = persistKunde(p3, "Leitner Vertrieb GmbH", null, address("Dorfplatz", "2", "6020", "Innsbruck"));
 
         Product bohr = product("Bohrmaschine Profi 750W");
         Product akku = product("Akkuschrauber 18V Set");
@@ -182,7 +188,7 @@ public class DemoDataSeeder {
         order(p3, leitner, 70, OrderStatus.FULFILLED, line(bohr, 2), line(helm, 4));
     }
 
-    private Kunde persistKunde(Partner owner, String lastName, String firstName, String address) {
+    private Kunde persistKunde(Partner owner, String lastName, String firstName, Address address) {
         Kunde kunde = new Kunde();
         kunde.ownerPartner = owner;
         kunde.lastName = lastName;

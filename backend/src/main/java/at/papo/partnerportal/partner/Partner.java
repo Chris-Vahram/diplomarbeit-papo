@@ -1,7 +1,9 @@
 package at.papo.partnerportal.partner;
 
+import at.papo.partnerportal.common.Address;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 
 import java.math.BigDecimal;
@@ -15,7 +17,8 @@ public class Partner extends PanacheEntity {
     @Column(nullable = false)
     public String name;
 
-    public String address;
+    @Embedded
+    public Address address;
 
     public String email;
 

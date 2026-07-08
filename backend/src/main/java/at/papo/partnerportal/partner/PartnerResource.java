@@ -1,5 +1,7 @@
 package at.papo.partnerportal.partner;
 
+import at.papo.partnerportal.customer.KundeDto;
+import at.papo.partnerportal.customer.KundeService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -23,6 +25,9 @@ public class PartnerResource {
     @Inject
     PartnerService partnerService;
 
+    @Inject
+    KundeService kundeService;
+
     @GET
     public List<PartnerDto> list() {
         return partnerService.list();
@@ -32,6 +37,14 @@ public class PartnerResource {
     @Path("/{id}")
     public PartnerDto get(@PathParam("id") Long id) {
         return partnerService.get(id);
+    }
+
+    // For the company's manual order-creation flow: that partner's own Endkunden,
+    // scoped exactly like the partner's own /partner/customers (design.md).
+    @GET
+    @Path("/{id}/customers")
+    public List<KundeDto> customers(@PathParam("id") Long id) {
+        return kundeService.listForPartner(partnerService.findOrThrow(id));
     }
 
     @POST

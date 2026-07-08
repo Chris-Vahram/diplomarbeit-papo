@@ -1,5 +1,6 @@
 package at.papo.partnerportal.importer;
 
+import at.papo.partnerportal.common.Address;
 import at.papo.partnerportal.partner.Partner;
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -20,7 +21,11 @@ public class PartnerImportDefinition implements ImportDefinition {
             new ImportField("partnerNumber", "Partnernummer", true,
                     List.of("partner nr", "partnernr", "nummer", "partner number", "kundennummer")),
             new ImportField("name", "Name", true, List.of("firma", "firmenname", "partnername")),
-            new ImportField("address", "Adresse", false, List.of("anschrift", "strasse")),
+            new ImportField("street", "Straße", true, List.of("strasse", "straße")),
+            new ImportField("houseNumber", "Hausnummer", true, List.of("hausnr", "nr", "hausnummer")),
+            new ImportField("postalCode", "PLZ", true, List.of("plz", "postleitzahl")),
+            new ImportField("city", "Ort", true, List.of("stadt", "ort")),
+            new ImportField("country", "Land", true, List.of("land", "country")),
             new ImportField("email", "E-Mail", false, List.of("email", "mail")),
             new ImportField("phone", "Telefon", false, List.of("tel", "telefonnummer")),
             new ImportField("commissionPercent", "Provision (%)", true,
@@ -41,6 +46,21 @@ public class PartnerImportDefinition implements ImportDefinition {
         }
         if (isBlank(mappedValues.get("name"))) {
             errors.add("Name fehlt.");
+        }
+        if (isBlank(mappedValues.get("street"))) {
+            errors.add("Straße fehlt.");
+        }
+        if (isBlank(mappedValues.get("houseNumber"))) {
+            errors.add("Hausnummer fehlt.");
+        }
+        if (isBlank(mappedValues.get("postalCode"))) {
+            errors.add("PLZ fehlt.");
+        }
+        if (isBlank(mappedValues.get("city"))) {
+            errors.add("Ort fehlt.");
+        }
+        if (isBlank(mappedValues.get("country"))) {
+            errors.add("Land fehlt.");
         }
 
         String commissionPercent = mappedValues.get("commissionPercent");
@@ -81,7 +101,9 @@ public class PartnerImportDefinition implements ImportDefinition {
         Partner partner = new Partner();
         partner.partnerNumber = mappedValues.get("partnerNumber").trim();
         partner.name = mappedValues.get("name").trim();
-        partner.address = blankToNull(mappedValues.get("address"));
+        partner.address = new Address(mappedValues.get("street").trim(), mappedValues.get("houseNumber").trim(),
+                mappedValues.get("postalCode").trim(), mappedValues.get("city").trim(),
+                mappedValues.get("country").trim());
         partner.email = blankToNull(mappedValues.get("email"));
         partner.phone = blankToNull(mappedValues.get("phone"));
         partner.commissionPercent = parseDecimal(mappedValues.get("commissionPercent"));

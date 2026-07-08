@@ -1,4 +1,5 @@
 import { isAuthenticated, hasRole, getSession, logout } from "./auth.js";
+import { apiFetch } from "./api.js";
 
 // Route table: hash path -> { tag, role, title }
 // role: null = public, "company" | "partner" = required realm role for FR-20 deep-link protection.
@@ -6,7 +7,7 @@ const routes = {
   "/login": { tag: "login-page", role: null, title: "Anmeldung" },
   "/company/dashboard": { tag: "company-dashboard-page", role: "company", title: "Firmen-Dashboard" },
   "/company/products": { tag: "company-product-list-page", role: "company", title: "Produkte" },
-  "/company/partners": { tag: "company-partner-list-page", role: "company", title: "Partner" },
+  "/company/partners": { tag: "company-partner-list-page", role: "company", title: "Partnerverwaltung" },
   "/company/orders": { tag: "company-order-list-page", role: "company", title: "Bestellungen" },
   "/company/import": { tag: "company-import-page", role: "company", title: "Datenimport" },
   "/partner/dashboard": { tag: "partner-dashboard-page", role: "partner", title: "Partner-Dashboard" },
@@ -93,20 +94,20 @@ function renderNav() {
   if (!session) return;
 
   appShell.classList.add(session.isCompany ? "context-company" : "context-partner");
-  appRole.textContent = session.isCompany ? "Firmenbereich" : "Partnerbereich";
+  appRole.textContent = "Partnerportal";
 
   const links = session.isCompany
     ? [
         ["/company/dashboard", "Dashboard"],
-        ["/company/products", "Produkte"],
-        ["/company/partners", "Partner"],
         ["/company/orders", "Bestellungen"],
+        ["/company/partners", "Partnerverwaltung"],
+        ["/company/products", "Produkte"],
         ["/company/import", "Datenimport"],
       ]
     : [
         ["/partner/dashboard", "Dashboard"],
-        ["/partner/products", "Produkte"],
         ["/partner/orders", "Meine Bestellungen"],
+        ["/partner/products", "Produkte"],
       ];
 
   const path = currentPath();
@@ -158,6 +159,33 @@ function renderNav() {
   });
 
   window.lucide?.createIcons();
+  refreshOrdersBadge();
+}
+
+// Unread-order count for the company sidebar "Bestellungen" nav item
+// (order-notifications spec). Derived from the already-fetched company order
+// list, recomputed whenever the nav re-renders — no polling/websocket, per design.md.
+export async function refreshOrdersBadge() {
+  const session = getSession();
+  const link = appNav.querySelector('a[href="#/company/orders"]');
+  if (!session?.isCompany || !link) return;
+  try {
+    const orders = await apiFetch("/company/orders");
+    const unseenCount = orders.filter((o) => !o.seenByCompany).length;
+    let badge = link.querySelector(".nav-badge");
+    if (unseenCount > 0) {
+      if (!badge) {
+        badge = document.createElement("span");
+        badge.className = "nav-badge";
+        link.appendChild(badge);
+      }
+      badge.textContent = unseenCount > 99 ? "99+" : String(unseenCount);
+    } else {
+      badge?.remove();
+    }
+  } catch {
+    // Badge is a non-critical enhancement — a failed fetch just leaves it as-is.
+  }
 }
 
 function render() {

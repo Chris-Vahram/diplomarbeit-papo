@@ -1,8 +1,10 @@
 package at.papo.partnerportal.customer;
 
+import at.papo.partnerportal.common.Address;
 import at.papo.partnerportal.partner.Partner;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
@@ -12,8 +14,8 @@ public class Kunde extends PanacheEntity {
     @Column(nullable = false)
     public String lastName;
 
-    @Column(nullable = false)
-    public String address;
+    @Embedded
+    public Address address;
 
     public String firstName;
 

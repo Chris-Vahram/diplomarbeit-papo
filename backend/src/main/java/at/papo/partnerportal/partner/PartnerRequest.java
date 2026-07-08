@@ -1,5 +1,7 @@
 package at.papo.partnerportal.partner;
 
+import at.papo.partnerportal.common.AddressRequest;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -12,7 +14,7 @@ import java.math.BigDecimal;
 public record PartnerRequest(
         @NotBlank(message = "Partnernummer ist erforderlich.") String partnerNumber,
         @NotBlank(message = "Name ist erforderlich.") String name,
-        String address,
+        @NotNull(message = "Adresse ist erforderlich.") @Valid AddressRequest address,
         String email,
         String phone,
         @NotNull(message = "Provision ist erforderlich.")

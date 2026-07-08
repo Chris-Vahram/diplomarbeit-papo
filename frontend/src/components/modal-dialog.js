@@ -1,5 +1,25 @@
 // <modal-dialog title="Partner anlegen"><form>...</form></modal-dialog>
 // Call .open() / .close(); dispatches "modal-close" event on backdrop/×/Escape.
+// Locks background scroll while any modal-dialog is open (counted, so nested/
+// sequential opens across different instances don't unlock each other early).
+// Uses position:fixed + a negative top offset (not plain overflow:hidden) so the
+// page doesn't visibly snap to the top when opened mid-scroll, and restores the
+// exact scroll position on close.
+let openModalCount = 0;
+let savedScrollY = 0;
+
+function lockBackgroundScroll() {
+  savedScrollY = window.scrollY;
+  document.body.classList.add("modal-open");
+  document.body.style.top = `-${savedScrollY}px`;
+}
+
+function unlockBackgroundScroll() {
+  document.body.classList.remove("modal-open");
+  document.body.style.top = "";
+  window.scrollTo(0, savedScrollY);
+}
+
 class ModalDialog extends HTMLElement {
   static get observedAttributes() {
     return ["title"];
@@ -41,13 +61,19 @@ class ModalDialog extends HTMLElement {
   }
 
   open() {
+    if (!this.hidden) return;
     this.hidden = false;
     document.addEventListener("keydown", this._escHandler);
+    if (openModalCount === 0) lockBackgroundScroll();
+    openModalCount += 1;
   }
 
   close() {
+    if (this.hidden) return;
     this.hidden = true;
     document.removeEventListener("keydown", this._escHandler);
+    openModalCount = Math.max(0, openModalCount - 1);
+    if (openModalCount === 0) unlockBackgroundScroll();
     this.dispatchEvent(new CustomEvent("modal-close", { bubbles: true }));
   }
 }

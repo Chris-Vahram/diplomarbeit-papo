@@ -1,6 +1,7 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import { formatNumber } from "../lib/format.js";
+import { addressFieldsHtml, readAddress, fillAddress } from "../lib/address-fields.js";
 
 // Commission dropdown presets per FSD FR-19/partner-management spec: 5/10/15 or a custom value.
 const COMMISSION_PRESETS = ["5", "10", "15"];
@@ -10,7 +11,7 @@ class CompanyPartnerListPage extends HTMLElement {
     this.classList.add("area--company");
     this.innerHTML = `
       <div class="list-header">
-        <h1>Partner</h1>
+        <h1>Partnerverwaltung</h1>
         <button type="button" class="button-primary" id="new-partner-btn">Neuer Partner</button>
       </div>
       <data-table id="partner-table"></data-table>
@@ -19,7 +20,7 @@ class CompanyPartnerListPage extends HTMLElement {
           <input type="hidden" name="id" />
           <form-field label="Partnernummer" name="partnerNumber" required></form-field>
           <form-field label="Name" name="name" required></form-field>
-          <form-field class="form-field--wide" label="Adresse" name="address"></form-field>
+          ${addressFieldsHtml("address")}
           <form-field label="E-Mail" name="email" type="email"></form-field>
           <form-field label="Telefon" name="phone"></form-field>
           <form-field label="Provision" name="commissionPercentPreset">
@@ -57,6 +58,17 @@ class CompanyPartnerListPage extends HTMLElement {
     this.table.emptyMessage = "Noch keine Partner angelegt.";
     this.table.searchKeys = ["name", "partnerNumber"];
     this.table.pageSize = 20;
+    this.table.filters = [
+      {
+        key: "activeLabel",
+        type: "select",
+        label: "Status",
+        options: [
+          { value: "active", label: "Aktiv" },
+          { value: "inactive", label: "Inaktiv" },
+        ],
+      },
+    ];
 
     this.modal = this.querySelector("#partner-modal");
     this.form = this.querySelector("#partner-form");
@@ -108,9 +120,10 @@ class CompanyPartnerListPage extends HTMLElement {
         partnerNumber: p.partnerNumber,
         name: p.name,
         commissionLabel: `${p.commissionPercent}%`,
+        activeLabel: p.active ? "active" : "inactive",
         statusBadge: `<status-badge status="${p.active ? "active" : "inactive"}"></status-badge>`,
         actions: `<div class="row-actions">
-          <button type="button" data-edit-id="${p.id}">Bearbeiten</button>
+          <button type="button" data-edit-id="${p.id}">Partnerdaten Bearbeiten</button>
           <button type="button" class="row-actions__secondary" data-manage-id="${p.id}">Produkte</button>
         </div>`,
       }));
@@ -134,7 +147,7 @@ class CompanyPartnerListPage extends HTMLElement {
     this.form.elements.id.value = partner.id;
     this.form.elements.partnerNumber.value = partner.partnerNumber;
     this.form.elements.name.value = partner.name;
-    this.form.elements.address.value = partner.address ?? "";
+    fillAddress(this.form, "address", partner.address);
     this.form.elements.email.value = partner.email ?? "";
     this.form.elements.phone.value = partner.phone ?? "";
     this.form.elements.keycloakUsername.value = partner.keycloakUsername ?? "";
@@ -198,7 +211,7 @@ class CompanyPartnerListPage extends HTMLElement {
     const payload = {
       partnerNumber: data.get("partnerNumber"),
       name: data.get("name"),
-      address: data.get("address") || null,
+      address: readAddress(this.form, "address"),
       email: data.get("email") || null,
       phone: data.get("phone") || null,
       commissionPercent,

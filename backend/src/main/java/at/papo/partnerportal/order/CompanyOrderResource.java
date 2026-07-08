@@ -6,6 +6,7 @@ import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -40,9 +41,22 @@ public class CompanyOrderResource {
         return csvExportService.exportOrders();
     }
 
+    // Manual order creation on a partner's behalf (order-management spec,
+    // "Bestellung manuell anlegen").
+    @POST
+    public OrderDto create(@Valid CompanyOrderRequest request) {
+        return orderService.createForPartnerId(request.partnerId(), request);
+    }
+
     @PUT
     @Path("/{id}/status")
     public OrderDto updateStatus(@PathParam("id") Long id, @Valid OrderStatusUpdateRequest request) {
         return orderService.updateStatus(id, request.status());
+    }
+
+    @PUT
+    @Path("/{id}/seen")
+    public OrderDto markSeen(@PathParam("id") Long id) {
+        return orderService.markSeen(id);
     }
 }

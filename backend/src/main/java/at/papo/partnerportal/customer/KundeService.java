@@ -25,7 +25,7 @@ public class KundeService {
         Kunde kunde = new Kunde();
         kunde.ownerPartner = partner;
         kunde.lastName = request.lastName();
-        kunde.address = request.address();
+        kunde.address = request.address().toEntity();
         kunde.firstName = request.firstName();
         kunde.email = request.email();
         kunde.phone = request.phone();

@@ -40,7 +40,7 @@ class CompanyDashboardResourceTest {
                 "settlement.find { it.partnerName == 'Elektro Huber GmbH' }.revenue", BigDecimal.class);
 
         int orderId = given().auth().oauth2(partnerToken).contentType("application/json")
-                .body("{\"newKunde\":{\"lastName\":\"Firmendashboardtest\",\"address\":\"Teststr. 11\"},"
+                .body("{\"newKunde\":{\"lastName\":\"Firmendashboardtest\",\"address\":{\"street\":\"Teststr.\",\"houseNumber\":\"11\",\"postalCode\":\"4020\",\"city\":\"Linz\",\"country\":\"Österreich\"}},"
                         + "\"items\":[{\"productId\":" + productId + ",\"quantity\":1}]}")
                 .when().post("/api/partner/orders")
                 .then().statusCode(200)
@@ -80,7 +80,7 @@ class CompanyDashboardResourceTest {
                 .extract().jsonPath().getLong("fulfilledOrderCount");
 
         int orderId = given().auth().oauth2(partnerToken).contentType("application/json")
-                .body("{\"newKunde\":{\"lastName\":\"Reviewedtest\",\"address\":\"Teststr. 12\"},"
+                .body("{\"newKunde\":{\"lastName\":\"Reviewedtest\",\"address\":{\"street\":\"Teststr.\",\"houseNumber\":\"12\",\"postalCode\":\"4020\",\"city\":\"Linz\",\"country\":\"Österreich\"}},"
                         + "\"items\":[{\"productId\":" + productId + ",\"quantity\":1}]}")
                 .when().post("/api/partner/orders")
                 .then().statusCode(200)

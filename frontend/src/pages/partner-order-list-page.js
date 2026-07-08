@@ -1,7 +1,12 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import { escapeHtml } from "../lib/html.js";
-import { formatEuro, formatNumber, formatDate } from "../lib/format.js";
+import { formatEuro, formatNumber, formatDate, formatAddress } from "../lib/format.js";
+import { addressFieldsHtml, readAddress, setAddressRequired } from "../lib/address-fields.js";
+import { renderOrderDetailsHtml } from "../lib/order-details.js";
+
+const STATUSES = ["SUBMITTED", "REVIEWED", "FULFILLED"];
+const STATUS_LABELS = { SUBMITTED: "Eingereicht", REVIEWED: "Geprüft", FULFILLED: "Abgeschlossen" };
 
 class PartnerOrderListPage extends HTMLElement {
   connectedCallback() {
@@ -15,21 +20,33 @@ class PartnerOrderListPage extends HTMLElement {
       <modal-dialog id="order-modal" title="Neue Bestellung">
         <div id="order-modal-content"></div>
       </modal-dialog>
+      <modal-dialog id="details-modal" title="Bestellung">
+        <div id="details-content"></div>
+      </modal-dialog>
     `;
 
     this.table = this.querySelector("#order-table");
     this.table.columns = [
       { key: "orderDate", label: "Datum" },
-      { key: "kundeName", label: "Kunde" },
+      { key: "kundeName", label: "Endkunde" },
       { key: "orderValueLabel", label: "Wert (€)" },
       { key: "commissionLabel", label: "Provision (€)" },
       { key: "statusBadge", label: "Status", html: true },
     ];
     this.table.emptyMessage = "Noch keine Bestellungen vorhanden.";
+    this.table.filters = [
+      { key: "orderDateIso", type: "daterange", label: "Datum" },
+      { key: "status", type: "select", label: "Status", options: STATUSES.map((s) => ({ value: s, label: STATUS_LABELS[s] })) },
+    ];
+    this.table.rowKey = "id";
+    this.table.addEventListener("row-click", (event) => this.openDetails(event.detail.id));
 
     this.modal = this.querySelector("#order-modal");
     this.modalContent = this.querySelector("#order-modal-content");
     this.querySelector("#new-order-btn").addEventListener("click", () => this.openModal());
+
+    this.detailsModal = this.querySelector("#details-modal");
+    this.detailsContent = this.querySelector("#details-content");
 
     this.load();
   }
@@ -37,8 +54,12 @@ class PartnerOrderListPage extends HTMLElement {
   async load() {
     try {
       const orders = await apiFetch("/partner/orders");
+      this.orders = orders;
       this.table.rows = orders.map((o) => ({
+        id: o.id,
         orderDate: formatDate(o.orderDate),
+        orderDateIso: o.orderDate,
+        status: o.status,
         kundeName: `${o.kunde.firstName ? o.kunde.firstName + " " : ""}${o.kunde.lastName}`,
         orderValueLabel: formatNumber(o.orderValue),
         commissionLabel: o.commissionValue != null ? formatNumber(o.commissionValue) : "–",
@@ -47,6 +68,14 @@ class PartnerOrderListPage extends HTMLElement {
     } catch (error) {
       showToast(error.message, "error");
     }
+  }
+
+  openDetails(id) {
+    const order = this.orders.find((o) => String(o.id) === String(id));
+    if (!order) return;
+    this.detailsModal.setAttribute("title", `Bestellung Nr. ${order.id}`);
+    this.detailsContent.innerHTML = renderOrderDetailsHtml(order, { showPartner: false });
+    this.detailsModal.open();
   }
 
   async openModal() {
@@ -78,24 +107,24 @@ class PartnerOrderListPage extends HTMLElement {
       .map((p) => `<option value="${p.id}" ${p.available ? "" : "disabled"}>${escapeHtml(p.name)}${p.available ? "" : " (nicht verfügbar)"}</option>`)
       .join("");
     const customerOptions = this.customers
-      .map((c) => `<option value="${c.id}">${escapeHtml(c.lastName)}${c.firstName ? ", " + escapeHtml(c.firstName) : ""} – ${escapeHtml(c.address)}</option>`)
+      .map((c) => `<option value="${c.id}">${escapeHtml(c.lastName)}${c.firstName ? ", " + escapeHtml(c.firstName) : ""} – ${escapeHtml(formatAddress(c.address))}</option>`)
       .join("");
     const hasCustomers = this.customers.length > 0;
 
     this.modalContent.innerHTML = `
       <form id="order-form" class="entity-form entity-form--grid">
         <fieldset class="form-field--wide">
-          <legend>Kunde</legend>
+          <legend>Endkunde</legend>
           <label class="radio-field">
             <input type="radio" name="kundeMode" value="existing" ${hasCustomers ? "checked" : "disabled"} />
-            Bestehenden Kunden wählen
+            Bestehenden Endkunden wählen
           </label>
           <label class="radio-field">
             <input type="radio" name="kundeMode" value="new" ${hasCustomers ? "" : "checked"} />
-            Neuen Kunden anlegen
+            Neuen Endkunden anlegen
           </label>
           <div id="existing-kunde-block" ${hasCustomers ? "" : "hidden"}>
-            <form-field label="Kunde" name="kundeId">
+            <form-field label="Endkunde" name="kundeId">
               <select name="kundeId">${customerOptions}</select>
             </form-field>
           </div>
@@ -103,7 +132,7 @@ class PartnerOrderListPage extends HTMLElement {
             <div class="entity-form--grid" style="margin-top:0">
               <form-field label="Nachname" name="newLastName" required></form-field>
               <form-field label="Vorname" name="newFirstName"></form-field>
-              <form-field class="form-field--wide" label="Adresse" name="newAddress" required></form-field>
+              ${addressFieldsHtml("newAddress")}
               <form-field label="E-Mail" name="newEmail" type="email"></form-field>
               <form-field label="Telefon" name="newPhone"></form-field>
             </div>
@@ -148,7 +177,7 @@ class PartnerOrderListPage extends HTMLElement {
     // "neuer Kunde" fields when "bestehenden Kunden wählen" is selected.
     const isNew = mode === "new";
     this.form.elements.newLastName.required = isNew;
-    this.form.elements.newAddress.required = isNew;
+    setAddressRequired(this.form, "newAddress", isNew);
   }
 
   addLine() {
@@ -173,7 +202,7 @@ class PartnerOrderListPage extends HTMLElement {
         mode === "new"
           ? {
               lastName: data.get("newLastName"),
-              address: data.get("newAddress"),
+              address: readAddress(this.form, "newAddress"),
               firstName: data.get("newFirstName") || null,
               email: data.get("newEmail") || null,
               phone: data.get("newPhone") || null,
@@ -204,7 +233,7 @@ class PartnerOrderListPage extends HTMLElement {
     this.modal.setAttribute("title", `Bestellung Nr. ${order.id} bestätigt`);
     this.modalContent.innerHTML = `
       <section class="order-confirmation order-confirmation--modal">
-        <p>Kunde: ${kundeName}, ${escapeHtml(order.kunde.address)}</p>
+        <p>Endkunde: ${kundeName}, ${escapeHtml(formatAddress(order.kunde.address))}</p>
         <div class="data-table__scroll">
           <table class="data-table">
             <thead><tr><th>Artikel</th><th>Menge</th><th>Preis (€)</th><th>Summe (€)</th></tr></thead>

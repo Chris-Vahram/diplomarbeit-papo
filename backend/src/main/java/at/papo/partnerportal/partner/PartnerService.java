@@ -41,7 +41,7 @@ public class PartnerService {
     @Transactional
     public PartnerDto updateOwnContactData(Partner partner, PartnerContactRequest request) {
         partner.name = request.name();
-        partner.address = request.address();
+        partner.address = request.address().toEntity();
         partner.email = request.email();
         partner.phone = request.phone();
         return PartnerDto.from(partner);
@@ -66,7 +66,7 @@ public class PartnerService {
 
     private void applyCompanyFields(Partner partner, PartnerRequest request) {
         partner.name = request.name();
-        partner.address = request.address();
+        partner.address = request.address().toEntity();
         partner.email = request.email();
         partner.phone = request.phone();
         partner.commissionPercent = request.commissionPercent();

@@ -30,7 +30,7 @@ class CsvExportResourceTest {
         long productId = Product.<Product>find("name", "Bohrmaschine Profi 750W").firstResult().id;
 
         given().auth().oauth2(partnerToken).contentType("application/json")
-                .body("{\"newKunde\":{\"lastName\":\"Müller\",\"address\":\"Teststr. 13\"},"
+                .body("{\"newKunde\":{\"lastName\":\"Müller\",\"address\":{\"street\":\"Teststr.\",\"houseNumber\":\"13\",\"postalCode\":\"4020\",\"city\":\"Linz\",\"country\":\"Österreich\"}},"
                         + "\"items\":[{\"productId\":" + productId + ",\"quantity\":1}]}")
                 .when().post("/api/partner/orders")
                 .then().statusCode(200);

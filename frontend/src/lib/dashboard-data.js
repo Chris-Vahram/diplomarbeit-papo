@@ -49,3 +49,28 @@ export function monthlyRevenue(orders, keys) {
   }
   return keys.map((k) => byKey[k]);
 }
+
+// The immediately preceding period of the same length as [from, to] — for the
+// metric-card "up/down vs. previous period" arrows. Non-overlapping: ends the
+// instant before `from`.
+export function previousPeriod(from, to) {
+  const lengthMs = to.getTime() - from.getTime();
+  const prevTo = new Date(from.getTime() - 1);
+  const prevFrom = new Date(prevTo.getTime() - lengthMs);
+  return { from: prevFrom, to: prevTo };
+}
+
+// metric-card's trend="up"|"down" + trend-label props from a current vs.
+// previous-period value. null when there's nothing meaningful to compare
+// (both zero) — the caller then omits the trend attributes and gets no arrow.
+export function trendInfo(current, previous) {
+  if (previous === 0) {
+    if (current === 0) return null;
+    return { trend: "up", label: "ggü. Vorperiode (neu)" };
+  }
+  const pct = ((current - previous) / previous) * 100;
+  const trend = pct >= 0 ? "up" : "down";
+  const sign = pct >= 0 ? "+" : "";
+  const pctStr = pct.toFixed(1).replace(".", ",");
+  return { trend, label: `${sign}${pctStr}% ggü. Vorperiode` };
+}

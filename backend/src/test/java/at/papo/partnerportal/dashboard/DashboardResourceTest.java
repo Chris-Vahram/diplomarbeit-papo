@@ -37,7 +37,7 @@ class DashboardResourceTest {
                 .extract().jsonPath().getLong("fulfilledOrderCount");
 
         int orderId = given().auth().oauth2(partnerToken).contentType("application/json")
-                .body("{\"newKunde\":{\"lastName\":\"Dashboardtest\",\"address\":\"Teststr. 9\"},"
+                .body("{\"newKunde\":{\"lastName\":\"Dashboardtest\",\"address\":{\"street\":\"Teststr.\",\"houseNumber\":\"9\",\"postalCode\":\"4020\",\"city\":\"Linz\",\"country\":\"Österreich\"}},"
                         + "\"items\":[{\"productId\":" + productId + ",\"quantity\":1}]}")
                 .when().post("/api/partner/orders")
                 .then().statusCode(200)

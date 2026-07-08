@@ -52,6 +52,18 @@ public class OrderService {
                 .toList();
     }
 
+    // Manual order creation by the company (order-management spec): resolves the
+    // company-selected partner, then reuses createForPartner unchanged so validation
+    // (enablement, availability, commission snapshot) is identical to the partner's own flow.
+    @Transactional
+    public OrderDto createForPartnerId(Long partnerId, CompanyOrderRequest request) {
+        Partner partner = Partner.findById(partnerId);
+        if (partner == null) {
+            throw new ApiException(404, "Partner nicht gefunden.");
+        }
+        return createForPartner(partner, request.toOrderRequest());
+    }
+
     @Transactional
     public OrderDto createForPartner(Partner partner, OrderRequest request) {
         Order order = new Order();
@@ -102,6 +114,18 @@ public class OrderService {
                     + "(Eingereicht → Geprüft → Abgeschlossen).");
         }
         order.status = status;
+        return OrderDto.from(order, commissionService.findForOrder(order));
+    }
+
+    // Flips the unseen flag when the company opens an order's details overlay
+    // (order-notifications spec: "opening details" is the seen trigger).
+    @Transactional
+    public OrderDto markSeen(Long orderId) {
+        Order order = Order.findById(orderId);
+        if (order == null) {
+            throw new ApiException(404, "Bestellung nicht gefunden.");
+        }
+        order.seenByCompany = true;
         return OrderDto.from(order, commissionService.findForOrder(order));
     }
 

@@ -1,7 +1,17 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import { formatEuro, formatNumber, formatDate } from "../lib/format.js";
-import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue } from "../lib/dashboard-data.js";
+import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue, previousPeriod, trendInfo } from "../lib/dashboard-data.js";
+import {
+  productOptionsHtml,
+  kundePickerHtml,
+  articleLinesHtml,
+  wireKundePicker,
+  wireArticleLines,
+  readKundePayload,
+  readItemsPayload,
+  renderOrderConfirmationHtml,
+} from "../lib/order-form.js";
 
 const eur = new Intl.NumberFormat("de-AT", { style: "currency", currency: "EUR" });
 const dateLabel = new Intl.DateTimeFormat("de-AT", { day: "2-digit", month: "2-digit", year: "numeric" });
@@ -76,24 +86,27 @@ class PartnerDashboardPage extends HTMLElement {
           <p class="page-heading__greeting">${greeting}</p>
           <h1>Partner-Dashboard</h1>
         </div>
-        <div class="period-picker">
-          <button type="button" class="period-picker__button" id="period-button">
-            <i data-lucide="calendar"></i>
-            <span id="period-label"></span>
-            <i data-lucide="chevron-down" class="period-picker__caret"></i>
-          </button>
-          <div class="period-picker__panel is-closed" id="period-panel">
-            <div class="period-picker__field">
-              <label for="period-from">Von</label>
-              <input type="date" id="period-from" />
-            </div>
-            <div class="period-picker__field">
-              <label for="period-to">Bis</label>
-              <input type="date" id="period-to" />
-            </div>
-            <div class="period-picker__actions">
-              <button type="button" class="period-picker__reset" id="period-reset">Zurücksetzen</button>
-              <button type="button" class="period-picker__apply" id="period-apply">Anwenden</button>
+        <div class="dashboard-header__actions">
+          <button type="button" class="button-primary" id="new-order-btn">Neue Bestellung</button>
+          <div class="period-picker">
+            <button type="button" class="period-picker__button" id="period-button">
+              <i data-lucide="calendar"></i>
+              <span id="period-label"></span>
+              <i data-lucide="chevron-down" class="period-picker__caret"></i>
+            </button>
+            <div class="period-picker__panel is-closed" id="period-panel">
+              <div class="period-picker__field">
+                <label for="period-from">Von</label>
+                <input type="date" id="period-from" />
+              </div>
+              <div class="period-picker__field">
+                <label for="period-to">Bis</label>
+                <input type="date" id="period-to" />
+              </div>
+              <div class="period-picker__actions">
+                <button type="button" class="period-picker__reset" id="period-reset">Zurücksetzen</button>
+                <button type="button" class="period-picker__apply" id="period-apply">Anwenden</button>
+              </div>
             </div>
           </div>
         </div>
@@ -102,6 +115,9 @@ class PartnerDashboardPage extends HTMLElement {
       <div class="chart-row" id="chart-row"></div>
       <h2>Letzte Bestellungen</h2>
       <data-table id="latest-orders-table"></data-table>
+      <modal-dialog id="order-modal" title="Neue Bestellung">
+        <div id="order-modal-content"></div>
+      </modal-dialog>
     `;
 
     this.metricRow = this.querySelector("#metric-row");
@@ -109,14 +125,69 @@ class PartnerDashboardPage extends HTMLElement {
     this.table = this.querySelector("#latest-orders-table");
     this.table.columns = [
       { key: "orderDate", label: "Datum" },
-      { key: "kundeName", label: "Kunde" },
+      { key: "kundeName", label: "Endkunde" },
       { key: "orderValueLabel", label: "Wert (€)" },
       { key: "statusBadge", label: "Status", html: true },
     ];
     this.table.emptyMessage = "Noch keine Bestellungen vorhanden.";
 
+    this.modal = this.querySelector("#order-modal");
+    this.modalContent = this.querySelector("#order-modal-content");
+    this.querySelector("#new-order-btn").addEventListener("click", () => this.openOrderModal());
+
     this.wirePeriodPicker();
     this.load();
+  }
+
+  async openOrderModal() {
+    this.modal.setAttribute("title", "Neue Bestellung");
+    this.modal.open();
+    this.modalContent.innerHTML = `<p>Lade…</p>`;
+    try {
+      const [products, customers] = await Promise.all([
+        apiFetch("/partner/products"),
+        apiFetch("/partner/customers"),
+      ]);
+      if (products.length === 0) {
+        this.modalContent.innerHTML = `<p>Für Sie sind noch keine Produkte freigeschaltet. Eine Bestellung ist erst möglich, sobald die Firma Produkte für Sie freischaltet.</p>`;
+        return;
+      }
+      this.modalContent.innerHTML = `
+        <form id="order-form" class="entity-form entity-form--grid">
+          ${kundePickerHtml(customers)}
+          ${articleLinesHtml()}
+          <div class="entity-form__actions">
+            <button type="submit">Bestellung aufgeben</button>
+          </div>
+        </form>
+      `;
+      const form = this.modalContent.querySelector("#order-form");
+      wireKundePicker(form);
+      wireArticleLines(form, productOptionsHtml(products));
+      form.addEventListener("submit", (event) => this.handleOrderSubmit(event, form));
+    } catch (error) {
+      showToast(error.message, "error");
+    }
+  }
+
+  async handleOrderSubmit(event, form) {
+    event.preventDefault();
+    const payload = { ...readKundePayload(form), items: readItemsPayload(form) };
+
+    try {
+      const order = await apiFetch("/partner/orders", { method: "POST", body: JSON.stringify(payload) });
+      showToast("Bestellung aufgegeben.", "success");
+      this.modal.setAttribute("title", `Bestellung Nr. ${order.id} bestätigt`);
+      this.modalContent.innerHTML = renderOrderConfirmationHtml(order, {
+        actionsHtml: `<button type="button" id="order-done-btn">Fertig</button>`,
+      });
+      this.modalContent.querySelector("#order-done-btn").addEventListener("click", () => {
+        this.modal.close();
+        this.load();
+      });
+    } catch (error) {
+      showToast(error.message, "error");
+    }
   }
 
   wirePeriodPicker() {
@@ -189,6 +260,16 @@ class PartnerDashboardPage extends HTMLElement {
     const inRange = filterByPeriod(this.orders, fromIso, toIso);
     const { revenue, commission, count } = fulfilledTotals(inRange);
 
+    // Same-length period immediately before the current one, for the metric-card
+    // up/down arrows ("... ggü. Vorperiode").
+    const prev = previousPeriod(this.period.from, this.period.to);
+    const prevInRange = filterByPeriod(this.orders, toIsoDate(prev.from), toIsoDate(prev.to));
+    const prevTotals = fulfilledTotals(prevInRange);
+    const revenueTrend = trendInfo(revenue, prevTotals.revenue);
+    const commissionTrend = trendInfo(commission, prevTotals.commission);
+    const countTrend = trendInfo(count, prevTotals.count);
+    const trendAttrs = (t) => (t ? `trend="${t.trend}" trend-label="${t.label}"` : "");
+
     const total = this.base.totalProductCount ?? 0;
     const ringPct = total > 0 ? Math.round((this.base.enabledProductCount / total) * 100) : 0;
 
@@ -197,9 +278,9 @@ class PartnerDashboardPage extends HTMLElement {
     const monthly = monthlyRevenue(this.orders, keys);
 
     this.metricRow.innerHTML = `
-      <metric-card label="Provision (abgeschlossen)" value="${formatEuro(commission)}" icon="percent"></metric-card>
-      <metric-card label="Umsatz (abgeschlossen)" value="${formatEuro(revenue)}" icon="trending-up"></metric-card>
-      <metric-card label="Abgeschlossene Bestellungen" value="${count}" icon="check-circle"></metric-card>
+      <metric-card label="Provision (abgeschlossen)" value="${formatEuro(commission)}" icon="percent" ${trendAttrs(commissionTrend)}></metric-card>
+      <metric-card label="Umsatz (abgeschlossen)" value="${formatEuro(revenue)}" icon="trending-up" ${trendAttrs(revenueTrend)}></metric-card>
+      <metric-card label="Abgeschlossene Bestellungen" value="${count}" icon="check-circle" ${trendAttrs(countTrend)}></metric-card>
       <metric-card label="Freigeschaltete Produkte" value="${this.base.enabledProductCount}" ring="${ringPct}" ring-layout="full" ring-caption="von ${total} Produkten"></metric-card>
       ${renderMonthChart("Umsatz nach Monat", labels, monthly)}
     `;
@@ -275,7 +356,7 @@ class PartnerDashboardPage extends HTMLElement {
 
     return `
       <div class="chart-card">
-        <h3 class="chart-card__title">Top-Kunden im gewählten Zeitraum</h3>
+        <h3 class="chart-card__title">Top-Endkunden im gewählten Zeitraum</h3>
         <div class="bar-chart">${bars || '<p class="data-table__empty">Keine Bestellungen im gewählten Zeitraum.</p>'}</div>
       </div>
       <div class="chart-card">

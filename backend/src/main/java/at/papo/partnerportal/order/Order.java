@@ -43,4 +43,9 @@ public class Order extends PanacheEntity {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("id")
     public List<OrderItem> items = new ArrayList<>();
+
+    // Company-side unseen/seen tracking (order-notifications spec). Only one
+    // company role exists, so a single flag is enough — see design.md.
+    @Column(nullable = false)
+    public boolean seenByCompany = false;
 }

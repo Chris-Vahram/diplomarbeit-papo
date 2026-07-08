@@ -15,6 +15,9 @@ import static org.hamcrest.Matchers.is;
 @QuarkusTest
 class OrderResourceTest {
 
+    private static final String ADDRESS_JSON = "{\"street\":\"Teststr.\",\"houseNumber\":\"1\","
+            + "\"postalCode\":\"4020\",\"city\":\"Linz\",\"country\":\"Österreich\"}";
+
     @Inject
     KeycloakTestTokens tokens;
 
@@ -27,13 +30,17 @@ class OrderResourceTest {
         return Partner.<Partner>find("partnerNumber", "P-1001").firstResult().id;
     }
 
+    private long partner1002Id() {
+        return Partner.<Partner>find("partnerNumber", "P-1002").firstResult().id;
+    }
+
     @Test
     void partnerCreatesOrderWithNewCustomer() {
         String token = tokens.tokenFor("partner-demo", "partner-demo");
         long productId = enabledProductId();
 
         given().auth().oauth2(token).contentType("application/json")
-                .body("{\"newKunde\":{\"lastName\":\"Mustermann\",\"address\":\"Teststr. 1\"},"
+                .body("{\"newKunde\":{\"lastName\":\"Mustermann\",\"address\":{\"street\":\"Teststr.\",\"houseNumber\":\"1\",\"postalCode\":\"4020\",\"city\":\"Linz\",\"country\":\"Österreich\"}},"
                         + "\"items\":[{\"productId\":" + productId + ",\"quantity\":2}]}")
                 .when().post("/api/partner/orders")
                 .then().statusCode(200)
@@ -51,7 +58,7 @@ class OrderResourceTest {
         long notEnabledProductId = Product.<Product>find("name", "Kabeltrommel 25m").firstResult().id;
 
         given().auth().oauth2(token).contentType("application/json")
-                .body("{\"newKunde\":{\"lastName\":\"Mustermann\",\"address\":\"Teststr. 1\"},"
+                .body("{\"newKunde\":{\"lastName\":\"Mustermann\",\"address\":{\"street\":\"Teststr.\",\"houseNumber\":\"1\",\"postalCode\":\"4020\",\"city\":\"Linz\",\"country\":\"Österreich\"}},"
                         + "\"items\":[{\"productId\":" + notEnabledProductId + ",\"quantity\":1}]}")
                 .when().post("/api/partner/orders")
                 .then().statusCode(400);
@@ -69,7 +76,7 @@ class OrderResourceTest {
 
         String partnerToken = tokens.tokenFor("partner-demo", "partner-demo");
         given().auth().oauth2(partnerToken).contentType("application/json")
-                .body("{\"newKunde\":{\"lastName\":\"Mustermann\",\"address\":\"Teststr. 1\"},"
+                .body("{\"newKunde\":{\"lastName\":\"Mustermann\",\"address\":{\"street\":\"Teststr.\",\"houseNumber\":\"1\",\"postalCode\":\"4020\",\"city\":\"Linz\",\"country\":\"Österreich\"}},"
                         + "\"items\":[{\"productId\":" + unavailableProductId + ",\"quantity\":1}]}")
                 .when().post("/api/partner/orders")
                 .then().statusCode(400);
@@ -86,7 +93,7 @@ class OrderResourceTest {
         String token = tokens.tokenFor("partner-demo", "partner-demo");
 
         given().auth().oauth2(token).contentType("application/json")
-                .body("{\"newKunde\":{\"lastName\":\"Mustermann\",\"address\":\"Teststr. 1\"},\"items\":[]}")
+                .body("{\"newKunde\":{\"lastName\":\"Mustermann\",\"address\":{\"street\":\"Teststr.\",\"houseNumber\":\"1\",\"postalCode\":\"4020\",\"city\":\"Linz\",\"country\":\"Österreich\"}},\"items\":[]}")
                 .when().post("/api/partner/orders")
                 .then().statusCode(400);
     }
@@ -97,7 +104,7 @@ class OrderResourceTest {
         long productId = enabledProductId();
 
         int orderId = given().auth().oauth2(partnerToken).contentType("application/json")
-                .body("{\"newKunde\":{\"lastName\":\"Firmenkunde\",\"address\":\"Teststr. 2\"},"
+                .body("{\"newKunde\":{\"lastName\":\"Firmenkunde\",\"address\":{\"street\":\"Teststr.\",\"houseNumber\":\"2\",\"postalCode\":\"4020\",\"city\":\"Linz\",\"country\":\"Österreich\"}},"
                         + "\"items\":[{\"productId\":" + productId + ",\"quantity\":1}]}")
                 .when().post("/api/partner/orders")
                 .then().statusCode(200)
@@ -135,7 +142,7 @@ class OrderResourceTest {
         long productId = enabledProductId();
 
         int orderId = given().auth().oauth2(partnerToken).contentType("application/json")
-                .body("{\"newKunde\":{\"lastName\":\"Statustest\",\"address\":\"Teststr. 3\"},"
+                .body("{\"newKunde\":{\"lastName\":\"Statustest\",\"address\":{\"street\":\"Teststr.\",\"houseNumber\":\"3\",\"postalCode\":\"4020\",\"city\":\"Linz\",\"country\":\"Österreich\"}},"
                         + "\"items\":[{\"productId\":" + productId + ",\"quantity\":1}]}")
                 .when().post("/api/partner/orders")
                 .then().statusCode(200)
@@ -185,5 +192,105 @@ class OrderResourceTest {
         given().auth().oauth2(token)
                 .when().get("/api/partner/orders")
                 .then().statusCode(200);
+    }
+
+    @Test
+    void newOrderIsUnseenByDefaultAndSeenEndpointFlipsIt() {
+        String partnerToken = tokens.tokenFor("partner-demo", "partner-demo");
+        long productId = enabledProductId();
+
+        int orderId = given().auth().oauth2(partnerToken).contentType("application/json")
+                .body("{\"newKunde\":{\"lastName\":\"Ungesehen\",\"address\":" + ADDRESS_JSON + "},"
+                        + "\"items\":[{\"productId\":" + productId + ",\"quantity\":1}]}")
+                .when().post("/api/partner/orders")
+                .then().statusCode(200)
+                .body("seenByCompany", is(false))
+                .extract().path("id");
+
+        String companyToken = tokens.tokenFor("company-demo", "company-demo");
+
+        given().auth().oauth2(companyToken)
+                .when().put("/api/company/orders/" + orderId + "/seen")
+                .then().statusCode(200)
+                .body("seenByCompany", is(true));
+
+        given().auth().oauth2(companyToken)
+                .when().get("/api/company/orders")
+                .then().statusCode(200)
+                .body("find { it.id == " + orderId + " }.seenByCompany", is(true));
+    }
+
+    @Test
+    void companyCreatesOrderForPartner() {
+        String companyToken = tokens.tokenFor("company-demo", "company-demo");
+        long partnerId = partner1001Id();
+        long productId = enabledProductId();
+
+        given().auth().oauth2(companyToken).contentType("application/json")
+                .body("{\"partnerId\":" + partnerId + ",\"newKunde\":{\"lastName\":\"Firmenanlage\",\"address\":"
+                        + ADDRESS_JSON + "},\"items\":[{\"productId\":" + productId + ",\"quantity\":1}]}")
+                .when().post("/api/company/orders")
+                .then().statusCode(200)
+                .body("status", is("SUBMITTED"))
+                .body("kunde.lastName", is("Firmenanlage"))
+                .body("partnerId", is((int) partnerId));
+    }
+
+    @Test
+    void companyOrderCreationRejectsMissingPartner() {
+        String companyToken = tokens.tokenFor("company-demo", "company-demo");
+
+        given().auth().oauth2(companyToken).contentType("application/json")
+                .body("{\"partnerId\":999999,\"newKunde\":{\"lastName\":\"Unbekannt\",\"address\":" + ADDRESS_JSON
+                        + "},\"items\":[{\"productId\":" + enabledProductId() + ",\"quantity\":1}]}")
+                .when().post("/api/company/orders")
+                .then().statusCode(404);
+    }
+
+    @Test
+    void companyOrderCreationRejectsEmptyItemsLikePartnerFlow() {
+        String companyToken = tokens.tokenFor("company-demo", "company-demo");
+        long partnerId = partner1001Id();
+
+        given().auth().oauth2(companyToken).contentType("application/json")
+                .body("{\"partnerId\":" + partnerId + ",\"newKunde\":{\"lastName\":\"Leer\",\"address\":"
+                        + ADDRESS_JSON + "},\"items\":[]}")
+                .when().post("/api/company/orders")
+                .then().statusCode(400);
+    }
+
+    @Test
+    void companyCannotSelectAnotherPartnersKundeForManualOrder() {
+        String partnerToken = tokens.tokenFor("partner-demo", "partner-demo");
+        int kundeId = given().auth().oauth2(partnerToken).contentType("application/json")
+                .body("{\"lastName\":\"Scope-Test\",\"address\":" + ADDRESS_JSON + "}")
+                .when().post("/api/partner/customers")
+                .then().statusCode(200)
+                .extract().path("id");
+
+        String companyToken = tokens.tokenFor("company-demo", "company-demo");
+
+        // kundeId belongs to P-1001, but the order is created for P-1002 — must be rejected,
+        // matching the same ownership check the partner's own flow enforces.
+        given().auth().oauth2(companyToken).contentType("application/json")
+                .body("{\"partnerId\":" + partner1002Id() + ",\"kundeId\":" + kundeId
+                        + ",\"items\":[{\"productId\":" + enabledProductId() + ",\"quantity\":1}]}")
+                .when().post("/api/company/orders")
+                .then().statusCode(404);
+    }
+
+    @Test
+    void companyFetchesPartnersCustomersScopedToThatPartner() {
+        String partnerToken = tokens.tokenFor("partner-demo", "partner-demo");
+        given().auth().oauth2(partnerToken).contentType("application/json")
+                .body("{\"lastName\":\"Listen-Test\",\"address\":" + ADDRESS_JSON + "}")
+                .when().post("/api/partner/customers")
+                .then().statusCode(200);
+
+        String companyToken = tokens.tokenFor("company-demo", "company-demo");
+        given().auth().oauth2(companyToken)
+                .when().get("/api/company/partners/" + partner1001Id() + "/customers")
+                .then().statusCode(200)
+                .body("find { it.lastName == 'Listen-Test' }", org.hamcrest.Matchers.notNullValue());
     }
 }
