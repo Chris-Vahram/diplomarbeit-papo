@@ -1,6 +1,7 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import { formatNumber } from "../lib/format.js";
+import { resolveImageUrls } from "../lib/product-images.js";
 
 class CompanyProductListPage extends HTMLElement {
   connectedCallback() {
@@ -20,7 +21,7 @@ class CompanyProductListPage extends HTMLElement {
             <textarea name="description"></textarea>
           </form-field>
           <form-field label="Kategorie" name="category"></form-field>
-          <form-field label="Bild-URL" name="imageUrl"></form-field>
+          <image-chooser name="imageUrl" class="form-field--wide"></image-chooser>
           <label class="checkbox-field">
             <input type="checkbox" name="available" checked />
             Verfügbar
@@ -47,6 +48,7 @@ class CompanyProductListPage extends HTMLElement {
 
     this.modal = this.querySelector("#product-modal");
     this.form = this.querySelector("#product-form");
+    this.imageChooser = this.querySelector("image-chooser");
 
     this.querySelector("#new-product-btn").addEventListener("click", () => this.openCreate());
     this.table.addEventListener("click", (event) => {
@@ -74,7 +76,7 @@ class CompanyProductListPage extends HTMLElement {
           ],
         },
       ];
-      this.table.rows = this.products.map((p) => ({
+      const rows = this.products.map((p) => ({
         imageUrl: p.imageUrl ?? "",
         name: p.name,
         priceLabel: formatNumber(p.price),
@@ -82,6 +84,7 @@ class CompanyProductListPage extends HTMLElement {
         availableLabel: p.available ? "Ja" : "Nein",
         actions: `<button type="button" data-edit-id="${p.id}">Bearbeiten</button>`,
       }));
+      this.table.rows = await resolveImageUrls(rows);
     } catch (error) {
       showToast(error.message, "error");
     }
@@ -90,6 +93,7 @@ class CompanyProductListPage extends HTMLElement {
   openCreate() {
     this.form.reset();
     this.form.elements.id.value = "";
+    this.imageChooser.reset();
     this.modal.setAttribute("title", "Neues Produkt");
     this.modal.open();
   }
@@ -102,7 +106,7 @@ class CompanyProductListPage extends HTMLElement {
     this.form.elements.price.value = product.price;
     this.form.elements.description.value = product.description ?? "";
     this.form.elements.category.value = product.category ?? "";
-    this.form.elements.imageUrl.value = product.imageUrl ?? "";
+    this.imageChooser.value = product.imageUrl ?? "";
     this.form.elements.available.checked = product.available;
     this.modal.setAttribute("title", "Produkt bearbeiten");
     this.modal.open();

@@ -8,7 +8,11 @@ import at.papo.partnerportal.order.Order;
 import at.papo.partnerportal.order.OrderItem;
 import at.papo.partnerportal.order.OrderStatus;
 import at.papo.partnerportal.partner.Partner;
+import at.papo.partnerportal.product.DemoPngGenerator;
 import at.papo.partnerportal.product.Product;
+import at.papo.partnerportal.product.ProductImage;
+import at.papo.partnerportal.product.ProductImageDto;
+import at.papo.partnerportal.product.ProductImageService;
 import io.quarkus.runtime.LaunchMode;
 import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -32,6 +36,9 @@ public class DemoDataSeeder {
     @Inject
     CommissionService commissionService;
 
+    @Inject
+    ProductImageService productImageService;
+
     @Transactional
     void onStart(@Observes StartupEvent event) {
         if (LaunchMode.current() == LaunchMode.NORMAL) {
@@ -42,6 +49,7 @@ public class DemoDataSeeder {
         }
         seedPartners();
         seedProducts();
+        seedProductImages();
         seedEnablements();
         // Demo orders only in dev/demo — tests assume a clean order baseline
         // (specific partners with zero orders), so don't seed them under %test.
@@ -119,6 +127,23 @@ public class DemoDataSeeder {
         product.category = category;
         product.imageUrl = imageUrl;
         product.persist();
+    }
+
+    // Seeds the reusable image gallery with real, validator-passing raster images (see
+    // DemoPngGenerator - pure JDK, no binary asset in the repo) and points one product
+    // at an uploaded image via the actual upload path, so the internal-image reference
+    // (Product.image / imageUrl = "/api/product-images/{id}") demos out of the box.
+    // The other seed products keep their external frontend-asset imageUrl untouched;
+    // "Wasserwaage 100cm" deliberately keeps no image at all (placeholder-path demo).
+    private void seedProductImages() {
+        ProductImageDto blau = productImageService.upload(
+                DemoPngGenerator.solidColorPng(64, 64, 58, 90, 120), "Standardbild Blau.png");
+        productImageService.upload(
+                DemoPngGenerator.solidColorPng(64, 64, 90, 140, 90), "Standardbild Grün.png");
+
+        Product akkuschrauber = product("Akkuschrauber 18V Set");
+        akkuschrauber.image = ProductImage.findById(blau.id());
+        akkuschrauber.imageUrl = blau.url();
     }
 
     // A few enabled products for "partner-demo" (P-1001) so the enabled-products
