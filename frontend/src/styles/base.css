@@ -1475,6 +1475,108 @@ data-table {
   font-size: var(--font-size-xs);
 }
 
+/* image-chooser.js: upload / gallery-pick / external-URL control for a product image. */
+.image-chooser {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  font-size: var(--font-size-sm);
+}
+
+.image-chooser__body {
+  display: flex;
+  gap: var(--spacing-4);
+  align-items: flex-start;
+}
+
+.image-chooser__preview {
+  width: 4rem;
+  height: 4rem;
+  flex-shrink: 0;
+}
+
+.image-chooser__controls {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.image-chooser__tabs {
+  display: flex;
+  gap: var(--spacing-2);
+  flex-wrap: wrap;
+}
+
+.image-chooser__tab {
+  padding: var(--spacing-1) var(--spacing-3);
+  border: 0.0625rem solid var(--border-strong);
+  border-radius: var(--radius-full);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-in-out), color var(--duration-fast) var(--ease-in-out);
+}
+
+.image-chooser__tab:hover { background: var(--bg-subtle); }
+
+.image-chooser__tab--active {
+  background: var(--color-primary-500);
+  border-color: var(--color-primary-500);
+  color: white;
+}
+
+.image-chooser__panel input[type="file"],
+.image-chooser__panel input[type="text"] {
+  width: 100%;
+  min-width: 0;
+  padding: var(--spacing-2) var(--spacing-3);
+  height: 2.5rem;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  border: 0.0625rem solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-sizing: border-box;
+}
+
+.image-chooser__hint {
+  margin: var(--spacing-1) 0 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.image-chooser__gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(3.5rem, 1fr));
+  gap: var(--spacing-2);
+  max-height: 12rem;
+  overflow-y: auto;
+}
+
+.image-chooser__gallery-item {
+  width: 3.5rem;
+  height: 3.5rem;
+  padding: 0;
+  border: 0.0625rem solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--color-neutral-100);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.image-chooser__gallery-item:hover { border-color: var(--border-focus); }
+
+.image-chooser__gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 /* ============================================================
    Modal dialog
    ============================================================ */

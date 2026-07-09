@@ -3,6 +3,9 @@ package at.papo.partnerportal.product;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 import java.math.BigDecimal;
 
@@ -24,4 +27,10 @@ public class Product extends PanacheEntity {
     public String category;
 
     public String imageUrl;
+
+    // Set when imageUrl points at an uploaded/gallery-picked image (see product-images
+    // capability); null when imageUrl is an external URL or unset.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "image_id")
+    public ProductImage image;
 }

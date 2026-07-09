@@ -62,4 +62,31 @@ class ProductResourceTest {
                 .when().get("/api/company/products")
                 .then().statusCode(403);
     }
+
+    // Covers ProductService.applyImage: an internal "/api/product-images/{id}" reference
+    // sets the image link and is echoed back verbatim; switching to an external URL clears
+    // that link again (observable via the product picking up the new imageUrl unchanged).
+    @Test
+    void productImageUrlSwitchesBetweenUploadedAndExternal() {
+        String token = tokens.tokenFor("company-demo", "company-demo");
+        byte[] png = DemoPngGenerator.solidColorPng(2, 2, 30, 30, 30);
+        String uploadedUrl = given().auth().oauth2(token)
+                .multiPart("file", "test.png", png, "image/png")
+                .when().post("/api/product-images")
+                .then().statusCode(200)
+                .extract().path("url");
+
+        int id = given().auth().oauth2(token).contentType("application/json")
+                .body("{\"name\":\"Bildartikel\",\"price\":5.00,\"imageUrl\":\"" + uploadedUrl + "\"}")
+                .when().post("/api/company/products")
+                .then().statusCode(200)
+                .body("imageUrl", org.hamcrest.Matchers.is(uploadedUrl))
+                .extract().path("id");
+
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"name\":\"Bildartikel\",\"price\":5.00,\"imageUrl\":\"https://example.at/bild.jpg\"}")
+                .when().put("/api/company/products/" + id)
+                .then().statusCode(200)
+                .body("imageUrl", org.hamcrest.Matchers.is("https://example.at/bild.jpg"));
+    }
 }

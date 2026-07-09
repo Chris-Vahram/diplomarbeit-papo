@@ -5,6 +5,19 @@ import { getSession, logout } from "./auth.js";
 // enabled in the backend for localhost origins (see docs/SETUP.md).
 const API_BASE = "http://localhost:8080/api";
 
+// Error responses are JSON ({"message": "...", "details"?: [...]}) from ApiExceptionMapper/
+// ValidationExceptionMapper (see backend/.../common/*ExceptionMapper.java) - extract the
+// plain German message instead of showing the raw JSON body in a toast. Falls back to the
+// raw text for non-JSON error bodies (e.g. a proxy/server error page).
+async function extractErrorMessage(response) {
+  const text = await response.text().catch(() => "");
+  try {
+    return JSON.parse(text).message ?? text;
+  } catch {
+    return text || response.statusText;
+  }
+}
+
 async function handleResponse(response) {
   if (response.status === 401) {
     logout();
@@ -13,7 +26,7 @@ async function handleResponse(response) {
   }
 
   if (!response.ok) {
-    const message = await response.text().catch(() => response.statusText);
+    const message = await extractErrorMessage(response);
     throw new Error(message || `Anfrage fehlgeschlagen (${response.status})`);
   }
 
@@ -48,6 +61,30 @@ export async function apiFetchForm(path, formData) {
   return handleResponse(response);
 }
 
+// Fetches a binary response (e.g. an uploaded product image) with the Bearer token and
+// returns the raw Blob - for callers that build their own object URL (see
+// lib/product-images.js) instead of triggering a file download like apiDownload below.
+export async function apiFetchBlob(path) {
+  const session = getSession();
+  const headers = new Headers();
+  if (session) {
+    headers.set("Authorization", `Bearer ${session.accessToken}`);
+  }
+
+  const response = await fetch(`${API_BASE}${path}`, { headers });
+  if (response.status === 401) {
+    logout();
+    location.hash = "#/login";
+    throw new Error("Sitzung abgelaufen. Bitte erneut anmelden.");
+  }
+  if (!response.ok) {
+    const message = await extractErrorMessage(response);
+    throw new Error(message || `Anfrage fehlgeschlagen (${response.status})`);
+  }
+
+  return response.blob();
+}
+
 // A plain <a href>/window.location download sends no Authorization header and
 // would 401 (data-export spec) - fetch the blob with the Bearer token ourselves
 // and trigger the save via a temporary object URL instead.
@@ -65,7 +102,7 @@ export async function apiDownload(path, filename) {
     throw new Error("Sitzung abgelaufen. Bitte erneut anmelden.");
   }
   if (!response.ok) {
-    const message = await response.text().catch(() => response.statusText);
+    const message = await extractErrorMessage(response);
     throw new Error(message || `Anfrage fehlgeschlagen (${response.status})`);
   }
 
