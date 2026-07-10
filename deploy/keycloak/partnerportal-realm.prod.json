@@ -1,0 +1,44 @@
+{
+  "realm": "partnerportal",
+  "enabled": true,
+  "registrationAllowed": false,
+  "roles": {
+    "realm": [
+      { "name": "company", "description": "Company / operator role - manages partners, products, enablement, order status" },
+      { "name": "partner", "description": "Sales partner role - places orders, views own data" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "partnerportal-frontend",
+      "publicClient": true,
+      "enabled": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["https://CHANGE_ME.example.com/*"],
+      "webOrigins": ["https://CHANGE_ME.example.com"]
+    }
+  ],
+  "users": [
+    {
+      "username": "company-demo",
+      "enabled": true,
+      "email": "company-demo@papo.local",
+      "firstName": "Company",
+      "lastName": "Demo",
+      "credentials": [{ "type": "password", "value": "company-demo", "temporary": false }],
+      "realmRoles": ["company"]
+    },
+    {
+      "username": "partner-demo",
+      "enabled": true,
+      "email": "partner-demo@papo.local",
+      "firstName": "Partner",
+      "lastName": "Demo",
+      "credentials": [{ "type": "password", "value": "partner-demo", "temporary": false }],
+      "realmRoles": ["partner"]
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+# Production topology (design.md) - single VM, four containers, Caddy fronting everything.
+# Separate from the dev-only docker-compose.yml (which only runs Postgres + Keycloak for
+# `mvnw quarkus:dev`). Run with:
+#
+#   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
+#
+# .env.prod is VM-local and gitignored - copy .env.prod.example and fill in real values.
+#
+# mem_limit values are a starting budget for the VM's 12 GB (design.md Risks) - adjust if
+# observed usage differs.
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: papo-postgres
+    restart: unless-stopped
+    mem_limit: 768m
+    environment:
+      POSTGRES_DB: partnerportal
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - papo-postgres-data:/var/lib/postgresql/data
+      - ./deploy/postgres/init-keycloak-db.sh:/docker-entrypoint-initdb.d/init-keycloak-db.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: papo-keycloak
+    restart: unless-stopped
+    mem_limit: 1024m
+    command: start --import-realm
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: ${DB_USER}
+      KC_DB_PASSWORD: ${DB_PASSWORD}
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_PROXY_HEADERS: xforwarded
+      KC_HOSTNAME: ${DOMAIN}
+      KC_HTTP_ENABLED: "true"
+    volumes:
+      - ./deploy/keycloak/partnerportal-realm.prod.json:/opt/keycloak/data/import/partnerportal-realm.json:ro
+
+  quarkus:
+    image: ghcr.io/chris-vahram/diplomarbeit-papo-backend:${IMAGE_TAG:-latest}
+    container_name: papo-backend
+    restart: unless-stopped
+    mem_limit: 640m
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+    environment:
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_URL: jdbc:postgresql://postgres:5432/partnerportal
+      KC_URL: http://keycloak:8080/auth/realms/partnerportal
+      KC_ISSUER: https://${DOMAIN}/auth/realms/partnerportal
+      KC_CLIENT_ID: partnerportal-frontend
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: papo-caddy
+    restart: unless-stopped
+    mem_limit: 128m
+    depends_on:
+      - quarkus
+      - keycloak
+    environment:
+      DOMAIN: ${DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./frontend:/srv/frontend:ro
+      - papo-caddy-data:/data
+      - papo-caddy-config:/config
+
+volumes:
+  papo-postgres-data:
+  papo-caddy-data:
+  papo-caddy-config:

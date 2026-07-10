@@ -1,0 +1,26 @@
+# Production reverse proxy - single domain, path-based routing (design.md Decision 4).
+# {$DOMAIN} is a Caddy-native env var placeholder (docker-compose.prod.yml injects it).
+# Until a real domain is chosen (tasks.md 6.1), DOMAIN can point at the VM's IP/localhost -
+# Caddy only attempts Let's Encrypt issuance for a real hostname, so this is safe to run early.
+
+{$DOMAIN} {
+	# Keycloak - KC_HTTP_RELATIVE_PATH=/auth on the keycloak service already expects the
+	# /auth prefix in the incoming path, so it must NOT be stripped here (plain `handle`,
+	# not `handle_path`).
+	handle /auth/* {
+		reverse_proxy keycloak:8080
+	}
+
+	# Quarkus backend - every @Path already starts with /api (see ProductResource etc.),
+	# so the prefix must reach the app unstripped here too.
+	handle /api/* {
+		reverse_proxy quarkus:8080
+	}
+
+	# Static frontend - everything else. Bind-mounted into the Caddy container (docker-compose.prod.yml).
+	handle {
+		root * /srv/frontend
+		try_files {path} /index.html
+		file_server
+	}
+}
