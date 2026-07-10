@@ -1,0 +1,20 @@
+Teams-Besprechung 10.07.2026 11:00 Uhr
+anwesend: Prof. Hammer, Chris Vahram, Tobias Huemer, Firmenangehörige
+
+Präsenation + Live Demo grundsätzlich gut, MVP gut angekommen
+
+Wichtig: gute Benutzerführung (Einfachheit, Partner sollen bei Bestellablauf Spaß haben) gute mobile Version, Partner oft nicht technikaffin
+
+Partner soll Endkunden, die länger nicht mehr bestellt haben sehen können
+
+Verbesserungen:
+	- Bei Produkt zu Bestellung hinzufügen: soll übersichtlicher sein (Suchleiste, Filter, ...)
+	- Filter bei Bestellungen nach Endkunde/Partner
+
+Daten/Vorghensweisenn innerhalb 1-2 Wochen von Firma geliefert, dann umsetzen, dann neuen Termin machen
+
+Hosten: WIR haben Hetzner-Instanzen, Christan Bachl meldet sich bei Chris
+
+Anmerkung: Applikation öfter selber durchtesten, um kleine Fehler zu finden
+
+ 
