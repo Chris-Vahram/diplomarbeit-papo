@@ -280,6 +280,50 @@ class OrderResourceTest {
     }
 
     @Test
+    void companyCannotCreateManualOrderForInactivePartner() {
+        String companyToken = tokens.tokenFor("company-demo", "company-demo");
+        long partnerId = partner1001Id();
+
+        io.restassured.path.json.JsonPath current = given().auth().oauth2(companyToken)
+                .when().get("/api/company/partners/" + partnerId)
+                .then().statusCode(200)
+                .extract().jsonPath();
+
+        java.util.Map<String, Object> updateBody = new java.util.HashMap<>();
+        updateBody.put("partnerNumber", current.getString("partnerNumber"));
+        updateBody.put("name", current.getString("name"));
+        updateBody.put("address", current.getMap("address"));
+        updateBody.put("email", current.getString("email"));
+        updateBody.put("phone", current.getString("phone"));
+        updateBody.put("commissionPercent", current.getDouble("commissionPercent"));
+        updateBody.put("keycloakUsername", current.getString("keycloakUsername"));
+
+        updateBody.put("active", false);
+        given().auth().oauth2(companyToken).contentType("application/json")
+                .body(updateBody)
+                .when().put("/api/company/partners/" + partnerId)
+                .then().statusCode(200)
+                .body("active", is(false));
+
+        try {
+            given().auth().oauth2(companyToken).contentType("application/json")
+                    .body("{\"partnerId\":" + partnerId + ",\"newKunde\":{\"lastName\":\"Inaktiv-Test\",\"address\":"
+                            + ADDRESS_JSON + "},\"items\":[{\"productId\":" + enabledProductId() + ",\"quantity\":1}]}")
+                    .when().post("/api/company/orders")
+                    .then().statusCode(409);
+        } finally {
+            // Restore seeded active state so later tests aren't polluted (same pattern as
+            // partnerCannotOrderUnavailableProductEvenIfEnabled's enablement restore above).
+            updateBody.put("active", true);
+            given().auth().oauth2(companyToken).contentType("application/json")
+                    .body(updateBody)
+                    .when().put("/api/company/partners/" + partnerId)
+                    .then().statusCode(200)
+                    .body("active", is(true));
+        }
+    }
+
+    @Test
     void companyFetchesPartnersCustomersScopedToThatPartner() {
         String partnerToken = tokens.tokenFor("partner-demo", "partner-demo");
         given().auth().oauth2(partnerToken).contentType("application/json")

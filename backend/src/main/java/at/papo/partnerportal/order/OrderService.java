@@ -61,6 +61,11 @@ public class OrderService {
         if (partner == null) {
             throw new ApiException(404, "Partner nicht gefunden.");
         }
+        // FR-23: an inactive partner may not receive new orders, including manual
+        // orders created by the company on the partner's behalf.
+        if (!partner.active) {
+            throw new ApiException(409, "Partner ist inaktiv und kann keine neuen Bestellungen erhalten.");
+        }
         return createForPartner(partner, request.toOrderRequest());
     }
 

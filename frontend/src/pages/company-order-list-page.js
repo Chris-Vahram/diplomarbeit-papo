@@ -36,6 +36,9 @@ class CompanyOrderListPage extends HTMLElement {
       <modal-dialog id="manual-order-modal" title="Bestellung manuell anlegen">
         <div id="manual-order-content"></div>
       </modal-dialog>
+      <modal-dialog id="shipping-confirmation-modal" title="Versandbestätigung">
+        <div id="shipping-confirmation-content"></div>
+      </modal-dialog>
     `;
 
     this.querySelector("#export-btn").addEventListener("click", () => this.exportCsv());
@@ -69,6 +72,8 @@ class CompanyOrderListPage extends HTMLElement {
     this.detailsContent = this.querySelector("#details-content");
     this.manualOrderModal = this.querySelector("#manual-order-modal");
     this.manualOrderContent = this.querySelector("#manual-order-content");
+    this.shippingConfirmationModal = this.querySelector("#shipping-confirmation-modal");
+    this.shippingConfirmationContent = this.querySelector("#shipping-confirmation-content");
 
     this.load();
   }
@@ -225,9 +230,23 @@ class CompanyOrderListPage extends HTMLElement {
 
   async updateStatus(orderId, status) {
     try {
-      await apiFetch(`/company/orders/${orderId}/status`, { method: "PUT", body: JSON.stringify({ status }) });
+      const order = await apiFetch(`/company/orders/${orderId}/status`, { method: "PUT", body: JSON.stringify({ status }) });
       showToast("Status aktualisiert.", "success");
       this.load();
+
+      // FR-17: a simulated shipping confirmation is shown when an order reaches
+      // "fulfilled" — not on the submitted->reviewed step.
+      if (status === "FULFILLED") {
+        this.shippingConfirmationContent.innerHTML = renderOrderConfirmationHtml(order, {
+          showPartner: true,
+          kind: "shipping",
+          actionsHtml: `<button type="button" id="shipping-confirmation-done-btn">Fertig</button>`,
+        });
+        this.shippingConfirmationContent.querySelector("#shipping-confirmation-done-btn").addEventListener("click", () => {
+          this.shippingConfirmationModal.close();
+        });
+        this.shippingConfirmationModal.open();
+      }
     } catch (error) {
       showToast(error.message, "error");
       this.load();
