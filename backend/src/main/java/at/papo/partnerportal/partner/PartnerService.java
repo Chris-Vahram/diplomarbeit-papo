@@ -47,8 +47,10 @@ public class PartnerService {
         return PartnerDto.from(partner);
     }
 
+    // Case-insensitive to match the importer's duplicate check (PartnerImportDefinition),
+    // so "P-1001" and "p-1001" can't coexist depending on which path created the partner.
     private void assertPartnerNumberFree(String partnerNumber, Long excludingId) {
-        Partner existing = Partner.find("partnerNumber", partnerNumber).firstResult();
+        Partner existing = Partner.find("lower(partnerNumber) = ?1", partnerNumber.toLowerCase()).firstResult();
         if (existing != null && !existing.id.equals(excludingId)) {
             throw new ApiException(409, "Partnernummer bereits vergeben.");
         }

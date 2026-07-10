@@ -14,13 +14,21 @@ export function filterByPeriod(orders, fromIso, toIso) {
   return orders.filter((o) => inPeriod(o.orderDate, fromIso, toIso));
 }
 
+// Sums money values in integer cents to avoid floating-point rounding drift
+// (order/commission values have at most 2 decimal places, matching the
+// backend's numeric(10,2) columns).
+function sumCents(values) {
+  const cents = values.reduce((sum, v) => sum + Math.round(v * 100), 0);
+  return cents / 100;
+}
+
 // Fulfilled-only totals — the dashboard convention (only fulfilled orders count
 // toward revenue/commission/order-count).
 export function fulfilledTotals(orders) {
   const fulfilled = orders.filter((o) => o.status === "FULFILLED");
   return {
-    revenue: fulfilled.reduce((sum, o) => sum + o.orderValue, 0),
-    commission: fulfilled.reduce((sum, o) => sum + (o.commissionValue ?? 0), 0),
+    revenue: sumCents(fulfilled.map((o) => o.orderValue)),
+    commission: sumCents(fulfilled.map((o) => o.commissionValue ?? 0)),
     count: fulfilled.length,
   };
 }

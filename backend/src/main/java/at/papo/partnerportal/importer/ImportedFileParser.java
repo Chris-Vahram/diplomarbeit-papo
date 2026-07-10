@@ -83,9 +83,13 @@ public final class ImportedFileParser {
                 return new ParsedFile(List.of(), List.of());
             }
 
+            // Index-based like the data-row loop below, not `for (Cell cell : headerRow)` -
+            // POI's row iterator skips blank cells, which would shift every later column's
+            // header (and therefore its data) one position left if a header cell is blank.
             Row headerRow = rowIterator.next();
             List<String> headers = new ArrayList<>();
-            for (Cell cell : headerRow) {
+            for (int i = 0; i < headerRow.getLastCellNum(); i++) {
+                Cell cell = headerRow.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
                 headers.add(formatter.formatCellValue(cell));
             }
 
