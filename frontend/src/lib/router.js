@@ -1,5 +1,6 @@
 import { isAuthenticated, hasRole, getSession, logout } from "./auth.js";
 import { apiFetch } from "./api.js";
+import { escapeHtml } from "./html.js";
 
 // Route table: hash path -> { tag, role, title }
 // role: null = public, "company" | "partner" = required realm role for FR-20 deep-link protection.
@@ -123,12 +124,12 @@ function renderNav() {
   menu.className = "profile-menu";
   menu.innerHTML = `
     <button type="button" class="profile-menu__button" aria-haspopup="true" aria-expanded="false">
-      <span class="profile-menu__avatar">${initials(session.username)}</span>
+      <span class="profile-menu__avatar">${escapeHtml(initials(session.username))}</span>
       <i data-lucide="chevron-down" class="profile-menu__caret"></i>
     </button>
     <div class="profile-menu__panel" hidden>
       <div class="profile-menu__identity">
-        <div class="profile-menu__name">${session.username}</div>
+        <div class="profile-menu__name">${escapeHtml(session.username)}</div>
         <div class="profile-menu__role">${session.isCompany ? "Firma" : "Partner"}</div>
       </div>
       <button type="button" data-action="profile" class="profile-menu__item">

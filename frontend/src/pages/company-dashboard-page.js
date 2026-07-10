@@ -2,6 +2,7 @@ import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import { formatEuro, formatNumber } from "../lib/format.js";
 import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue } from "../lib/dashboard-data.js";
+import { escapeHtml } from "../lib/html.js";
 
 const eur = new Intl.NumberFormat("de-AT", { style: "currency", currency: "EUR" });
 const dateLabel = new Intl.DateTimeFormat("de-AT", { day: "2-digit", month: "2-digit", year: "numeric" });
@@ -237,7 +238,7 @@ class CompanyDashboardPage extends HTMLElement {
         (p, i) => `
         <div class="bar-chart__row${i === 0 ? " bar-chart__row--leader" : ""}">
           <span class="bar-chart__rank">${i === 0 ? '<i data-lucide="trophy"></i>' : ""}</span>
-          <span class="bar-chart__label" title="${p.partnerName}">${p.partnerName}</span>
+          <span class="bar-chart__label" title="${escapeHtml(p.partnerName)}">${escapeHtml(p.partnerName)}</span>
           <span class="bar-chart__track"><span class="bar-chart__fill" style="width:${((p.revenue / maxRevenue) * 100).toFixed(1)}%"></span></span>
           <span class="bar-chart__value">${eur.format(p.revenue)}</span>
         </div>`,

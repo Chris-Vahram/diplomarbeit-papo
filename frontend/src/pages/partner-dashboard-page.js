@@ -2,6 +2,7 @@ import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import { formatEuro, formatNumber, formatDate } from "../lib/format.js";
 import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue, previousPeriod, trendInfo } from "../lib/dashboard-data.js";
+import { escapeHtml } from "../lib/html.js";
 import {
   productOptionsHtml,
   kundePickerHtml,
@@ -316,7 +317,7 @@ class PartnerDashboardPage extends HTMLElement {
         return `
         <div class="bar-chart__row${isLeader ? " bar-chart__row--leader" : ""}">
           <span class="bar-chart__rank">${isLeader ? '<i data-lucide="trophy"></i>' : ""}</span>
-          <span class="bar-chart__label" title="${c.name}">${c.name}</span>
+          <span class="bar-chart__label" title="${escapeHtml(c.name)}">${escapeHtml(c.name)}</span>
           <span class="bar-chart__track"><span class="bar-chart__fill" style="width:${((c.value / maxValue) * 100).toFixed(1)}%"></span></span>
           <span class="bar-chart__value">${eur.format(c.value)}</span>
         </div>`;

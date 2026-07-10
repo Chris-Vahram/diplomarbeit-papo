@@ -42,6 +42,10 @@ public class ProductImageResource {
         return productImageService.upload(Files.readAllBytes(file.uploadedFile()), file.fileName());
     }
 
+    // Accepted risk (2026-07-09 security review): any authenticated partner can read any
+    // image id, independent of product enablement - ids are sequential/enumerable. Not
+    // fixed because product images are non-sensitive (gallery assets, not partner data);
+    // revisit with an enablement check if image confidentiality ever matters.
     @GET
     @Path("/{id}")
     @RolesAllowed({ "company", "partner" })

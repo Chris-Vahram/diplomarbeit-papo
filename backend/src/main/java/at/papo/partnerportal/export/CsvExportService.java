@@ -48,8 +48,8 @@ public class CsvExportService {
                     CommissionRecord commission = commissionsByOrderId.get(order.id);
                     return new String[] {
                             formatDate(order.orderDate),
-                            order.partner.name,
-                            kundeName(order),
+                            sanitizeFormula(order.partner.name),
+                            sanitizeFormula(kundeName(order)),
                             formatMoney(order.orderValue),
                             commission != null ? formatMoney(commission.commissionPercentUsed) : "",
                             commission != null ? formatMoney(commission.commissionValue) : "",
@@ -64,7 +64,7 @@ public class CsvExportService {
 
         return writeCsv(new String[] { "Partner", "Bestell-Nr", "Basiswert", "Provision %", "Provision" },
                 records, record -> new String[] {
-                        record.partner.name,
+                        sanitizeFormula(record.partner.name),
                         String.valueOf(record.order.id),
                         formatMoney(record.orderValue),
                         formatMoney(record.commissionPercentUsed),
@@ -75,6 +75,16 @@ public class CsvExportService {
     private static String kundeName(Order order) {
         String firstName = order.kunde.firstName;
         return (firstName != null && !firstName.isBlank() ? firstName + " " : "") + order.kunde.lastName;
+    }
+
+    // Prefixes values that would be interpreted as a spreadsheet formula (leading
+    // =, +, -, or @) with an apostrophe so Excel renders them as literal text -
+    // partner/Kunde names are free text and not otherwise validated.
+    private static String sanitizeFormula(String value) {
+        if (value != null && !value.isEmpty() && "=+-@".indexOf(value.charAt(0)) >= 0) {
+            return "'" + value;
+        }
+        return value;
     }
 
     // German-locale Excel expects a decimal comma; no thousands grouping (BigDecimal
