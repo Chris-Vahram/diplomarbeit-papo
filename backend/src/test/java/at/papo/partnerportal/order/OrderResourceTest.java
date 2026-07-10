@@ -186,6 +186,45 @@ class OrderResourceTest {
     }
 
     @Test
+    void unseenCountEndpointRequiresCompanyRoleAndReturnsCorrectCount() {
+        String partnerToken = tokens.tokenFor("partner-demo", "partner-demo");
+        long productId = enabledProductId();
+
+        given().auth().oauth2(partnerToken)
+                .when().get("/api/company/orders/unseen-count")
+                .then().statusCode(403);
+
+        String companyToken = tokens.tokenFor("company-demo", "company-demo");
+        long before = given().auth().oauth2(companyToken)
+                .when().get("/api/company/orders/unseen-count")
+                .then().statusCode(200)
+                .extract().as(Long.class);
+
+        int orderId = given().auth().oauth2(partnerToken).contentType("application/json")
+                .body("{\"newKunde\":{\"lastName\":\"Unseen-Count\",\"address\":" + ADDRESS_JSON + "},"
+                        + "\"items\":[{\"productId\":" + productId + ",\"quantity\":1}]}")
+                .when().post("/api/partner/orders")
+                .then().statusCode(200)
+                .extract().path("id");
+
+        long afterOrder = given().auth().oauth2(companyToken)
+                .when().get("/api/company/orders/unseen-count")
+                .then().statusCode(200)
+                .extract().as(Long.class);
+        org.junit.jupiter.api.Assertions.assertEquals(before + 1, afterOrder);
+
+        given().auth().oauth2(companyToken)
+                .when().put("/api/company/orders/" + orderId + "/seen")
+                .then().statusCode(200);
+
+        long afterSeen = given().auth().oauth2(companyToken)
+                .when().get("/api/company/orders/unseen-count")
+                .then().statusCode(200)
+                .extract().as(Long.class);
+        org.junit.jupiter.api.Assertions.assertEquals(before, afterSeen);
+    }
+
+    @Test
     void partnerSeesOnlyOwnOrders() {
         String token = tokens.tokenFor("partner-demo", "partner-demo");
 

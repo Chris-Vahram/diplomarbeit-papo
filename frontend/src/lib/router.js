@@ -163,15 +163,14 @@ function renderNav() {
 }
 
 // Unread-order count for the company sidebar "Bestellungen" nav item
-// (order-notifications spec). Derived from the already-fetched company order
-// list, recomputed whenever the nav re-renders — no polling/websocket, per design.md.
+// (order-notifications spec). Fetched from a dedicated count endpoint (not the full
+// order list, which this runs on every nav re-render) — no polling/websocket, per design.md.
 export async function refreshOrdersBadge() {
   const session = getSession();
   const link = appNav.querySelector('a[href="#/company/orders"]');
   if (!session?.isCompany || !link) return;
   try {
-    const orders = await apiFetch("/company/orders");
-    const unseenCount = orders.filter((o) => !o.seenByCompany).length;
+    const unseenCount = await apiFetch("/company/orders/unseen-count");
     let badge = link.querySelector(".nav-badge");
     if (unseenCount > 0) {
       if (!badge) {
