@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Partnerportal – Diplomarbeit</title>
+  <link rel="stylesheet" href="reveal/reveal.css" />
+  <link rel="stylesheet" href="theme.css" />
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- 1. Titel -->
+      <section class="dark">
+        <p class="eyebrow">HTL Diplomarbeit · Informatik / IT Medientechnik</p>
+        <h1>Partnerportal</h1>
+        <p class="lead">Ein internes B2B-Bestellportal für partnerbasierte Vertriebsmodelle. Kette: Unternehmen → Partner → Endkunde.</p>
+        <p class="meta">
+          <strong>Chris Vahram</strong> &amp; <strong>Tobias</strong>
+          <span class="sep">·</span> Referenzkunde <strong>PAPO</strong>
+          <span class="sep">·</span> 2026
+        </p>
+      </section>
+
+      <!-- 2. Problem -->
+      <section>
+        <p class="eyebrow">Ausgangslage</p>
+        <h2>Bestellungen laufen heute manuell</h2>
+        <p class="lead">PAPO verwaltet Partner und Artikel ohne zentrales System – jede Bestellung verursacht Handarbeit.</p>
+
+        <div class="stats">
+          <div class="stat"><div class="num">~200</div><div class="lbl">Partner</div></div>
+          <div class="stat"><div class="num">~800</div><div class="lbl">Artikel</div></div>
+          <div class="stat"><div class="num">10–15</div><div class="lbl">Bestellungen/Tag per E-Mail</div></div>
+          <div class="stat"><div class="num">3–4</div><div class="lbl">Bestellungen/Tag per Telefon</div></div>
+        </div>
+
+        <ul class="plain">
+          <li><strong>Keine zentrale Verwaltung</strong> von Partner- und Artikeldaten</li>
+          <li><strong>Keine kontrollierte Sichtbarkeit</strong> – welcher Partner welches Produkt bestellen darf</li>
+          <li><strong>Keine automatische Zuordnung</strong> von Bestellung zu Partner und Provision</li>
+        </ul>
+      </section>
+
+      <!-- 3. Akteure & Kette -->
+      <section>
+        <p class="eyebrow">Akteure &amp; Kette</p>
+        <h2>Unternehmen → Partner → Endkunde</h2>
+
+        <div class="chain">
+          <span class="node hot">Unternehmen</span>
+          <span class="arrow">→</span>
+          <span class="node">Partner</span>
+          <span class="arrow">→</span>
+          <span class="node">Endkunde</span>
+        </div>
+
+        <div class="actors">
+          <div class="actor hot">
+            <h3>Unternehmen</h3>
+            <ul>
+              <li>Verwaltet Partner &amp; Produkte zentral</li>
+              <li>Importiert Excel/CSV-Daten</li>
+              <li>Schaltet Produkte pro Partner frei</li>
+              <li>Sieht alle Bestellungen, setzt Status</li>
+            </ul>
+          </div>
+          <div class="flow">→</div>
+          <div class="actor">
+            <h3>Partner</h3>
+            <ul>
+              <li>Sieht nur freigeschaltete Produkte</li>
+              <li>Legt Bestellungen für Endkunden an</li>
+              <li>Sieht eigene Bestellungen &amp; Provision</li>
+              <li>Bearbeitet eigene Kontaktdaten</li>
+            </ul>
+          </div>
+          <div class="flow">→</div>
+          <div class="actor quiet">
+            <h3>Endkunde</h3>
+            <ul>
+              <li>Nutzt das Portal <strong>nicht</strong> (MVP)</li>
+              <li>Wird vom Partner angelegt/ausgewählt</li>
+              <li>Empfänger der Ware</li>
+              <li>Erhält simulierte Bestätigungen</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Kernablauf -->
+      <section>
+        <p class="eyebrow">Use Case</p>
+        <h2>Kernablauf: Partner bestellt für Endkunde</h2>
+
+        <ol class="steps">
+          <li>Partner meldet sich an<small>Login über Keycloak, Rolle „partner“</small></li>
+          <li>Endkunde auswählen oder neu anlegen<small>Pflicht: Nachname + Adresse</small></li>
+          <li>Bestellung mit mehreren Artikeln + Mengen aufgeben<small>nur freigeschaltete, verfügbare Artikel</small></li>
+          <li>Automatische Zuordnung zum Partner<small>Provision wird als eigener Datensatz berechnet</small></li>
+          <li>Bildschirmbestätigung + simulierte Bestell-E-Mail<small>kein echter Versand (siehe Backlog B-04)</small></li>
+        </ol>
+
+        <div class="status-chain">
+          <span class="pill submitted">submitted</span>
+          <span class="arrow">→</span>
+          <span class="pill reviewed">reviewed</span>
+          <span class="arrow">→</span>
+          <span class="pill fulfilled">fulfilled</span>
+          <span class="status-note">Statuswechsel nur durch das Unternehmen</span>
+        </div>
+      </section>
+
+      <!-- 5. Funktionsumfang -->
+      <section>
+        <p class="eyebrow">Funktionsumfang</p>
+        <h2>Was das MVP leistet</h2>
+
+        <div class="grid-3">
+          <div class="card">
+            <h3>Partner- &amp; Produktverwaltung</h3>
+            <p>Zentrale CRUD-Verwaltung durch das Unternehmen, inkl. Provisionsprozent und Aktiv/Inaktiv-Status.</p>
+          </div>
+          <div class="card">
+            <h3>Excel/CSV-Import</h3>
+            <p>Spalten-Mapping, Duplikaterkennung und Validierungsbericht für Partner- und Artikeldaten.</p>
+          </div>
+          <div class="card">
+            <h3>Produktfreischaltung</h3>
+            <p>Produkte werden pro Partner einzeln freigeschaltet – nur freigeschaltete Artikel sind bestellbar.</p>
+          </div>
+          <div class="card">
+            <h3>Partner-Dashboard</h3>
+            <p>Landing Screen mit Provision, Umsatz, Bestellanzahl und letzten Bestellungen.</p>
+          </div>
+          <div class="card">
+            <h3>Bestellabwicklung</h3>
+            <p>Mehrartikel-Bestellungen mit Mengen, automatische Partnerzuordnung, Statusworkflow.</p>
+          </div>
+          <div class="card">
+            <h3>Provision pro Bestellung</h3>
+            <p>Prozentsatz je Partner (5/10/15 % oder individuell), als eigener CommissionRecord gespeichert.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Technologie-Stack -->
+      <section>
+        <p class="eyebrow">Technologie</p>
+        <h2>Fixer Technologie-Stack</h2>
+
+        <table class="stack">
+          <tr>
+            <td class="k">Frontend</td>
+            <td class="v">HTML, CSS, native Web Components / Custom Elements<small>kein externes Frontend-Framework</small></td>
+          </tr>
+          <tr>
+            <td class="k">Backend</td>
+            <td class="v">Quarkus (Java)<small>Quarkus REST, Hibernate ORM mit Panache</small></td>
+          </tr>
+          <tr>
+            <td class="k">Datenbank</td>
+            <td class="v">PostgreSQL</td>
+          </tr>
+          <tr>
+            <td class="k">Auth</td>
+            <td class="v">Keycloak (OIDC)<small>Rollen: company, partner</small></td>
+          </tr>
+          <tr>
+            <td class="k">Import</td>
+            <td class="v">Apache POI (xlsx) + opencsv (csv)</td>
+          </tr>
+        </table>
+      </section>
+
+      <!-- 7. Architektur (Excalidraw-Diagramm) -->
+      <section>
+        <p class="eyebrow">Architektur</p>
+        <h2>System- und Bestellablauf-Diagramm</h2>
+        <div class="diagram-wrap">
+          <img src="assets/bestellablauf.svg" alt="Diagramm: Systemarchitektur (Frontend, Keycloak, Quarkus-Backend, PostgreSQL) und Bestellablauf (Partner-Login, Kunde auswählen, Bestellung aufgeben, Zuordnung + Provision, Bestätigung, Status submitted-reviewed-fulfilled)" />
+        </div>
+      </section>
+
+      <!-- 8. Screenshots (Platzhalter) -->
+      <section>
+        <p class="eyebrow">Bildschirmaufnahmen</p>
+        <h2>Oberfläche <span style="font-weight:400; color: var(--ink-faint); font-size: 0.55em;">(Platzhalter)</span></h2>
+
+        <div class="shots">
+          <!-- Platzhalter 1: Login -->
+          <div class="shot">
+            <span class="ph-tag">Platzhalter</span>
+            <div class="shot-bar">
+              <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+              <span class="url">partnerportal.local/login</span>
+            </div>
+            <div class="shot-body">
+              <div class="wf-center">
+                <div class="wf line-lg" style="width:140px;"></div>
+                <div class="wf line" style="width:210px;"></div>
+                <div class="wf line-sm" style="width:210px;"></div>
+                <div class="wf btn"></div>
+              </div>
+            </div>
+            <div class="shot-caption">Login (Keycloak)</div>
+          </div>
+
+          <!-- Platzhalter 2: Dashboard -->
+          <div class="shot">
+            <span class="ph-tag">Platzhalter</span>
+            <div class="shot-bar">
+              <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+              <span class="url">partnerportal.local/dashboard</span>
+            </div>
+            <div class="shot-body">
+              <div class="wf line-lg"></div>
+              <div class="wf-row">
+                <div class="wf-tile"><div class="wf num"></div><div class="wf cap"></div></div>
+                <div class="wf-tile"><div class="wf num"></div><div class="wf cap"></div></div>
+                <div class="wf-tile"><div class="wf num"></div><div class="wf cap"></div></div>
+              </div>
+              <div class="wf line"></div>
+              <div class="wf line-sm"></div>
+            </div>
+            <div class="shot-caption">Partner-Dashboard</div>
+          </div>
+
+          <!-- Platzhalter 3: Bestellformular -->
+          <div class="shot">
+            <span class="ph-tag">Platzhalter</span>
+            <div class="shot-bar">
+              <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+              <span class="url">partnerportal.local/orders/new</span>
+            </div>
+            <div class="shot-body">
+              <div class="wf line-lg" style="width:45%;"></div>
+              <div class="wf-tr"><div class="wf cell"></div><div class="wf cell" style="flex:0 0 40px;"></div></div>
+              <div class="wf-tr"><div class="wf cell"></div><div class="wf cell" style="flex:0 0 40px;"></div></div>
+              <div class="wf-tr"><div class="wf cell"></div><div class="wf cell" style="flex:0 0 40px;"></div></div>
+              <div class="wf btn"></div>
+            </div>
+            <div class="shot-caption">Bestellformular (mehrere Artikel)</div>
+          </div>
+
+          <!-- Platzhalter 4: Bestellliste / Status -->
+          <div class="shot">
+            <span class="ph-tag">Platzhalter</span>
+            <div class="shot-bar">
+              <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+              <span class="url">partnerportal.local/orders</span>
+            </div>
+            <div class="shot-body">
+              <div class="wf-tr"><div class="wf cell"></div><span class="mini-pill submitted">submitted</span></div>
+              <div class="wf-tr"><div class="wf cell"></div><span class="mini-pill reviewed">reviewed</span></div>
+              <div class="wf-tr"><div class="wf cell"></div><span class="mini-pill fulfilled">fulfilled</span></div>
+              <div class="wf-tr"><div class="wf cell"></div><span class="mini-pill fulfilled">fulfilled</span></div>
+            </div>
+            <div class="shot-caption">Bestellübersicht mit Status</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. Out of scope / Phase-2-Backlog -->
+      <section>
+        <p class="eyebrow">Bewusst nicht gebaut</p>
+        <h2>Out of Scope / Phase-2-Backlog</h2>
+        <p class="lead" style="margin-bottom: 26px;">Diese Punkte sind spezifiziert, aber nicht Teil des MVP – Referenz: <span class="mono">phase2_backlog.md</span></p>
+
+        <ul class="backlog">
+          <li><span class="btag">B-01</span> Externer Endkunden-Shop <span class="note">cut</span></li>
+          <li><span class="btag">B-02</span> Shop-Design-Anpassung (Logo, Farben, Layout) <span class="note">cut</span></li>
+          <li><span class="btag">B-03</span> Automatischer Provisions-Levelaufstieg <span class="note">stub – manuell im MVP</span></li>
+          <li><span class="btag">B-04</span> Echter E-Mail-Versand (SMTP) <span class="note">stub – simuliert im MVP</span></li>
+          <li><span class="btag">B-05</span> Automatische Weiterleitung von Shop-Anfragen <span class="note">cut</span></li>
+          <li><span class="btag">B-06</span> BMD-Schnittstelle <span class="note">cut – dauerhaft</span></li>
+          <li><span class="btag">B-07</span> Provisionsauszahlung / Settlement <span class="note">cut</span></li>
+        </ul>
+      </section>
+
+      <!-- 10. Ausblick -->
+      <section class="dark">
+        <p class="eyebrow">Ausblick</p>
+        <h2>Nächste Schritte</h2>
+        <ul class="plain" style="max-width: 30em;">
+          <li>Feedback aus Firmengesprächen einarbeiten</li>
+          <li>Import-Spaltenformate anhand realer Kundendaten finalisieren</li>
+          <li>Weitere Härtung: Sicherheit, Effizienz, Bedienbarkeit</li>
+          <li>Feinschliff am Design (Auftragsbestätigung, Farbgebung)</li>
+          <li>Diplomarbeits-Dokumentation fertigstellen</li>
+        </ul>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="reveal/reveal.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      controls: true,
+      progress: true,
+      center: false,
+      transition: 'slide',
+      slideNumber: 'c/t',
+      width: 1280,
+      height: 720,
+      margin: 0.04
+    });
+  </script>
+</body>
+</html>
