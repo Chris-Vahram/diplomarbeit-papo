@@ -26,15 +26,6 @@ function toIsoDate(date) {
   return date.toISOString().slice(0, 10);
 }
 
-function defaultPeriod() {
-  // Trailing 6 months so the headline KPIs cover the same window as the month
-  // chart and the dashboard is populated by default. The picker narrows from here.
-  const now = new Date();
-  const to = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-  const from = new Date(now.getFullYear(), now.getMonth() - 5, 1, 0, 0, 0, 0);
-  return { from, to };
-}
-
 function formatCompactEur(value) {
   return value >= 1000 ? `${(value / 1000).toFixed(1).replace(".", ",")} T€` : eur.format(value);
 }
@@ -76,7 +67,9 @@ function renderMonthChart(title, monthLabels, monthlyValues) {
 class PartnerDashboardPage extends HTMLElement {
   connectedCallback() {
     this.classList.add("area--partner");
-    this.period = defaultPeriod();
+    // No explicit range by default - headline totals show the backend's true
+    // all-time values (partner-dashboard spec: "without a range, all-time values").
+    this.period = null;
 
     const greeting = "Willkommen zurück zum";
 
@@ -174,6 +167,10 @@ class PartnerDashboardPage extends HTMLElement {
     event.preventDefault();
     const payload = { ...readKundePayload(form), items: readItemsPayload(form) };
 
+    // Guard against a double-click firing two requests while the first is in flight.
+    const submitButton = form.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+
     try {
       const order = await apiFetch("/partner/orders", { method: "POST", body: JSON.stringify(payload) });
       showToast("Bestellung aufgegeben.", "success");
@@ -187,6 +184,7 @@ class PartnerDashboardPage extends HTMLElement {
       });
     } catch (error) {
       showToast(error.message, "error");
+      submitButton.disabled = false;
     }
   }
 
@@ -223,7 +221,7 @@ class PartnerDashboardPage extends HTMLElement {
     });
 
     this.querySelector("#period-reset").addEventListener("click", () => {
-      this.period = defaultPeriod();
+      this.period = null;
       this.periodPanel.classList.add("is-closed");
       this.updatePeriodUi();
       this.render();
@@ -231,10 +229,16 @@ class PartnerDashboardPage extends HTMLElement {
   }
 
   updatePeriodUi() {
-    this.periodFromInput.value = toIsoDate(this.period.from);
-    this.periodToInput.value = toIsoDate(this.period.to);
-    this.querySelector("#period-label").textContent =
-      `${dateLabel.format(this.period.from)} – ${dateLabel.format(this.period.to)}`;
+    if (this.period) {
+      this.periodFromInput.value = toIsoDate(this.period.from);
+      this.periodToInput.value = toIsoDate(this.period.to);
+      this.querySelector("#period-label").textContent =
+        `${dateLabel.format(this.period.from)} – ${dateLabel.format(this.period.to)}`;
+    } else {
+      this.periodFromInput.value = "";
+      this.periodToInput.value = "";
+      this.querySelector("#period-label").textContent = "Gesamter Zeitraum";
+    }
   }
 
   async load() {
@@ -255,19 +259,32 @@ class PartnerDashboardPage extends HTMLElement {
 
   render() {
     if (!this.orders) return;
-    const fromIso = toIsoDate(this.period.from);
-    const toIso = toIsoDate(this.period.to);
-    const inRange = filterByPeriod(this.orders, fromIso, toIso);
-    const { revenue, commission, count } = fulfilledTotals(inRange);
 
-    // Same-length period immediately before the current one, for the metric-card
-    // up/down arrows ("... ggü. Vorperiode").
-    const prev = previousPeriod(this.period.from, this.period.to);
-    const prevInRange = filterByPeriod(this.orders, toIsoDate(prev.from), toIsoDate(prev.to));
-    const prevTotals = fulfilledTotals(prevInRange);
-    const revenueTrend = trendInfo(revenue, prevTotals.revenue);
-    const commissionTrend = trendInfo(commission, prevTotals.commission);
-    const countTrend = trendInfo(count, prevTotals.count);
+    let inRange, revenue, commission, count, revenueTrend, commissionTrend, countTrend;
+    if (this.period) {
+      const fromIso = toIsoDate(this.period.from);
+      const toIso = toIsoDate(this.period.to);
+      inRange = filterByPeriod(this.orders, fromIso, toIso);
+      ({ revenue, commission, count } = fulfilledTotals(inRange));
+
+      // Same-length period immediately before the current one, for the metric-card
+      // up/down arrows ("... ggü. Vorperiode").
+      const prev = previousPeriod(this.period.from, this.period.to);
+      const prevInRange = filterByPeriod(this.orders, toIsoDate(prev.from), toIsoDate(prev.to));
+      const prevTotals = fulfilledTotals(prevInRange);
+      revenueTrend = trendInfo(revenue, prevTotals.revenue);
+      commissionTrend = trendInfo(commission, prevTotals.commission);
+      countTrend = trendInfo(count, prevTotals.count);
+    } else {
+      // No explicit range: headline totals are the backend's true all-time values
+      // (BigDecimal-exact, no client-side recompute) - charts show all orders.
+      // No "previous period" concept without an explicit range, so no trend arrows.
+      inRange = this.orders;
+      revenue = this.base.totalRevenue;
+      commission = this.base.totalCommission;
+      count = this.base.fulfilledOrderCount;
+      revenueTrend = commissionTrend = countTrend = null;
+    }
     const trendAttrs = (t) => (t ? `trend="${t.trend}" trend-label="${t.label}"` : "");
 
     const total = this.base.totalProductCount ?? 0;

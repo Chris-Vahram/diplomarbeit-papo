@@ -89,6 +89,18 @@ class OrderResourceTest {
     }
 
     @Test
+    void partnerOrderWithExcessiveQuantityIsRejected() {
+        String token = tokens.tokenFor("partner-demo", "partner-demo");
+        long productId = enabledProductId();
+
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"newKunde\":{\"lastName\":\"Mustermann\",\"address\":{\"street\":\"Teststr.\",\"houseNumber\":\"1\",\"postalCode\":\"4020\",\"city\":\"Linz\",\"country\":\"Österreich\"}},"
+                        + "\"items\":[{\"productId\":" + productId + ",\"quantity\":10001}]}")
+                .when().post("/api/partner/orders")
+                .then().statusCode(400);
+    }
+
+    @Test
     void partnerOrderWithoutItemsIsRejected() {
         String token = tokens.tokenFor("partner-demo", "partner-demo");
 

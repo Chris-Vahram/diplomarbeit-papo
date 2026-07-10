@@ -41,6 +41,17 @@ class PartnerResourceTest {
     }
 
     @Test
+    void companyCreateRejectsDuplicatePartnerNumberDifferingOnlyByCase() {
+        String token = tokens.tokenFor("company-demo", "company-demo");
+
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"partnerNumber\":\"p-1001\",\"name\":\"Duplikat Kleinschreibung\",\"address\":"
+                        + SAMPLE_ADDRESS_JSON + ",\"commissionPercent\":5}")
+                .when().post("/api/company/partners")
+                .then().statusCode(409);
+    }
+
+    @Test
     void companyCreateRejectsCommissionAboveOneHundred() {
         String token = tokens.tokenFor("company-demo", "company-demo");
 
