@@ -36,8 +36,14 @@ public class OrderService {
     @Inject
     CommissionService commissionService;
 
+    // join fetch + distinct: one query instead of 1+N+N+N (items/partner/kunde each
+    // loaded per order without it). distinct collapses the duplicate parent rows the
+    // items join produces (one row per item) back to one Order per id.
     public List<OrderDto> listForPartner(Partner partner) {
-        List<Order> orders = Order.list("partner", partner);
+        List<Order> orders = Order.find(
+                "select distinct o from Order o join fetch o.items join fetch o.partner join fetch o.kunde "
+                        + "where o.partner = ?1 order by o.id",
+                partner).list();
         Map<Long, CommissionRecord> commissionsByOrderId = commissionService.findForOrders(orders);
         return orders.stream()
                 .map(order -> OrderDto.from(order, commissionsByOrderId.get(order.id)))
@@ -45,11 +51,17 @@ public class OrderService {
     }
 
     public List<OrderDto> listAll() {
-        List<Order> orders = Order.listAll();
+        List<Order> orders = Order.find(
+                "select distinct o from Order o join fetch o.items join fetch o.partner join fetch o.kunde "
+                        + "order by o.id").list();
         Map<Long, CommissionRecord> commissionsByOrderId = commissionService.findForOrders(orders);
         return orders.stream()
                 .map(order -> OrderDto.from(order, commissionsByOrderId.get(order.id)))
                 .toList();
+    }
+
+    public long countUnseen() {
+        return Order.count("seenByCompany = false");
     }
 
     // Manual order creation by the company (order-management spec): resolves the
