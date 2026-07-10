@@ -130,8 +130,11 @@ export function readItemsPayload(form) {
 // On-screen confirmation + simulated ("not really sent") e-mail shown right after an
 // order is placed — same pattern for the partner's own flow and the company's manual
 // creation flow. `actionsHtml` (e.g. a "Fertig"/"Neue Bestellung" button) is placed
-// inside the card, as its last child.
-export function renderOrderConfirmationHtml(order, { showPartner = false, actionsHtml = "" } = {}) {
+// inside the card, as its last child. `kind: "shipping"` renders the FR-17 simulated
+// shipping confirmation shown when the company sets an order to fulfilled — same
+// layout, distinct heading/e-mail text so it isn't mistaken for the order confirmation.
+export function renderOrderConfirmationHtml(order, { showPartner = false, actionsHtml = "", kind = "order" } = {}) {
+  const isShipping = kind === "shipping";
   const rows = order.items
     .map(
       (item) =>
@@ -142,7 +145,7 @@ export function renderOrderConfirmationHtml(order, { showPartner = false, action
 
   return `
     <section class="order-confirmation">
-      <h2>Bestellung Nr. ${order.id} bestätigt</h2>
+      <h2>${isShipping ? `Versandbestätigung für Bestellung Nr. ${order.id}` : `Bestellung Nr. ${order.id} bestätigt`}</h2>
       ${showPartner ? `<p>Partner: ${escapeHtml(order.partnerName)}</p>` : ""}
       <p>Endkunde: ${kundeName}, ${escapeHtml(formatAddress(order.kunde.address))}</p>
       <div class="data-table__scroll">
@@ -153,10 +156,14 @@ export function renderOrderConfirmationHtml(order, { showPartner = false, action
       </div>
       <p><strong>Gesamtwert: ${formatEuro(order.orderValue)}</strong></p>
       <section class="simulated-email">
-        <h3>Simulierte Bestätigungs-E-Mail (nicht wirklich versendet)</h3>
+        <h3>${isShipping ? "Simulierte Versandbestätigung (nicht wirklich versendet)" : "Simulierte Bestätigungs-E-Mail (nicht wirklich versendet)"}</h3>
         <p>An: ${escapeHtml(order.kunde.email) || "keine E-Mail-Adresse hinterlegt"}</p>
-        <p>Betreff: Ihre Bestellung Nr. ${order.id}</p>
-        <p>Sehr geehrte/r ${kundeName}, vielen Dank für Ihre Bestellung über ${formatEuro(order.orderValue)}. Wir bearbeiten sie umgehend.</p>
+        <p>Betreff: ${isShipping ? `Ihre Bestellung Nr. ${order.id} wurde versendet` : `Ihre Bestellung Nr. ${order.id}`}</p>
+        <p>${
+          isShipping
+            ? `Sehr geehrte/r ${kundeName}, Ihre Bestellung über ${formatEuro(order.orderValue)} wurde versendet und ist auf dem Weg zu Ihnen.`
+            : `Sehr geehrte/r ${kundeName}, vielen Dank für Ihre Bestellung über ${formatEuro(order.orderValue)}. Wir bearbeiten sie umgehend.`
+        }</p>
       </section>
       ${actionsHtml}
     </section>`;

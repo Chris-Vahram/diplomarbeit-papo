@@ -83,6 +83,18 @@ cd backend
 java -jar target/quarkus-app/quarkus-run.jar
 ```
 
+`%prod`-Zugangsdaten (DB, OIDC-Issuer) sind über Umgebungsvariablen überschreibbar, damit ein
+gepackter Lauf nicht stillschweigend die Demo-Standardwerte verwendet:
+
+| Variable | Standardwert |
+|---|---|
+| `DB_USERNAME` | `partnerportal` |
+| `DB_PASSWORD` | `partnerportal` |
+| `DB_JDBC_URL` | `jdbc:postgresql://localhost:5432/partnerportal` |
+| `OIDC_AUTH_SERVER_URL` | `http://localhost:8081/realms/partnerportal` |
+
+Für den lokalen Demo-Lauf mit den Compose-Containern können die Standardwerte unverändert bleiben.
+
 ## Sicherheitshinweise (bewusste Prototyp-Abkürzungen)
 
 Nur für den lokalen Schulprototyp akzeptabel, nicht für echten Betrieb:
