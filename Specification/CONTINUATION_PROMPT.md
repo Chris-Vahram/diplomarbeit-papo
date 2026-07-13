@@ -21,7 +21,11 @@ ready commit message, do not commit unless he explicitly says so.
 
 # REPO
 Working repo (git): /Users/mitgl/Desktop/Schule/4CHITM/Diplomarbeit/diplomarbeit-papo
-Branch: main (== origin/main). Everything from this session is UNCOMMITTED in the working tree.
+Branch: main (== origin/main, clean tree). This session's PLANNING work is committed + pushed
+(commits 1fb81c5..36a4b71: meeting+backlog+PAPO fix, the 7 openspec proposals, the quality skill,
+deck edits). IMPLEMENTATION of the 7 changes has NOT started. Note: Tobias pushed in parallel this
+session (application.properties + his own copy of the 10.07 meeting note) — rebased in, meeting-note
+add/add conflict resolved (kept the structured version with Chris's Keycloak Nachtrag).
 
 # READ ORDER FOR DEEP WORK (authoritative docs)
 1. CLAUDE.md (repo root) — project memory, locked scope, key decisions, entities, roles. READ FIRST.
@@ -91,26 +95,40 @@ combobox stale-id, over-constrained specs. All RECONCILED into the plans (protot
 back on Codex's enterprise-migration apparatus and frontend-test-runner demand — no production, no JS
 test framework). The 3 simple changes (session-refresh, order-filters, print) did NOT need cross-review.
 
-# WHAT'S UNCOMMITTED (all of it — group into logical commits when Chris asks)
-- Besprechungsprotokoll10_07_2026.txt (new) + phase2_backlog.md (10.07 decisions synced)
-- PAPO naming fix: CLAUDE.md, functional_specification_document_partnerportal_final.md, _full_vision.md
-- 7 new openspec/changes/ dirs (above)
-- .claude/skills/partnerportal-quality/ (untracked — project quality-review skill, commit it)
-- docs/claude-skills-to-install.md (skill-install decision log)
-- presentation/mvp-deck/index.html + theme.css (deck edits from a prior session)
-- Specification/CONTINUATION_PROMPT.md (this file)
-Suggested commit grouping: (a) docs: 10.07 meeting + backlog + PAPO naming fix; (b) docs: 7 openspec
-change proposals; (c) chore: partnerportal-quality skill; (d) docs: deck edits + skills-install log.
+# COMMITTED + PUSHED THIS SESSION (main, commits 1fb81c5..36a4b71)
+- docs: 10.07 meeting note + phase2_backlog sync + PAPO naming fix (CLAUDE.md + both FSDs) + this file
+- docs(openspec): the 7 change proposals
+- chore: .claude/skills/partnerportal-quality (project quality-review skill)
+- docs: presentation-deck edits + skills-install log
+Working tree is now CLEAN. The next thing that produces uncommitted work is implementing a change.
+
+# ARCHIVING STATUS (merged code != archived OpenSpec change)
+Merged-but-UNarchived changes still sitting in openspec/changes/:
+- add-product-image-upload (✓ 18/18) — COMPLETE, archivable NOW via /opsx:archive (no blocker).
+- security-hardening-review-fixes (14/16), close-fsd-order-gaps (10/12), order-correctness-hardening
+  (16/19), order-list-efficiency (12/15) — code merged to main, but each has leftover VERIFY tasks
+  needing the dev stack (Docker Keycloak+Postgres) up; archive after running those.
+- build-partnerportal-mvp (46/53) — remaining 7 are 8.x thesis/UI-doc tasks; not archivable yet.
+- ci-cd-deployment-with-gh-actions (0/40) — planned only, re-scope Oracle->Hetzner first.
+archive/ already holds 9 changes through 2026-07-08.
 
 # WHAT'S LEFT / NEXT MOVES
-- Implement the 7 changes with Sonnet, one branch each (see IMPLEMENTATION WORKFLOW). Suggested order:
-  self-host-fonts -> add-keycloak-session-refresh -> improve-order-form -> add-order-list-filters
-  -> add-dormant-kunde-visibility -> remove-keycloak-username-field -> add-order-document-print.
-  (self-host-fonts first since improve-order-form depends on it; keycloak-field last, biggest blast radius.)
+- Implement the 7 changes with Sonnet. DECIDED WORKFLOW (2026-07-13, headache-free): SEQUENTIAL, not
+  parallel — one change at a time, each on its own branch cut from an UPDATED main, merged before the
+  next starts. This way the shared-file edits (base.css touched by fonts/order-form/dormant/print;
+  company-order-list-page.js touched by order-form + order-filters) are already in main before the next
+  change touches them -> ZERO merge conflicts. No worktrees needed. Loop per change: Chris cuts branch ->
+  Sonnet /opsx:apply + implement + check off tasks.md + commit to branch -> verify (verify +
+  partnerportal-quality + /code-review; optional Codex diff review on the meaty ones) -> Chris merges to
+  main + push -> next.
+  ORDER: self-host-fonts (tiny; improve-order-form depends on it) -> add-keycloak-session-refresh
+  (isolated) -> improve-order-form -> add-order-list-filters (after order-form, shared file) ->
+  add-dormant-kunde-visibility -> add-order-document-print -> remove-keycloak-username-field (LAST,
+  biggest blast radius: PartnerService + DTO + ~4 test files, nothing after it to conflict with).
 - Waiting on EXTERNALS: client data (1-2 wks) -> finalize import column mapping (FSD §13 open question);
   Christian Bachl's Hetzner contact -> re-scope ci-cd-deployment-with-gh-actions Oracle->Hetzner, then deploy.
-- Verify checklists on the 4 already-merged hardening changes (need dev stack up) + archive 5 openspec
-  changes (the 4 hardening + add-product-image-upload) via /opsx:archive.
+- Run VERIFY checklists on the 4 merged hardening changes (dev stack up) then ARCHIVE them + also archive
+  add-product-image-upload (already complete) via /opsx:archive. See ARCHIVING STATUS above.
 - Remove leftover git worktrees from the prior session if still present:
   /private/tmp/deck-branch-worktree, fsd-gaps-worktree, order-correctness-worktree, order-efficiency-worktree.
 - THESIS writeup (8.4, FSD->impl->tests mapping, thorough — Chris's ask). Not started. Longest pole.
@@ -197,7 +215,9 @@ change proposals; (c) chore: partnerportal-quality skill; (d) docs: deck edits +
 - Hetzner provisioning timing (Bachl contact) -> ci-cd re-scope.
 
 # NEXT STEP
-Ask Chris what he wants next. Most likely: start implementing a change (self-host-fonts or
-add-keycloak-session-refresh first, switch to Sonnet), commit the uncommitted planning work, or run the
-verify checklists on the merged hardening changes. Do not assume. Fill in his answer: <STATE NEXT>.
+Planning is committed + pushed; the immediate next move is IMPLEMENTATION. Most likely: switch to Sonnet
+and build `self-host-fonts` on `feat/self-host-fonts` (first in the sequential order above), then walk
+the list one change at a time. Alternatives Chris may pick: archive add-product-image-upload now
+(/opsx:archive, it's the one clean complete change), or run the hardening Verify checklists with the dev
+stack up. Ask, don't assume. Fill in his answer: <STATE NEXT>.
 ```
