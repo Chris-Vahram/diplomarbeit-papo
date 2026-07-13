@@ -3,172 +3,201 @@
 Copy the block below into a fresh session to resume with full context.
 
 ```text
-You are continuing work on an HTL Diplomarbeit software project. Treat this as the authoritative context. Do not re-derive or re-litigate settled decisions. If something is unclear, ask targeted questions instead of assuming.
+You are continuing work on an HTL Diplomarbeit software project. Treat this as authoritative context. Do not re-derive or re-litigate settled decisions. If something is unclear, ask targeted questions instead of assuming.
 
 # PROJECT
-Web-based Partner Portal (Partnerportal). Model: Company -> Partner -> End Customer.
-Reference client: PAPO (~200 partners, ~800 articles). HTL diploma demo prototype, not enterprise.
+Web-based internal B2B Partner Portal. Model: Company -> Partner -> End Customer.
+"PAPO" (= PartnerPortal) is the NAME OF THIS THESIS/PRODUCT itself, NOT a client. This was
+corrected across CLAUDE.md + the FSDs on 2026-07-13 (they used to wrongly say "reference client
+PAPO"). The real reference client is unnamed (~200 partners, ~800 articles; orders arrive manually
+by e-mail/phone today). Do not reintroduce "PAPO" as a client name. HTL diploma demo prototype,
+NOT enterprise — calibrate all review/scope decisions to a 2-person school project with no
+production deployment and manually-provisioned Keycloak users.
 
-# REPO / FILE LOCATIONS
+# TEAM / SPLIT
+Chris = implementation (backend + functional frontend). Tobias Huemer = frontend visual design.
+Julian left the project. Chris runs all git commit/push/merge himself — hand him branch name +
+ready commit message, do not commit unless he explicitly says so.
+
+# REPO
 Working repo (git): /Users/mitgl/Desktop/Schule/4CHITM/Diplomarbeit/diplomarbeit-papo
-- Specification/functional_specification_document_partnerportal_final.md = authoritative FSD (v2), MVP-only. READ FIRST.
-- Specification/functional_specification_document_full_vision.md = whole-project vision (MVP + all deferred B-01..B-09 folded into one narrative + roadmap). Reference only, not the build target.
-- Specification/phase2_backlog.md = deferred features B-01..B-09 + append-only decisions log. HONOR THIS.
-- Specification/IMPLEMENTATION_PLAN.md = flat implementation plan (8 sections, WP1-WP13, phases).
-- Specification/CONTINUATION_PROMPT.md = this file.
-- Documentation/Besprechungsprotokolle/ = client meeting notes (17.06 + 24.06.2026).
-- openspec/changes/build-partnerportal-mvp/ = MVP OpenSpec change (schema spec-driven), NOT archived yet (8.3-8.5/FD.x still open, see WHAT'S LEFT). tasks.md checkboxes = progress truth.
-- openspec/changes/archive/ = 8 archived changes: 2026-07-04-fix-audit-hardening, 2026-07-05-add-german-locale-formatting, 2026-07-06-add-dashboard-date-filter (superseded, not built - see below), 2026-07-06-integrate-frontend-design, 2026-07-06-add-company-dashboard, 2026-07-06-add-csv-export, 2026-07-06-add-list-search-pagination, 2026-07-06-add-product-category-image.
-- openspec/specs/ = published capability specs (company-dashboard, partner-dashboard, data-export, locale-formatting, partner-management, product-management, product-enablement) - source of truth for what's actually built, kept in sync on each archive.
-- CLAUDE.md (repo root) = project memory aligned with FSD v2; where anything conflicts, FSD v2 + backlog win.
-- docs/SETUP.md = how to run everything (docker compose, quarkus:dev, static frontend server, demo users).
-- docs/DATA_MODEL.md = ER diagram + entity descriptions (Phase 7).
-- docs/CONVENTIONS.md = backend/frontend naming and structure conventions.
-- Design/ = Tobias's design-system reference docs (tokens.json, variables.css, guidelines/) - committed to main, kept for reference; the actual shipped design lives directly in frontend/ (see below), not copy-pasted from here.
-- frontend/vendor/lucide-1.23.0.min.js = pinned local Lucide icon build (was a live unpkg.com CDN import - vendored for offline-safe demo, do not revert to a CDN script tag).
-Note: .claude and .codex live ONLY inside diplomarbeit-papo/ (outer copies deleted).
+Branch: main (== origin/main). Everything from this session is UNCOMMITTED in the working tree.
 
-# GLOBAL WORKING RULES (already in ~/.claude/CLAUDE.md, apply automatically - no need to repeat the OpenSpec schema itself, it's global)
-- Spec-driven via OpenSpec: propose -> apply tasks.md top-down -> validate -> archive. Proactively use plan mode before new features/changes.
-- Branch per phase/task-cluster (not always main); commit in small logical chunks; pause at natural checkpoints for review rather than grinding through everything unattended.
-- Git commit/push/merge: Chris runs these himself, always - just hand him a ready-to-use commit message and which branch to act on. Do not run commit/push/merge yourself even mid-implementation, even if asked to "continue" - only on an explicit in-the-moment ask (e.g. "commit this", "merge now").
-- End every implementation turn by stating the branch name + a ready commit message, unprompted (Chris juggles multiple parallel change branches).
+# READ ORDER FOR DEEP WORK (authoritative docs)
+1. CLAUDE.md (repo root) — project memory, locked scope, key decisions, entities, roles. READ FIRST.
+2. Specification/functional_specification_document_partnerportal_final.md — FSD v2, authoritative MVP (FR-01..FR-25).
+3. Specification/phase2_backlog.md — deferred features B-01..B-08 + append-only decisions log (10.07 meeting synced here).
+4. Specification/IMPLEMENTATION_PLAN.md — narrative plan (WP1-WP13).
+5. Documentation/Besprechungsprotokolle/ — client meeting notes; NEWEST = Besprechungsprotokoll10_07_2026.txt (authoritative, overrides FSD on conflict).
+6. docs/CONVENTIONS.md (package layout, REST paths, frontend structure) + docs/SETUP.md (dev/demo stack, demo users) + docs/DATA_MODEL.md (entities; STALE re ProductImage + the keycloak-username removal).
+7. openspec/changes/<name>/ — per-change proposal.md + design.md + specs/ + tasks.md (tasks.md = progress source of truth).
+8. Memory files (auto-loaded via MEMORY.md) — see MEMORY-RELEVANT below.
 
-# STATUS (2026-07-07, verify against `openspec list --json` before trusting)
-MVP core (Phases 0-6, build-partnerportal-mvp: 46/53) is DONE and merged to main.
-Post-MVP work also DONE and merged: fix-audit-hardening (security/robustness), add-list-search-pagination,
-add-company-dashboard, add-csv-export, add-german-locale-formatting (de-AT money/date formatting incl. CSV),
-add-product-category-image (product image thumbnails), a small order-form bugfix (hidden "neuer Kunde" fields kept
-`required`, blocked submit - fixed), and the big one:
+# STATUS (2026-07-13). Verify with `openspec list` and `git status` before trusting.
+MVP core + all post-MVP work through the 4 hardening changes + product-image-upload is DONE and MERGED
+to main (see git log). This session did NO implementation — it PLANNED. Specifically:
 
-**Tobias pushed the full visual design as working code** (`76bbe40 Frontend Design`, 2026-07-05/06) - not just
-tokens, a full rewrite of both dashboards, metric-card, router, base.css (+2024 lines), and a period-picker.
-It initially referenced 7 backend fields that didn't exist (NaN/crashes) and pulled in an unpinned external
-Lucide CDN. Change `integrate-frontend-design` (IMPLEMENTED, ARCHIVED 2026-07-06) reconciled this:
-- Both dashboards now aggregate client-side from the order-list endpoints (new `frontend/src/lib/dashboard-data.js`)
-  - the period-picker previously sent `?from&to` the backend silently ignored; it now actually filters.
-- Kept (client-side, no backend change): month chart, Bestellstatus-Donut, Top-Kunden.
-- Added one trivial backend field: `PartnerDashboardDto.totalProductCount` (`Product.count()`) for the products ring.
-- Removed the "ggü. Vorperiode" trend indicators entirely -> deferred as **B-08** in phase2_backlog.md (not built).
-- Lucide vendored + pinned locally (`frontend/vendor/lucide-1.23.0.min.js`) - no more live CDN script tag.
-- `DemoDataSeeder` now seeds ~21 historical orders + Kunden (dev-only, gated on `LaunchMode.DEVELOPMENT`
-  specifically - NOT the broader `!= NORMAL` check other seed methods use - tests assume a zero-order
-  baseline for certain partners and would break if orders were seeded under `%test` too).
-- `add-dashboard-date-filter` (planned separately, before Tobias's push landed) turned out to be fully
-  superseded by his period-picker - archived as superseded, never built as its own change.
-- Backend 46/46 tests green throughout. Both dashboards browser-verified: no NaN, umlauts render, period
-  filter proven to change totals live.
+## 1. Captured the 10.07.2026 client meeting (was missing from the repo)
+Documentation/Besprechungsprotokolle/Besprechungsprotokoll10_07_2026.txt. Key outcomes (authoritative):
+- MVP + live demo well received.
+- Priorities: simple Benutzerführung + good MOBILE version (partners often not tech-savvy); partner
+  should see Endkunden who haven't ordered in a while.
+- Improvements: product-add in order form needs Suchleiste + Filter; order-list filter by Endkunde/Partner.
+- HOSTING CHANGED: company provides HETZNER instances (Christian Bachl contacts Chris) — SUPERSEDES the
+  Oracle-Cloud assumption in ci-cd-deployment-with-gh-actions. Re-scope that change before building.
+- Company delivers real data/Vorgehensweisen within 1-2 weeks -> then implement import mapping -> new Termin.
+- Chris's Nachtrag: Keycloak logs you out fast; the "Keycloak-Username" field on partner-create is unclear.
+Backlog decisions log (phase2_backlog.md) updated with all of this.
 
-Product image thumbnails (9.3, IMPLEMENTED, ARCHIVED 2026-07-06):
-- `data-table` supports an opt-in `image: true` column type; image URLs are escaped into `src`, never rendered as raw HTML.
-- Company product list and partner enabled-products list show a `Bild` thumbnail column.
-- Empty or failed images fall back to a neutral placeholder via a capture-phase `error` listener, with no inline JS.
-- Demo products use local SVG assets in `frontend/assets/products/`; "Wasserwaage 100cm" intentionally has no image to exercise the placeholder path.
-- Browser-verified after merging Tobias's responsive layout changes: company + partner thumbnails load locally, no external image requests, dead URL falls back, malicious `imageUrl` does not execute, umlauts render.
+## 2. Proposed 7 new OpenSpec changes (all validate, 0 tasks done, NONE applied)
+Driven by the meeting + the 2026-07-09 redesign review. Planned with Opus/Fable, ready for Sonnet apply.
+  - add-keycloak-session-refresh (0/14) — fixes the fast logout. auth.js never uses the refresh_token;
+    getSession() wipes on access-token expiry (~5min default). Add refresh + retry-once + realm 15min bump.
+    RESOLVED: logout is on IN-APP sidebar navigation -> sessionStorage is correct, refresh flow is the full
+    fix (no localStorage). Frontend-only + 1 realm value. SINGLE-PASS (no cross-review needed).
+  - remove-keycloak-username-field (0/25) — drops the confusing field; link Partner<->Keycloak via
+    Partner.partnerNumber instead (LOCKED decision). HARDENED by Codex review: partnerNumber is
+    canonicalized to UPPERCASE (Locale.ROOT) on every write, resolve() exact-matches the uppercased
+    Keycloak username claim -> closes a real case-variant-duplicate auth-ambiguity bug (DB unique
+    constraint is case-sensitive). Backend+frontend+tests. Demo seed partner renamed P-1001 -> PARTNER-DEMO.
+  - add-dormant-kunde-visibility (0/18) — new "Meine Endkunden" partner page + lastOrderDate per Kunde
+    (one grouped query, no N+1) + "Inaktiv" badge/filter. Threshold 60 days DECIDED (confirm w/ client
+    at next Termin). Calendar-day arithmetic (not JS ms). Page-local oldest-first sort (NOT shared
+    data-table sorting — scoped down on review). Backend tests added.
+  - add-order-list-filters (0/15) — company: Partner dropdown + Endkunde text filter; both lists:
+    Endkunde + time. FINDING: time+status filters ALREADY SHIP (frontend-fixes-and-additions); real gap
+    is only the Partner dropdown + Endkunde text filter + reset button. NO backend change (OrderDto
+    already has partnerId/partnerName/KundeDto). Client-side per order-list-efficiency decision.
+  - improve-order-form (0/19) — searchable combobox picker (replaces 800-item <select>) + live line/
+    order totals + commission preview (matches backend HALF_UP to the cent). commissionPercent + prices
+    already client-side -> NO backend change. TRIMMED on review: ships search+totals; the document/
+    letterhead "Belegvorschau" look is DEFERRED to a later change. Company picker must carry price/
+    category (currently dropped). Combobox stale-selection guard + category escaping. Depends on
+    self-host-fonts landing first.
+  - self-host-fonts (0/4) — vendor woff2 + @font-face, drop the Google-Fonts CDN @import in base.css.
+    Split out of improve-order-form on review (offline precondition for ALL design work).
+  - add-order-document-print (0/10) — "Beleg drucken" via native window.print() + @media print on the
+    order confirmation + order-details. No library, offline. NEW feature (Chris greenlit planning it).
 
-Branch history: everything above is merged to `main` via --no-ff merges, main == origin/main, fully pushed.
+## 3. Cross-model review workflow established (used this session)
+Chris runs BOTH Claude + Codex subscriptions. New rule in ~/.claude/CLAUDE.md: on genuinely complex
+changes, get a second-model review from the other vendor before finalizing (plan+review -> code+review).
+This session: ran `codex exec -m gpt-5.6-sol -c model_reasoning_effort="high"` on the 3 meaty changes
+(improve-order-form, remove-keycloak-username-field, add-dormant-kunde-visibility). Codex read the actual
+backend code and found: the partnerNumber case-normalization bug (fixed), company picker dropping price/
+category (fixed), preview!=confirmation on mid-session price change (spec softened to "estimate"),
+commission float parity (HALF_UP), threshold contradiction, calendar-day arithmetic, category escaping,
+combobox stale-id, over-constrained specs. All RECONCILED into the plans (prototype-calibrated: pushed
+back on Codex's enterprise-migration apparatus and frontend-test-runner demand — no production, no JS
+test framework). The 3 simple changes (session-refresh, order-filters, print) did NOT need cross-review.
 
-# WHAT'S LEFT
-- 8.3 (T) UI/UX documentation - Tobias's task alone (T, not C/C+T). Not attempted by Chris/Claude.
-- 8.4 (C+T) Diploma writeup linking FSD requirements -> implementation -> tests, noting deferred
-  B-01..B-09 - thesis-body writing in Chris's voice. Chris wants this THOROUGH (more effort, real
-  prose + a mapping table, not just a checklist) - his explicit call 2026-07-05. Not started.
-- 8.5 (C+T) Research question wording - Chris approved this wording on 2026-07-07 for supervisor review:
-  "Wie kann ein webbasiertes Partnerportal gestaltet werden, das Unternehmen, Vertriebspartner und Endkunden
-  in einem partnerbasierten Vertriebsmodell schrittweise verbindet und dabei Partnerverwaltung, Produktfreigabe,
-  Bestellabwicklung, Provisionszuordnung und Auswertungen in einer benutzerfreundlichen und erweiterbaren
-  Plattform zusammenfuehrt?" Supervisor sign-off is still pending.
-- FD.1-FD.4 Frontend visual design - Tobias's core deliverable already landed + reconciled (see STATUS
-  above). Any further visual polish passes from Tobias would still need the same reconciliation pattern
-  (check for missing-backend-field references before trusting a new page redesign renders correctly).
-- Client (Hammer) meeting was scheduled Di 2026-07-07 10:30 - if it already happened, ask Chris whether
-  sample partner/article import files were obtained (the one remaining open import question - not a
-  blocker, the import UI's column-mapping handles any layout regardless).
+# WHAT'S UNCOMMITTED (all of it — group into logical commits when Chris asks)
+- Besprechungsprotokoll10_07_2026.txt (new) + phase2_backlog.md (10.07 decisions synced)
+- PAPO naming fix: CLAUDE.md, functional_specification_document_partnerportal_final.md, _full_vision.md
+- 7 new openspec/changes/ dirs (above)
+- .claude/skills/partnerportal-quality/ (untracked — project quality-review skill, commit it)
+- docs/claude-skills-to-install.md (skill-install decision log)
+- presentation/mvp-deck/index.html + theme.css (deck edits from a prior session)
+- Specification/CONTINUATION_PROMPT.md (this file)
+Suggested commit grouping: (a) docs: 10.07 meeting + backlog + PAPO naming fix; (b) docs: 7 openspec
+change proposals; (c) chore: partnerportal-quality skill; (d) docs: deck edits + skills-install log.
 
-# HOW TO RESUME
-Ask Chris what he wants next rather than assuming: diploma writeup (8.4), UI/UX docs coordination
-(8.3, Tobias-owned), research-question follow-up (8.5), client import-sample follow-up, or something new entirely.
+# WHAT'S LEFT / NEXT MOVES
+- Implement the 7 changes with Sonnet, one branch each (see IMPLEMENTATION WORKFLOW). Suggested order:
+  self-host-fonts -> add-keycloak-session-refresh -> improve-order-form -> add-order-list-filters
+  -> add-dormant-kunde-visibility -> remove-keycloak-username-field -> add-order-document-print.
+  (self-host-fonts first since improve-order-form depends on it; keycloak-field last, biggest blast radius.)
+- Waiting on EXTERNALS: client data (1-2 wks) -> finalize import column mapping (FSD §13 open question);
+  Christian Bachl's Hetzner contact -> re-scope ci-cd-deployment-with-gh-actions Oracle->Hetzner, then deploy.
+- Verify checklists on the 4 already-merged hardening changes (need dev stack up) + archive 5 openspec
+  changes (the 4 hardening + add-product-image-upload) via /opsx:archive.
+- Remove leftover git worktrees from the prior session if still present:
+  /private/tmp/deck-branch-worktree, fsd-gaps-worktree, order-correctness-worktree, order-efficiency-worktree.
+- THESIS writeup (8.4, FSD->impl->tests mapping, thorough — Chris's ask). Not started. Longest pole.
+  Use both models: Opus 4.8 drafts (consistent voice), GPT-5.6 Sol critiques. Sonnet 5 for cheap drafts.
+- Tobias's lane (do NOT implement): mobile/responsive, simplicity polish, visual side of the new features.
 
-# HARD RULE
-Meetings override the FSD when they conflict (newer = authoritative). FSD v2 + phase2_backlog.md already encode the meeting decisions. Do not reintroduce v1 assumptions.
+# IMPLEMENTATION WORKFLOW (how Chris works — follow it)
+- Spec-driven OpenSpec: the 7 changes are already proposed. To build one: /opsx:apply <change-name>,
+  work tasks.md top-down by dependency, check off tasks as done. Validate after spec edits.
+- Plan with Opus/Fable, IMPLEMENT with Sonnet (switch model at apply time).
+- One branch per change (e.g. fix/keycloak-session-refresh, feat/improve-order-form). Commit in small
+  logical chunks. Chris runs git himself — end each turn with branch + ready commit message, unprompted.
+- After implementing a change, BEFORE commit/merge: run the `verify` skill (drive the flow end-to-end,
+  incl. unhappy path) + the `partnerportal-quality` skill + built-in `/code-review`. For the meaty
+  changes, optionally a Codex cross-review of the diff (`codex exec -m gpt-5.6-sol -c
+  model_reasoning_effort="high" "review the diff on this branch ..."`), paste findings back, reconcile.
+- Browser-verify UI changes with Playwright (dev stack). Every text-I/O change needs an explicit
+  umlaut (ä/ö/ü/ß) test/scenario — hard requirement (Austrian).
 
-# LOCKED SCOPE (MVP) - already built, described here for orientation only
-Internal B2B partner-ordering portal. Core process = partner logs in (Keycloak) -> selects or creates end customer (Kunde) -> places order (multiple articles + quantities) on customer's behalf -> order auto-assigned to partner -> on-screen confirmation + simulated email (no real send) -> company advances status submitted -> reviewed -> fulfilled and handles fulfillment.
-- Commission: field on Partner (Partner.commissionPercent). Company sets via dropdown 5/10/15 + optional custom value. Percentage of total order value. Stored as own CommissionRecord. NO separate CommissionLevel entity. Auto level-up deferred (B-03).
-- Active status: DB-only flag Partner.active, enforced server-side after login (CurrentPartner.resolve()). Keycloak stays simple (no enabled sync).
-- Kunde = reusable entity (select existing or create new); mandatory last name + address; other fields optional. Scoped to the creating partner - a partner never sees another partner's Kunden.
-- Multiple articles per order (article + quantity per line). OrderItem stores unit-price snapshot.
-- Partner dashboard totals (commission/revenue/order count) = fulfilled orders only; latest-orders list shows any status. Both dashboards now also support a Von/Bis period-picker (client-side filtering, see STATUS).
-- Excel/CSV import of partners + articles: column mapping (with auto-suggested defaults) + duplicate detection + validation report.
-- Roles: company, partner (Keycloak). End customers do NOT use the portal in MVP. Keycloak users provisioned manually, never by import.
-- All money/dates render German (de-AT): `€ 1.234,56`, `dd.MM.yyyy`, incl. CSV exports (decimal comma, no thousands grouping, so German-locale Excel parses them as numbers).
+# SKILLS TO USE
+- /opsx:apply, /opsx:archive, /opsx:propose (or openspec-* variants) — the OpenSpec workflow.
+- partnerportal-quality (PROJECT skill in .claude/skills/) — reviews a diff against THIS project's rules
+  (role/scoping, German texts, money=BigDecimal/integer-cents, MVP scope). Run before commit/merge.
+  Complements, does not replace, the built-in code-review.
+- verify — drive a change end-to-end and observe real behavior before calling it done (Prof asked for
+  more self-testing). run — launch/screenshot the app.
+- code-review / security-review / simplify — built-in per-diff passes.
+- frontend-design — for improve-order-form UI + any Direction-B / mobile design work (loaded this session
+  for the order-form direction). dataviz — if dashboard charts get touched.
+- claude-api — model IDs / API reference (Opus 4.8 = claude-opus-4-8, Fable 5 = claude-fable-5, Sonnet 5
+  = claude-sonnet-5).
+- Codex (external, via CLI): `codex exec -m gpt-5.6-sol -c model_reasoning_effort="high" "<prompt>"` for
+  cross-model review. GPT-5.6 tiers: Sol (best) / Terra / Luna; efforts include max/ultra. Reads local
+  files directly (no repo upload, no copy-paste). sage CLI (`@tigtech/sage`) auto-reviews Claude Code
+  live during implementation — optional, currently OpenAI-reviewer only.
 
-# FIXED TECH STACK (NO ALTERNATIVES - do not suggest others)
-Frontend: HTML, CSS, native Web Components / Custom Elements (no framework, no Bootstrap/Angular/React/etc). Lucide icons vendored locally (pinned version, no CDN).
-Backend: Quarkus (Java), Hibernate ORM Panache, Quarkus REST (formerly RESTEasy Reactive), OIDC.
-Database: PostgreSQL.
-Auth: Keycloak.
-Import libs: Apache POI (xlsx) + opencsv (csv, also used for CSV export).
+# SUBAGENTS (spawn only if Chris asks or names one)
+- Chris used background subagents this session to propose 3 changes in parallel (worked well). For
+  implementation, prefer inline; delegate to subagents only for mechanical parallel work Chris requests.
+- caveman:cavecrew-investigator (locate code, compressed output), cavecrew-builder (1-2 file surgical
+  edit), cavecrew-reviewer (diff review). general-purpose for multi-step. Explore for read-only lookup.
 
-# DATA MODEL (entities) - see docs/DATA_MODEL.md for full ER diagram + descriptions
-Partner (incl. commissionPercent, active, keycloakUsername), Product, ProductEnablement (partner x product),
-Kunde (incl. ownerPartner), Order (table "orders" - reserved SQL word), OrderItem (unit-price snapshot),
-CommissionRecord. No CommissionLevel entity. Money = BigDecimal everywhere.
+# MEMORY-RELEVANT (auto-loaded from MEMORY.md, verify against code before trusting)
+- cross-model-review-workflow — Codex cross-review on complex changes; thesis = both models (Opus drafts,
+  Sol critiques).
+- partnerportal-review-decisions-2026-07 — Direction B "Auftragsbeleg", Q1 order-form money-preview.
+- austrian-client-umlauts-and-split-changes — umlauts hard requirement; one change per concern.
+- git-branching-and-checkpoints + always-state-branch-and-commit-message — branch per change, hand Chris
+  branch+message, he commits.
+- partnerportal-dev-environment-gotchas — see DEV GOTCHAS below.
 
-# OUT OF SCOPE / DEFERRED (phase2_backlog.md - do NOT build into MVP)
-B-01 external end-customer shop + direct ordering (CUT)
-B-02 shop design customization (CUT)
-B-03 automatic commission level-up (STUB; MVP = manual)
-B-04 real email sending (STUB; MVP = simulated in-app)
-B-05 shop inquiry auto-forward (CUT)
-B-06 BMD interface (CUT, permanent; data via Excel import instead)
-B-07 commission settlement/payout (CUT)
-B-08 dashboard "ggü. Vorperiode" trend indicators (CUT; Tobias's design built the UI, backend doesn't support it, marginal value for an internal tool - added 2026-07-06)
-To build any later, user says "implement B-XX".
+# LOCKED DECISIONS (do not re-litigate)
+- Commission = Partner.commissionPercent, dropdown 5/10/15 + custom; stored per order as CommissionRecord;
+  BigDecimal HALF_UP; no CommissionLevel entity.
+- Active status = DB flag Partner.active, enforced server-side (CurrentPartner.resolve + company manual
+  path). Kunde scoped to creating partner. OrderItem unit-price snapshot; quantity <= 10000.
+- Partner<->Keycloak link (as of this session's plan) = Partner.partnerNumber, canonical uppercase,
+  exact match. Keycloak users provisioned MANUALLY (import creates Partner records only).
+- Dashboard totals: fulfilled-only; all-time by default, integer-cent ranged totals.
+- Schema: Hibernate auto-gen, no Flyway (dev/test drop-and-create + DemoDataSeeder; demo/prod update).
+- German (de-AT) everywhere. Tech stack FIXED: HTML/CSS/native Web Components (no framework), Quarkus,
+  PostgreSQL, Keycloak, Apache POI + opencsv. No new deps, no CDN (offline demo).
+- Presentation deck = hand-authored reveal.js (offline). Scope-split decisions this session: fonts split
+  out; Belegvorschau document-look deferred; dormant sort page-local.
 
-# TEAM
-Chris implements (backend + functional frontend). Tobias does frontend visual design; delivered as working
-code directly into frontend/ (not just CSS tokens as originally planned) - see STATUS for the reconciliation
-that was needed. Julian left the project.
+# DEV GOTCHAS (learned the hard way)
+- `my_postgres` container squats port 5432 -> `docker stop my_postgres` before `docker compose up -d`.
+- Hash-router SPA: edited JS can look stale between routes -> switch origin localhost<->127.0.0.1 (both
+  CORS-whitelisted) or CDP Network.clearBrowserCache to force fresh fetches; re-login (sessionStorage).
+- Keycloak access token ~5-6min (the very thing add-keycloak-session-refresh fixes).
+- Quarkus dev drop-and-creates + reseeds on JVM restart; seeder only runs when Partner.count()==0.
+- @Lob byte[] on Postgres throws — use plain byte[] (bytea). RestAssured .multiPart mis-encodes non-ASCII
+  filenames client-side — build multipart by hand for umlaut-filename tests.
+- Frontend apiFetch* helpers take paths WITHOUT leading /api; use them (not raw fetch) so German error
+  toasts work (lib/api.js extractErrorMessage).
+- zsh: a trailing `# comment` on a one-liner is passed as a literal arg — keep comments on their own line.
+- Git worktree + uncommitted openspec artifacts authored in main before branching can BLOCK merge -
+  author change files inside the worktree, or rm the untracked main-tree duplicate before merging.
 
-# STILL-OPEN QUESTIONS (do not assume - ask if they block you)
-- Research question supervisor sign-off - wording is approved by Chris (2026-07-07); confirm whether the
-  supervisor accepted it.
-- Import file column formats for the partner + article Excel/CSV files - client sample data status unknown
-  (client meeting was scheduled 2026-07-07). Not a blocker: the import UI's column-mapping step handles any
-  layout, with a best-guess default mapping based on known German header aliases.
-
-# ALREADY RESOLVED (do not reopen)
-- Dashboard totals: fulfilled orders only (commission/revenue/order count); latest-orders list shows any status. Both dashboards additionally support a client-side Von/Bis period filter.
-- Commission: Partner.commissionPercent, dropdown 5/10/15 + custom. No level entity.
-- Optional Kunde fields on order form: first name, e-mail, phone.
-- Kunde scoping: per creating partner, not shared across partners.
-- Affiliate identifier: deferred, not in MVP.
-- Schema management: Hibernate auto-generation, no Flyway (drop-and-create + programmatic seed for dev/test, update for demo/prod).
-- Keycloak user provisioning: import creates Partner records only; logins created manually, linked via username claim.
-- German (de-AT) formatting for all money/dates in the UI and CSV exports.
-- Dashboard "ggü. Vorperiode" trend: deferred as B-08, not built.
-- Sidebar color scheme / role-distinct accents: light sidebar, Blau (company) / Teal (partner) accents kept - provisional per Chris, may change when Tobias finalizes.
-
-# DEV ENVIRONMENT GOTCHAS (learned the hard way - check before re-debugging)
-- An unrelated `my_postgres` container on this machine often squats port 5432; `docker stop my_postgres` before `docker compose up -d` if the compose stack fails to bind.
-- The frontend is a hash-router SPA served by a plain static server - navigating between hash routes does NOT reload the document, so edited JS files can appear stale. Force a real navigation (change the path/query, not just the hash) and, if testing via Playwright, disable the browser cache via a CDP session (`Network.clearBrowserCache` + `setCacheDisabled`) before trusting what renders - even that sometimes needs a full `page.goto` to `about:blank` first to actually drop cached ES modules.
-- Keycloak access tokens expire in ~5-6 minutes; a Playwright session left idle will silently bounce to /login on the next API call - not a bug, just relogin.
-- Quarkus dev mode (`quarkus:dev`) uses `drop-and-create` schema + `DemoDataSeeder` - every JVM restart wipes and reseeds the dev DB. Any manually-created test data (partners, orders, Kunden) from a prior session is gone after a restart. The seeder now also creates ~21 historical demo orders (dev-only, not under `%test`) so the dashboards/charts demo with real data out of the box.
-- If a stale `quarkus:dev` process is already running on :8080 from a previous session, killing and restarting it is often necessary to pick up entity/seeder changes (dev-mode hot reload does not always cover new `@Observes StartupEvent` seed logic or new entity fields cleanly).
-
-# HOW TO WORK
-- Strict, precise, realistic for a 2-person HTL diploma. No enterprise overkill, no generic PRM filler.
-- Stay on the Company -> Partner -> End Customer model; keep roles/areas clean.
-- Requirements/tasks concrete and testable.
-- When a large piece of external work lands (e.g. a design push, an import file), verify it against the
-  real backend/data before trusting it renders correctly - don't assume it "just works" because it looks done.
-
-# HARD REQUIREMENT: UMLAUTS
-Client is Austrian - ä/ö/ü/ß correctness is a hard requirement in every text I/O path (import
-column headers/parsing, CSV export, search matching, any rendered name/address), not polish.
-Every change touching text I/O needs an explicit umlaut test/scenario.
+# OPEN QUESTIONS (ask, don't assume)
+- Import file column formats — waiting on client data (1-2 wks).
+- Dormancy threshold 60 — confirm with client at next Termin (not blocking).
+- Research-question supervisor sign-off (wording approved by Chris 2026-07-07).
+- Hetzner provisioning timing (Bachl contact) -> ci-cd re-scope.
 
 # NEXT STEP
-Ask Chris what he wants next (see HOW TO RESUME). Do not assume. Fill in his answer here: <STATE WHAT YOU WANT NEXT>.
+Ask Chris what he wants next. Most likely: start implementing a change (self-host-fonts or
+add-keycloak-session-refresh first, switch to Sonnet), commit the uncommitted planning work, or run the
+verify checklists on the merged hardening changes. Do not assume. Fill in his answer: <STATE NEXT>.
 ```
