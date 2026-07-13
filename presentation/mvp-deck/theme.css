@@ -150,6 +150,9 @@ section.dark .meta strong {
 
 section.dark .meta .sep { color: #4b5c7c; }
 
+section.dark ul.plain li { color: #b9c7dd; }
+section.dark ul.plain li strong { color: #ffffff; }
+
 /* --- Kette Unternehmen -> Partner -> Endkunde --------------------------- */
 
 .chain {

@@ -17,8 +17,7 @@
         <h1>Partnerportal</h1>
         <p class="lead">Ein internes B2B-Bestellportal für partnerbasierte Vertriebsmodelle. Kette: Unternehmen → Partner → Endkunde.</p>
         <p class="meta">
-          <strong>Chris Vahram</strong> &amp; <strong>Tobias</strong>
-          <span class="sep">·</span> Referenzkunde <strong>PAPO</strong>
+          <strong>Chris Vahram</strong> &amp; <strong>Tobias Huemer</strong>
           <span class="sep">·</span> 2026
         </p>
       </section>
@@ -27,7 +26,7 @@
       <section>
         <p class="eyebrow">Ausgangslage</p>
         <h2>Bestellungen laufen heute manuell</h2>
-        <p class="lead">PAPO verwaltet Partner und Artikel ohne zentrales System – jede Bestellung verursacht Handarbeit.</p>
+        <p class="lead">Heute gibt es kein zentrales System für Partner- und Artikeldaten – jede Bestellung bedeutet Handarbeit.</p>
 
         <div class="stats">
           <div class="stat"><div class="num">~200</div><div class="lbl">Partner</div></div>
@@ -99,7 +98,7 @@
           <li>Endkunde auswählen oder neu anlegen<small>Pflicht: Nachname + Adresse</small></li>
           <li>Bestellung mit mehreren Artikeln + Mengen aufgeben<small>nur freigeschaltete, verfügbare Artikel</small></li>
           <li>Automatische Zuordnung zum Partner<small>Provision wird als eigener Datensatz berechnet</small></li>
-          <li>Bildschirmbestätigung + simulierte Bestell-E-Mail<small>kein echter Versand (siehe Backlog B-04)</small></li>
+          <li>Bildschirmbestätigung + simulierte Bestell-E-Mail<small>kein echter Versand</small></li>
         </ol>
 
         <div class="status-chain">
@@ -174,99 +173,18 @@
         </table>
       </section>
 
-      <!-- 7. Architektur (Excalidraw-Diagramm) -->
-      <section>
-        <p class="eyebrow">Architektur</p>
-        <h2>System- und Bestellablauf-Diagramm</h2>
-        <div class="diagram-wrap">
-          <img src="assets/bestellablauf.svg" alt="Diagramm: Systemarchitektur (Frontend, Keycloak, Quarkus-Backend, PostgreSQL) und Bestellablauf (Partner-Login, Kunde auswählen, Bestellung aufgeben, Zuordnung + Provision, Bestätigung, Status submitted-reviewed-fulfilled)" />
-        </div>
+      <!-- 7. Live-Demo (Übergang) -->
+      <section class="dark">
+        <p class="eyebrow">Ab hier live</p>
+        <h1>Live-Demo</h1>
+        <p class="lead">Partner-Login → Bestellung aufgeben → Status durch das Unternehmen ändern.</p>
       </section>
 
-      <!-- 8. Screenshots (Platzhalter) -->
-      <section>
-        <p class="eyebrow">Bildschirmaufnahmen</p>
-        <h2>Oberfläche <span style="font-weight:400; color: var(--ink-faint); font-size: 0.55em;">(Platzhalter)</span></h2>
-
-        <div class="shots">
-          <!-- Platzhalter 1: Login -->
-          <div class="shot">
-            <span class="ph-tag">Platzhalter</span>
-            <div class="shot-bar">
-              <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
-              <span class="url">partnerportal.local/login</span>
-            </div>
-            <div class="shot-body">
-              <div class="wf-center">
-                <div class="wf line-lg" style="width:140px;"></div>
-                <div class="wf line" style="width:210px;"></div>
-                <div class="wf line-sm" style="width:210px;"></div>
-                <div class="wf btn"></div>
-              </div>
-            </div>
-            <div class="shot-caption">Login (Keycloak)</div>
-          </div>
-
-          <!-- Platzhalter 2: Dashboard -->
-          <div class="shot">
-            <span class="ph-tag">Platzhalter</span>
-            <div class="shot-bar">
-              <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
-              <span class="url">partnerportal.local/dashboard</span>
-            </div>
-            <div class="shot-body">
-              <div class="wf line-lg"></div>
-              <div class="wf-row">
-                <div class="wf-tile"><div class="wf num"></div><div class="wf cap"></div></div>
-                <div class="wf-tile"><div class="wf num"></div><div class="wf cap"></div></div>
-                <div class="wf-tile"><div class="wf num"></div><div class="wf cap"></div></div>
-              </div>
-              <div class="wf line"></div>
-              <div class="wf line-sm"></div>
-            </div>
-            <div class="shot-caption">Partner-Dashboard</div>
-          </div>
-
-          <!-- Platzhalter 3: Bestellformular -->
-          <div class="shot">
-            <span class="ph-tag">Platzhalter</span>
-            <div class="shot-bar">
-              <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
-              <span class="url">partnerportal.local/orders/new</span>
-            </div>
-            <div class="shot-body">
-              <div class="wf line-lg" style="width:45%;"></div>
-              <div class="wf-tr"><div class="wf cell"></div><div class="wf cell" style="flex:0 0 40px;"></div></div>
-              <div class="wf-tr"><div class="wf cell"></div><div class="wf cell" style="flex:0 0 40px;"></div></div>
-              <div class="wf-tr"><div class="wf cell"></div><div class="wf cell" style="flex:0 0 40px;"></div></div>
-              <div class="wf btn"></div>
-            </div>
-            <div class="shot-caption">Bestellformular (mehrere Artikel)</div>
-          </div>
-
-          <!-- Platzhalter 4: Bestellliste / Status -->
-          <div class="shot">
-            <span class="ph-tag">Platzhalter</span>
-            <div class="shot-bar">
-              <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
-              <span class="url">partnerportal.local/orders</span>
-            </div>
-            <div class="shot-body">
-              <div class="wf-tr"><div class="wf cell"></div><span class="mini-pill submitted">submitted</span></div>
-              <div class="wf-tr"><div class="wf cell"></div><span class="mini-pill reviewed">reviewed</span></div>
-              <div class="wf-tr"><div class="wf cell"></div><span class="mini-pill fulfilled">fulfilled</span></div>
-              <div class="wf-tr"><div class="wf cell"></div><span class="mini-pill fulfilled">fulfilled</span></div>
-            </div>
-            <div class="shot-caption">Bestellübersicht mit Status</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 9. Out of scope / Phase-2-Backlog -->
+      <!-- 8. Out of scope / Phase-2-Backlog -->
       <section>
         <p class="eyebrow">Bewusst nicht gebaut</p>
         <h2>Out of Scope / Phase-2-Backlog</h2>
-        <p class="lead" style="margin-bottom: 26px;">Diese Punkte sind spezifiziert, aber nicht Teil des MVP – Referenz: <span class="mono">phase2_backlog.md</span></p>
+        <p class="lead" style="margin-bottom: 26px;">Diese Punkte sind spezifiziert, aber bewusst nicht Teil des MVP.</p>
 
         <ul class="backlog">
           <li><span class="btag">B-01</span> Externer Endkunden-Shop <span class="note">cut</span></li>
@@ -274,12 +192,11 @@
           <li><span class="btag">B-03</span> Automatischer Provisions-Levelaufstieg <span class="note">stub – manuell im MVP</span></li>
           <li><span class="btag">B-04</span> Echter E-Mail-Versand (SMTP) <span class="note">stub – simuliert im MVP</span></li>
           <li><span class="btag">B-05</span> Automatische Weiterleitung von Shop-Anfragen <span class="note">cut</span></li>
-          <li><span class="btag">B-06</span> BMD-Schnittstelle <span class="note">cut – dauerhaft</span></li>
           <li><span class="btag">B-07</span> Provisionsauszahlung / Settlement <span class="note">cut</span></li>
         </ul>
       </section>
 
-      <!-- 10. Ausblick -->
+      <!-- 9. Ausblick -->
       <section class="dark">
         <p class="eyebrow">Ausblick</p>
         <h2>Nächste Schritte</h2>
