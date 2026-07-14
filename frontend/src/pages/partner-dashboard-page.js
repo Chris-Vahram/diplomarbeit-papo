@@ -4,7 +4,6 @@ import { formatEuro, formatNumber, formatDate } from "../lib/format.js";
 import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue, previousPeriod, trendInfo } from "../lib/dashboard-data.js";
 import { escapeHtml } from "../lib/html.js";
 import {
-  productOptionsHtml,
   kundePickerHtml,
   articleLinesHtml,
   wireKundePicker,
@@ -12,6 +11,7 @@ import {
   readKundePayload,
   readItemsPayload,
   renderOrderConfirmationHtml,
+  renderOrderSummaryHtml,
 } from "../lib/order-form.js";
 
 const eur = new Intl.NumberFormat("de-AT", { style: "currency", currency: "EUR" });
@@ -138,14 +138,19 @@ class PartnerDashboardPage extends HTMLElement {
     this.modal.open();
     this.modalContent.innerHTML = `<p>Lade…</p>`;
     try {
-      const [products, customers] = await Promise.all([
+      const [products, customers, profile] = await Promise.all([
         apiFetch("/partner/products"),
         apiFetch("/partner/customers"),
+        apiFetch("/partner/profile"),
       ]);
+      this.commissionPercent = profile.commissionPercent;
       if (products.length === 0) {
         this.modalContent.innerHTML = `<p>Für Sie sind noch keine Produkte freigeschaltet. Eine Bestellung ist erst möglich, sobald die Firma Produkte für Sie freischaltet.</p>`;
         return;
       }
+      // Stacked, not side-by-side - the modal panel (42.5rem, shared by every modal
+      // in the app) isn't wide enough for the 2-column .order-form-layout used on
+      // the full order-new page (same reasoning as the company manual-order modal).
       this.modalContent.innerHTML = `
         <form id="order-form" class="entity-form entity-form--grid">
           ${kundePickerHtml(customers)}
@@ -154,10 +159,16 @@ class PartnerDashboardPage extends HTMLElement {
             <button type="submit">Bestellung aufgeben</button>
           </div>
         </form>
+        <div id="order-summary"></div>
       `;
       const form = this.modalContent.querySelector("#order-form");
+      const summaryEl = this.modalContent.querySelector("#order-summary");
+      const renderSummary = ({ items, totalCents }) => {
+        summaryEl.innerHTML = renderOrderSummaryHtml({ items, totalCents, commissionPercent: this.commissionPercent });
+      };
       wireKundePicker(form);
-      wireArticleLines(form, productOptionsHtml(products));
+      wireArticleLines(form, products, renderSummary);
+      renderSummary({ items: [], totalCents: 0 });
       form.addEventListener("submit", (event) => this.handleOrderSubmit(event, form));
     } catch (error) {
       showToast(error.message, "error");

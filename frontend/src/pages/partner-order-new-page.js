@@ -1,7 +1,6 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import {
-  productOptionsHtml,
   kundePickerHtml,
   articleLinesHtml,
   wireKundePicker,
@@ -9,6 +8,7 @@ import {
   readKundePayload,
   readItemsPayload,
   renderOrderConfirmationHtml,
+  renderOrderSummaryHtml,
 } from "../lib/order-form.js";
 
 class PartnerOrderNewPage extends HTMLElement {
@@ -21,12 +21,14 @@ class PartnerOrderNewPage extends HTMLElement {
 
   async load() {
     try {
-      const [products, customers] = await Promise.all([
+      const [products, customers, profile] = await Promise.all([
         apiFetch("/partner/products"),
         apiFetch("/partner/customers"),
+        apiFetch("/partner/profile"),
       ]);
       this.products = products;
       this.customers = customers;
+      this.commissionPercent = profile.commissionPercent;
       if (this.products.length === 0) {
         this.content.innerHTML = `<p>Für Sie sind noch keine Produkte freigeschaltet. Eine Bestellung ist erst möglich, sobald die Firma Produkte für Sie freischaltet.</p>`;
         return;
@@ -39,19 +41,28 @@ class PartnerOrderNewPage extends HTMLElement {
 
   renderForm() {
     this.content.innerHTML = `
-      <form id="order-form" class="entity-form">
-        ${kundePickerHtml(this.customers)}
-        ${articleLinesHtml()}
-        <div class="entity-form__actions">
-          <button type="submit">Bestellung aufgeben</button>
-        </div>
-      </form>
+      <div class="order-form-layout">
+        <form id="order-form" class="entity-form">
+          ${kundePickerHtml(this.customers)}
+          ${articleLinesHtml()}
+          <div class="entity-form__actions">
+            <button type="submit">Bestellung aufgeben</button>
+          </div>
+        </form>
+        <div id="order-summary"></div>
+      </div>
     `;
 
     this.form = this.querySelector("#order-form");
+    this.summaryEl = this.querySelector("#order-summary");
     wireKundePicker(this.form);
-    wireArticleLines(this.form, productOptionsHtml(this.products));
+    wireArticleLines(this.form, this.products, (state) => this.renderSummary(state));
     this.form.addEventListener("submit", (event) => this.handleSubmit(event));
+    this.renderSummary({ items: [], totalCents: 0 });
+  }
+
+  renderSummary({ items, totalCents }) {
+    this.summaryEl.innerHTML = renderOrderSummaryHtml({ items, totalCents, commissionPercent: this.commissionPercent });
   }
 
   async handleSubmit(event) {

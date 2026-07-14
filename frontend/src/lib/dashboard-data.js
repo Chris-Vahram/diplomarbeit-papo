@@ -4,6 +4,8 @@
 // don't exist (design: integrate-frontend-design). orderDate is ISO "YYYY-MM-DD",
 // so range checks are plain string comparisons (chronological == lexicographic).
 
+import { sumCents } from "./money.js";
+
 const MONTHS_DE = ["Jän", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
 
 export function inPeriod(isoDate, fromIso, toIso) {
@@ -12,14 +14,6 @@ export function inPeriod(isoDate, fromIso, toIso) {
 
 export function filterByPeriod(orders, fromIso, toIso) {
   return orders.filter((o) => inPeriod(o.orderDate, fromIso, toIso));
-}
-
-// Sums money values in integer cents to avoid floating-point rounding drift
-// (order/commission values have at most 2 decimal places, matching the
-// backend's numeric(10,2) columns).
-function sumCents(values) {
-  const cents = values.reduce((sum, v) => sum + Math.round(v * 100), 0);
-  return cents / 100;
 }
 
 // Fulfilled-only totals — the dashboard convention (only fulfilled orders count
