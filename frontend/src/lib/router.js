@@ -87,6 +87,36 @@ function closeProfileMenu() {
 
 document.addEventListener("click", () => closeProfileMenu());
 
+// Order-document print (add-order-document-print): the button lives inside the
+// shared confirmation/details HTML fragments (order-form.js, order-details.js),
+// always immediately followed by its .print-document sibling - one delegated
+// listener here covers every mount point without per-page wiring. The document
+// is often printed from inside a modal-dialog; cloning it into a fresh
+// top-level #print-root (removed again afterwards) sidesteps the modal's
+// positioning/overflow so a long document paginates correctly (base.css).
+let printSource = null;
+
+document.addEventListener("click", (event) => {
+  const printButton = event.target.closest("[data-action='print']");
+  if (!printButton) return;
+  printSource = printButton.previousElementSibling;
+  window.print();
+});
+
+window.addEventListener("beforeprint", () => {
+  if (!printSource) return;
+  document.getElementById("print-root")?.remove();
+  const printRoot = document.createElement("div");
+  printRoot.id = "print-root";
+  printRoot.innerHTML = printSource.innerHTML;
+  document.body.appendChild(printRoot);
+});
+
+window.addEventListener("afterprint", () => {
+  document.getElementById("print-root")?.remove();
+  printSource = null;
+});
+
 function renderNav() {
   const session = getSession();
   appShell.classList.remove("context-company", "context-partner");

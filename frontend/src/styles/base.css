@@ -2725,3 +2725,93 @@ legend {
     font-size: var(--font-size-2xl);
   }
 }
+
+/* Print: order document (Auftragsbeleg, add-order-document-print).
+   .print-document wraps the printable part of a confirmation/details view,
+   often nested inside a modal-dialog. A naive "hide everything else, promote
+   .print-document via position:absolute" does not work reliably for long
+   documents: pagination is computed from the (still in-flow, merely
+   invisible) surrounding page, not from the absolutely-positioned overlay,
+   silently truncating anything past that unrelated page's height. Instead,
+   router.js clones .print-document's content into a fresh #print-root
+   (a plain top-level sibling of #app-shell, appended on `beforeprint` and
+   removed on `afterprint`) so the printed content is a normal, unconstrained
+   flow with correct multi-page pagination regardless of length or DOM depth.
+   .print-only elements (letterhead, the confirmation's commission line) stay
+   hidden on screen and are revealed only inside the print clone. */
+.print-only {
+  display: none;
+}
+
+#print-root {
+  display: none;
+}
+
+@media print {
+  /* A modal is very often still "open" (in JS state) while printing from it -
+     body.modal-open's position:fixed + overflow:hidden (scroll-lock, see its
+     own comment above) would otherwise cap the printable area to one
+     viewport-sized page regardless of #print-root's real height. */
+  body.modal-open {
+    position: static;
+    overflow: visible;
+  }
+
+  body > *:not(#print-root) {
+    display: none !important;
+  }
+
+  #print-root {
+    display: block !important;
+  }
+
+  .print-only {
+    display: block;
+  }
+
+  .print-letterhead {
+    margin-bottom: var(--spacing-6);
+    padding-bottom: var(--spacing-4);
+    border-bottom: 0.125rem solid var(--text-primary);
+  }
+
+  .print-letterhead__brand {
+    font-weight: 800;
+    font-size: 1.5rem;
+    letter-spacing: var(--letter-spacing-tight);
+  }
+
+  .print-letterhead__title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    margin-top: var(--spacing-1);
+  }
+
+  .print-letterhead__meta {
+    display: flex;
+    gap: var(--spacing-4);
+    margin-top: var(--spacing-2);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+  }
+
+  .print-letterhead__order-no {
+    font-family: var(--font-mono);
+  }
+
+  @page {
+    margin: 18mm;
+  }
+
+  table {
+    break-inside: auto;
+  }
+
+  tr {
+    break-inside: avoid;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+}
