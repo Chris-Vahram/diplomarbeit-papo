@@ -35,6 +35,7 @@ class PartnerOrderListPage extends HTMLElement {
     ];
     this.table.emptyMessage = "Noch keine Bestellungen vorhanden.";
     this.table.filters = [
+      { key: "kundeName", type: "text", label: "Endkunde" },
       { key: "orderDateIso", type: "daterange", label: "Datum" },
       { key: "status", type: "select", label: "Status", options: STATUSES.map((s) => ({ value: s, label: STATUS_LABELS[s] })) },
     ];

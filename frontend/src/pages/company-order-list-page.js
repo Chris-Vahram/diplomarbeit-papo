@@ -56,10 +56,6 @@ class CompanyOrderListPage extends HTMLElement {
     this.table.emptyMessage = "Noch keine Bestellungen vorhanden.";
     this.table.searchKeys = ["partnerName", "kundeName"];
     this.table.pageSize = 20;
-    this.table.filters = [
-      { key: "orderDateIso", type: "daterange", label: "Datum" },
-      { key: "status", type: "select", label: "Status", options: STATUSES.map((s) => ({ value: s, label: STATUS_LABELS[s] })) },
-    ];
     this.table.rowKey = "id";
 
     this.table.addEventListener("change", (event) => {
@@ -81,10 +77,31 @@ class CompanyOrderListPage extends HTMLElement {
   async load() {
     try {
       this.orders = await apiFetch("/company/orders");
+      // Filter options (esp. the Partner dropdown, built from the loaded orders) are set
+      // once here, not in renderRows() - renderRows() also runs on unrelated updates (e.g.
+      // marking an order seen), and re-assigning .filters resets the user's active filters.
+      this.table.filters = [
+        { key: "partnerId", type: "select", label: "Partner", options: this.partnerFilterOptions() },
+        { key: "kundeName", type: "text", label: "Endkunde" },
+        { key: "orderDateIso", type: "daterange", label: "Datum" },
+        { key: "status", type: "select", label: "Status", options: STATUSES.map((s) => ({ value: s, label: STATUS_LABELS[s] })) },
+      ];
       this.renderRows();
     } catch (error) {
       showToast(error.message, "error");
     }
+  }
+
+  // Distinct partners among the loaded orders, id-keyed so two partners sharing a display
+  // name stay separate filter entries (design.md).
+  partnerFilterOptions() {
+    const byId = new Map();
+    for (const o of this.orders) {
+      if (!byId.has(o.partnerId)) byId.set(o.partnerId, o.partnerName);
+    }
+    return [...byId.entries()]
+      .map(([id, name]) => ({ value: String(id), label: name }))
+      .sort((a, b) => a.label.localeCompare(b.label, "de-AT"));
   }
 
   renderRows() {
@@ -96,6 +113,7 @@ class CompanyOrderListPage extends HTMLElement {
       orderDate: `${formatDate(o.orderDate)}${o.seenByCompany ? "" : ' <span class="badge-new">NEU</span>'}`,
       orderDateIso: o.orderDate,
       status: o.status,
+      partnerId: o.partnerId,
       partnerName: o.partnerName,
       kundeName: `${o.kunde.firstName ? o.kunde.firstName + " " : ""}${o.kunde.lastName}`,
       orderValueLabel: formatNumber(o.orderValue),
