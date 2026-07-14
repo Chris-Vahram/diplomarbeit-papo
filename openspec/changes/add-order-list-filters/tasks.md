@@ -23,4 +23,4 @@
 - [x] 4.5 Filtered-empty: a no-match combination shows "Keine Treffer." with controls still usable; a partner with zero orders still sees "Noch keine Bestellungen vorhanden."
 - [x] 4.6 Partner list (partner-demo): Endkunde/Datum/Status filters work, no Partner filter is rendered; no additional HTTP request fires when changing filters (network tab)
 - [x] 4.7 Toolbar layout holds at narrow (mobile) viewport on both order lists; adjust `base.css` wrap only if broken (holds cleanly at 375px on both lists, no CSS change needed)
-- [ ] 4.8 Run `openspec validate add-order-list-filters` and the partnerportal-quality review before handing over branch + commit message
+- [x] 4.8 Run `openspec validate add-order-list-filters` and the partnerportal-quality review before handing over branch + commit message

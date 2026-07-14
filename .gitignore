@@ -77,3 +77,4 @@ frontend/dist/
 
 ### Playwright MCP ###
 .playwright-mcp/
+.playwright-cli/
