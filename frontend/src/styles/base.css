@@ -1239,7 +1239,8 @@ data-table {
 }
 
 .data-table__filter select,
-.data-table__filter input[type="date"] {
+.data-table__filter input[type="date"],
+.data-table__filter input[type="text"] {
   padding: var(--spacing-2) var(--spacing-3);
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
@@ -1250,17 +1251,41 @@ data-table {
   transition: border-color var(--duration-fast) var(--ease-in-out), box-shadow var(--duration-fast) var(--ease-in-out);
 }
 
+.data-table__filter input[type="text"] {
+  width: 10rem;
+}
+
 .data-table__filter select:hover,
-.data-table__filter input[type="date"]:hover {
+.data-table__filter input[type="date"]:hover,
+.data-table__filter input[type="text"]:hover {
   border-color: var(--color-neutral-400);
 }
 
 .data-table__filter select:focus,
-.data-table__filter input[type="date"]:focus {
+.data-table__filter input[type="date"]:focus,
+.data-table__filter input[type="text"]:focus {
   outline: none;
   border-color: var(--border-focus);
   box-shadow: var(--shadow-focus-ring);
   background: var(--bg-surface);
+}
+
+.data-table__reset {
+  padding: var(--spacing-2) var(--spacing-3);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  border: 0.0625rem solid var(--border-strong);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-in-out);
+}
+
+.data-table__reset:hover {
+  border-color: var(--color-neutral-400);
+  color: var(--text-primary);
 }
 
 /* spacing between the toolbar and the table below it */
