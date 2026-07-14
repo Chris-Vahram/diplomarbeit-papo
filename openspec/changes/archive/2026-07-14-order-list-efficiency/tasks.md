@@ -19,8 +19,8 @@
 
 ## 4. Verify
 
-- [ ] 4.1 Manually confirm: company order list and partner order list still show the same orders/items/data as before (no regression from the join-fetch rewrite)
-- [ ] 4.2 Manually confirm: partner dashboard "latest orders" still shows the correct 5 most recent orders with correct commission values
-- [ ] 4.3 Manually confirm: the sidebar unseen-order badge count still updates correctly after opening an order's details
+- [x] 4.1 Manually confirm: company order list and partner order list still show the same orders/items/data as before (no regression from the join-fetch rewrite) — verified 2026-07-14: company 21 orders + partner 15 orders, each with populated items array (join-fetch)
+- [x] 4.2 Manually confirm: partner dashboard "latest orders" still shows the correct 5 most recent orders with correct commission values — verified 2026-07-14: "Letzte Bestellungen" shows exactly the 5 newest (ids 15→11, mixed status) with commission values, matching the DTO
+- [x] 4.3 Manually confirm: the sidebar unseen-order badge count still updates correctly after opening an order's details — verified 2026-07-14: opening order Nr.21 details dropped unseen-count 21→20 and the sidebar badge "Bestellungen 21"→"20"
 - [x] 4.4 Run the backend test suite (65/65 pass, BUILD SUCCESS; includes the new unseen-count endpoint test)
 - [x] 4.5 Run `openspec validate order-list-efficiency` (valid)

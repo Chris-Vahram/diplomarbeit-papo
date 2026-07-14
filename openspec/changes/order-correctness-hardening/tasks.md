@@ -29,8 +29,8 @@
 
 ## 6. Verify
 
-- [ ] 6.1 Manually confirm: double-clicking order-submit on both partner entry points creates exactly one order and one commission record
-- [ ] 6.2 Manually confirm: partner dashboard with no range set shows the same totals as the backend's all-time DTO; setting a range scopes correctly
-- [ ] 6.3 Manually confirm: company dashboard shows the same behavior
+- [x] 6.1 Manually confirm: double-clicking order-submit on both partner entry points creates exactly one order and one commission record — **bug found + FIXED 2026-07-14**: the full order-new page (`partner-order-new-page.js` handleSubmit) was missing the double-submit guard the dashboard quick-order already had; a fast double-submit created TWO orders. Added the same `submitButton.disabled=true` guard; re-verified — double-submit now creates exactly one order (button disables synchronously, second click no-ops).
+- [x] 6.2 Manually confirm: partner dashboard with no range set shows the same totals as the backend's all-time DTO; setting a range scopes correctly — verified 2026-07-14: no-range UI €247,22/€2.472,20/11 == DTO; June range → €446,30/€44,63/2 (scoped, integer-cent)
+- [x] 6.3 Manually confirm: company dashboard shows the same behavior — verified 2026-07-14: no-range == DTO (dynamically after a status change too); June range → €533,30/3 (scoped)
 - [x] 6.4 Run the backend test suite (67/67 pass, BUILD SUCCESS; includes 3 new tests: excessive quantity, case-insensitive dedup, XLSX blank-header)
 - [x] 6.5 Run `openspec validate order-correctness-hardening` (valid)

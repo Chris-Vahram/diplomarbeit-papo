@@ -27,7 +27,7 @@
 
 ## 6. Verify
 
-- [ ] 6.1 Manually confirm a partner name like `<img src=x onerror=alert(1)>` renders as literal text on the company dashboard (no execution)
-- [ ] 6.2 Manually confirm an exported CSV cell for a name starting with `=` opens as text in a spreadsheet
+- [x] 6.1 Manually confirm a partner name like `<img src=x onerror=alert(1)>` renders as literal text on the company dashboard (no execution) — verified 2026-07-14 (Playwright): payload escaped to `&lt;img`, 0 injected `<img>`, no alert
+- [x] 6.2 Manually confirm an exported CSV cell for a name starting with `=` opens as text in a spreadsheet — verified 2026-07-14: commissions CSV cell exported as `"'=1+1"` (apostrophe-prefixed)
 - [x] 6.3 Run the backend test suite; confirm existing export/import tests still pass (64/64 pass, BUILD SUCCESS)
 - [x] 6.4 Run `openspec validate security-hardening-review-fixes`

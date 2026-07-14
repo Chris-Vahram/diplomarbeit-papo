@@ -102,15 +102,26 @@ test framework). The 3 simple changes (session-refresh, order-filters, print) di
 - docs: presentation-deck edits + skills-install log
 Working tree is now CLEAN. The next thing that produces uncommitted work is implementing a change.
 
-# ARCHIVING STATUS (merged code != archived OpenSpec change)
-Merged-but-UNarchived changes still sitting in openspec/changes/:
-- add-product-image-upload (✓ 18/18) — COMPLETE, archivable NOW via /opsx:archive (no blocker).
-- security-hardening-review-fixes (14/16), close-fsd-order-gaps (10/12), order-correctness-hardening
-  (16/19), order-list-efficiency (12/15) — code merged to main, but each has leftover VERIFY tasks
-  needing the dev stack (Docker Keycloak+Postgres) up; archive after running those.
-- build-partnerportal-mvp (46/53) — remaining 7 are 8.x thesis/UI-doc tasks; not archivable yet.
+# ARCHIVING STATUS (updated 2026-07-14 after the hardening QA pass)
+ARCHIVED this session (all Verify tasks browser-confirmed via Playwright): add-product-image-upload,
+security-hardening-review-fixes, close-fsd-order-gaps, order-list-efficiency. Specs synced to
+openspec/specs/ (new: product-images, security-hardening, order-management, order-notifications).
+STILL ACTIVE (not archivable yet):
+- order-correctness-hardening (✓ all 19 tasks done + verified) — archive ABORTS on a spec-sync mismatch:
+  its partner-management delta MODIFIES "### Requirement: Partner validation", which only exists in the
+  still-unarchived build-partnerportal-mvp change (so it's not in the published spec). Structural, not a
+  QA issue. Fix path: archive build-partnerportal-mvp first (publishes that requirement), then this
+  archives cleanly; OR change that one delta from MODIFIED to ADDED; OR archive with --skip-specs (lossy —
+  drops this change's other valid deltas too). Left active with a note for now.
+- build-partnerportal-mvp (46/53) — remaining 7 are 8.x thesis/UI-doc tasks; not archivable yet. Its
+  unarchived state is what blocks order-correctness above.
 - ci-cd-deployment-with-gh-actions (0/40) — planned only, re-scope Oracle->Hetzner first.
-archive/ already holds 9 changes through 2026-07-08.
+- the 7 new meeting-driven changes — proposed, not implemented.
+HARDENING QA RESULT (2026-07-14): 11/11 Verify items confirmed. One real bug found + fixed during it:
+`partner-order-new-page.js` had NO double-submit guard (dashboard quick-order did) — a fast double-submit
+created TWO orders; added the `submitButton.disabled=true` guard, re-verified one order. That fix is a
+loose commit on top of the archived order-correctness change (see git log / WHAT'S LEFT).
+archive/ now holds 13 changes.
 
 # WHAT'S LEFT / NEXT MOVES
 - Implement the 7 changes with Sonnet. DECIDED WORKFLOW (2026-07-13, headache-free): SEQUENTIAL, not

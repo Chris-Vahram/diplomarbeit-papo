@@ -17,7 +17,7 @@
 
 ## 4. Verify
 
-- [ ] 4.1 Manually confirm: advancing an order to fulfilled shows the simulated shipping confirmation in-app; no real send
-- [ ] 4.2 Manually confirm: company cannot create a manual order for a deactivated partner (German error, nothing persisted)
+- [x] 4.1 Manually confirm: advancing an order to fulfilled shows the simulated shipping confirmation in-app; no real send — verified 2026-07-14 (Playwright): order→Abgeschlossen popped "Versandbestätigung für Bestellung Nr. 19" with "Simulierte Versandbestätigung (nicht wirklich versendet)"
+- [x] 4.2 Manually confirm: company cannot create a manual order for a deactivated partner (German error, nothing persisted) — verified 2026-07-14: deactivated partner 3 → POST /api/company/orders returned 409 "Partner ist inaktiv und kann keine neuen Bestellungen erhalten."; order count 21→21 (nothing persisted)
 - [x] 4.3 Run the backend test suite (65/65 pass, BUILD SUCCESS; includes the new inactive-partner test)
 - [x] 4.4 Run `openspec validate close-fsd-order-gaps` (valid)
