@@ -58,12 +58,17 @@ class PartnerOrderNewPage extends HTMLElement {
     event.preventDefault();
     const payload = { ...readKundePayload(this.form), items: readItemsPayload(this.form) };
 
+    // Guard against a double-click firing two requests while the first is in flight.
+    const submitButton = this.form.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+
     try {
       const order = await apiFetch("/partner/orders", { method: "POST", body: JSON.stringify(payload) });
       showToast("Bestellung aufgegeben.", "success");
       this.renderConfirmation(order);
     } catch (error) {
       showToast(error.message, "error");
+      submitButton.disabled = false;
     }
   }
 
