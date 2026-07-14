@@ -2,6 +2,7 @@
   "realm": "partnerportal",
   "enabled": true,
   "registrationAllowed": false,
+  "accessTokenLifespan": 900,
   "roles": {
     "realm": [
       { "name": "company", "description": "Company / operator role - manages partners, products, enablement, order status" },

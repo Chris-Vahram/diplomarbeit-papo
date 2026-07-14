@@ -1,4 +1,4 @@
-import { isAuthenticated, hasRole, getSession, logout } from "./auth.js";
+import { isAuthenticated, getSession, ensureValidSession, logout } from "./auth.js";
 import { apiFetch } from "./api.js";
 import { escapeHtml } from "./html.js";
 
@@ -188,7 +188,13 @@ export async function refreshOrdersBadge() {
   }
 }
 
-function render() {
+// render() awaits ensureValidSession(), so a fast second navigation can start before
+// the first one's continuation resumes - this token lets a superseded render bail out
+// instead of overwriting the DOM with a stale route.
+let renderGeneration = 0;
+
+async function render() {
+  const myGeneration = ++renderGeneration;
   closeMobileNav();
   const path = currentPath();
   const route = routes[path];
@@ -199,13 +205,19 @@ function render() {
   }
 
   // FR-20: protected views must not be reachable via direct URL without authorization.
-  if (route.role && !isAuthenticated()) {
-    location.hash = "#/login";
-    return;
-  }
-  if (route.role && !hasRole(route.role)) {
-    location.hash = `#${resolveDefaultRoute()}`;
-    return;
+  // ensureValidSession() refreshes an expired-but-refreshable access token first, so a
+  // partner mid-navigation isn't bounced to login just because the old token lapsed.
+  if (route.role) {
+    const session = await ensureValidSession();
+    if (myGeneration !== renderGeneration) return;
+    if (!session) {
+      location.hash = "#/login";
+      return;
+    }
+    if (!session.roles.includes(route.role)) {
+      location.hash = `#${resolveDefaultRoute()}`;
+      return;
+    }
   }
   if (path === "/login" && isAuthenticated()) {
     location.hash = `#${resolveDefaultRoute()}`;
