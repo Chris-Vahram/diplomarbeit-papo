@@ -2,7 +2,7 @@
 // Extracted out of partner-order-new-page.js so the company's manual order-creation
 // flow (design.md risk note) reuses this instead of duplicating the whole page.
 import { escapeHtml } from "./html.js";
-import { formatEuro, formatNumber, formatAddress } from "./format.js";
+import { formatEuro, formatNumber, formatAddress, formatDate } from "./format.js";
 import { addressFieldsHtml, readAddress, setAddressRequired } from "./address-fields.js";
 import { toCents, commissionCentsHalfUp } from "./money.js";
 
@@ -430,10 +430,22 @@ export function renderOrderConfirmationHtml(order, { showPartner = false, action
   return `
     <section class="order-confirmation">
       <h2>${isShipping ? `Versandbestätigung für Bestellung Nr. ${order.id}` : `Bestellung Nr. ${order.id} bestätigt`}</h2>
-      ${showPartner ? `<p>Partner: ${escapeHtml(order.partnerName)}</p>` : ""}
-      <p>Endkunde: ${kundeName}, ${escapeHtml(formatAddress(order.kunde.address))}</p>
-      ${itemsTableFragment(items)}
-      <p><strong>Gesamtwert: ${formatEuro(order.orderValue)}</strong></p>
+      <div class="print-document">
+        <header class="print-letterhead print-only">
+          <div class="print-letterhead__brand">PAPO</div>
+          <div class="print-letterhead__title">Auftragsbeleg</div>
+          <div class="print-letterhead__meta">
+            <span class="print-letterhead__order-no">Bestellnummer ${order.id}</span>
+            <span>${formatDate(order.orderDate)}</span>
+          </div>
+        </header>
+        ${showPartner ? `<p>Partner: ${escapeHtml(order.partnerName)}</p>` : ""}
+        <p>Endkunde: ${kundeName}, ${escapeHtml(formatAddress(order.kunde.address))}</p>
+        ${itemsTableFragment(items)}
+        <p><strong>Gesamtwert: ${formatEuro(order.orderValue)}</strong></p>
+        ${order.commissionValue != null ? `<p class="print-only">Provision (${percentFormat.format(order.commissionPercentUsed)} %): ${formatEuro(order.commissionValue)}</p>` : ""}
+      </div>
+      <button type="button" class="print-button" data-action="print">Beleg drucken</button>
       <section class="simulated-email">
         <h3>${isShipping ? "Simulierte Versandbestätigung (nicht wirklich versendet)" : "Simulierte Bestätigungs-E-Mail (nicht wirklich versendet)"}</h3>
         <p>An: ${escapeHtml(order.kunde.email) || "keine E-Mail-Adresse hinterlegt"}</p>
