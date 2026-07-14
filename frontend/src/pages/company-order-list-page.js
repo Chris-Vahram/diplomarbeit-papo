@@ -5,7 +5,6 @@ import { formatNumber, formatDate } from "../lib/format.js";
 import { renderOrderDetailsHtml } from "../lib/order-details.js";
 import { refreshOrdersBadge } from "../lib/router.js";
 import {
-  productOptionsHtml,
   kundePickerHtml,
   articleLinesHtml,
   wireKundePicker,
@@ -13,6 +12,7 @@ import {
   readKundePayload,
   readItemsPayload,
   renderOrderConfirmationHtml,
+  renderOrderSummaryHtml,
 } from "../lib/order-form.js";
 
 const STATUSES = ["SUBMITTED", "REVIEWED", "FULFILLED"];
@@ -172,11 +172,15 @@ class CompanyOrderListPage extends HTMLElement {
       ]);
       const products = enablement
         .filter((p) => p.enabled)
-        .map((p) => ({ id: p.productId, name: p.name, available: p.available }));
+        .map((p) => ({ id: p.productId, name: p.name, price: p.price, category: p.category, available: p.available }));
       if (products.length === 0) {
         container.innerHTML = `<p>Für diesen Partner sind noch keine Produkte freigeschaltet.</p>`;
         return;
       }
+      const partner = this.manualOrderPartners.find((p) => String(p.id) === String(partnerId));
+      // Stacked, not the side-by-side .order-form-layout used on the full order-new
+      // page: the modal panel (42.5rem, shared by every modal in the app) isn't wide
+      // enough for a 2-column layout without widening it for unrelated modals too.
       container.innerHTML = `
         <form id="manual-order-form" class="entity-form">
           ${kundePickerHtml(customers)}
@@ -185,10 +189,16 @@ class CompanyOrderListPage extends HTMLElement {
             <button type="submit">Bestellung anlegen</button>
           </div>
         </form>
+        <div id="manual-order-summary"></div>
       `;
       const form = container.querySelector("#manual-order-form");
+      const summaryEl = container.querySelector("#manual-order-summary");
+      const renderSummary = ({ items, totalCents }) => {
+        summaryEl.innerHTML = renderOrderSummaryHtml({ items, totalCents, commissionPercent: partner?.commissionPercent ?? null });
+      };
       wireKundePicker(form);
-      wireArticleLines(form, productOptionsHtml(products));
+      wireArticleLines(form, products, renderSummary);
+      renderSummary({ items: [], totalCents: 0 });
       form.addEventListener("submit", (event) => this.handleManualSubmit(event, partnerId, form));
     } catch (error) {
       showToast(error.message, "error");

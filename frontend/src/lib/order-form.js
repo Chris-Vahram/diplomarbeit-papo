@@ -4,15 +4,10 @@
 import { escapeHtml } from "./html.js";
 import { formatEuro, formatNumber, formatAddress } from "./format.js";
 import { addressFieldsHtml, readAddress, setAddressRequired } from "./address-fields.js";
+import { toCents, commissionCentsHalfUp } from "./money.js";
 
-export function productOptionsHtml(products) {
-  return products
-    .map(
-      (p) =>
-        `<option value="${p.id}" ${p.available ? "" : "disabled"}>${escapeHtml(p.name)}${p.available ? "" : " (nicht verfügbar)"}</option>`,
-    )
-    .join("");
-}
+const MAX_SUGGESTIONS = 20;
+const percentFormat = new Intl.NumberFormat("de-AT", { maximumFractionDigits: 2 });
 
 function customerOptionsHtml(customers) {
   return customers
@@ -59,6 +54,9 @@ export function articleLinesHtml() {
       <legend>Artikel</legend>
       <div id="order-lines"></div>
       <button type="button" id="add-line-btn">Artikel hinzufügen</button>
+      <p class="order-lines-total">
+        <strong>Zwischensumme: <span id="order-lines-total-value" aria-live="polite">€ 0,00</span></strong>
+      </p>
     </fieldset>`;
 }
 
@@ -81,23 +79,261 @@ export function wireKundePicker(form) {
   toggle();
 }
 
-export function wireArticleLines(form, productOptions) {
-  const linesContainer = form.querySelector("#order-lines");
-  const addLine = () => {
-    const row = document.createElement("div");
-    row.className = "order-line";
-    row.innerHTML = `
-      <select name="productId" required>${productOptions}</select>
+function filterProducts(products, term) {
+  const needle = term.trim().toLowerCase();
+  if (!needle) return [];
+  return products.filter(
+    (p) => p.name.toLowerCase().includes(needle) || (p.category ?? "").toLowerCase().includes(needle),
+  );
+}
+
+function suggestionHtml(product, index, lineId) {
+  const disabled = !product.available;
+  return `
+    <li
+      role="option"
+      id="combobox-option-${lineId}-${index}"
+      class="product-combobox__option${disabled ? " product-combobox__option--disabled" : ""}"
+      data-product-id="${product.id}"
+      aria-disabled="${disabled}"
+    >
+      <span class="product-combobox__option-name">${escapeHtml(product.name)}</span>
+      <span class="product-combobox__option-category">${escapeHtml(product.category ?? "")}</span>
+      <span class="product-combobox__option-price">${formatEuro(product.price)}</span>
+      ${disabled ? `<span class="product-combobox__option-unavailable">(nicht verfügbar)</span>` : ""}
+    </li>`;
+}
+
+function productLineHtml(lineId) {
+  return `
+    <div class="order-line" data-line-id="${lineId}">
+      <div class="product-combobox">
+        <input
+          type="text"
+          class="product-combobox__input"
+          placeholder="Artikel suchen…"
+          autocomplete="off"
+          role="combobox"
+          aria-expanded="false"
+          aria-autocomplete="list"
+          aria-controls="combobox-listbox-${lineId}"
+        />
+        <input type="hidden" name="productId" required />
+        <ul class="product-combobox__listbox" id="combobox-listbox-${lineId}" role="listbox" hidden></ul>
+      </div>
+      <span class="order-line__unit-price" data-role="unit-price">–</span>
       <input type="number" name="quantity" min="1" step="1" value="1" required />
+      <span class="order-line__total" data-role="line-total">–</span>
       <button type="button" class="remove-line-btn">Entfernen</button>
-    `;
-    linesContainer.appendChild(row);
+    </div>`;
+}
+
+// Wires one article line's combobox (search/filter/keyboard/outside-click) and
+// its price/line-total display. Returns a controller so the caller (wireArticleLines)
+// can read the current selection and forward outside-click events without each
+// line registering its own document-level listener.
+function wireComboboxLine(lineEl, products, lineId, notify) {
+  const searchInput = lineEl.querySelector(".product-combobox__input");
+  const hiddenInput = lineEl.querySelector('input[name="productId"]');
+  const listbox = lineEl.querySelector(".product-combobox__listbox");
+  const quantityInput = lineEl.querySelector('input[name="quantity"]');
+  const unitPriceEl = lineEl.querySelector('[data-role="unit-price"]');
+  const lineTotalEl = lineEl.querySelector('[data-role="line-total"]');
+
+  let activeIndex = -1;
+  let currentMatches = [];
+
+  function selectedProduct() {
+    const id = hiddenInput.value;
+    return id ? products.find((p) => String(p.id) === id) : null;
+  }
+
+  function updateLineDisplay() {
+    const product = selectedProduct();
+    const quantity = Number(quantityInput.value) || 0;
+    if (product) {
+      unitPriceEl.textContent = formatEuro(product.price);
+      lineTotalEl.textContent = formatEuro((toCents(product.price) * quantity) / 100);
+    } else {
+      unitPriceEl.textContent = "–";
+      lineTotalEl.textContent = "–";
+    }
+    notify();
+  }
+
+  function closeListbox() {
+    listbox.hidden = true;
+    listbox.innerHTML = "";
+    searchInput.setAttribute("aria-expanded", "false");
+    searchInput.removeAttribute("aria-activedescendant");
+    activeIndex = -1;
+    currentMatches = [];
+  }
+
+  function selectableIndexes() {
+    return currentMatches.reduce((acc, p, i) => {
+      if (p.available) acc.push(i);
+      return acc;
+    }, []);
+  }
+
+  function setActive(index) {
+    activeIndex = index;
+    const options = listbox.querySelectorAll("li[data-product-id]");
+    options.forEach((el, i) => el.classList.toggle("product-combobox__option--active", i === index));
+    if (index >= 0) {
+      searchInput.setAttribute("aria-activedescendant", `combobox-option-${lineId}-${index}`);
+      options[index]?.scrollIntoView({ block: "nearest" });
+    } else {
+      searchInput.removeAttribute("aria-activedescendant");
+    }
+  }
+
+  function choose(product) {
+    if (!product.available) return;
+    hiddenInput.value = String(product.id);
+    searchInput.value = product.name;
+    closeListbox();
+    updateLineDisplay();
+  }
+
+  function openListbox() {
+    const term = searchInput.value;
+    const matches = filterProducts(products, term);
+    if (!term.trim()) {
+      closeListbox();
+      return;
+    }
+    if (matches.length === 0) {
+      currentMatches = [];
+      listbox.innerHTML = `<li class="product-combobox__empty">Keine Artikel gefunden</li>`;
+      listbox.hidden = false;
+      searchInput.setAttribute("aria-expanded", "true");
+      activeIndex = -1;
+      return;
+    }
+    const visible = matches.slice(0, MAX_SUGGESTIONS);
+    const hasMore = matches.length > MAX_SUGGESTIONS;
+    listbox.innerHTML =
+      visible.map((p, i) => suggestionHtml(p, i, lineId)).join("") +
+      (hasMore ? `<li class="product-combobox__hint">Weitere Treffer eingrenzen…</li>` : "");
+    currentMatches = visible;
+    listbox.hidden = false;
+    searchInput.setAttribute("aria-expanded", "true");
+    activeIndex = -1;
+  }
+
+  searchInput.addEventListener("input", () => {
+    if (hiddenInput.value) {
+      // Stale-selection guard: editing after a choice clears it, so the line can
+      // never display one product while submitting another.
+      hiddenInput.value = "";
+      updateLineDisplay();
+    }
+    openListbox();
+  });
+
+  searchInput.addEventListener("focus", () => {
+    if (searchInput.value.trim()) openListbox();
+  });
+
+  searchInput.addEventListener("keydown", (event) => {
+    const selectable = selectableIndexes();
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      if (!selectable.length) return;
+      const pos = selectable.indexOf(activeIndex);
+      setActive(selectable[(pos + 1) % selectable.length]);
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      if (!selectable.length) return;
+      const pos = selectable.indexOf(activeIndex);
+      setActive(selectable[(pos - 1 + selectable.length) % selectable.length]);
+    } else if (event.key === "Enter") {
+      // Prevent the native implicit form submission whenever the dropdown is open
+      // (searching, or only a disabled/no-match result showing) - Enter's job here
+      // is to confirm a suggestion, never to submit the form out from under the user.
+      if (!listbox.hidden) {
+        event.preventDefault();
+        if (activeIndex >= 0 && currentMatches[activeIndex]) {
+          choose(currentMatches[activeIndex]);
+        }
+      }
+    } else if (event.key === "Escape") {
+      closeListbox();
+    }
+  });
+
+  listbox.addEventListener("click", (event) => {
+    const li = event.target.closest("li[data-product-id]");
+    if (!li) return;
+    const product = products.find((p) => String(p.id) === li.dataset.productId);
+    if (product) choose(product);
+  });
+
+  quantityInput.addEventListener("input", updateLineDisplay);
+
+  updateLineDisplay();
+
+  return {
+    el: lineEl,
+    getSelection() {
+      const product = selectedProduct();
+      const quantity = Number(quantityInput.value) || 0;
+      return { product, quantity, lineTotalCents: product ? toCents(product.price) * quantity : 0 };
+    },
+    handleOutsideClick(event) {
+      if (!lineEl.contains(event.target)) closeListbox();
+    },
   };
+}
+
+export function wireArticleLines(form, products, onLinesChange) {
+  const linesContainer = form.querySelector("#order-lines");
+  const totalValueEl = form.querySelector("#order-lines-total-value");
+  const lineControllers = [];
+  let lineIdCounter = 0;
+
+  function notifyChange() {
+    const items = lineControllers.map((c) => c.getSelection()).filter((s) => s.product);
+    const totalCents = items.reduce((sum, i) => sum + i.lineTotalCents, 0);
+    if (totalValueEl) totalValueEl.textContent = formatEuro(totalCents / 100);
+    onLinesChange?.({ items, totalCents });
+  }
+
+  function addLine() {
+    lineIdCounter += 1;
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = productLineHtml(lineIdCounter);
+    const lineEl = wrapper.firstElementChild;
+    linesContainer.appendChild(lineEl);
+    lineControllers.push(wireComboboxLine(lineEl, products, lineIdCounter, notifyChange));
+  }
+
   form.querySelector("#add-line-btn").addEventListener("click", addLine);
   linesContainer.addEventListener("click", (event) => {
     const button = event.target.closest(".remove-line-btn");
-    if (button) button.closest(".order-line").remove();
+    if (!button) return;
+    const lineEl = button.closest(".order-line");
+    const index = lineControllers.findIndex((c) => c.el === lineEl);
+    if (index >= 0) lineControllers.splice(index, 1);
+    lineEl.remove();
+    notifyChange();
   });
+  // wireArticleLines() runs again every time an order form is (re-)rendered - a
+  // partner placing a second order, the company switching partners, a dashboard
+  // quick-order reopened. Without this, each run would leave behind a permanent
+  // document listener over stale (detached) lines. Self-unsubscribes the first time
+  // it fires after linesContainer is no longer in the document.
+  function handleDocumentClick(event) {
+    if (!linesContainer.isConnected) {
+      document.removeEventListener("click", handleDocumentClick);
+      return;
+    }
+    for (const controller of lineControllers) controller.handleOutsideClick(event);
+  }
+  document.addEventListener("click", handleDocumentClick);
+
   addLine();
 }
 
@@ -127,6 +363,54 @@ export function readItemsPayload(form) {
   }));
 }
 
+// Shared by the post-submit confirmation and the live order summary, so the two
+// can't drift apart (design.md risk note). `items` is [{name, quantity, unitPrice, lineTotal}].
+function itemsTableFragment(items) {
+  const rows = items
+    .map(
+      (i) =>
+        `<tr><td>${escapeHtml(i.name)}</td><td>${i.quantity}</td><td>${formatNumber(i.unitPrice)}</td><td>${formatNumber(i.lineTotal)}</td></tr>`,
+    )
+    .join("");
+  return `
+    <div class="data-table__scroll">
+      <table class="data-table">
+        <thead><tr><th>Artikel</th><th>Menge</th><th>Preis (€)</th><th>Summe (€)</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+function commissionLineHtml(percent, totalCents) {
+  const commissionCents = commissionCentsHalfUp(totalCents, percent);
+  return `
+    <p class="order-summary__commission">
+      Ihre Provision (${percentFormat.format(percent)} %): ${formatEuro(commissionCents / 100)}
+      <span class="order-summary__estimate-hint">(Vorschau)</span>
+    </p>`;
+}
+
+// Live order-summary panel (order-form-experience spec): tracks the composed
+// order as the partner/company works. `commissionPercent` is null until known
+// (company flow, before a partner is chosen) - the commission line is then omitted.
+export function renderOrderSummaryHtml({ items, totalCents, commissionPercent }) {
+  if (items.length === 0) {
+    return `<div class="order-summary order-summary--empty"><p>Noch keine Artikel</p></div>`;
+  }
+  const rows = items.map((i) => ({
+    name: i.product.name,
+    quantity: i.quantity,
+    unitPrice: i.product.price,
+    lineTotal: i.lineTotalCents / 100,
+  }));
+  return `
+    <div class="order-summary">
+      ${itemsTableFragment(rows)}
+      <p class="order-summary__total"><strong>Gesamtwert: <span aria-live="polite">${formatEuro(totalCents / 100)}</span></strong></p>
+      ${commissionPercent != null ? commissionLineHtml(commissionPercent, totalCents) : ""}
+    </div>`;
+}
+
 // On-screen confirmation + simulated ("not really sent") e-mail shown right after an
 // order is placed — same pattern for the partner's own flow and the company's manual
 // creation flow. `actionsHtml` (e.g. a "Fertig"/"Neue Bestellung" button) is placed
@@ -135,12 +419,12 @@ export function readItemsPayload(form) {
 // layout, distinct heading/e-mail text so it isn't mistaken for the order confirmation.
 export function renderOrderConfirmationHtml(order, { showPartner = false, actionsHtml = "", kind = "order" } = {}) {
   const isShipping = kind === "shipping";
-  const rows = order.items
-    .map(
-      (item) =>
-        `<tr><td>${escapeHtml(item.productName)}</td><td>${item.quantity}</td><td>${formatNumber(item.unitPriceSnapshot)}</td><td>${formatNumber(item.lineTotal)}</td></tr>`,
-    )
-    .join("");
+  const items = order.items.map((item) => ({
+    name: item.productName,
+    quantity: item.quantity,
+    unitPrice: item.unitPriceSnapshot,
+    lineTotal: item.lineTotal,
+  }));
   const kundeName = `${order.kunde.firstName ? escapeHtml(order.kunde.firstName) + " " : ""}${escapeHtml(order.kunde.lastName)}`;
 
   return `
@@ -148,12 +432,7 @@ export function renderOrderConfirmationHtml(order, { showPartner = false, action
       <h2>${isShipping ? `Versandbestätigung für Bestellung Nr. ${order.id}` : `Bestellung Nr. ${order.id} bestätigt`}</h2>
       ${showPartner ? `<p>Partner: ${escapeHtml(order.partnerName)}</p>` : ""}
       <p>Endkunde: ${kundeName}, ${escapeHtml(formatAddress(order.kunde.address))}</p>
-      <div class="data-table__scroll">
-        <table class="data-table">
-          <thead><tr><th>Artikel</th><th>Menge</th><th>Preis (€)</th><th>Summe (€)</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
+      ${itemsTableFragment(items)}
       <p><strong>Gesamtwert: ${formatEuro(order.orderValue)}</strong></p>
       <section class="simulated-email">
         <h3>${isShipping ? "Simulierte Versandbestätigung (nicht wirklich versendet)" : "Simulierte Bestätigungs-E-Mail (nicht wirklich versendet)"}</h3>

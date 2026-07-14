@@ -20,7 +20,7 @@ Two client asks converge on the same screen. The 10.07.2026 meeting: adding a pr
 
 ## Impact
 
-- **Frontend only:** `frontend/src/lib/order-form.js` (picker, lines, live totals, summary), `frontend/src/pages/partner-order-new-page.js` + `frontend/src/pages/company-order-list-page.js` (wiring, profile fetch, carry price/category in the company picker data), `frontend/src/styles/base.css` (summary styling).
+- **Frontend only:** `frontend/src/lib/order-form.js` (picker, lines, live totals, summary), `frontend/src/pages/partner-order-new-page.js` + `frontend/src/pages/company-order-list-page.js` + `frontend/src/pages/partner-dashboard-page.js` (wiring, profile fetch, carry price/category in the company picker data), `frontend/src/styles/base.css` (summary styling). All three order-creation entry points (full page, company manual flow, dashboard quick-order) get full feature parity — same picker, totals, and commission preview — since the client's money-visibility ask (Q1) applies equally regardless of entry point.
 - **No backend change.** No REST, entity, or authorization change. Order request payload contract (`productId`/`quantity` lines) stays identical.
 - **Depends on `self-host-fonts`** (offline fonts, split out on review) landing first — the monospace amounts assume local Fira Code.
 - Serves the open a11y findings on the way: combobox keyboard navigation and an `aria-live` total.
