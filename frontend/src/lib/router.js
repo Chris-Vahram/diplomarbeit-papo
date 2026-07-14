@@ -15,6 +15,7 @@ const routes = {
   "/partner/products": { tag: "partner-product-list-page", role: "partner", title: "Produkte" },
   "/partner/orders": { tag: "partner-order-list-page", role: "partner", title: "Meine Bestellungen" },
   "/partner/orders/new": { tag: "partner-order-new-page", role: "partner", title: "Neue Bestellung" },
+  "/partner/customers": { tag: "partner-customer-list-page", role: "partner", title: "Meine Endkunden" },
   "/partner/profile": { tag: "partner-profile-page", role: "partner", title: "Mein Profil" },
 };
 
@@ -27,6 +28,7 @@ const NAV_ICONS = {
   "/partner/dashboard": "layout-dashboard",
   "/partner/products": "package",
   "/partner/orders": "shopping-cart",
+  "/partner/customers": "contact",
   "/partner/profile": "circle-user",
 };
 
@@ -108,6 +110,7 @@ function renderNav() {
     : [
         ["/partner/dashboard", "Dashboard"],
         ["/partner/orders", "Meine Bestellungen"],
+        ["/partner/customers", "Endkunden"],
         ["/partner/products", "Produkte"],
       ];
 
@@ -244,6 +247,7 @@ window.addEventListener("DOMContentLoaded", () => {
   import("../pages/partner-product-list-page.js");
   import("../pages/partner-order-list-page.js");
   import("../pages/partner-order-new-page.js");
+  import("../pages/partner-customer-list-page.js");
   import("../pages/partner-profile-page.js");
   render();
 });
