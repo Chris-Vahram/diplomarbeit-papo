@@ -21,11 +21,13 @@ ready commit message, do not commit unless he explicitly says so.
 
 # REPO
 Working repo (git): /Users/mitgl/Desktop/Schule/4CHITM/Diplomarbeit/diplomarbeit-papo
-Branch: main (== origin/main, clean tree). This session's PLANNING work is committed + pushed
-(commits 1fb81c5..36a4b71: meeting+backlog+PAPO fix, the 7 openspec proposals, the quality skill,
-deck edits). IMPLEMENTATION of the 7 changes has NOT started. Note: Tobias pushed in parallel this
-session (application.properties + his own copy of the 10.07 meeting note) — rebased in, meeting-note
-add/add conflict resolved (kept the structured version with Chris's Keycloak Nachtrag).
+Branch: main (== origin/main, clean tree). Everything this session is committed + pushed
+(commits 1fb81c5..def2702): planning (meeting+backlog+PAPO fix, 7 openspec proposals, quality skill,
+deck edits), then the hardening QA outcomes — archived 4 changes (image-upload + 3 hardening), the
+double-submit bugfix (0117169), and the verify records. IMPLEMENTATION of the 7 new changes has NOT
+started — that's the next move. Note: Tobias pushed in parallel earlier (application.properties + his
+own copy of the 10.07 meeting note) — rebased in, meeting-note add/add conflict resolved (kept the
+structured version with Chris's Keycloak Nachtrag).
 
 # READ ORDER FOR DEEP WORK (authoritative docs)
 1. CLAUDE.md (repo root) — project memory, locked scope, key decisions, entities, roles. READ FIRST.
@@ -95,12 +97,16 @@ combobox stale-id, over-constrained specs. All RECONCILED into the plans (protot
 back on Codex's enterprise-migration apparatus and frontend-test-runner demand — no production, no JS
 test framework). The 3 simple changes (session-refresh, order-filters, print) did NOT need cross-review.
 
-# COMMITTED + PUSHED THIS SESSION (main, commits 1fb81c5..36a4b71)
-- docs: 10.07 meeting note + phase2_backlog sync + PAPO naming fix (CLAUDE.md + both FSDs) + this file
-- docs(openspec): the 7 change proposals
-- chore: .claude/skills/partnerportal-quality (project quality-review skill)
-- docs: presentation-deck edits + skills-install log
-Working tree is now CLEAN. The next thing that produces uncommitted work is implementing a change.
+# COMMITTED + PUSHED THIS SESSION (main, commits 1fb81c5..def2702)
+- 1fb81c5 docs: 10.07 meeting note + phase2_backlog sync + PAPO naming fix (CLAUDE.md + both FSDs)
+- 2959877 docs(openspec): the 7 change proposals
+- c76599c chore: .claude/skills/partnerportal-quality (project quality-review skill)
+- 36a4b71 docs: presentation-deck edits + skills-install log
+- 75ae88a chore: archive add-product-image-upload + sync specs
+- 0117169 fix: guard order-new page against double-submit (bug found in the hardening QA)
+- def2702 chore: archive 3 verified hardening changes + record QA results
+Working tree is CLEAN. The next thing that produces uncommitted work is implementing one of the 7 changes
+(plus this file itself when re-updated).
 
 # ARCHIVING STATUS (updated 2026-07-14 after the hardening QA pass)
 ARCHIVED this session (all Verify tasks browser-confirmed via Playwright): add-product-image-upload,
