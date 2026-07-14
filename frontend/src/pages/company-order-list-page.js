@@ -196,9 +196,9 @@ class CompanyOrderListPage extends HTMLElement {
         return;
       }
       const partner = this.manualOrderPartners.find((p) => String(p.id) === String(partnerId));
-      // Stacked, not the side-by-side .order-form-layout used on the full order-new
-      // page: the modal panel (42.5rem, shared by every modal in the app) isn't wide
-      // enough for a 2-column layout without widening it for unrelated modals too.
+      // Stacked, not side-by-side: the modal panel (42.5rem, shared by every modal
+      // in the app) isn't wide enough for a 2-column layout without widening it for
+      // unrelated modals too.
       container.innerHTML = `
         <form id="manual-order-form" class="entity-form">
           ${kundePickerHtml(customers)}

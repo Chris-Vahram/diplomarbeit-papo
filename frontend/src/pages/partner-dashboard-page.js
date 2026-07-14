@@ -3,16 +3,6 @@ import { showToast } from "../components/toast-notice.js";
 import { formatEuro, formatNumber, formatDate } from "../lib/format.js";
 import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue, previousPeriod, trendInfo } from "../lib/dashboard-data.js";
 import { escapeHtml } from "../lib/html.js";
-import {
-  kundePickerHtml,
-  articleLinesHtml,
-  wireKundePicker,
-  wireArticleLines,
-  readKundePayload,
-  readItemsPayload,
-  renderOrderConfirmationHtml,
-  renderOrderSummaryHtml,
-} from "../lib/order-form.js";
 
 const eur = new Intl.NumberFormat("de-AT", { style: "currency", currency: "EUR" });
 const dateLabel = new Intl.DateTimeFormat("de-AT", { day: "2-digit", month: "2-digit", year: "numeric" });
@@ -109,9 +99,6 @@ class PartnerDashboardPage extends HTMLElement {
       <div class="chart-row" id="chart-row"></div>
       <h2>Letzte Bestellungen</h2>
       <data-table id="latest-orders-table"></data-table>
-      <modal-dialog id="order-modal" title="Neue Bestellung">
-        <div id="order-modal-content"></div>
-      </modal-dialog>
     `;
 
     this.metricRow = this.querySelector("#metric-row");
@@ -125,79 +112,12 @@ class PartnerDashboardPage extends HTMLElement {
     ];
     this.table.emptyMessage = "Noch keine Bestellungen vorhanden.";
 
-    this.modal = this.querySelector("#order-modal");
-    this.modalContent = this.querySelector("#order-modal-content");
-    this.querySelector("#new-order-btn").addEventListener("click", () => this.openOrderModal());
+    this.querySelector("#new-order-btn").addEventListener("click", () => {
+      location.hash = "#/partner/orders/new";
+    });
 
     this.wirePeriodPicker();
     this.load();
-  }
-
-  async openOrderModal() {
-    this.modal.setAttribute("title", "Neue Bestellung");
-    this.modal.open();
-    this.modalContent.innerHTML = `<p>Lade…</p>`;
-    try {
-      const [products, customers, profile] = await Promise.all([
-        apiFetch("/partner/products"),
-        apiFetch("/partner/customers"),
-        apiFetch("/partner/profile"),
-      ]);
-      this.commissionPercent = profile.commissionPercent;
-      if (products.length === 0) {
-        this.modalContent.innerHTML = `<p>Für Sie sind noch keine Produkte freigeschaltet. Eine Bestellung ist erst möglich, sobald die Firma Produkte für Sie freischaltet.</p>`;
-        return;
-      }
-      // Stacked, not side-by-side - the modal panel (42.5rem, shared by every modal
-      // in the app) isn't wide enough for the 2-column .order-form-layout used on
-      // the full order-new page (same reasoning as the company manual-order modal).
-      this.modalContent.innerHTML = `
-        <form id="order-form" class="entity-form entity-form--grid">
-          ${kundePickerHtml(customers)}
-          ${articleLinesHtml()}
-          <div class="entity-form__actions">
-            <button type="submit">Bestellung aufgeben</button>
-          </div>
-        </form>
-        <div id="order-summary"></div>
-      `;
-      const form = this.modalContent.querySelector("#order-form");
-      const summaryEl = this.modalContent.querySelector("#order-summary");
-      const renderSummary = ({ items, totalCents }) => {
-        summaryEl.innerHTML = renderOrderSummaryHtml({ items, totalCents, commissionPercent: this.commissionPercent });
-      };
-      wireKundePicker(form);
-      wireArticleLines(form, products, renderSummary);
-      renderSummary({ items: [], totalCents: 0 });
-      form.addEventListener("submit", (event) => this.handleOrderSubmit(event, form));
-    } catch (error) {
-      showToast(error.message, "error");
-    }
-  }
-
-  async handleOrderSubmit(event, form) {
-    event.preventDefault();
-    const payload = { ...readKundePayload(form), items: readItemsPayload(form) };
-
-    // Guard against a double-click firing two requests while the first is in flight.
-    const submitButton = form.querySelector('button[type="submit"]');
-    submitButton.disabled = true;
-
-    try {
-      const order = await apiFetch("/partner/orders", { method: "POST", body: JSON.stringify(payload) });
-      showToast("Bestellung aufgegeben.", "success");
-      this.modal.setAttribute("title", `Bestellung Nr. ${order.id} bestätigt`);
-      this.modalContent.innerHTML = renderOrderConfirmationHtml(order, {
-        actionsHtml: `<button type="button" id="order-done-btn">Fertig</button>`,
-      });
-      this.modalContent.querySelector("#order-done-btn").addEventListener("click", () => {
-        this.modal.close();
-        this.load();
-      });
-    } catch (error) {
-      showToast(error.message, "error");
-      submitButton.disabled = false;
-    }
   }
 
   wirePeriodPicker() {
