@@ -2,11 +2,13 @@ package at.papo.partnerportal.importer;
 
 import at.papo.partnerportal.common.Address;
 import at.papo.partnerportal.partner.Partner;
+import at.papo.partnerportal.partner.PartnerNumber;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static at.papo.partnerportal.importer.ImportValueParsing.blankToNull;
@@ -90,16 +92,17 @@ public class PartnerImportDefinition implements ImportDefinition {
     }
 
     // Case-insensitive to match the in-file duplicate check (already lowercased)
-    // and the product definition's lower(name) pattern.
+    // and the product definition's lower(name) pattern. Locale.ROOT matches
+    // PartnerNumber.canonicalize's case-folding (avoids the Turkish-I trap).
     @Override
     public boolean existsInDb(String identifierValue) {
-        return Partner.count("lower(partnerNumber) = ?1", identifierValue.toLowerCase()) > 0;
+        return Partner.count("lower(partnerNumber) = ?1", identifierValue.toLowerCase(Locale.ROOT)) > 0;
     }
 
     @Override
     public void persist(Map<String, String> mappedValues) {
         Partner partner = new Partner();
-        partner.partnerNumber = mappedValues.get("partnerNumber").trim();
+        partner.partnerNumber = PartnerNumber.canonicalize(mappedValues.get("partnerNumber"));
         partner.name = mappedValues.get("name").trim();
         partner.address = new Address(mappedValues.get("street").trim(), mappedValues.get("houseNumber").trim(),
                 mappedValues.get("postalCode").trim(), mappedValues.get("city").trim(),

@@ -2064,8 +2064,15 @@ table button[data-edit-id] {
 .entity-form--grid .form-field--wide,
 .entity-form--grid .checkbox-field,
 .entity-form--grid .entity-form__actions,
-.entity-form--grid .address-fields {
+.entity-form--grid .address-fields,
+.entity-form--grid .partner-form__hint {
   grid-column: 1 / -1;
+}
+
+.partner-form__hint {
+  margin: calc(-1 * var(--spacing-2)) 0 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
 }
 
 /* Address sub-form (address-fields.js): 4 narrow fields (Hausnummer/PLZ/Ort/Land)

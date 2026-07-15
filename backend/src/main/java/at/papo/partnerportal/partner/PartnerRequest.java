@@ -20,9 +20,6 @@ public record PartnerRequest(
         @NotNull(message = "Provision ist erforderlich.")
         @DecimalMin(value = "0.0", message = "Provision darf nicht negativ sein.")
         @DecimalMax(value = "100.0", message = "Provision darf 100% nicht überschreiten.") BigDecimal commissionPercent,
-        Boolean active,
-        // Links a manually provisioned Keycloak login to this partner (see partner-management
-        // spec "Company links Keycloak login"). Optional; import never sets this.
-        String keycloakUsername
+        Boolean active
 ) {
 }

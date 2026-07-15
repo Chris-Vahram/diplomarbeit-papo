@@ -6,10 +6,12 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
+import java.util.Locale;
+
 // Resolves the authenticated partner's own Partner record from the Keycloak
 // username claim — never trust a client-supplied partner id (docs/CONVENTIONS.md).
-// See design.md "Keycloak user provisioning" and the auth-access-control spec
-// requirement "Partner login linking".
+// The username claim is matched against the canonical (upper-case) Partner.partnerNumber;
+// see partner-management spec requirement "Partner login linking via partner number".
 @RequestScoped
 public class CurrentPartner {
 
@@ -17,8 +19,7 @@ public class CurrentPartner {
     JsonWebToken jwt;
 
     public Partner resolve() {
-        String username = jwt.getName();
-        Partner partner = Partner.find("keycloakUsername", username).firstResult();
+        Partner partner = Partner.find("partnerNumber", jwt.getName().toUpperCase(Locale.ROOT)).firstResult();
         if (partner == null) {
             throw new ApiException(403, "Kein Partnerkonto mit diesem Login verknüpft.");
         }

@@ -21,14 +21,13 @@ erDiagram
 
     PARTNER {
         Long id PK
-        String partnerNumber UK "z.B. P-1001"
+        String partnerNumber UK "kanonisch Großschreibung, z.B. PARTNER-DEMO; = Keycloak-Login"
         String name
         String address
         String email
         String phone
         BigDecimal commissionPercent "5.2, Preset 5/10/15 + individuell"
         boolean active "DB-Flag, nicht mit Keycloak synced"
-        String keycloakUsername UK "nullable, manuell verknüpft"
     }
 
     PRODUCT {
@@ -94,9 +93,15 @@ Ein Vertriebspartner (Firma). `commissionPercent` ist ein einfaches numerisches
 Feld (kein `CommissionLevel`), von der Firma per Dropdown (5/10/15 % oder
 individueller Wert) gesetzt. `active` ist ein reines DB-Flag — Keycloak weiß
 nichts von Aktiv/Inaktiv; `CurrentPartner.resolve()` prüft es serverseitig bei
-jedem partnerbezogenen Request. `keycloakUsername` verknüpft einen manuell
-angelegten Keycloak-Login mit dem Partner-Datensatz; ein Partner ohne Login
-kann sich nicht anmelden.
+jedem partnerbezogenen Request. Der Login-Link läuft über `partnerNumber`:
+Keycloak-Logins werden manuell mit Benutzername = Partnernummer angelegt.
+`partnerNumber` wird bei jedem Schreibzugriff (Anlage/Bearbeitung/Import) auf
+Großschreibung kanonisiert, damit der case-sensitive DB-Unique-Constraint
+Groß-/Kleinschreibungs-Duplikate wirklich verhindert; `resolve()` gleicht den
+(von Keycloak kleingeschriebenen) Login-Claim großgeschrieben exakt gegen
+`partnerNumber` ab. Ein Partner ohne passenden Keycloak-Login kann sich nicht
+anmelden. Eine Änderung der Partnernummer ändert damit auch den Login — die
+Firma wird im Bearbeiten-Formular entsprechend gewarnt.
 
 ### Product
 Zentral von der Firma verwaltete Artikel. `available` steuert Bestellbarkeit
