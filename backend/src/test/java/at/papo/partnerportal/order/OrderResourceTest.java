@@ -22,12 +22,12 @@ class OrderResourceTest {
     KeycloakTestTokens tokens;
 
     private long enabledProductId() {
-        // Seeded enabled for P-1001 (partner-demo) - see DemoDataSeeder.
+        // Seeded enabled for PARTNER-DEMO (partner-demo) - see DemoDataSeeder.
         return Product.<Product>find("name", "Akkuschrauber 18V Set").firstResult().id;
     }
 
     private long partner1001Id() {
-        return Partner.<Partner>find("partnerNumber", "P-1001").firstResult().id;
+        return Partner.<Partner>find("partnerNumber", "PARTNER-DEMO").firstResult().id;
     }
 
     private long partner1002Id() {
@@ -321,7 +321,7 @@ class OrderResourceTest {
 
         String companyToken = tokens.tokenFor("company-demo", "company-demo");
 
-        // kundeId belongs to P-1001, but the order is created for P-1002 — must be rejected,
+        // kundeId belongs to PARTNER-DEMO, but the order is created for P-1002 — must be rejected,
         // matching the same ownership check the partner's own flow enforces.
         given().auth().oauth2(companyToken).contentType("application/json")
                 .body("{\"partnerId\":" + partner1002Id() + ",\"kundeId\":" + kundeId
@@ -347,7 +347,6 @@ class OrderResourceTest {
         updateBody.put("email", current.getString("email"));
         updateBody.put("phone", current.getString("phone"));
         updateBody.put("commissionPercent", current.getDouble("commissionPercent"));
-        updateBody.put("keycloakUsername", current.getString("keycloakUsername"));
 
         updateBody.put("active", false);
         given().auth().oauth2(companyToken).contentType("application/json")

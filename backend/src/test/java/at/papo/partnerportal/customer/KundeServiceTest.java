@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // %test doesn't seed demo orders/Kunden (DemoDataSeeder.onStart skips seedOrders() outside
 // DEVELOPMENT so other tests keep a clean order baseline) - this test builds its own minimal
-// fixtures directly, including for a second partner that has no Keycloak-linked test user
+// fixtures directly, including for a second partner that has no Keycloak-linked login
 // (there is no REST endpoint to create a Kunde for a partner other than the caller, which is
 // exactly the scoping behaviour under test).
 @QuarkusTest
@@ -61,7 +61,7 @@ class KundeServiceTest {
 
     @Test
     void lastOrderDateIsMostRecentOrderPerKundeAndNullWithoutOrders() {
-        Partner p1 = partner("P-1001");
+        Partner p1 = partner("PARTNER-DEMO");
         QuarkusTransaction.requiringNew().run(() -> {
             Kunde withOrders = persistKunde(p1, "Mit Bestellungen");
             persistOrder(p1, withOrders, 40);
@@ -77,7 +77,7 @@ class KundeServiceTest {
 
     @Test
     void kundenAreScopedToTheirOwningPartnerOnly() {
-        Partner p1 = partner("P-1001");
+        Partner p1 = partner("PARTNER-DEMO");
         Partner p2 = partner("P-1002");
         QuarkusTransaction.requiringNew().run(() -> persistKunde(p1, "Partner-Eins-Kunde"));
         QuarkusTransaction.requiringNew().run(() -> persistKunde(p2, "Partner-Zwei-Kunde"));
@@ -93,7 +93,7 @@ class KundeServiceTest {
 
     @Test
     void listForPartnerRunsExactlyOneQuery() {
-        Partner p1 = partner("P-1001");
+        Partner p1 = partner("PARTNER-DEMO");
         Statistics statistics = entityManagerFactory.unwrap(SessionFactory.class).getStatistics();
         statistics.clear();
 

@@ -59,15 +59,16 @@ public class DemoDataSeeder {
     }
 
     private void seedPartners() {
-        // Matches the Keycloak demo user "partner-demo" so login -> dashboard works out of the box.
-        persistPartner("P-1001", "Elektro Huber GmbH", address("Hauptstraße", "12", "4020", "Linz"),
-                "partner-demo@example.at", "+43 660 1234567", "10.00", true, "partner-demo");
+        // Canonical (upper-case) partner number == the Keycloak demo user "partner-demo"
+        // (resolve() upper-cases the login claim), so login -> dashboard works out of the box.
+        persistPartner("PARTNER-DEMO", "Elektro Huber GmbH", address("Hauptstraße", "12", "4020", "Linz"),
+                "partner-demo@example.at", "+43 660 1234567", "10.00", true);
         // No linked Keycloak user yet — demonstrates the manual-provisioning gap (design.md).
         persistPartner("P-1002", "Sanitär Bauer KG", address("Ringstraße", "5", "8010", "Graz"),
-                "office@sanitaer-bauer.example.at", "+43 664 2345678", "5.00", true, null);
+                "office@sanitaer-bauer.example.at", "+43 664 2345678", "5.00", true);
         // Inactive — for FR-23 inactive-partner testing (Phase 2).
         persistPartner("P-1003", "Baumarkt Weber e.U.", address("Industriezeile", "3", "6020", "Innsbruck"),
-                "info@weber-baumarkt.example.at", "+43 512 3456789", "15.00", false, null);
+                "info@weber-baumarkt.example.at", "+43 512 3456789", "15.00", false);
     }
 
     // Every seed address is in Austria; the country part is fixed here.
@@ -76,7 +77,7 @@ public class DemoDataSeeder {
     }
 
     private void persistPartner(String partnerNumber, String name, Address address, String email,
-            String phone, String commissionPercent, boolean active, String keycloakUsername) {
+            String phone, String commissionPercent, boolean active) {
         Partner partner = new Partner();
         partner.partnerNumber = partnerNumber;
         partner.name = name;
@@ -85,7 +86,6 @@ public class DemoDataSeeder {
         partner.phone = phone;
         partner.commissionPercent = new BigDecimal(commissionPercent);
         partner.active = active;
-        partner.keycloakUsername = keycloakUsername;
         partner.persist();
     }
 
@@ -146,10 +146,10 @@ public class DemoDataSeeder {
         akkuschrauber.imageUrl = blau.url();
     }
 
-    // A few enabled products for "partner-demo" (P-1001) so the enabled-products
+    // A few enabled products for "partner-demo" (PARTNER-DEMO) so the enabled-products
     // view (product-enablement spec) has demo data out of the box.
     private void seedEnablements() {
-        Partner partnerDemo = Partner.find("partnerNumber", "P-1001").firstResult();
+        Partner partnerDemo = Partner.find("partnerNumber", "PARTNER-DEMO").firstResult();
         for (String productName : List.of("Bohrmaschine Profi 750W", "Akkuschrauber 18V Set", "Schutzhelm gelb")) {
             Product product = Product.find("name", productName).firstResult();
             ProductEnablement enablement = new ProductEnablement();
@@ -163,7 +163,7 @@ public class DemoDataSeeder {
     // data out of the box (dashboards aggregate orders client-side, and orders
     // otherwise all carry today's date). Dev/test only, like the rest of this seed.
     private void seedOrders() {
-        Partner p1 = Partner.find("partnerNumber", "P-1001").firstResult();
+        Partner p1 = Partner.find("partnerNumber", "PARTNER-DEMO").firstResult();
         Partner p2 = Partner.find("partnerNumber", "P-1002").firstResult();
         Partner p3 = Partner.find("partnerNumber", "P-1003").firstResult();
 
@@ -185,7 +185,7 @@ public class DemoDataSeeder {
         Product handschuh = product("Handschuhe Gr. L (Set 10 Paar)");
         Product kabel = product("Kabeltrommel 25m");
 
-        // P-1001 (partner-demo): spread over ~5 months, mostly fulfilled, mixed Kunden.
+        // PARTNER-DEMO (partner-demo): spread over ~5 months, mostly fulfilled, mixed Kunden.
         order(p1, fischer, 158, OrderStatus.FULFILLED, line(akku, 2), line(bohr, 1));
         order(p1, mueller, 142, OrderStatus.FULFILLED, line(kabel, 3));
         order(p1, koller, 120, OrderStatus.FULFILLED, line(helm, 5), line(handschuh, 5));

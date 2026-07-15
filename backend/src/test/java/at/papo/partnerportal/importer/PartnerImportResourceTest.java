@@ -54,11 +54,11 @@ class PartnerImportResourceTest {
     @Test
     void commitAcceptsValidRowsRejectsInvalidAndDuplicateRows() {
         String token = tokens.tokenFor("company-demo", "company-demo");
-        // Row 1: valid new partner. Row 2: missing name. Row 3: duplicate of seeded P-1001.
+        // Row 1: valid new partner. Row 2: missing name. Row 3: duplicate of seeded PARTNER-DEMO.
         String csvText = "Nr,Name,Strasse,Hausnummer,PLZ,Ort,Land,Provision\n"
                 + "P-9002,Neupartner,Teststraße,1,4020,Linz,Österreich,8\n"
                 + ",Ohne Nummer,Teststraße,1,4020,Linz,Österreich,5\n"
-                + "P-1001,Duplikat,Teststraße,1,4020,Linz,Österreich,10\n";
+                + "PARTNER-DEMO,Duplikat,Teststraße,1,4020,Linz,Österreich,10\n";
         byte[] csv = csvText.getBytes(StandardCharsets.UTF_8);
         String mapping = "{\"partnerNumber\":\"Nr\",\"name\":\"Name\"," + ADDRESS_MAPPING
                 + ",\"commissionPercent\":\"Provision\"}";
@@ -81,9 +81,10 @@ class PartnerImportResourceTest {
     @Test
     void commitRejectsDuplicatePartnerNumberDifferingOnlyInCase() {
         String token = tokens.tokenFor("company-demo", "company-demo");
-        // Seeded demo partner is "P-1001" — lowercase "p-1001" must still be caught as a duplicate.
+        // Seeded demo partner's canonical number is "PARTNER-DEMO" — mixed-case
+        // "partner-demo" must still be caught as a duplicate after canonicalization.
         String csvText = "Nr,Name,Strasse,Hausnummer,PLZ,Ort,Land,Provision\n"
-                + "p-1001,Kleinschreibung,Teststraße,1,4020,Linz,Österreich,5\n";
+                + "partner-demo,Kleinschreibung,Teststraße,1,4020,Linz,Österreich,5\n";
         byte[] csv = csvText.getBytes(StandardCharsets.UTF_8);
         String mapping = "{\"partnerNumber\":\"Nr\",\"name\":\"Name\"," + ADDRESS_MAPPING
                 + ",\"commissionPercent\":\"Provision\"}";

@@ -34,6 +34,12 @@ Keycloak importiert beim Start automatisch den Realm `partnerportal`
 | `company-demo` | `company-demo` | company |
 | `partner-demo` | `partner-demo` | partner |
 
+**Provisionierungs-Konvention:** Keycloak-User werden manuell angelegt, mit
+Benutzername = Partnernummer (kanonisch großgeschrieben; Keycloak selbst
+speichert Logins kleingeschrieben, das Backend gleicht case-insensitiv ab).
+Der Demo-Partner hinter `partner-demo` trägt dev/test daher exakt die
+Partnernummer `PARTNER-DEMO`.
+
 ## 2. Backend starten (Dev-Modus)
 
 ```bash
