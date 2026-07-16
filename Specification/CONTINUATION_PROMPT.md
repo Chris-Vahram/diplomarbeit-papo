@@ -9,9 +9,12 @@ You are continuing work on an HTL Diplomarbeit software project. Treat this as a
 Web-based internal B2B Partner Portal. Model: Company -> Partner -> End Customer.
 "PAPO" (= PartnerPortal) is the NAME OF THIS THESIS/PRODUCT itself, NOT a client. The real
 reference client is unnamed (~200 partners, ~800 articles; orders arrive manually by e-mail/phone
-today). Do not reintroduce "PAPO" as a client name. HTL diploma demo prototype, NOT enterprise —
-calibrate all review/scope decisions to a 2-person school project with no production deployment
-and manually-provisioned Keycloak users.
+today). Do not reintroduce "PAPO" as a client name. CALIBRATION (corrected by Chris 2026-07-16):
+this is a REAL app for a REAL company, built during Chris's pre-final/final school year with the
+supervisor — it WILL be deployed (Hetzner VM already provisioned, see below). The MVP is the
+prototype stage for the company; the plan is for it to become a full product afterwards. So: not
+throwaway-demo quality, but still calibrate to a 2-person team with manually-provisioned Keycloak
+users — real deployment, not enterprise ceremony.
 
 # TEAM / SPLIT
 Chris = implementation (backend + functional frontend). Tobias Huemer = frontend visual design.
@@ -27,9 +30,11 @@ zero shell-quoting exposure regardless of message content — always use it now.
 
 # REPO
 Working repo (git): /Users/mitgl/Desktop/Schule/4CHITM/Diplomarbeit/diplomarbeit-papo
-Branch: `feat/remove-keycloak-username-field`, checked out off an up-to-date main, with the
-complete `remove-keycloak-username-field` implementation UNCOMMITTED and ready for Chris to
-commit (`git commit -F <file>`, message drafted) and merge — verify with `git status`/`git log`.
+Branch: main. `feat/remove-keycloak-username-field` is COMMITTED AND MERGED (Chris merged it
+right after this file was last updated) — main is fully up to date with that change. Verify with
+`git status`/`git log` before trusting; Chris said he was about to restart his laptop, so a fresh
+session may start with a clean shell/Docker state (see DEV GOTCHAS' Keycloak-flake entry below —
+a restart may or may not have cleared it, don't assume either way, just check if it recurs).
 
 # READ ORDER FOR DEEP WORK (authoritative docs)
 1. CLAUDE.md (repo root) — project memory, locked scope, key decisions, entities, roles. READ FIRST.
@@ -37,7 +42,7 @@ commit (`git commit -F <file>`, message drafted) and merge — verify with `git 
 3. Specification/phase2_backlog.md — deferred features B-01..B-08 + append-only decisions log.
 4. Specification/IMPLEMENTATION_PLAN.md — narrative plan (WP1-WP13).
 5. Documentation/Besprechungsprotokolle/ — client meeting notes; NEWEST = Besprechungsprotokoll10_07_2026.txt (authoritative, overrides FSD on conflict). Its asks ("Suchleiste, Filter" + "Filter bei Bestellungen nach Endkunde/Partner" + dormant-Endkunde visibility + good mobile + "ich will Artikel sehen UND suchen können") drove essentially all of the last two sessions' work.
-6. docs/CONVENTIONS.md (package layout, REST paths, frontend structure) + docs/SETUP.md (dev/demo stack, demo users) + docs/DATA_MODEL.md (entities; STALE re ProductImage + the keycloak-username removal — not-yet-applied change).
+6. docs/CONVENTIONS.md (package layout, REST paths, frontend structure) + docs/SETUP.md (dev/demo stack, demo users) + docs/DATA_MODEL.md (entities; STALE re ProductImage only now — the keycloak-username removal is already applied and DATA_MODEL.md is in sync with it).
 7. openspec/changes/<name>/ — per-change proposal.md + design.md + specs/ + tasks.md (tasks.md = progress source of truth). Run `openspec list` to see live status of every change.
 8. Memory files (auto-loaded via MEMORY.md) — see MEMORY-RELEVANT below.
 
@@ -45,9 +50,7 @@ commit (`git commit -F <file>`, message drafted) and merge — verify with `git 
 session did `remove-keycloak-username-field`, the last planned change). Verify with `openspec
 list` and `git status` before trusting.
 
-## This session: `remove-keycloak-username-field` (25/25 tasks, IMPLEMENTED + REVIEWED, NOT YET COMMITTED)
-On branch `feat/remove-keycloak-username-field`, working tree has the full diff, uncommitted —
-Chris just needs to commit (`-F <file>`, message already drafted at end of session) and merge.
+## This session: `remove-keycloak-username-field` (25/25 tasks, IMPLEMENTED + REVIEWED + MERGED to main)
 `Partner.keycloakUsername` field/column/DTO-attribute removed entirely; the Partner<->Keycloak
 login link is now `Partner.partnerNumber` itself (canonicalized upper-case, `Locale.ROOT`, on
 every write — manual create/update in `PartnerService`, CSV import in `PartnerImportDefinition`,
@@ -81,10 +84,10 @@ missing the `netty-resolver-dns-native-macos` dependency — Netty already WARNS
 every single run this whole session ("Can not find
 io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider ... may result in incorrect DNS
 resolutions on MacOS"), a known Testcontainers-on-macOS gap, nothing to do with this change. Not
-fixed in this branch (out of scope, touches shared `pom.xml`) — flagged for Chris to add
-separately if the flakiness keeps biting. **Bottom line: safe to commit/merge as-is; just re-run
-`./mvnw test` yourself once (or a couple times) for a final green before or after merging — it's
-an infra coin-flip, not a code problem.**
+fixed (out of scope, touches shared `pom.xml`, and this change is now merged) — see DEV GOTCHAS
+below for the full writeup and the fix if Chris wants to add it in a small separate change later.
+Chris merged anyway on the reasoning that it's an infra coin-flip, not a code problem — confirmed
+correct: the change compiled clean and was 75/75 green right after the core implementation.
 
 ## What got merged to main in the PRIOR session today (all Playwright-verified)
 - `add-dormant-kunde-visibility` — `GET /api/partner/customers` gains a nullable `lastOrderDate` via one grouped left-join JPQL query (no N+1, verified with a Hibernate-statistics-backed test). New "Meine Endkunden" page, oldest-first default, "Länger keine Bestellung" filter + "Inaktiv" badge at a 60-day threshold (client-confirmable later). Boundary-tested at exactly 59/60/61 days.
@@ -94,15 +97,14 @@ an infra coin-flip, not a code problem.**
 ## Sequencing that played out across both sessions today (small wins first, then the big ones)
 1. `add-dormant-kunde-visibility` + `add-order-document-print` — done first, zero file overlap, quick.
 2. `partner-order-cart` — its own focused pass, biggest remaining frontend piece, budgeted real attention (multi-hour, iterative, two real bugs found via testing + cross-review).
-3. `remove-keycloak-username-field` (25/25, this session) — last, as always planned (biggest blast radius: PartnerService + DTO + ~4 backend test files — sequenced last so nothing after it could conflict). Implemented + reviewed + Playwright-verified; only remaining step is Chris's commit + merge (see STATUS above).
+3. `remove-keycloak-username-field` (25/25) — last, as always planned (biggest blast radius: PartnerService + DTO + ~4 backend test files — sequenced last so nothing after it could conflict). Implemented + reviewed + Playwright-verified + **merged to main**.
 
-# WHAT'S LEFT / NEXT MOVES — Chris's call
-- **Commit + merge `feat/remove-keycloak-username-field`** — the only remaining step on this session's work; everything else below is genuinely NEW work, nothing queued.
-- `ci-cd-deployment-with-gh-actions` (0/40 tasks) — planned only, needs Oracle→Hetzner re-scope once Christian Bachl's Hetzner contact happens (company-side, not Chris's blocker to clear).
+# WHAT'S LEFT / NEXT MOVES — Chris's call (nothing pre-queued, pick any)
+- `ci-cd-deployment-with-gh-actions` (0/40 tasks) — planned only. ORIGIN (traced 2026-07-16): authored on Tobias's side 2026-07-08 (.openspec.yaml created:), committed by him 2026-07-09 in `8ef0d90 "archive spec of frontend changes"`; NOT from a client meeting and NOT from Chris — it pre-dates the 10.07 Hetzner decision, hence its stale Oracle-Cloud/arm64 assumptions. **The Hetzner VM is now LIVE**: Bachl gave Chris SSH access (`ssh papo@178.104.109.45`, Chris's ed25519 key authorized, VM is x86_64 — verified via `uname -m` 2026-07-16; domain available from Bachl on request). Deployment itself IS wanted (real client, real deployment — see CALIBRATION above). Before building: re-scope the proposal — Oracle→Hetzner, arm64→x86_64 (`linux/amd64` image), drop Oracle Object Storage backup leg, unblock sections 5/6 (VM exists, domain on request).
 - Import column-mapping — waiting on real client data (company said 1-2 weeks as of the 10.07 meeting; check if it's arrived, it's now been ~8 days).
 - `build-partnerportal-mvp` (46/53) and `order-correctness-hardening` — still un-archived; archiving `build-partnerportal-mvp` first would unblock `order-correctness-hardening`'s archive (a spec-sync ordering issue, not a quality issue).
 - `add-order-document-print`'s task 5.5 (Firefox print-preview spot-check) — quick manual follow-up whenever Chris has Firefox handy; not blocking anything.
-- Optional, unrelated to any change: add `netty-resolver-dns-native-macos` to `backend/pom.xml` to stop the intermittent local `mvn test` Keycloak Dev-Services flake (see STATUS above) — small, separate, not urgent.
+- Optional, unrelated to any change: add `netty-resolver-dns-native-macos` to `backend/pom.xml` to stop the intermittent local `mvn test` Keycloak Dev-Services flake (see DEV GOTCHAS) — small, separate, not urgent; only worth it if the flake keeps recurring after Chris's laptop restart.
 
 Every change works the same way: branch off an UPDATED main -> `/opsx:apply` -> implement -> `verify` skill + `partnerportal-quality` skill + `/code-review` (Codex cross-review for genuinely complex ones — worked cleanly this session with a short/narrow prompt, see DEV GOTCHAS for the exact invocation that succeeded) -> hand Chris branch + a `-F <file>`-safe commit message -> he merges -> next.
 
@@ -164,17 +166,19 @@ Every change works the same way: branch off an UPDATED main -> `/opsx:apply` -> 
 - Multiple long-lived stray `quarkus:dev` JVM processes (some running since a PRIOR session, untracked) were found competing for port 8080 and system resources mid-session — `ps aux | grep quarkus:dev` and kill anything not actively needed before troubleshooting infra flakiness; they're trivially restarted with `cd backend && ./mvnw quarkus:dev`.
 
 # OPEN QUESTIONS (ask, don't assume)
-- Import file column formats — waiting on client data (check if the "1-2 weeks" from the 10.07 meeting has elapsed — it's been about 5 days as of this writing).
+- Import file column formats — waiting on client data (check if the "1-2 weeks" from the 10.07 meeting has elapsed — it's been about 8 days as of this writing).
 - Dormancy threshold (60 days, per add-dormant-kunde-visibility) — confirm with client at next Termin, not blocking (already shipped with 60 as the working default).
-- Hetzner provisioning timing (Bachl contact) -> ci-cd re-scope.
+- ~~Hetzner provisioning timing (Bachl contact)~~ RESOLVED 2026-07-16: VM live (`papo@178.104.109.45`, x86_64); ci-cd re-scope now unblocked. Still open: ask Bachl for the domain when deployment starts.
 - `add-order-document-print` task 5.5 — Firefox print-preview spot-check, needs Chris's own machine (no Firefox in this sandbox).
 
 # NEXT STEP
-`remove-keycloak-username-field` is fully implemented, reviewed, and Playwright-verified on
-`feat/remove-keycloak-username-field` — Chris just needs to commit (`-F <file>`) and merge; no
-further implementation work needed on it. Once merged, confirm with Chris which of WHAT'S LEFT
-above to pick up (all are genuinely new, nothing pre-queued) — likely candidates: check whether
-client import data has arrived, or archive `build-partnerportal-mvp` +
+`remove-keycloak-username-field` is done and merged — nothing outstanding from it. First thing in
+a fresh session: run `git status` + `git log` + `openspec list` to confirm the merged state is
+what you expect (this file may lag reality if more happened after it was written), and check
+`docker ps` / retry `./mvnw test` once cleanly before assuming the Keycloak Dev-Services flake
+(see DEV GOTCHAS) is still present post-restart — it may just be gone now. Then confirm with Chris
+which of WHAT'S LEFT above to pick up (nothing pre-queued, genuinely his call) — likely
+candidates: check whether client import data has arrived, archive `build-partnerportal-mvp` +
 `order-correctness-hardening`, or start `ci-cd-deployment-with-gh-actions` if Hetzner is ready.
 Fill in his answer: <STATE NEXT>.
 ```
