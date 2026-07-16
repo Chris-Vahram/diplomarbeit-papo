@@ -182,6 +182,6 @@ candidates: check whether client import data has arrived, archive `build-partner
 `order-correctness-hardening`, the thesis writeup (8.4), or run the QA/scope checkup (see below).
 Do NOT pick up `ci-cd-deployment-with-gh-actions` — that's Tobias's, Chris stays out.
 QA checkup: a full Fable-5 quality + scope audit prompt is saved at
-`scratchpad/checkup-prompt.md` (references this file) — read-only report, run it in a fresh
+`docs/QA_CHECKUP_PROMPT.md` (references this file) — read-only report, run it in a fresh
 Fable-5 session when Chris wants a pre-Termin health/scope check. Fill in his answer: <STATE NEXT>.
 ```
