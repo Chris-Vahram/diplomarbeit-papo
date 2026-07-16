@@ -100,7 +100,7 @@ correct: the change compiled clean and was 75/75 green right after the core impl
 3. `remove-keycloak-username-field` (25/25) — last, as always planned (biggest blast radius: PartnerService + DTO + ~4 backend test files — sequenced last so nothing after it could conflict). Implemented + reviewed + Playwright-verified + **merged to main**.
 
 # WHAT'S LEFT / NEXT MOVES — Chris's call (nothing pre-queued, pick any)
-- `ci-cd-deployment-with-gh-actions` (0/40 tasks) — planned only. ORIGIN (traced 2026-07-16): authored on Tobias's side 2026-07-08 (.openspec.yaml created:), committed by him 2026-07-09 in `8ef0d90 "archive spec of frontend changes"`; NOT from a client meeting and NOT from Chris — it pre-dates the 10.07 Hetzner decision, hence its stale Oracle-Cloud/arm64 assumptions. **The Hetzner VM is now LIVE**: Bachl gave Chris SSH access (`ssh papo@178.104.109.45`, Chris's ed25519 key authorized, VM is x86_64 — verified via `uname -m` 2026-07-16; domain available from Bachl on request). Deployment itself IS wanted (real client, real deployment — see CALIBRATION above). Before building: re-scope the proposal — Oracle→Hetzner, arm64→x86_64 (`linux/amd64` image), drop Oracle Object Storage backup leg, unblock sections 5/6 (VM exists, domain on request).
+- `ci-cd-deployment-with-gh-actions` (0/40 tasks) — **TOBIAS'S CHANGE, CHRIS STAYS OUT.** Confirmed 2026-07-16: Tobias authored it (his side, 2026-07-08; committed by him 2026-07-09 in `8ef0d90 "archive spec of frontend changes"`) and is building it himself — he already has the decisions worked through with his own Claude and says it's nearly built. Do NOT re-scope, plan, or implement it from Chris's side; it is not on Chris's plate. NOT from a client meeting. Deployment itself IS wanted (real client, real deployment — see CALIBRATION above). Context handed to Tobias so his stale Oracle assumptions can be fixed on his side: the Hetzner VM is LIVE — `ssh papo@178.104.109.45`, Chris's ed25519 key authorized; recon 2026-07-16 → **x86_64 (target `linux/amd64`), 4 vCPU / 7.6 GB RAM (NOT 12 like Oracle → tighter budget, mem_limits matter, native-image more attractive), Ubuntu 26.04 LTS, Docker 29.6.1 + Compose v5.3.1 already installed** (VM-provision/Docker-install tasks already done by the company); domain available from Bachl on request; drop the Oracle Object Storage backup leg (use a Hetzner target).
 - Import column-mapping — waiting on real client data (company said 1-2 weeks as of the 10.07 meeting; check if it's arrived, it's now been ~8 days).
 - `build-partnerportal-mvp` (46/53) and `order-correctness-hardening` — still un-archived; archiving `build-partnerportal-mvp` first would unblock `order-correctness-hardening`'s archive (a spec-sync ordering issue, not a quality issue).
 - `add-order-document-print`'s task 5.5 (Firefox print-preview spot-check) — quick manual follow-up whenever Chris has Firefox handy; not blocking anything.
@@ -179,6 +179,9 @@ what you expect (this file may lag reality if more happened after it was written
 (see DEV GOTCHAS) is still present post-restart — it may just be gone now. Then confirm with Chris
 which of WHAT'S LEFT above to pick up (nothing pre-queued, genuinely his call) — likely
 candidates: check whether client import data has arrived, archive `build-partnerportal-mvp` +
-`order-correctness-hardening`, or start `ci-cd-deployment-with-gh-actions` if Hetzner is ready.
-Fill in his answer: <STATE NEXT>.
+`order-correctness-hardening`, the thesis writeup (8.4), or run the QA/scope checkup (see below).
+Do NOT pick up `ci-cd-deployment-with-gh-actions` — that's Tobias's, Chris stays out.
+QA checkup: a full Fable-5 quality + scope audit prompt is saved at
+`scratchpad/checkup-prompt.md` (references this file) — read-only report, run it in a fresh
+Fable-5 session when Chris wants a pre-Termin health/scope check. Fill in his answer: <STATE NEXT>.
 ```
