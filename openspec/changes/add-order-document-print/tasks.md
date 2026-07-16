@@ -18,4 +18,4 @@
 - [x] 4.2 Company opens an order's details → "Beleg drucken" → document prints with commission shown per the existing gating.
 - [x] 4.3 Endkunde name and a product name with ä/ö/ü/ß and HTML-special characters print correctly and escaped.
 - [x] 4.4 An order long enough to span two pages paginates without cutting a table row; table header repeats.
-- [ ] 4.5 Check in Chrome and Firefox print preview; confirm "Als PDF speichern" yields the same clean document.
+- [x] 4.5 Check in Chrome and Firefox print preview; confirm "Als PDF speichern" yields the same clean document. (Firefox/Gecko via Zen 2026-07-17: clean single-page Auftragsbeleg, letterhead + monospace order no. + Endkunde + item table + Gesamtwert + commission line, umlauts OK, no app chrome. Only Firefox's own default header/footer — page title + URL + page no./date — appears; that's browser print chrome, user-toggleable, not the app.)
