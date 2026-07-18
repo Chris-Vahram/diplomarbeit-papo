@@ -2555,6 +2555,7 @@ legend {
 
 .cart-line {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--spacing-2);
   padding: var(--spacing-2) 0;
@@ -2580,7 +2581,8 @@ legend {
 
 .cart-line__name {
   flex: 1;
-  min-width: 0;
+  min-width: 8rem;
+  overflow-wrap: anywhere;
   font-size: var(--font-size-sm);
 }
 
@@ -2943,14 +2945,6 @@ legend {
 
   .cart {
     position: static;
-  }
-
-  /* Same reasoning as .order-line above: a cart line's fixed-width parts
-     (thumb, quantity input, total, remove button) alone already approach a
-     phone's width - without wrapping, the row's min-content forces .cart
-     wider than the viewport instead of shrinking to fit it. */
-  .cart-line {
-    flex-wrap: wrap;
   }
 
   .catalog__grid {
