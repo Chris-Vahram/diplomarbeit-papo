@@ -8,9 +8,14 @@ import org.junit.jupiter.api.Test;
 
 import jakarta.inject.Inject;
 
+import java.util.Comparator;
+import java.util.List;
+
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
 class OrderResourceTest {
@@ -243,6 +248,30 @@ class OrderResourceTest {
         given().auth().oauth2(token)
                 .when().get("/api/partner/orders")
                 .then().statusCode(200);
+    }
+
+    @Test
+    void partnerSeesNewestOwnOrdersFirst() {
+        String token = tokens.tokenFor("partner-demo", "partner-demo");
+        long productId = enabledProductId();
+
+        for (String lastName : List.of("Sortierung-A", "Sortierung-B")) {
+            given().auth().oauth2(token).contentType("application/json")
+                    .body("{\"newKunde\":{\"lastName\":\"" + lastName + "\",\"address\":" + ADDRESS_JSON + "},"
+                            + "\"items\":[{\"productId\":" + productId + ",\"quantity\":1}]}")
+                    .when().post("/api/partner/orders")
+                    .then().statusCode(200);
+        }
+
+        io.restassured.path.json.JsonPath orders = given().auth().oauth2(token)
+                .when().get("/api/partner/orders")
+                .then().statusCode(200)
+                .extract().jsonPath();
+
+        List<Integer> ids = orders.getList("id", Integer.class);
+        List<Integer> partnerIds = orders.getList("partnerId", Integer.class);
+        assertEquals(ids.stream().sorted(Comparator.reverseOrder()).toList(), ids);
+        assertTrue(partnerIds.stream().allMatch(id -> id == partner1001Id()));
     }
 
     @Test

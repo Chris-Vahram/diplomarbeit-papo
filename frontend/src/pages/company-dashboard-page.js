@@ -1,15 +1,11 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import { formatEuro, formatNumber } from "../lib/format.js";
-import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue } from "../lib/dashboard-data.js";
+import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue, toLocalIsoDate } from "../lib/dashboard-data.js";
 import { escapeHtml } from "../lib/html.js";
 
 const eur = new Intl.NumberFormat("de-AT", { style: "currency", currency: "EUR" });
 const dateLabel = new Intl.DateTimeFormat("de-AT", { day: "2-digit", month: "2-digit", year: "numeric" });
-
-function toIsoDate(date) {
-  return date.toISOString().slice(0, 10);
-}
 
 function formatCompactEur(value) {
   return value >= 1000 ? `${(value / 1000).toFixed(1).replace(".", ",")} T€` : eur.format(value);
@@ -147,8 +143,8 @@ class CompanyDashboardPage extends HTMLElement {
 
   updatePeriodUi() {
     if (this.period) {
-      this.periodFromInput.value = toIsoDate(this.period.from);
-      this.periodToInput.value = toIsoDate(this.period.to);
+      this.periodFromInput.value = toLocalIsoDate(this.period.from);
+      this.periodToInput.value = toLocalIsoDate(this.period.to);
       this.querySelector("#period-label").textContent =
         `${dateLabel.format(this.period.from)} – ${dateLabel.format(this.period.to)}`;
     } else {
@@ -179,8 +175,8 @@ class CompanyDashboardPage extends HTMLElement {
 
     let inRange, revenue, commission, count;
     if (this.period) {
-      const fromIso = toIsoDate(this.period.from);
-      const toIso = toIsoDate(this.period.to);
+      const fromIso = toLocalIsoDate(this.period.from);
+      const toIso = toLocalIsoDate(this.period.to);
       inRange = filterByPeriod(this.orders, fromIso, toIso);
       ({ revenue, commission, count } = fulfilledTotals(inRange));
     } else {

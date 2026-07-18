@@ -33,7 +33,10 @@ export function kundePickerHtml(customers) {
       </label>
       <div id="existing-kunde-block" ${hasCustomers ? "" : "hidden"}>
         <form-field label="Endkunde" name="kundeId">
-          <select name="kundeId">${customerOptionsHtml(customers)}</select>
+          <select name="kundeId" required>
+            <option value="" disabled selected>Bitte Endkunden wählen…</option>
+            ${customerOptionsHtml(customers)}
+          </select>
         </form-field>
       </div>
       <div id="new-kunde-block" ${hasCustomers ? "hidden" : ""}>
@@ -63,6 +66,13 @@ export function articleLinesHtml() {
 export function wireKundePicker(form) {
   const existingBlock = form.querySelector("#existing-kunde-block");
   const newBlock = form.querySelector("#new-kunde-block");
+  const existingSelect = form.elements.kundeId;
+  const validateExistingCustomer = () => {
+    const requiresExistingCustomer = form.elements.kundeMode.value === "existing";
+    existingSelect.setCustomValidity(
+      requiresExistingCustomer && !existingSelect.value ? "Bitte Endkunden wählen." : "",
+    );
+  };
   const toggle = () => {
     const mode = form.elements.kundeMode.value;
     existingBlock.hidden = mode !== "existing";
@@ -70,12 +80,15 @@ export function wireKundePicker(form) {
     // Required only while visible, so the browser doesn't block submit on hidden
     // "neuer Kunde" fields when "bestehenden Kunden wählen" is selected.
     const isNew = mode === "new";
+    existingSelect.required = !isNew;
     form.elements.newLastName.required = isNew;
     setAddressRequired(form, "newAddress", isNew);
+    validateExistingCustomer();
   };
   for (const radio of form.elements.kundeMode) {
     radio.addEventListener("change", toggle);
   }
+  existingSelect.addEventListener("change", validateExistingCustomer);
   toggle();
 }
 
