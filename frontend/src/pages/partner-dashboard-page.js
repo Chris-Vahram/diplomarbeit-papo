@@ -1,7 +1,7 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import { formatEuro, formatNumber, formatDate } from "../lib/format.js";
-import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue, previousPeriod, trendInfo } from "../lib/dashboard-data.js";
+import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue, previousPeriod, trendInfo, toLocalIsoDate } from "../lib/dashboard-data.js";
 import { escapeHtml } from "../lib/html.js";
 
 const eur = new Intl.NumberFormat("de-AT", { style: "currency", currency: "EUR" });
@@ -12,10 +12,6 @@ const STATUS_META = {
   reviewed: { label: "Geprüft", bg: "--status-reviewed-bg" },
   fulfilled: { label: "Abgeschlossen", bg: "--status-fulfilled-bg" },
 };
-
-function toIsoDate(date) {
-  return date.toISOString().slice(0, 10);
-}
 
 function formatCompactEur(value) {
   return value >= 1000 ? `${(value / 1000).toFixed(1).replace(".", ",")} T€` : eur.format(value);
@@ -162,8 +158,8 @@ class PartnerDashboardPage extends HTMLElement {
 
   updatePeriodUi() {
     if (this.period) {
-      this.periodFromInput.value = toIsoDate(this.period.from);
-      this.periodToInput.value = toIsoDate(this.period.to);
+      this.periodFromInput.value = toLocalIsoDate(this.period.from);
+      this.periodToInput.value = toLocalIsoDate(this.period.to);
       this.querySelector("#period-label").textContent =
         `${dateLabel.format(this.period.from)} – ${dateLabel.format(this.period.to)}`;
     } else {
@@ -194,15 +190,15 @@ class PartnerDashboardPage extends HTMLElement {
 
     let inRange, revenue, commission, count, revenueTrend, commissionTrend, countTrend;
     if (this.period) {
-      const fromIso = toIsoDate(this.period.from);
-      const toIso = toIsoDate(this.period.to);
+      const fromIso = toLocalIsoDate(this.period.from);
+      const toIso = toLocalIsoDate(this.period.to);
       inRange = filterByPeriod(this.orders, fromIso, toIso);
       ({ revenue, commission, count } = fulfilledTotals(inRange));
 
       // Same-length period immediately before the current one, for the metric-card
       // up/down arrows ("... ggü. Vorperiode").
       const prev = previousPeriod(this.period.from, this.period.to);
-      const prevInRange = filterByPeriod(this.orders, toIsoDate(prev.from), toIsoDate(prev.to));
+      const prevInRange = filterByPeriod(this.orders, toLocalIsoDate(prev.from), toLocalIsoDate(prev.to));
       const prevTotals = fulfilledTotals(prevInRange);
       revenueTrend = trendInfo(revenue, prevTotals.revenue);
       commissionTrend = trendInfo(commission, prevTotals.commission);

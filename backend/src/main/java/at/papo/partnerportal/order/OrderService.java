@@ -42,7 +42,7 @@ public class OrderService {
     public List<OrderDto> listForPartner(Partner partner) {
         List<Order> orders = Order.find(
                 "select distinct o from Order o join fetch o.items join fetch o.partner join fetch o.kunde "
-                        + "where o.partner = ?1 order by o.id",
+                        + "where o.partner = ?1 order by o.id desc",
                 partner).list();
         Map<Long, CommissionRecord> commissionsByOrderId = commissionService.findForOrders(orders);
         return orders.stream()
