@@ -264,9 +264,8 @@ async function render() {
   renderNav();
 }
 
-window.addEventListener("hashchange", render);
-window.addEventListener("DOMContentLoaded", () => {
-  import("../components/index.js");
+window.addEventListener("DOMContentLoaded", async () => {
+  await import("../components/index.js");
   import("../pages/login-page.js");
   import("../pages/company-dashboard-page.js");
   import("../pages/company-product-list-page.js");
@@ -279,5 +278,6 @@ window.addEventListener("DOMContentLoaded", () => {
   import("../pages/partner-order-new-page.js");
   import("../pages/partner-customer-list-page.js");
   import("../pages/partner-profile-page.js");
+  window.addEventListener("hashchange", render);
   render();
 });
