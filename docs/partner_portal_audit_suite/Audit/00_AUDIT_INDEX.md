@@ -4,7 +4,7 @@
 
 - Initial audit date: 2026-07-16
 - Baseline commit: `8ef0d90` (letzter Stand vor `add-product-image-upload`, 2026-07-09)
-- Current reviewed commit: `9a9f5cd` (main)
+- Current reviewed commit: `cd6a025` (main)
 - Latest meeting document: `Documentation/Besprechungsprotokolle/Besprechungsprotokoll10_07_2026.txt`
 
 ## Completed Reports
@@ -15,22 +15,23 @@
 | Scope Review | Done (2026-07-16) | `Audit/02_SCOPE_REVIEW_REPORT.md` | `9a9f5cd` |
 | Technical Review | Done (2026-07-16) | `Audit/03_TECHNICAL_REVIEW_REPORT.md` | `9a9f5cd` |
 | UX Review | Done (2026-07-17) | `Audit/04_UX_REVIEW_REPORT.md` | `9a9f5cd` |
-| Final Synthesis | Not started | `Audit/05_FINAL_ACTION_PLAN.md` | |
+| Final Synthesis | Done (2026-07-17) | `Audit/05_FINAL_ACTION_PLAN.md` | `cd6a025` |
 
 ## Finding Summary
 
 | Status | Count |
 |---|---:|
 | Open | 0 |
-| Confirmed | 5 |
+| Confirmed | 25 |
 | In Progress | 0 |
 | Fixed | 0 |
 | Verified | 0 |
-| Deferred | 0 |
+| Deferred | 2 |
 | Rejected | 0 |
-| Decision Required | 1 |
+| Duplicate | 0 |
+| Decision Required | 2 |
 
-Formale Findings (IDs): SCOPE-001..003 (Phase 2) + TECH-001..003 / SEC-001..003 (Phase 3) + UX-001..008 / M-001..003 / A11Y-001..004 / DS-001..005 (Phase 4). Phase 4 bringt **2 High** (UX-001 Reload-Leertabelle, UX-002 Cart-Zeilen-Überlappung — beide vor dem nächsten Termin fixen). Phase-1-Auffälligkeiten in `01_PROJECT_OVERVIEW_REPORT.md` §4–§7. Zählung oben wird in Phase 5 (Register) konsolidiert.
+Die Zusammenfassung zählt die 29 Registerzeilen; `DS-001..004` bleibt dabei eine konsolidierte Sammelzeile. Alle Findings wurden in Phase 5 im Register (`06_FINDINGS_REGISTER.md`) konsolidiert und im Aktionsplan (`05_FINAL_ACTION_PLAN.md`) priorisiert. **Kein Critical, 2 High** (UX-001 Reload-Leertabelle, UX-002 Cart-Zeilen-Überlappung — Fix-Change `fix-ux-reload-and-cart-overlap` bereits proposed).
 
 ## Tools Used (Phase 3)
 
@@ -45,9 +46,11 @@ Vollständiger Backend-Read (55 Klassen), Frontend-Kernmodule, `application.prop
 
 ## Next Actions
 
-1. Phase 5 Final Synthesis (`Audit/prompts/05_FINAL_SYNTHESIS_PROMPT.md`) — Register konsolidieren, P0–P4, „3 Dinge vor dem Termin".
-2. **UX-001 + UX-002 fixen:** Change **`fix-ux-reload-and-cart-overlap` ist bereits proposed** (proposal+design+specs+tasks, Root-Cause in dessen `design.md`) — **noch NICHT applied**. Entscheidung Chris 2026-07-17: als **erster Fix-Batch nach Phase 5** applien, aber **UX-001 (Reload → leere Listen) muss vor jeder Live-Demo beim Termin gefixt sein** (Task-Blocker). Branch `fix/ux-reload-and-cart-overlap` von aktuellem main → `/opsx:apply` (mit Sonnet). Report 04 §2.
-3. TECH-001 fixen (Chris): Dashboard-Zeitraumfilter Off-by-one (`toISOString` → manuelle lokale ISO-Komposition), beide Dashboards, + Unit-Test in `dashboard-data.js`.
-4. Dev-Services-Testlauf reparieren (kleiner separater Change): Docker-Desktop-Netzwerkmodus prüfen oder Compose-Keycloak-Workaround dokumentieren (Report 03 §6; Suite via Workaround bereits 76/76 grün bestätigt).
-5. SCOPE-001 entscheiden (Chris): B-08-Backlog auf STUB updaten (empfohlen, 1 Zeile) oder Trend-Code entfernen.
-6. Import-Daten beim Kunden nachfassen (seit 10.07 ausständig).
+Vollständige Priorisierung + Batches: `Audit/05_FINAL_ACTION_PLAN.md` (§6/§7). Kurzfassung:
+
+1. **Batch A (P1):** `fix-ux-reload-and-cart-overlap` implementieren (UX-001 + UX-002) — Change proposed, 0/9; Branch von aktuellem main → `/opsx:apply` (mit Sonnet). Muss vor jeder Live-Demo gefixt sein.
+2. **Batch B (P1):** UX-003 („Bitte wählen…") + UX-004 (Bestellliste neueste zuerst) + TECH-001 (Dashboard-Zeitraum ±1 Tag, beide Dashboards + Unit-Test) als kleiner gemeinsamer Fix-Change.
+3. **Import-Daten nachfassen** (Frist 10.07.+1–2 Wochen abgelaufen) — blockt Batch C (Mapping-Finalisierung + UX-005 + TECH-002) und Terminplanung.
+4. **Batch D (Hygiene, kein Code):** OpenSpec-Archivierung (mvp zuerst), `DATA_MODEL.md`, SCOPE-001-B-08-Backlog-Zeile, Dev-Services-Workaround dokumentieren (INFRA-001).
+5. **Batch E (vor Abgabe):** A11y (A11Y-001..004) + Test-Lücken (TEST-001) + Polish; Tobias: Kontrast-Token (A11Y-002), M-001, DS-001..004 in FD.4.
+6. **Deployment-Gate:** UX-008 (Demo-Credentials von Login-Seite) vor Hetzner-Go-Live; M-002 vor erstem Partner-Rollout.
