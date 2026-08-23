@@ -11,10 +11,10 @@
 		reverse_proxy keycloak:8080
 	}
 
-	# Quarkus backend - every @Path already starts with /api (see ProductResource etc.),
-	# so the prefix must reach the app unstripped here too.
+	# Backend - every @Path already starts with /api (see ProductResource etc.), so the
+	# prefix must reach the app unstripped here too.
 	handle /api/* {
-		reverse_proxy quarkus:8080
+		reverse_proxy backend:8080
 	}
 
 	# Static frontend - everything else. Bind-mounted into the Caddy container (docker-compose.prod.yml).

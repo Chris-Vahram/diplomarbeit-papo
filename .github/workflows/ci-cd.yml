@@ -1,0 +1,91 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Test backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+          cache-dependency-path: backend/pom.xml
+
+      - name: Run tests
+        working-directory: backend
+        run: ./mvnw --batch-mode test
+
+  build-and-push:
+    name: Build and push image to GHCR
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+          cache-dependency-path: backend/pom.xml
+
+      - name: Package (skip tests - already verified by the test job)
+        working-directory: backend
+        run: ./mvnw --batch-mode package -DskipTests
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          file: backend/src/main/docker/Dockerfile.jvm
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/diplomarbeit-papo-backend:latest
+            ghcr.io/${{ github.repository_owner }}/diplomarbeit-papo-backend:${{ github.sha }}
+
+  deploy:
+    name: Deploy to production VM
+    needs: build-and-push
+    # TEMPORARILY DISABLED: VM-side deploy prerequisites not done yet (tasks.md
+    # 5.3 GH Actions secrets, 5.4 GHCR PAT login on VM, 5.6 compose/Caddy/init files
+    # copied to VM). Re-enable by restoring the line below once those land.
+    # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: false
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH and redeploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: papo
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            cd ~/papo-deploy
+            docker compose -f docker-compose.prod.yml --env-file .env.prod pull
+            docker compose -f docker-compose.prod.yml --env-file .env.prod up -d

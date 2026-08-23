@@ -17,8 +17,8 @@
       "standardFlowEnabled": false,
       "directAccessGrantsEnabled": true,
       "serviceAccountsEnabled": false,
-      "redirectUris": ["https://CHANGE_ME.example.com/*"],
-      "webOrigins": ["https://CHANGE_ME.example.com"]
+      "redirectUris": ["https://__DOMAIN__/*"],
+      "webOrigins": ["https://__DOMAIN__"]
     }
   ],
   "users": [

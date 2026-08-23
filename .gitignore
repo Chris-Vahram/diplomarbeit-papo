@@ -78,3 +78,9 @@ frontend/dist/
 ### Playwright MCP ###
 .playwright-mcp/
 .playwright-cli/
+
+### Production deployment (VM-local, never committed) ###
+.env.prod
+deploy/backup/*.dump
+deploy/backup/*.log
+deploy/rclone.conf
