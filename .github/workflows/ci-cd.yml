@@ -58,6 +58,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # GHCR requires the full image path to be lowercase; github.repository_owner keeps
+      # its original casing (e.g. "Chris-Vahram"), which docker/build-push-action rejects
+      # outright ("repository name must be lowercase"). GitHub Actions expressions have no
+      # built-in lower() function, so do it in a shell step and reuse the result below.
+      - name: Compute lowercase image name
+        id: image
+        run: echo "name=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')-backend" >> "$GITHUB_OUTPUT"
+
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
@@ -66,8 +74,8 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/diplomarbeit-papo-backend:latest
-            ghcr.io/${{ github.repository_owner }}/diplomarbeit-papo-backend:${{ github.sha }}
+            ${{ steps.image.outputs.name }}:latest
+            ${{ steps.image.outputs.name }}:${{ github.sha }}
 
   deploy:
     name: Deploy to production VM
