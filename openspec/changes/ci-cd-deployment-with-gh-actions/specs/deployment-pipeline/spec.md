@@ -24,7 +24,7 @@ The system SHALL NOT build or deploy a container image unless the test job for t
 - **THEN** the build-and-push job runs
 
 ### Requirement: Container image build and publish
-The system SHALL build a Quarkus JVM-mode container image targeting `linux/arm64` and publish it to GitHub Container Registry (GHCR) as a private package on every successful push to `main`.
+The system SHALL build a Quarkus JVM-mode container image targeting `linux/amd64` and publish it to GitHub Container Registry (GHCR) as a private package on every successful push to `main`.
 
 #### Scenario: Successful build produces tagged images
 - **WHEN** the build-and-push job runs for a commit with SHA `<sha>` on `main`
@@ -34,7 +34,7 @@ The system SHALL build a Quarkus JVM-mode container image targeting `linux/arm64
 
 #### Scenario: Build targets the deployment architecture
 - **WHEN** the image is built
-- **THEN** it SHALL be built for the `linux/arm64` platform to match the deployment VM's architecture
+- **THEN** it SHALL be built for the `linux/amd64` platform to match the deployment VM's architecture (VM is `x86_64`, same as GitHub-hosted runners — no cross-arch build needed)
 
 ### Requirement: Automated deployment via SSH
 The system SHALL deploy the newly built image to the production VM by connecting over SSH and running `docker compose pull && docker compose up -d`, without requiring the pipeline to hold standing access to the VM outside of the workflow run.
@@ -66,7 +66,7 @@ The system SHALL keep all deployment credentials (database password, Keycloak ad
 - **AND** the `%dev` and `%test` profiles remain unchanged, continuing to work with `mvnw quarkus:dev` exactly as before this change
 
 ### Requirement: Production topology — single VM, containerized services
-The system SHALL run the frontend, backend, Postgres, Keycloak, and reverse proxy as containers via Docker Compose on a single Oracle Cloud VM, with the frontend and API served from the same origin.
+The system SHALL run the frontend, backend, Postgres, Keycloak, and reverse proxy as containers via Docker Compose on a single self-managed VPS, with the frontend and API served from the same origin.
 
 #### Scenario: Single-origin routing
 - **WHEN** a client requests the production domain
@@ -96,19 +96,19 @@ The system SHALL persist Postgres data via a Docker volume so that data survives
 - **WHEN** the Postgres container is stopped and restarted (e.g. as part of a deploy or a VM reboot)
 - **THEN** all previously stored data (partners, products, orders, Keycloak realm state) is still present
 
-### Requirement: Database backups, local and offsite
-The system SHALL run a scheduled backup job that dumps both production databases and stores copies both locally on the VM and offsite in Oracle Object Storage.
+### Requirement: Database backups, local now, offsite deferred
+The system SHALL run a scheduled backup job that dumps both production databases and stores copies locally on the VM, with local retention pruning. Offsite replication to an S3-compatible object storage bucket via `rclone` is designed but deferred to a follow-up, provider TBD (design.md Decision 7) — not a requirement of this change; local backup bounds the VM-loss risk window for the evaluation period.
 
 #### Scenario: Scheduled local dump
 - **WHEN** the backup schedule triggers
 - **THEN** `pg_dump` runs for both the `partnerportal` and `keycloak` databases
 - **AND** the resulting dump files are written to a local directory on the VM
 
-#### Scenario: Offsite copy
-- **WHEN** a local dump completes successfully
-- **THEN** the dump file is uploaded to an Oracle Object Storage bucket via its S3-compatible API
-- **AND** upload credentials are sourced from VM-local configuration, not from GitHub Actions secrets
-
 #### Scenario: Local retention
-- **WHEN** local dump files exceed the configured retention window
-- **THEN** older local dump files are pruned, while offsite copies in Object Storage are retained independently of local pruning
+- **WHEN** local dump files exceed the configured retention window (last 14 dumps per database)
+- **THEN** older local dump files are pruned
+
+#### Scenario: Offsite copy (deferred, out of scope for this change)
+- **WHEN** the offsite half is implemented in a follow-up change
+- **THEN** each local dump SHALL be uploaded to an S3-compatible bucket via `rclone`
+- **AND** upload credentials SHALL be sourced from VM-local configuration, never from GitHub Actions secrets

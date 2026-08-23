@@ -1,0 +1,93 @@
+# Production topology (design.md): single VM, four containers, Postgres/Keycloak
+# never touched by a deploy - only `backend` gets replaced (docker compose pull && up -d).
+# Config comes from .env.prod (VM-local, gitignored; see .env.prod.example for the template).
+#
+# `name:` and the `papo-prod-*` container names are deliberate: the dev-only
+# docker-compose.yml uses plain `papo-postgres`/`papo-keycloak` container names and (absent
+# an explicit project name) the same default project namespace, since both files live in
+# this same directory. Without disambiguation here, running this file locally recreates -
+# and detaches from - the dev stack's containers (same postgres volume, different config).
+name: papo-prod
+services:
+  postgres:
+    image: postgres:16
+    container_name: papo-prod-postgres
+    restart: unless-stopped
+    mem_limit: 768m
+    environment:
+      POSTGRES_DB: partnerportal
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - papo-postgres-data:/var/lib/postgresql/data
+      - ./deploy/postgres/init-keycloak-db.sh:/docker-entrypoint-initdb.d/init-keycloak-db.sh:ro
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: papo-prod-keycloak
+    restart: unless-stopped
+    mem_limit: 1024m
+    depends_on:
+      - postgres
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: ${DB_USER}
+      KC_DB_PASSWORD: ${DB_PASSWORD}
+      KC_HOSTNAME: ${DOMAIN}
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_PROXY_HEADERS: xforwarded
+      KC_HTTP_ENABLED: "true"
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./deploy/keycloak/partnerportal-realm.prod.json.template:/opt/keycloak/partnerportal-realm.json.template:ro
+      - ./deploy/keycloak/render-and-start.sh:/opt/keycloak/render-and-start.sh:ro
+    # Render the realm template with the real DOMAIN before importing it (design.md
+    # Decision 4 status note: redirectUris/webOrigins/KC_HOSTNAME must come from one
+    # source of truth, never a hardcoded/stale placeholder).
+    entrypoint: ["/bin/sh", "/opt/keycloak/render-and-start.sh"]
+
+  backend:
+    image: ghcr.io/chris-vahram/diplomarbeit-papo-backend:${IMAGE_TAG:-latest}
+    container_name: papo-prod-backend
+    restart: unless-stopped
+    mem_limit: 768m
+    depends_on:
+      - postgres
+      - keycloak
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/partnerportal
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      # Internal address: fast container-to-container JWKS/token-introspection calls,
+      # no round-trip through Caddy. The externally-visible issuer is set separately
+      # below (see application.properties %prod.quarkus.oidc.token.issuer).
+      KC_URL: http://keycloak:8080/auth/realms/partnerportal
+      KC_ISSUER: https://${DOMAIN}/auth/realms/partnerportal
+      KC_CLIENT_ID: partnerportal-frontend
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: papo-prod-caddy
+    restart: unless-stopped
+    mem_limit: 128m
+    depends_on:
+      - backend
+      - keycloak
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./frontend:/srv/frontend:ro
+      - papo-caddy-data:/data
+      - papo-caddy-config:/config
+
+volumes:
+  papo-postgres-data:
+  papo-caddy-data:
+  papo-caddy-config:
