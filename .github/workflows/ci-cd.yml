@@ -72,7 +72,11 @@ jobs:
   deploy:
     name: Deploy to production VM
     needs: build-and-push
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # TEMPORARILY DISABLED: VM-side deploy prerequisites not done yet (tasks.md
+    # 5.3 GH Actions secrets, 5.4 GHCR PAT login on VM, 5.6 compose/Caddy/init files
+    # copied to VM). Re-enable by restoring the line below once those land.
+    # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: false
     runs-on: ubuntu-latest
     steps:
       - name: SSH and redeploy
