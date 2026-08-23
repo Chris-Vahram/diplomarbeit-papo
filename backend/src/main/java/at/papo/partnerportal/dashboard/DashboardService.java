@@ -37,15 +37,22 @@ public class DashboardService {
                 .map(order -> order.orderValue)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        // Batch lookup instead of one findForOrder call per fulfilled order (same
+        // pattern as buildForCompany below).
+        Map<Long, CommissionRecord> fulfilledCommissionsByOrderId = commissionService.findForOrders(fulfilledOrders);
         BigDecimal totalCommission = fulfilledOrders.stream()
-                .map(commissionService::findForOrder)
+                .map(order -> fulfilledCommissionsByOrderId.get(order.id))
                 .filter(java.util.Objects::nonNull)
                 .map(commission -> commission.commissionValue)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        List<OrderDto> latestOrders = Order.<Order>list("partner = ?1 order by id desc", partner).stream()
-                .limit(LATEST_ORDERS_LIMIT)
-                .map(order -> OrderDto.from(order, commissionService.findForOrder(order)))
+        // DB-side limit instead of loading every order and slicing in Java.
+        List<Order> latestOrderEntities = Order.<Order>find("partner = ?1 order by id desc", partner)
+                .page(0, LATEST_ORDERS_LIMIT)
+                .list();
+        Map<Long, CommissionRecord> latestCommissionsByOrderId = commissionService.findForOrders(latestOrderEntities);
+        List<OrderDto> latestOrders = latestOrderEntities.stream()
+                .map(order -> OrderDto.from(order, latestCommissionsByOrderId.get(order.id)))
                 .toList();
 
         return new PartnerDashboardDto(totalCommission, totalRevenue, fulfilledOrders.size(),

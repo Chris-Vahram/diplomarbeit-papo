@@ -34,6 +34,14 @@ public class CompanyOrderResource {
         return orderService.listAll();
     }
 
+    // Lets the sidebar unseen-order badge (order-notifications spec) refresh on every
+    // route render without re-downloading the full order list just to count a flag.
+    @GET
+    @Path("/unseen-count")
+    public long unseenCount() {
+        return orderService.countUnseen();
+    }
+
     @GET
     @Path("/export")
     @Produces("text/csv;charset=UTF-8")

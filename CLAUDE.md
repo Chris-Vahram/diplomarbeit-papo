@@ -4,7 +4,7 @@
 This project belongs to **Chris**.
 
 ## Project
-Web-based **internal B2B partner-ordering portal** (Partnerportal) for partner-driven sales models. Chain: **Company -> Partner -> End Customer**. HTL Diplomarbeit (Informatik / IT Medientechnik), team: **Chris + Tobias** (Julian left the project). Split (2026-07-02): **Chris = implementation** (backend + functional frontend), **Tobias = frontend design** (visual design via Claude design, delivered async as CSS for `base.css` — implementation never waits for it). Reference client: PAPO (~200 partners, ~800 articles; orders today arrive manually by e-mail/phone).
+Web-based **internal B2B partner-ordering portal** (Partnerportal) for partner-driven sales models. Chain: **Company -> Partner -> End Customer**. HTL Diplomarbeit (Informatik / IT Medientechnik), team: **Chris + Tobias** (Julian left the project). Split (2026-07-02): **Chris = implementation** (backend + functional frontend), **Tobias = frontend design** (visual design via Claude design, delivered async as CSS for `base.css` — implementation never waits for it). **PAPO = the project/product name itself** (PartnerPortal — this thesis's own name), not a client. The real reference client is unnamed (~200 partners, ~800 articles; orders today arrive manually by e-mail/phone).
 
 ## Authoritative documents (read in this order for deep work)
 1. `Specification/functional_specification_document_partnerportal_final.md` — **FSD v2, authoritative** for the MVP build (FR-01..FR-25, NFRs, entities, business rules, acceptance criteria, resolved decisions in §13).

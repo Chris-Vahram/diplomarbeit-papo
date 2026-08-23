@@ -1,0 +1,28 @@
+Teams-Besprechung 10.07.2026, 11:00 Uhr
+anwesend: Prof. Hammer, Chris Vahram, Tobias Huemer, Firmenangehörige
+
+Präsentation + Live-Demo grundsätzlich gut, MVP gut angekommen.
+
+Wichtig:
+	gute Benutzerführung (Einfachheit, Partner sollen beim Bestellablauf Spaß haben)
+	gute mobile Version (Partner oft nicht technikaffin)
+	Partner soll Endkunden sehen können, die länger nicht mehr bestellt haben
+
+Verbesserungen:
+	Produkt zu Bestellung hinzufügen: übersichtlicher (Suchleiste, Filter, ...)
+	Filter bei Bestellungen nach Endkunde/Partner
+
+Ablauf:
+	Daten/Vorgehensweisen innerhalb 1-2 Wochen von Firma geliefert
+	-> dann umsetzen
+	-> dann neuen Termin machen
+
+Hosten:
+	Firma hat Hetzner-Instanzen; Christian Bachl meldet sich bei Chris.
+
+Anmerkung:
+	Applikation öfter selbst durchtesten, um kleine Fehler zu finden.
+
+Chris (Nachtrag):
+	Keycloak - man wird schnell ausgeloggt (Session o.ä.)
+	beim Partner anlegen: Feld "Keycloak - Username" unklar/unwichtig

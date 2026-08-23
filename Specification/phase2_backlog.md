@@ -8,7 +8,7 @@ Status legend:
 - `STUB` = partially in MVP (simulated / manual / mock), full version deferred.
 - `PLANNED` = agreed for later, not started.
 
-Last updated: 2026-07-02
+Last updated: 2026-07-13
 
 ---
 
@@ -82,3 +82,4 @@ Last updated: 2026-07-02
 - 2026-07-03: Dashboard totals decided — commission/revenue/order count on the partner dashboard count only `fulfilled` own orders; latest-orders list still shows any status.
 - 2026-07-03: Phase 1 backend implemented on branch `phase-1/data-model-crud` (entities, Product/Partner CRUD + self-edit, programmatic dev/test seeder). Kunde records decided to be scoped to the creating partner (new requirement, was an unspecified gap).
 - 2026-07-06: Tobias pushed the visual design as working code (`76bbe40 Frontend Design`), which rewrote both dashboards and added widgets referencing backend data that doesn't exist. Scope call (Chris): reconcile via OpenSpec change `integrate-frontend-design` — keep the period-picker + the cheap client-side-derivable widgets (monthly chart, Bestellstatus-Donut, Top-Kunden — all computable from the order list), vendor+pin the Lucide icon dependency (was `unpkg.com/lucide@latest`), seed historical demo orders so the dashboards demo well. Only the "ggü. Vorperiode" trend is fully deferred → B-08. The planned change `add-dashboard-date-filter` is superseded by Tobias's period-picker (do not implement).
+- 2026-07-13: Client meeting 10.07.2026 (Teams; Prof. Hammer, Chris, Tobias, Firma) captured in `Documentation/Besprechungsprotokolle/Besprechungsprotokoll10_07_2026.txt`. MVP well received. New client priorities: (1) simple Benutzerführung + good mobile version (partners often not tech-savvy — Tobias's lane), (2) partner can see Endkunden who haven't ordered in a while, (3) product picker in the order form needs Suchleiste + Filter, (4) order-list filters by Endkunde/Partner (time filter re-confirmed from 07.07). Hosting: company provides **Hetzner** instances (Christian Bachl contacts Chris) — supersedes the Oracle-Cloud assumption in `ci-cd-deployment-with-gh-actions` (re-scope before building). Company delivers real data/Vorgehensweisen within 1–2 weeks → implement → new Termin. Also from Chris's Nachtrag: fix the quick Keycloak logout (→ change `add-keycloak-session-refresh`), remove the unclear "Keycloak-Username" field from partner create (repeat of 07.07; decided 2026-07-13: link via `Partner.partnerNumber` instead).

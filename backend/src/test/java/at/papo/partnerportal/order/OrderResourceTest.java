@@ -8,9 +8,14 @@ import org.junit.jupiter.api.Test;
 
 import jakarta.inject.Inject;
 
+import java.util.Comparator;
+import java.util.List;
+
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
 class OrderResourceTest {
@@ -22,12 +27,12 @@ class OrderResourceTest {
     KeycloakTestTokens tokens;
 
     private long enabledProductId() {
-        // Seeded enabled for P-1001 (partner-demo) - see DemoDataSeeder.
+        // Seeded enabled for PARTNER-DEMO (partner-demo) - see DemoDataSeeder.
         return Product.<Product>find("name", "Akkuschrauber 18V Set").firstResult().id;
     }
 
     private long partner1001Id() {
-        return Partner.<Partner>find("partnerNumber", "P-1001").firstResult().id;
+        return Partner.<Partner>find("partnerNumber", "PARTNER-DEMO").firstResult().id;
     }
 
     private long partner1002Id() {
@@ -86,6 +91,18 @@ class OrderResourceTest {
         given().auth().oauth2(companyToken)
                 .when().delete("/api/company/partners/" + partnerId + "/products/" + unavailableProductId)
                 .then().statusCode(204);
+    }
+
+    @Test
+    void partnerOrderWithExcessiveQuantityIsRejected() {
+        String token = tokens.tokenFor("partner-demo", "partner-demo");
+        long productId = enabledProductId();
+
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"newKunde\":{\"lastName\":\"Mustermann\",\"address\":{\"street\":\"Teststr.\",\"houseNumber\":\"1\",\"postalCode\":\"4020\",\"city\":\"Linz\",\"country\":\"Österreich\"}},"
+                        + "\"items\":[{\"productId\":" + productId + ",\"quantity\":10001}]}")
+                .when().post("/api/partner/orders")
+                .then().statusCode(400);
     }
 
     @Test
@@ -186,12 +203,75 @@ class OrderResourceTest {
     }
 
     @Test
+    void unseenCountEndpointRequiresCompanyRoleAndReturnsCorrectCount() {
+        String partnerToken = tokens.tokenFor("partner-demo", "partner-demo");
+        long productId = enabledProductId();
+
+        given().auth().oauth2(partnerToken)
+                .when().get("/api/company/orders/unseen-count")
+                .then().statusCode(403);
+
+        String companyToken = tokens.tokenFor("company-demo", "company-demo");
+        long before = given().auth().oauth2(companyToken)
+                .when().get("/api/company/orders/unseen-count")
+                .then().statusCode(200)
+                .extract().as(Long.class);
+
+        int orderId = given().auth().oauth2(partnerToken).contentType("application/json")
+                .body("{\"newKunde\":{\"lastName\":\"Unseen-Count\",\"address\":" + ADDRESS_JSON + "},"
+                        + "\"items\":[{\"productId\":" + productId + ",\"quantity\":1}]}")
+                .when().post("/api/partner/orders")
+                .then().statusCode(200)
+                .extract().path("id");
+
+        long afterOrder = given().auth().oauth2(companyToken)
+                .when().get("/api/company/orders/unseen-count")
+                .then().statusCode(200)
+                .extract().as(Long.class);
+        org.junit.jupiter.api.Assertions.assertEquals(before + 1, afterOrder);
+
+        given().auth().oauth2(companyToken)
+                .when().put("/api/company/orders/" + orderId + "/seen")
+                .then().statusCode(200);
+
+        long afterSeen = given().auth().oauth2(companyToken)
+                .when().get("/api/company/orders/unseen-count")
+                .then().statusCode(200)
+                .extract().as(Long.class);
+        org.junit.jupiter.api.Assertions.assertEquals(before, afterSeen);
+    }
+
+    @Test
     void partnerSeesOnlyOwnOrders() {
         String token = tokens.tokenFor("partner-demo", "partner-demo");
 
         given().auth().oauth2(token)
                 .when().get("/api/partner/orders")
                 .then().statusCode(200);
+    }
+
+    @Test
+    void partnerSeesNewestOwnOrdersFirst() {
+        String token = tokens.tokenFor("partner-demo", "partner-demo");
+        long productId = enabledProductId();
+
+        for (String lastName : List.of("Sortierung-A", "Sortierung-B")) {
+            given().auth().oauth2(token).contentType("application/json")
+                    .body("{\"newKunde\":{\"lastName\":\"" + lastName + "\",\"address\":" + ADDRESS_JSON + "},"
+                            + "\"items\":[{\"productId\":" + productId + ",\"quantity\":1}]}")
+                    .when().post("/api/partner/orders")
+                    .then().statusCode(200);
+        }
+
+        io.restassured.path.json.JsonPath orders = given().auth().oauth2(token)
+                .when().get("/api/partner/orders")
+                .then().statusCode(200)
+                .extract().jsonPath();
+
+        List<Integer> ids = orders.getList("id", Integer.class);
+        List<Integer> partnerIds = orders.getList("partnerId", Integer.class);
+        assertEquals(ids.stream().sorted(Comparator.reverseOrder()).toList(), ids);
+        assertTrue(partnerIds.stream().allMatch(id -> id == partner1001Id()));
     }
 
     @Test
@@ -270,13 +350,56 @@ class OrderResourceTest {
 
         String companyToken = tokens.tokenFor("company-demo", "company-demo");
 
-        // kundeId belongs to P-1001, but the order is created for P-1002 — must be rejected,
+        // kundeId belongs to PARTNER-DEMO, but the order is created for P-1002 — must be rejected,
         // matching the same ownership check the partner's own flow enforces.
         given().auth().oauth2(companyToken).contentType("application/json")
                 .body("{\"partnerId\":" + partner1002Id() + ",\"kundeId\":" + kundeId
                         + ",\"items\":[{\"productId\":" + enabledProductId() + ",\"quantity\":1}]}")
                 .when().post("/api/company/orders")
                 .then().statusCode(404);
+    }
+
+    @Test
+    void companyCannotCreateManualOrderForInactivePartner() {
+        String companyToken = tokens.tokenFor("company-demo", "company-demo");
+        long partnerId = partner1001Id();
+
+        io.restassured.path.json.JsonPath current = given().auth().oauth2(companyToken)
+                .when().get("/api/company/partners/" + partnerId)
+                .then().statusCode(200)
+                .extract().jsonPath();
+
+        java.util.Map<String, Object> updateBody = new java.util.HashMap<>();
+        updateBody.put("partnerNumber", current.getString("partnerNumber"));
+        updateBody.put("name", current.getString("name"));
+        updateBody.put("address", current.getMap("address"));
+        updateBody.put("email", current.getString("email"));
+        updateBody.put("phone", current.getString("phone"));
+        updateBody.put("commissionPercent", current.getDouble("commissionPercent"));
+
+        updateBody.put("active", false);
+        given().auth().oauth2(companyToken).contentType("application/json")
+                .body(updateBody)
+                .when().put("/api/company/partners/" + partnerId)
+                .then().statusCode(200)
+                .body("active", is(false));
+
+        try {
+            given().auth().oauth2(companyToken).contentType("application/json")
+                    .body("{\"partnerId\":" + partnerId + ",\"newKunde\":{\"lastName\":\"Inaktiv-Test\",\"address\":"
+                            + ADDRESS_JSON + "},\"items\":[{\"productId\":" + enabledProductId() + ",\"quantity\":1}]}")
+                    .when().post("/api/company/orders")
+                    .then().statusCode(409);
+        } finally {
+            // Restore seeded active state so later tests aren't polluted (same pattern as
+            // partnerCannotOrderUnavailableProductEvenIfEnabled's enablement restore above).
+            updateBody.put("active", true);
+            given().auth().oauth2(companyToken).contentType("application/json")
+                    .body(updateBody)
+                    .when().put("/api/company/partners/" + partnerId)
+                    .then().statusCode(200)
+                    .body("active", is(true));
+        }
     }
 
     @Test

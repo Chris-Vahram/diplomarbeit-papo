@@ -1,6 +1,14 @@
-# Production topology (design.md): single VM, four containers, Postgres/Keycloak
-# never touched by a deploy - only `backend` gets replaced (docker compose pull && up -d).
-# Config comes from .env.prod (VM-local, gitignored; see .env.prod.example for the template).
+# Production topology (design.md): single VM, four containers, Caddy fronting everything.
+# Separate from the dev-only docker-compose.yml (which only runs Postgres + Keycloak for
+# `mvnw quarkus:dev`). Run with:
+#
+#   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
+#
+# .env.prod is VM-local and gitignored - copy .env.prod.example and fill in real values.
+#
+# mem_limit values are a starting budget for the VM's 7.6 GB (design.md Decision 2 - the
+# provider changed from the originally-planned 12 GB Oracle box; see proposal.md) - adjust
+# if observed usage differs.
 #
 # `name:` and the `papo-prod-*` container names are deliberate: the dev-only
 # docker-compose.yml uses plain `papo-postgres`/`papo-keycloak` container names and (absent
@@ -21,6 +29,11 @@ services:
     volumes:
       - papo-postgres-data:/var/lib/postgresql/data
       - ./deploy/postgres/init-keycloak-db.sh:/docker-entrypoint-initdb.d/init-keycloak-db.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
@@ -28,7 +41,8 @@ services:
     restart: unless-stopped
     mem_limit: 1024m
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD}
@@ -55,8 +69,10 @@ services:
     restart: unless-stopped
     mem_limit: 768m
     depends_on:
-      - postgres
-      - keycloak
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
     environment:
       DB_URL: jdbc:postgresql://postgres:5432/partnerportal
       DB_USER: ${DB_USER}
@@ -82,7 +98,7 @@ services:
     environment:
       DOMAIN: ${DOMAIN}
     volumes:
-      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./deploy/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - ./frontend:/srv/frontend:ro
       - papo-caddy-data:/data
       - papo-caddy-config:/config

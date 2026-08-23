@@ -19,6 +19,9 @@ class CompanyPartnerListPage extends HTMLElement {
         <form id="partner-form" class="entity-form entity-form--grid">
           <input type="hidden" name="id" />
           <form-field label="Partnernummer" name="partnerNumber" required></form-field>
+          <p class="partner-form__hint" id="partner-number-hint" hidden>
+            Die Partnernummer ist der Login des Partners (Keycloak-Benutzername). Bei einer Änderung muss der Keycloak-Benutzername entsprechend angepasst werden.
+          </p>
           <form-field label="Name" name="name" required></form-field>
           ${addressFieldsHtml("address")}
           <form-field label="E-Mail" name="email" type="email"></form-field>
@@ -32,7 +35,6 @@ class CompanyPartnerListPage extends HTMLElement {
             </select>
           </form-field>
           <form-field label="Individueller Wert (%)" name="commissionPercentCustom" type="number" step="0.01" min="0" max="100"></form-field>
-          <form-field class="form-field--wide" label="Keycloak-Benutzername" name="keycloakUsername"></form-field>
           <label class="checkbox-field">
             <input type="checkbox" name="active" checked />
             Aktiv
@@ -72,6 +74,7 @@ class CompanyPartnerListPage extends HTMLElement {
 
     this.modal = this.querySelector("#partner-modal");
     this.form = this.querySelector("#partner-form");
+    this.partnerNumberHint = this.querySelector("#partner-number-hint");
     this.customField = this.querySelector('form-field[name="commissionPercentCustom"]');
     this.presetSelect = this.form.elements.commissionPercentPreset;
 
@@ -137,6 +140,7 @@ class CompanyPartnerListPage extends HTMLElement {
     this.form.elements.id.value = "";
     this.presetSelect.value = "10";
     this.toggleCustomField();
+    this.partnerNumberHint.hidden = true;
     this.modal.setAttribute("title", "Neuer Partner");
     this.modal.open();
   }
@@ -150,8 +154,8 @@ class CompanyPartnerListPage extends HTMLElement {
     fillAddress(this.form, "address", partner.address);
     this.form.elements.email.value = partner.email ?? "";
     this.form.elements.phone.value = partner.phone ?? "";
-    this.form.elements.keycloakUsername.value = partner.keycloakUsername ?? "";
     this.form.elements.active.checked = partner.active;
+    this.partnerNumberHint.hidden = false;
 
     const commissionStr = String(partner.commissionPercent);
     if (COMMISSION_PRESETS.includes(commissionStr)) {
@@ -216,7 +220,6 @@ class CompanyPartnerListPage extends HTMLElement {
       phone: data.get("phone") || null,
       commissionPercent,
       active: this.form.elements.active.checked,
-      keycloakUsername: data.get("keycloakUsername") || null,
     };
 
     try {

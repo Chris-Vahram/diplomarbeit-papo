@@ -34,6 +34,12 @@ Keycloak importiert beim Start automatisch den Realm `partnerportal`
 | `company-demo` | `company-demo` | company |
 | `partner-demo` | `partner-demo` | partner |
 
+**Provisionierungs-Konvention:** Keycloak-User werden manuell angelegt, mit
+Benutzername = Partnernummer (kanonisch großgeschrieben; Keycloak selbst
+speichert Logins kleingeschrieben, das Backend gleicht case-insensitiv ab).
+Der Demo-Partner hinter `partner-demo` trägt dev/test daher exakt die
+Partnernummer `PARTNER-DEMO`.
+
 ## 2. Backend starten (Dev-Modus)
 
 ```bash
@@ -82,6 +88,18 @@ cd backend
 ./mvnw package
 java -jar target/quarkus-app/quarkus-run.jar
 ```
+
+`%prod`-Zugangsdaten (DB, OIDC-Issuer) sind über Umgebungsvariablen überschreibbar, damit ein
+gepackter Lauf nicht stillschweigend die Demo-Standardwerte verwendet:
+
+| Variable | Standardwert |
+|---|---|
+| `DB_USERNAME` | `partnerportal` |
+| `DB_PASSWORD` | `partnerportal` |
+| `DB_JDBC_URL` | `jdbc:postgresql://localhost:5432/partnerportal` |
+| `OIDC_AUTH_SERVER_URL` | `http://localhost:8081/realms/partnerportal` |
+
+Für den lokalen Demo-Lauf mit den Compose-Containern können die Standardwerte unverändert bleiben.
 
 ## Sicherheitshinweise (bewusste Prototyp-Abkürzungen)
 

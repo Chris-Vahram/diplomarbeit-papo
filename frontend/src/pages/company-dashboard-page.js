@@ -1,24 +1,11 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import { formatEuro, formatNumber } from "../lib/format.js";
-import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue } from "../lib/dashboard-data.js";
+import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue, toLocalIsoDate } from "../lib/dashboard-data.js";
+import { escapeHtml } from "../lib/html.js";
 
 const eur = new Intl.NumberFormat("de-AT", { style: "currency", currency: "EUR" });
 const dateLabel = new Intl.DateTimeFormat("de-AT", { day: "2-digit", month: "2-digit", year: "numeric" });
-
-function toIsoDate(date) {
-  return date.toISOString().slice(0, 10);
-}
-
-function defaultPeriod() {
-  // Trailing 6 months so the headline KPIs cover the same window as the month
-  // chart and the dashboard is populated by default (not scoped to an often-empty
-  // current month). The picker narrows from here.
-  const now = new Date();
-  const to = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-  const from = new Date(now.getFullYear(), now.getMonth() - 5, 1, 0, 0, 0, 0);
-  return { from, to };
-}
 
 function formatCompactEur(value) {
   return value >= 1000 ? `${(value / 1000).toFixed(1).replace(".", ",")} T€` : eur.format(value);
@@ -57,7 +44,9 @@ function renderMonthChart(title, monthLabels, monthlyValues) {
 class CompanyDashboardPage extends HTMLElement {
   connectedCallback() {
     this.classList.add("area--company");
-    this.period = defaultPeriod();
+    // No explicit range by default - headline totals show the backend's true
+    // all-time values (company-dashboard spec: "without a range, all-time values").
+    this.period = null;
 
     const greeting = "Willkommen zurück zum";
 
@@ -145,7 +134,7 @@ class CompanyDashboardPage extends HTMLElement {
     });
 
     this.querySelector("#period-reset").addEventListener("click", () => {
-      this.period = defaultPeriod();
+      this.period = null;
       this.periodPanel.classList.add("is-closed");
       this.updatePeriodUi();
       this.render();
@@ -153,10 +142,16 @@ class CompanyDashboardPage extends HTMLElement {
   }
 
   updatePeriodUi() {
-    this.periodFromInput.value = toIsoDate(this.period.from);
-    this.periodToInput.value = toIsoDate(this.period.to);
-    this.querySelector("#period-label").textContent =
-      `${dateLabel.format(this.period.from)} – ${dateLabel.format(this.period.to)}`;
+    if (this.period) {
+      this.periodFromInput.value = toLocalIsoDate(this.period.from);
+      this.periodToInput.value = toLocalIsoDate(this.period.to);
+      this.querySelector("#period-label").textContent =
+        `${dateLabel.format(this.period.from)} – ${dateLabel.format(this.period.to)}`;
+    } else {
+      this.periodFromInput.value = "";
+      this.periodToInput.value = "";
+      this.querySelector("#period-label").textContent = "Gesamter Zeitraum";
+    }
   }
 
   async load() {
@@ -177,10 +172,21 @@ class CompanyDashboardPage extends HTMLElement {
 
   render() {
     if (!this.orders) return;
-    const fromIso = toIsoDate(this.period.from);
-    const toIso = toIsoDate(this.period.to);
-    const inRange = filterByPeriod(this.orders, fromIso, toIso);
-    const { revenue, commission, count } = fulfilledTotals(inRange);
+
+    let inRange, revenue, commission, count;
+    if (this.period) {
+      const fromIso = toLocalIsoDate(this.period.from);
+      const toIso = toLocalIsoDate(this.period.to);
+      inRange = filterByPeriod(this.orders, fromIso, toIso);
+      ({ revenue, commission, count } = fulfilledTotals(inRange));
+    } else {
+      // No explicit range: headline totals are the backend's true all-time values
+      // (BigDecimal-exact, no client-side recompute) - settlement/charts show all orders.
+      inRange = this.orders;
+      revenue = this.roster.totalRevenue;
+      commission = this.roster.totalCommission;
+      count = this.roster.fulfilledOrderCount;
+    }
     const avgOrderValue = count > 0 ? revenue / count : 0;
 
     // Monthly chart: trailing 6 months (stable trend), independent of the picker.
@@ -237,7 +243,7 @@ class CompanyDashboardPage extends HTMLElement {
         (p, i) => `
         <div class="bar-chart__row${i === 0 ? " bar-chart__row--leader" : ""}">
           <span class="bar-chart__rank">${i === 0 ? '<i data-lucide="trophy"></i>' : ""}</span>
-          <span class="bar-chart__label" title="${p.partnerName}">${p.partnerName}</span>
+          <span class="bar-chart__label" title="${escapeHtml(p.partnerName)}">${escapeHtml(p.partnerName)}</span>
           <span class="bar-chart__track"><span class="bar-chart__fill" style="width:${((p.revenue / maxRevenue) * 100).toFixed(1)}%"></span></span>
           <span class="bar-chart__value">${eur.format(p.revenue)}</span>
         </div>`,

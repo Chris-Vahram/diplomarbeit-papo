@@ -11,10 +11,13 @@ import { escapeHtml } from "../lib/html.js";
 // Optional .searchKeys = [key, ...] + .pageSize = n opt this table into a client-side search
 // input + pager. Search matches raw values at .searchKeys (never rendered cell HTML), so it
 // never hits markup like action buttons or status selects. Both unset = identical to before.
-// Optional .filters = [{ key, type: "select"|"daterange", label, options? }] renders filter
-// controls next to the search input; predicates compose with search in _filteredRows() (all
-// must match, client-side, consistent with the existing search/pagination — see design.md).
-// "select" reads row[key] exactly; "daterange" reads row[key] as an ISO "YYYY-MM-DD" string.
+// Optional .filters = [{ key, type: "select"|"daterange"|"text", label, options? }] renders
+// filter controls next to the search input; predicates compose with search in _filteredRows()
+// (all must match, client-side, consistent with the existing search/pagination — see design.md).
+// "select" reads row[key] exactly; "daterange" reads row[key] as an ISO "YYYY-MM-DD" string;
+// "text" matches row[key] case-insensitively as a substring, same semantics as search (no
+// ASCII folding - umlauts must match themselves). A "Filter zurücksetzen" control is rendered
+// automatically whenever search or filters are configured, clearing both in one click.
 // Optional .rowKey = "id" makes rows clickable: a click anywhere in a row (that isn't on an
 // interactive control already in the row - button/select/a/input) dispatches a bubbling
 // "row-click" CustomEvent with detail.id = row[rowKey], for callers to open a details overlay.
@@ -89,6 +92,20 @@ class DataTable extends HTMLElement {
         }
         return;
       }
+      const textFilter = event.target.closest("[data-table-filter-text]");
+      if (textFilter) {
+        const key = textFilter.dataset.tableFilterText;
+        this._filterValues[key] = textFilter.value;
+        this._page = 1;
+        const caret = textFilter.selectionStart;
+        this.render();
+        const input = this.querySelector(`[data-table-filter-text="${key}"]`);
+        if (input) {
+          input.focus();
+          input.setSelectionRange(caret, caret);
+        }
+        return;
+      }
       const dateFilter = event.target.closest("[data-table-filter-from], [data-table-filter-to]");
       if (dateFilter) {
         const key = dateFilter.dataset.tableFilterFrom ?? dateFilter.dataset.tableFilterTo;
@@ -109,6 +126,15 @@ class DataTable extends HTMLElement {
       }
     });
     this.addEventListener("click", (event) => {
+      if (event.target.closest("[data-table-reset]")) {
+        this._searchQuery = "";
+        for (const def of this._filterDefs) {
+          this._filterValues[def.key] = def.type === "daterange" ? { from: "", to: "" } : "";
+        }
+        this._page = 1;
+        this.render();
+        return;
+      }
       if (event.target.closest("[data-table-prev]")) {
         this._page = Math.max(1, this._page - 1);
         this.render();
@@ -152,6 +178,10 @@ class DataTable extends HTMLElement {
         if (value.to && rowValue > value.to) return false;
         return true;
       }
+      if (def.type === "text") {
+        if (!value) return true;
+        return String(row[def.key] ?? "").toLowerCase().includes(value.toLowerCase());
+      }
       if (!value) return true;
       return String(row[def.key] ?? "") === value;
     });
@@ -165,6 +195,14 @@ class DataTable extends HTMLElement {
   }
 
   _renderFilterControl(def) {
+    if (def.type === "text") {
+      const value = this._filterValues[def.key] ?? "";
+      return `
+        <div class="data-table__filter">
+          ${def.label ? `<span class="data-table__filter-label">${escapeHtml(def.label)}</span>` : ""}
+          <input type="text" data-table-filter-text="${def.key}" placeholder="${escapeHtml(def.label ?? "")}" value="${escapeHtml(value)}" />
+        </div>`;
+    }
     if (def.type === "daterange") {
       const value = this._filterValues[def.key];
       return `
@@ -202,8 +240,12 @@ class DataTable extends HTMLElement {
     const filtersHtml = this._filterDefs.length
       ? `<div class="data-table__filters">${this._filterDefs.map((def) => this._renderFilterControl(def)).join("")}</div>`
       : "";
+    const resetHtml =
+      searchHtml || filtersHtml
+        ? `<button type="button" class="data-table__reset" data-table-reset>Filter zurücksetzen</button>`
+        : "";
     const toolbarHtml = searchHtml || filtersHtml
-      ? `<div class="data-table__toolbar">${searchHtml}${filtersHtml}</div>`
+      ? `<div class="data-table__toolbar">${searchHtml}${filtersHtml}${resetHtml}</div>`
       : "";
 
     const filtered = this._filteredRows();

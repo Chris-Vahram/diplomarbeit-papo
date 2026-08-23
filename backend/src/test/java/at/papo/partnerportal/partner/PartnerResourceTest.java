@@ -34,10 +34,62 @@ class PartnerResourceTest {
         String token = tokens.tokenFor("company-demo", "company-demo");
 
         given().auth().oauth2(token).contentType("application/json")
-                .body("{\"partnerNumber\":\"P-1001\",\"name\":\"Duplikat\",\"address\":" + SAMPLE_ADDRESS_JSON
+                .body("{\"partnerNumber\":\"PARTNER-DEMO\",\"name\":\"Duplikat\",\"address\":" + SAMPLE_ADDRESS_JSON
                         + ",\"commissionPercent\":5}")
                 .when().post("/api/company/partners")
                 .then().statusCode(409);
+    }
+
+    @Test
+    void companyCreateRejectsDuplicatePartnerNumberDifferingOnlyByCase() {
+        String token = tokens.tokenFor("company-demo", "company-demo");
+
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"partnerNumber\":\"partner-demo\",\"name\":\"Duplikat Kleinschreibung\",\"address\":"
+                        + SAMPLE_ADDRESS_JSON + ",\"commissionPercent\":5}")
+                .when().post("/api/company/partners")
+                .then().statusCode(409);
+    }
+
+    // Guards the case-variant-duplicate hole (design.md Decision 2): storing the canonical
+    // upper-case form means the login match resolves to at most one partner.
+    @Test
+    void companyCreatedPartnerNumberIsCanonicalizedToUpperCase() {
+        String token = tokens.tokenFor("company-demo", "company-demo");
+
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"partnerNumber\":\"p-9104\",\"name\":\"Kleinschreibung\",\"address\":" + SAMPLE_ADDRESS_JSON
+                        + ",\"commissionPercent\":5}")
+                .when().post("/api/company/partners")
+                .then().statusCode(200)
+                .body("partnerNumber", is("P-9104"));
+
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"partnerNumber\":\"P-9104\",\"name\":\"Zweiter Versuch\",\"address\":" + SAMPLE_ADDRESS_JSON
+                        + ",\"commissionPercent\":5}")
+                .when().post("/api/company/partners")
+                .then().statusCode(409);
+    }
+
+    // The duplicate pre-check must compare canonical (trimmed+upper-cased) values, not the raw
+    // request body - otherwise a whitespace-padded duplicate slips past the friendly 409 and
+    // hits the DB unique constraint directly as an unhandled 500.
+    @Test
+    void companyCreateRejectsDuplicatePartnerNumberWithPaddedWhitespace() {
+        String token = tokens.tokenFor("company-demo", "company-demo");
+
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"partnerNumber\":\"P-9105\",\"name\":\"Original\",\"address\":" + SAMPLE_ADDRESS_JSON
+                        + ",\"commissionPercent\":5}")
+                .when().post("/api/company/partners")
+                .then().statusCode(200);
+
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"partnerNumber\":\"  P-9105  \",\"name\":\"Duplikat mit Leerzeichen\",\"address\":"
+                        + SAMPLE_ADDRESS_JSON + ",\"commissionPercent\":5}")
+                .when().post("/api/company/partners")
+                .then().statusCode(409)
+                .body("message", is("Partnernummer bereits vergeben."));
     }
 
     @Test
@@ -49,39 +101,6 @@ class PartnerResourceTest {
                         + SAMPLE_ADDRESS_JSON + ",\"commissionPercent\":150}")
                 .when().post("/api/company/partners")
                 .then().statusCode(400);
-    }
-
-    @Test
-    void companyCanLinkAndUpdateKeycloakUsername() {
-        String token = tokens.tokenFor("company-demo", "company-demo");
-
-        String created = given().auth().oauth2(token).contentType("application/json")
-                .body("{\"partnerNumber\":\"P-9102\",\"name\":\"Login-Test\",\"address\":" + SAMPLE_ADDRESS_JSON
-                        + ",\"commissionPercent\":10,\"keycloakUsername\":\"future-login\"}")
-                .when().post("/api/company/partners")
-                .then().statusCode(200)
-                .body("keycloakUsername", is("future-login"))
-                .extract().asString();
-        long id = io.restassured.path.json.JsonPath.from(created).getLong("id");
-
-        given().auth().oauth2(token).contentType("application/json")
-                .body("{\"partnerNumber\":\"P-9102\",\"name\":\"Login-Test\",\"address\":" + SAMPLE_ADDRESS_JSON
-                        + ",\"commissionPercent\":10,\"keycloakUsername\":\"future-login-renamed\"}")
-                .when().put("/api/company/partners/" + id)
-                .then().statusCode(200)
-                .body("keycloakUsername", is("future-login-renamed"));
-    }
-
-    @Test
-    void companyCreateRejectsDuplicateKeycloakUsername() {
-        String token = tokens.tokenFor("company-demo", "company-demo");
-        // "partner-demo" is already linked to the seeded P-1001.
-
-        given().auth().oauth2(token).contentType("application/json")
-                .body("{\"partnerNumber\":\"P-9103\",\"name\":\"Konflikt\",\"address\":" + SAMPLE_ADDRESS_JSON
-                        + ",\"commissionPercent\":10,\"keycloakUsername\":\"partner-demo\"}")
-                .when().post("/api/company/partners")
-                .then().statusCode(409);
     }
 
     @Test
@@ -129,7 +148,7 @@ class PartnerResourceTest {
     }
 
     private long partner1001Id() {
-        return Partner.<Partner>find("partnerNumber", "P-1001").firstResult().id;
+        return Partner.<Partner>find("partnerNumber", "PARTNER-DEMO").firstResult().id;
     }
 
     private void setActive(String companyToken, long partnerId, String currentStateJson, boolean active) {
@@ -139,15 +158,14 @@ class PartnerResourceTest {
                 current.getString("address.street"), current.getString("address.houseNumber"),
                 current.getString("address.postalCode"), current.getString("address.city"),
                 current.getString("address.country"));
-        // PUT is a full replace - every field the DTO carries (incl. keycloakUsername) must be
-        // round-tripped here, or this restore-after-toggle helper silently wipes it.
+        // PUT is a full replace - every field the DTO carries must be round-tripped here,
+        // or this restore-after-toggle helper silently wipes it.
         String body = String.format(
                 "{\"partnerNumber\":\"%s\",\"name\":\"%s\",\"address\":%s,\"email\":%s,\"phone\":%s,"
-                        + "\"commissionPercent\":%s,\"active\":%s,\"keycloakUsername\":%s}",
+                        + "\"commissionPercent\":%s,\"active\":%s}",
                 current.getString("partnerNumber"), current.getString("name"),
                 addressJson, quoteOrNull(current.getString("email")),
-                quoteOrNull(current.getString("phone")), current.getString("commissionPercent"), active,
-                quoteOrNull(current.getString("keycloakUsername")));
+                quoteOrNull(current.getString("phone")), current.getString("commissionPercent"), active);
 
         given().auth().oauth2(companyToken).contentType("application/json")
                 .body(body)
@@ -158,6 +176,67 @@ class PartnerResourceTest {
 
     private String quoteOrNull(String value) {
         return value == null ? "null" : "\"" + value + "\"";
+    }
+
+    // Keycloak's username claim comes back lowercase ("partner-demo"); the seeded partner's
+    // canonical partnerNumber is upper-case ("PARTNER-DEMO") - proves resolve() folds case
+    // via toUpperCase, not just an exact-case match (partner-management spec scenario
+    // "Lowercased Keycloak username still resolves").
+    @Test
+    void partnerLoginResolvesViaCaseFoldedPartnerNumber() {
+        String token = tokens.tokenFor("partner-demo", "partner-demo");
+
+        given().auth().oauth2(token)
+                .when().get("/api/partner/profile")
+                .then().statusCode(200)
+                .body("partnerNumber", is("PARTNER-DEMO"));
+    }
+
+    @Test
+    void unlinkedPartnerLoginIsRejectedWithUnchangedGermanMessage() {
+        String companyToken = tokens.tokenFor("company-demo", "company-demo");
+        long partnerId = partner1001Id();
+        String originalState = given().auth().oauth2(companyToken)
+                .when().get("/api/company/partners/" + partnerId)
+                .then().statusCode(200)
+                .extract().asString();
+
+        // Rename the seeded partner's number away from PARTNER-DEMO so the partner-demo
+        // login claim (upper-cased to PARTNER-DEMO) matches no partner record. try/finally so a
+        // failed assertion below still restores the shared seeded fixture other tests rely on.
+        try {
+            renamePartnerNumber(companyToken, partnerId, originalState, "PARTNER-DEMO-RENAMED");
+
+            String partnerToken = tokens.tokenFor("partner-demo", "partner-demo");
+            given().auth().oauth2(partnerToken)
+                    .when().get("/api/partner/profile")
+                    .then().statusCode(403)
+                    .body("message", is("Kein Partnerkonto mit diesem Login verknüpft."));
+        } finally {
+            renamePartnerNumber(companyToken, partnerId, originalState, "PARTNER-DEMO");
+        }
+    }
+
+    private void renamePartnerNumber(String companyToken, long partnerId, String currentStateJson,
+            String newPartnerNumber) {
+        io.restassured.path.json.JsonPath current = io.restassured.path.json.JsonPath.from(currentStateJson);
+        String addressJson = String.format(
+                "{\"street\":\"%s\",\"houseNumber\":\"%s\",\"postalCode\":\"%s\",\"city\":\"%s\",\"country\":\"%s\"}",
+                current.getString("address.street"), current.getString("address.houseNumber"),
+                current.getString("address.postalCode"), current.getString("address.city"),
+                current.getString("address.country"));
+        String body = String.format(
+                "{\"partnerNumber\":\"%s\",\"name\":\"%s\",\"address\":%s,\"email\":%s,\"phone\":%s,"
+                        + "\"commissionPercent\":%s,\"active\":%s}",
+                newPartnerNumber, current.getString("name"), addressJson,
+                quoteOrNull(current.getString("email")), quoteOrNull(current.getString("phone")),
+                current.getString("commissionPercent"), current.getBoolean("active"));
+
+        given().auth().oauth2(companyToken).contentType("application/json")
+                .body(body)
+                .when().put("/api/company/partners/" + partnerId)
+                .then().statusCode(200)
+                .body("partnerNumber", is(newPartnerNumber));
     }
 
     @Test
@@ -176,7 +255,7 @@ class PartnerResourceTest {
         given().auth().oauth2(token)
                 .when().get("/api/partner/profile")
                 .then().statusCode(200)
-                .body("partnerNumber", is("P-1001"))
+                .body("partnerNumber", is("PARTNER-DEMO"))
                 .body("commissionPercent", is(10.0f));
 
         given().auth().oauth2(token).contentType("application/json")

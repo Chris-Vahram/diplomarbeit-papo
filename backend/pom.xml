@@ -84,6 +84,16 @@
             <artifactId>rest-assured</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Silences Netty's macOS DNS resolver warning during Dev Services (Testcontainers)
+             startup in ./mvnw test; suspected contributor to an intermittent local Keycloak
+             Dev Services connection flake on macOS. Test-scoped: dev/test only, not needed at
+             runtime, harmless no-op download on non-macOS build machines (e.g. Linux CI/prod). -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-resolver-dns-native-macos</artifactId>
+            <classifier>osx-aarch_64</classifier>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

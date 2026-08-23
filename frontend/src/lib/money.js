@@ -1,0 +1,26 @@
+// Integer-cent money arithmetic shared across the dashboard aggregation and the
+// order-form live totals - float arithmetic on euro values accumulates rounding
+// drift (project rule: money math in integer cents, never a naive float reduce).
+
+export function toCents(euroValue) {
+  return Math.round(euroValue * 100);
+}
+
+export function sumCents(values) {
+  const cents = values.reduce((sum, v) => sum + toCents(v), 0);
+  return cents / 100;
+}
+
+// Mirrors CommissionService.createForOrder exactly: BigDecimal orderValue
+// .multiply(percent).divide(100, 2, HALF_UP). Computed as an exact integer
+// division with an explicit half-up tie rule (not a float divide/Math.round,
+// which can drift a cent right at the .5 boundary) so the preview equals the
+// stored CommissionRecord to the cent.
+export function commissionCentsHalfUp(orderValueCents, percent) {
+  const percentBasisPoints = Math.round(percent * 100);
+  const numerator = orderValueCents * percentBasisPoints;
+  const denominator = 10000;
+  const quotient = Math.floor(numerator / denominator);
+  const remainder = numerator - quotient * denominator;
+  return remainder * 2 >= denominator ? quotient + 1 : quotient;
+}

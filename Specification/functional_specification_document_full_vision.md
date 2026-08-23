@@ -21,7 +21,7 @@ The system goes beyond classic PRM (Partner Relationship Management). It does no
 **Company → Partner → End Customer**
 
 ### Reference Client
-PAPO — ~200 partners, ~800 articles. Partner orders currently arrive by e-mail (~10–15/day) and phone (~3–4/day), processed manually.
+Reference client (unnamed) — ~200 partners, ~800 articles. Partner orders currently arrive by e-mail (~10–15/day) and phone (~3–4/day), processed manually. (PAPO is this project's own name, not the client.)
 
 ### Full Project Goal
 Develop a web-based system that:

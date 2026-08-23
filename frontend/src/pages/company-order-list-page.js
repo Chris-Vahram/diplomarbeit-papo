@@ -5,7 +5,6 @@ import { formatNumber, formatDate } from "../lib/format.js";
 import { renderOrderDetailsHtml } from "../lib/order-details.js";
 import { refreshOrdersBadge } from "../lib/router.js";
 import {
-  productOptionsHtml,
   kundePickerHtml,
   articleLinesHtml,
   wireKundePicker,
@@ -13,6 +12,7 @@ import {
   readKundePayload,
   readItemsPayload,
   renderOrderConfirmationHtml,
+  renderOrderSummaryHtml,
 } from "../lib/order-form.js";
 
 const STATUSES = ["SUBMITTED", "REVIEWED", "FULFILLED"];
@@ -36,6 +36,9 @@ class CompanyOrderListPage extends HTMLElement {
       <modal-dialog id="manual-order-modal" title="Bestellung manuell anlegen">
         <div id="manual-order-content"></div>
       </modal-dialog>
+      <modal-dialog id="shipping-confirmation-modal" title="Versandbestätigung">
+        <div id="shipping-confirmation-content"></div>
+      </modal-dialog>
     `;
 
     this.querySelector("#export-btn").addEventListener("click", () => this.exportCsv());
@@ -53,10 +56,6 @@ class CompanyOrderListPage extends HTMLElement {
     this.table.emptyMessage = "Noch keine Bestellungen vorhanden.";
     this.table.searchKeys = ["partnerName", "kundeName"];
     this.table.pageSize = 20;
-    this.table.filters = [
-      { key: "orderDateIso", type: "daterange", label: "Datum" },
-      { key: "status", type: "select", label: "Status", options: STATUSES.map((s) => ({ value: s, label: STATUS_LABELS[s] })) },
-    ];
     this.table.rowKey = "id";
 
     this.table.addEventListener("change", (event) => {
@@ -69,6 +68,8 @@ class CompanyOrderListPage extends HTMLElement {
     this.detailsContent = this.querySelector("#details-content");
     this.manualOrderModal = this.querySelector("#manual-order-modal");
     this.manualOrderContent = this.querySelector("#manual-order-content");
+    this.shippingConfirmationModal = this.querySelector("#shipping-confirmation-modal");
+    this.shippingConfirmationContent = this.querySelector("#shipping-confirmation-content");
 
     this.load();
   }
@@ -76,10 +77,31 @@ class CompanyOrderListPage extends HTMLElement {
   async load() {
     try {
       this.orders = await apiFetch("/company/orders");
+      // Filter options (esp. the Partner dropdown, built from the loaded orders) are set
+      // once here, not in renderRows() - renderRows() also runs on unrelated updates (e.g.
+      // marking an order seen), and re-assigning .filters resets the user's active filters.
+      this.table.filters = [
+        { key: "partnerId", type: "select", label: "Partner", options: this.partnerFilterOptions() },
+        { key: "kundeName", type: "text", label: "Endkunde" },
+        { key: "orderDateIso", type: "daterange", label: "Datum" },
+        { key: "status", type: "select", label: "Status", options: STATUSES.map((s) => ({ value: s, label: STATUS_LABELS[s] })) },
+      ];
       this.renderRows();
     } catch (error) {
       showToast(error.message, "error");
     }
+  }
+
+  // Distinct partners among the loaded orders, id-keyed so two partners sharing a display
+  // name stay separate filter entries (design.md).
+  partnerFilterOptions() {
+    const byId = new Map();
+    for (const o of this.orders) {
+      if (!byId.has(o.partnerId)) byId.set(o.partnerId, o.partnerName);
+    }
+    return [...byId.entries()]
+      .map(([id, name]) => ({ value: String(id), label: name }))
+      .sort((a, b) => a.label.localeCompare(b.label, "de-AT"));
   }
 
   renderRows() {
@@ -91,6 +113,7 @@ class CompanyOrderListPage extends HTMLElement {
       orderDate: `${formatDate(o.orderDate)}${o.seenByCompany ? "" : ' <span class="badge-new">NEU</span>'}`,
       orderDateIso: o.orderDate,
       status: o.status,
+      partnerId: o.partnerId,
       partnerName: o.partnerName,
       kundeName: `${o.kunde.firstName ? o.kunde.firstName + " " : ""}${o.kunde.lastName}`,
       orderValueLabel: formatNumber(o.orderValue),
@@ -167,11 +190,15 @@ class CompanyOrderListPage extends HTMLElement {
       ]);
       const products = enablement
         .filter((p) => p.enabled)
-        .map((p) => ({ id: p.productId, name: p.name, available: p.available }));
+        .map((p) => ({ id: p.productId, name: p.name, price: p.price, category: p.category, available: p.available }));
       if (products.length === 0) {
         container.innerHTML = `<p>Für diesen Partner sind noch keine Produkte freigeschaltet.</p>`;
         return;
       }
+      const partner = this.manualOrderPartners.find((p) => String(p.id) === String(partnerId));
+      // Stacked, not side-by-side: the modal panel (42.5rem, shared by every modal
+      // in the app) isn't wide enough for a 2-column layout without widening it for
+      // unrelated modals too.
       container.innerHTML = `
         <form id="manual-order-form" class="entity-form">
           ${kundePickerHtml(customers)}
@@ -180,10 +207,16 @@ class CompanyOrderListPage extends HTMLElement {
             <button type="submit">Bestellung anlegen</button>
           </div>
         </form>
+        <div id="manual-order-summary"></div>
       `;
       const form = container.querySelector("#manual-order-form");
+      const summaryEl = container.querySelector("#manual-order-summary");
+      const renderSummary = ({ items, totalCents }) => {
+        summaryEl.innerHTML = renderOrderSummaryHtml({ items, totalCents, commissionPercent: partner?.commissionPercent ?? null });
+      };
       wireKundePicker(form);
-      wireArticleLines(form, productOptionsHtml(products));
+      wireArticleLines(form, products, renderSummary);
+      renderSummary({ items: [], totalCents: 0 });
       form.addEventListener("submit", (event) => this.handleManualSubmit(event, partnerId, form));
     } catch (error) {
       showToast(error.message, "error");
@@ -225,9 +258,23 @@ class CompanyOrderListPage extends HTMLElement {
 
   async updateStatus(orderId, status) {
     try {
-      await apiFetch(`/company/orders/${orderId}/status`, { method: "PUT", body: JSON.stringify({ status }) });
+      const order = await apiFetch(`/company/orders/${orderId}/status`, { method: "PUT", body: JSON.stringify({ status }) });
       showToast("Status aktualisiert.", "success");
       this.load();
+
+      // FR-17: a simulated shipping confirmation is shown when an order reaches
+      // "fulfilled" — not on the submitted->reviewed step.
+      if (status === "FULFILLED") {
+        this.shippingConfirmationContent.innerHTML = renderOrderConfirmationHtml(order, {
+          showPartner: true,
+          kind: "shipping",
+          actionsHtml: `<button type="button" id="shipping-confirmation-done-btn">Fertig</button>`,
+        });
+        this.shippingConfirmationContent.querySelector("#shipping-confirmation-done-btn").addEventListener("click", () => {
+          this.shippingConfirmationModal.close();
+        });
+        this.shippingConfirmationModal.open();
+      }
     } catch (error) {
       showToast(error.message, "error");
       this.load();

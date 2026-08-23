@@ -5,14 +5,29 @@ import at.papo.partnerportal.partner.Partner;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 // Kunde records are scoped per creating partner (design.md, "Kunde scoping").
 @ApplicationScoped
 public class KundeService {
 
+    // Single grouped left-join query — no per-Kunde order lookups (design.md, decision 2).
+    private static final String LIST_WITH_LAST_ORDER_DATE = """
+            select k, max(o.orderDate)
+            from Kunde k left join Order o on o.kunde = k
+            where k.ownerPartner = :partner
+            group by k
+            """;
+
     public List<KundeDto> listForPartner(Partner partner) {
-        return Kunde.<Kunde>list("ownerPartner", partner).stream().map(KundeDto::from).toList();
+        List<Object[]> rows = Kunde.getEntityManager()
+                .createQuery(LIST_WITH_LAST_ORDER_DATE, Object[].class)
+                .setParameter("partner", partner)
+                .getResultList();
+        return rows.stream()
+                .map(row -> KundeDto.from((Kunde) row[0], (LocalDate) row[1]))
+                .toList();
     }
 
     @Transactional

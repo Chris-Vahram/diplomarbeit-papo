@@ -29,9 +29,4 @@ public class Partner extends PanacheEntity {
 
     @Column(nullable = false)
     public boolean active = true;
-
-    // Links a Keycloak login (username claim) to this Partner record.
-    // Provisioned manually, never by import — see design.md.
-    @Column(unique = true)
-    public String keycloakUsername;
 }

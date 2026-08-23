@@ -5,6 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
+import java.util.Locale;
 
 @ApplicationScoped
 public class PartnerService {
@@ -19,10 +20,10 @@ public class PartnerService {
 
     @Transactional
     public PartnerDto create(PartnerRequest request) {
-        assertPartnerNumberFree(request.partnerNumber(), null);
-        assertKeycloakUsernameFree(request.keycloakUsername(), null);
+        String partnerNumber = PartnerNumber.canonicalize(request.partnerNumber());
+        assertPartnerNumberFree(partnerNumber, null);
         Partner partner = new Partner();
-        partner.partnerNumber = request.partnerNumber();
+        partner.partnerNumber = partnerNumber;
         applyCompanyFields(partner, request);
         partner.persist();
         return PartnerDto.from(partner);
@@ -31,9 +32,9 @@ public class PartnerService {
     @Transactional
     public PartnerDto update(Long id, PartnerRequest request) {
         Partner partner = findOrThrow(id);
-        assertPartnerNumberFree(request.partnerNumber(), id);
-        assertKeycloakUsernameFree(request.keycloakUsername(), id);
-        partner.partnerNumber = request.partnerNumber();
+        String partnerNumber = PartnerNumber.canonicalize(request.partnerNumber());
+        assertPartnerNumberFree(partnerNumber, id);
+        partner.partnerNumber = partnerNumber;
         applyCompanyFields(partner, request);
         return PartnerDto.from(partner);
     }
@@ -47,20 +48,14 @@ public class PartnerService {
         return PartnerDto.from(partner);
     }
 
+    // Case-insensitive to match the importer's duplicate check (PartnerImportDefinition),
+    // so "P-1001" and "p-1001" can't coexist depending on which path created the partner.
+    // Locale.ROOT to match PartnerNumber.canonicalize's case-folding (avoids the Turkish-I trap).
     private void assertPartnerNumberFree(String partnerNumber, Long excludingId) {
-        Partner existing = Partner.find("partnerNumber", partnerNumber).firstResult();
+        Partner existing = Partner.find("lower(partnerNumber) = ?1", partnerNumber.toLowerCase(Locale.ROOT))
+                .firstResult();
         if (existing != null && !existing.id.equals(excludingId)) {
             throw new ApiException(409, "Partnernummer bereits vergeben.");
-        }
-    }
-
-    private void assertKeycloakUsernameFree(String keycloakUsername, Long excludingId) {
-        if (keycloakUsername == null || keycloakUsername.isBlank()) {
-            return;
-        }
-        Partner existing = Partner.find("keycloakUsername", keycloakUsername).firstResult();
-        if (existing != null && !existing.id.equals(excludingId)) {
-            throw new ApiException(409, "Keycloak-Benutzername ist bereits mit einem anderen Partner verknüpft.");
         }
     }
 
@@ -71,8 +66,6 @@ public class PartnerService {
         partner.phone = request.phone();
         partner.commissionPercent = request.commissionPercent();
         partner.active = request.active() == null || request.active();
-        partner.keycloakUsername = request.keycloakUsername() == null || request.keycloakUsername().isBlank()
-                ? null : request.keycloakUsername().trim();
     }
 
     Partner findOrThrow(Long id) {

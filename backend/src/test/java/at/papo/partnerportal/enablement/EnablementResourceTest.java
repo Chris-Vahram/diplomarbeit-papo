@@ -18,10 +18,10 @@ class EnablementResourceTest {
     KeycloakTestTokens tokens;
 
     private long partner1001Id() {
-        return Partner.<Partner>find("partnerNumber", "P-1001").firstResult().id;
+        return Partner.<Partner>find("partnerNumber", "PARTNER-DEMO").firstResult().id;
     }
 
-    // Not part of DemoDataSeeder's enablements for P-1001 - keeps this test's
+    // Not part of DemoDataSeeder's enablements for PARTNER-DEMO - keeps this test's
     // enable/disable round-trip from disturbing the seeded enabled-products count
     // that partnerSeesOnlyOwnEnabledProducts asserts on.
     private long unseededProductId() {

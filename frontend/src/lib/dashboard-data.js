@@ -4,7 +4,16 @@
 // don't exist (design: integrate-frontend-design). orderDate is ISO "YYYY-MM-DD",
 // so range checks are plain string comparisons (chronological == lexicographic).
 
+import { sumCents } from "./money.js";
+
 const MONTHS_DE = ["Jän", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
+
+export function toLocalIsoDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 
 export function inPeriod(isoDate, fromIso, toIso) {
   return (!fromIso || isoDate >= fromIso) && (!toIso || isoDate <= toIso);
@@ -19,8 +28,8 @@ export function filterByPeriod(orders, fromIso, toIso) {
 export function fulfilledTotals(orders) {
   const fulfilled = orders.filter((o) => o.status === "FULFILLED");
   return {
-    revenue: fulfilled.reduce((sum, o) => sum + o.orderValue, 0),
-    commission: fulfilled.reduce((sum, o) => sum + (o.commissionValue ?? 0), 0),
+    revenue: sumCents(fulfilled.map((o) => o.orderValue)),
+    commission: sumCents(fulfilled.map((o) => o.commissionValue ?? 0)),
     count: fulfilled.length,
   };
 }

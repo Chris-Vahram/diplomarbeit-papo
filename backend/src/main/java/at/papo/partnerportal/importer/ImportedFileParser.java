@@ -1,6 +1,7 @@
 package at.papo.partnerportal.importer;
 
 import at.papo.partnerportal.common.ApiException;
+import org.jboss.logging.Logger;
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
@@ -29,6 +30,8 @@ import java.util.Map;
 // CONTINUATION_PROMPT.md "still open"); column mapping in ImportService is
 // what makes that not matter - any header layout can be mapped by the user.
 public final class ImportedFileParser {
+
+    private static final Logger LOG = Logger.getLogger(ImportedFileParser.class);
 
     private ImportedFileParser() {
     }
@@ -66,7 +69,8 @@ public final class ImportedFileParser {
             }
             return new ParsedFile(headers, rows);
         } catch (Exception e) {
-            throw new ApiException(400, "CSV-Datei konnte nicht gelesen werden: " + e.getMessage());
+            LOG.error("CSV-Import fehlgeschlagen", e);
+            throw new ApiException(400, "CSV-Datei konnte nicht gelesen werden. Bitte Format und Inhalt prüfen.");
         }
     }
 
@@ -79,9 +83,13 @@ public final class ImportedFileParser {
                 return new ParsedFile(List.of(), List.of());
             }
 
+            // Index-based like the data-row loop below, not `for (Cell cell : headerRow)` -
+            // POI's row iterator skips blank cells, which would shift every later column's
+            // header (and therefore its data) one position left if a header cell is blank.
             Row headerRow = rowIterator.next();
             List<String> headers = new ArrayList<>();
-            for (Cell cell : headerRow) {
+            for (int i = 0; i < headerRow.getLastCellNum(); i++) {
+                Cell cell = headerRow.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
                 headers.add(formatter.formatCellValue(cell));
             }
 
@@ -100,7 +108,8 @@ public final class ImportedFileParser {
             }
             return new ParsedFile(headers, rows);
         } catch (Exception e) {
-            throw new ApiException(400, "Excel-Datei konnte nicht gelesen werden: " + e.getMessage());
+            LOG.error("Excel-Import fehlgeschlagen", e);
+            throw new ApiException(400, "Excel-Datei konnte nicht gelesen werden. Bitte Format und Inhalt prüfen.");
         }
     }
 
