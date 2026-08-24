@@ -2468,7 +2468,10 @@ legend {
   display: flex;
   gap: var(--spacing-4);
   overflow-x: auto;
-  padding-bottom: var(--spacing-2);
+  /* No padding-bottom reserved for the scrollbar here on purpose - that space
+     is invisible (nothing draws a border there) but still counts as real
+     height, so the catalog panel (and via grid stretch, the Warenkorb box
+     beside it) ended up a few pixels taller than where the cards visibly end. */
 }
 
 .catalog__empty {
@@ -2503,16 +2506,26 @@ legend {
   opacity: 0.6;
 }
 
+/* A fixed height (not aspect-ratio, which made this 13rem tall at the card's
+   own 13rem width) - a tall thumbnail is what forced the whole row (and thus
+   produkte-step-layout's overflow:hidden fallback) to clip the add-to-cart
+   button. A shorter, width-independent thumb keeps a full card comfortably
+   inside the calculated row height instead of relying on clipping at all. */
 .product-card__thumb {
   display: block;
   width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
+  height: 7rem;
+  /* contain, not cover: these product images are (roughly square) product
+     shots/icons - cover scales a square image up to fill a much-wider-than-
+     tall 7rem box, cropping off a large chunk of it (icons ending up
+     cut-off/off-center). contain shows the whole image, letterboxed on the
+     sides against the thumb's own background instead. */
+  object-fit: contain;
   background: var(--color-neutral-100);
 }
 
 .product-card__thumb--empty {
-  aspect-ratio: 1 / 1;
+  height: 7rem;
   background: var(--color-neutral-100);
 }
 
@@ -2952,18 +2965,18 @@ legend {
    remaining width). minmax(0, 1fr) is required, not just 1fr - it's what lets
    .catalog__grid's overflow-x:auto actually clip/scroll instead of the grid
    track growing to fit its content and blowing out the column.
-   An explicit height (not "auto" + align-items:stretch) is deliberate: a grid
-   row's auto size is computed from each item's own *unconstrained* content
-   size, and .cart--preview's cart__lines (many lines, overflow-y:auto) has no
-   real cap until something above it resolves to a definite height - so an
-   auto-sized row just grows to fit the longest cart instead of matching the
-   catalog column, and overflow:auto never engages. Sized to comfortably fit
-   the toolbar + one row of 11rem product cards. */
+   Deliberately NO explicit height here (an earlier version guessed a fixed/
+   calc'd value - it went out of sync with the catalog's real height the
+   moment that height changed, e.g. when the card thumbnail size changed,
+   making the two columns visibly mismatched again). Leaving the row "auto"
+   makes the catalog's own natural content (toolbar + one card row) the actual
+   source of truth - align-items: stretch (the grid default) then stretches
+   .cart--preview to match THAT, so the two columns can't go out of sync no
+   matter what changes the catalog's height later. */
 .produkte-step-layout {
   display: grid;
   grid-template-columns: 21rem minmax(0, 1fr);
   gap: var(--spacing-5);
-  height: 30rem;
 }
 
 /* Header (heading) and footer (totals) stay fixed; only the lines in between
@@ -2977,6 +2990,26 @@ legend {
   display: flex;
   flex-direction: column;
   height: 100%;
+  /* Grid items default to min-height:auto (their own content's natural
+     minimum), which wins over an explicit height whenever the container is
+     shorter than that - the row then renders at the *content* height instead
+     of the requested one, .cart--preview's height:100% resolves against the
+     (too-small) requested height instead of what actually got rendered, and
+     the mismatch reads as the box overflowing past its own bottom edge into
+     whatever sits below it. min-height:0 removes that floor so shrinking the
+     row (produkte-step-layout's calc() above) actually shrinks this box too. */
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Same min-height:0 reasoning as .cart--preview - without it, a full card row
+   forces produkte-step-layout's row back up to its own natural height on a
+   short viewport regardless of the calc() above, which is what desynced
+   .cart--preview's height:100% from the row's actual rendered size. overflow:
+   hidden is the fallback for the (much rarer) case where even one card row
+   still doesn't fit - clips it rather than letting it spill into the buttons below. */
+.produkte-catalog-panel {
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -3019,7 +3052,9 @@ legend {
 .cart--summary {
   display: flex;
   flex-direction: column;
-  max-height: 24rem;
+  /* Same reasoning as .produkte-step-layout above, chrome total ≈ 27.5rem here
+     (this step's two-line description is a bit taller). */
+  max-height: min(24rem, calc(100vh - 27.5rem));
 }
 
 .cart--summary .cart-summary__lines {
@@ -3122,12 +3157,89 @@ legend {
 }
 
 /* Scoped to the "Erfolg" step only (not the company's use of the same card in
-   a modal) - the bill + simulated e-mail together can be taller than the
-   viewport once the checkpoint bar/description/actions are also on screen;
-   scroll inside the card itself rather than growing the whole page. */
+   a modal, nor its markup in order-form.js, which stays untouched).
+   max-width: none - full step width, same as every other step's layout.
+   A grid (not flex) so the print button can be explicitly placed directly
+   under .print-document specifically - it can't actually become a DOM child
+   of .print-document (router.js's print handler reads
+   `printButton.previousElementSibling` and requires that to BE
+   .print-document, not an ancestor several levels up), so this is a CSS-only
+   "looks like one box" trick: zero row-gap between print-document and the
+   button (own margin-top below cancels the grid gap) plus matching
+   borders/radius on touching edges, while column 2 (.simulated-email) stays a
+   fully separate box. max-height/overflow-y stays - the bill + e-mail
+   together can still be taller than the viewport once the checkpoint bar/
+   description/actions are also on screen. */
 .wizard-step--erfolg .order-confirmation {
+  max-width: none;
   max-height: 60vh;
   overflow-y: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-5);
+  /* The outer card chrome (padding/border/shadow) is reset here - .print-document
+     and .simulated-email below are the two visible boxes now, laid directly in
+     the step like every other step's sibling boxes; an outer card around both
+     would just nest a box inside a box. */
+  padding: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+
+.wizard-step--erfolg .order-confirmation > h2 {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+/* .print-document has no box styling of its own elsewhere (it's just the
+   printable region, per the print-root cloning note below) - added here only,
+   so it reads as its own box. Flat bottom (no border/radius there) since the
+   print button attaches flush underneath it, below. */
+.wizard-step--erfolg .order-confirmation .print-document {
+  grid-column: 1;
+  grid-row: 2;
+  min-width: 0;
+  padding: var(--spacing-5);
+  background: var(--bg-surface);
+  border: 0.0625rem solid var(--border-default);
+  border-bottom: none;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Styled as the bill box's own footer bar: same column, next row, negative
+   margin-top cancels the grid's row-gap so it sits flush against
+   .print-document's (border-less) bottom edge instead of floating separately. */
+.wizard-step--erfolg .order-confirmation .print-button {
+  grid-column: 1;
+  grid-row: 3;
+  margin-top: calc(-1 * var(--spacing-5));
+  padding: var(--spacing-3) var(--spacing-5);
+  width: 100%;
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-align: left;
+  cursor: pointer;
+  border: 0.0625rem solid var(--border-default);
+  border-top: 0.0625rem dashed var(--border-strong);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: background var(--duration-fast) var(--ease-in-out);
+}
+
+.wizard-step--erfolg .order-confirmation .print-button:hover {
+  background: var(--color-neutral-200);
+}
+
+.wizard-step--erfolg .order-confirmation .simulated-email {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  margin-top: 0;
 }
 
 .simulated-email {
