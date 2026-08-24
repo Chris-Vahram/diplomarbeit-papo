@@ -243,6 +243,13 @@ ul.plain li::before {
 
 ul.plain li strong { color: var(--ink); font-weight: 600; }
 
+ul.plain li small {
+  display: block;
+  font-size: 18px;
+  color: var(--ink-faint);
+  margin-top: 4px;
+}
+
 /* --- Karten-Raster ------------------------------------------------------ */
 
 .grid-3 {
@@ -606,6 +613,10 @@ ul.backlog li .note {
   color: var(--ink-faint);
   white-space: nowrap;
 }
+
+ul.backlog li .note.done { color: var(--green); }
+ul.backlog li .note.open { color: var(--amber); }
+ul.backlog li .note.blocked { color: var(--accent); }
 
 /* --- Fokus / Motion ----------------------------------------------------- */
 

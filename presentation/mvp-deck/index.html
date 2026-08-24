@@ -196,15 +196,49 @@
         </ul>
       </section>
 
-      <!-- 9. Ausblick -->
+      <!-- 9. Phase 2 – Zwischentitel -->
+      <section class="dark">
+        <p class="eyebrow">Phase 2</p>
+        <h1>Seit dem Termin am 10.07.</h1>
+        <p class="lead">Was seither umgesetzt wurde – und was noch aussteht.</p>
+      </section>
+
+      <!-- 10. Feedback umgesetzt -->
+      <section>
+        <p class="eyebrow">Feedback umgesetzt</p>
+        <h2>Alle konkreten Wünsche aus dem Meeting sind erledigt</h2>
+        <ul class="backlog">
+          <li><span class="btag">UX</span> Bestellablauf als geführter Schritt-für-Schritt-Wizard <span class="note done">erledigt</span></li>
+          <li><span class="btag">UX</span> Produktsuche mit Suchleiste &amp; Filter im Bestellformular <span class="note done">erledigt</span></li>
+          <li><span class="btag">UX</span> Filter nach Endkunde/Partner in den Bestelllisten <span class="note done">erledigt</span></li>
+          <li><span class="btag">UX</span> Partner sieht Endkunden ohne kürzliche Bestellung <span class="note done">erledigt</span></li>
+          <li><span class="btag">Fix</span> Keycloak-Session hält länger, kein schnelles Auto-Logout mehr <span class="note done">erledigt</span></li>
+          <li><span class="btag">Fix</span> Unklares Feld „Keycloak-Username“ entfernt, Login läuft über Partnernummer <span class="note done">erledigt</span></li>
+          <li><span class="btag">UX</span> Feinschliff mobile Ansicht <span class="note open">laufend</span></li>
+        </ul>
+      </section>
+
+      <!-- 11. Hosting -->
+      <section>
+        <p class="eyebrow">Hosting</p>
+        <h2>Deployment: bereit bis auf die Domain</h2>
+        <p class="lead">Firma stellt die Hetzner-VM, CI/CD läuft auf unserer Seite bereits vollständig.</p>
+        <ul class="plain">
+          <li><strong>Tests &amp; Build</strong> laufen automatisch bei jedem Push<small>GitHub Actions, Backend-Testsuite grün</small></li>
+          <li><strong>Docker-Image</strong> wird automatisch gebaut und ins Registry gepusht<small>GHCR, bei jedem Merge nach main</small></li>
+          <li><strong>Deploy-Schritt</strong> ist fertig implementiert, aber noch deaktiviert<small>fehlende Domain blockiert TLS-Zertifikat &amp; Keycloak-Hostname-Konfiguration</small></li>
+        </ul>
+      </section>
+
+      <!-- 12. Ausblick -->
       <section class="dark">
         <p class="eyebrow">Ausblick</p>
         <h2>Nächste Schritte</h2>
         <ul class="plain" style="max-width: 30em;">
-          <li>Feedback aus Firmengesprächen einarbeiten</li>
-          <li>Import-Spaltenformate anhand realer Kundendaten finalisieren</li>
+          <li><strong>Sobald Domain da:</strong> Deploy-Pipeline aktivieren, live gehen</li>
+          <li><strong>Sobald Firmendaten da:</strong> Import-Spaltenmapping finalisieren</li>
+          <li>Mobile Feinschliff fortsetzen</li>
           <li>Weitere Härtung: Sicherheit, Effizienz, Bedienbarkeit</li>
-          <li>Feinschliff am Design (Auftragsbestätigung, Farbgebung)</li>
           <li>Diplomarbeits-Dokumentation fertigstellen</li>
         </ul>
       </section>
