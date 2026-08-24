@@ -2052,6 +2052,13 @@ table button[data-edit-id] {
   max-width: none;
 }
 
+/* Same reasoning as #manual-order-form above: the wizard's "Neuer Endkunde"
+   step has the full wizard-step width to work with, not the narrow single-column
+   default .entity-form assumes elsewhere (e.g. the partner's own profile-edit form). */
+#neuer-kunde-form {
+  max-width: none;
+}
+
 .entity-form--grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -2424,13 +2431,6 @@ legend {
   text-decoration: underline;
 }
 
-.order-cart-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 22rem;
-  align-items: start;
-  gap: var(--spacing-5);
-}
-
 .catalog__toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -2460,21 +2460,36 @@ legend {
   background: var(--bg-surface);
 }
 
+/* Horizontally-scrolling single row rather than a wrapping grid: with the
+   "Übersicht"/cart-preview panel now owning its own column (produkte-step-layout
+   below), a wrapping multi-row grid would fight that column for height. A
+   fixed card width (.product-card) lets the row scroll instead. */
 .catalog__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  display: flex;
   gap: var(--spacing-4);
+  overflow-x: auto;
+  padding-bottom: var(--spacing-2);
 }
 
-.catalog__empty,
-.catalog__hint {
-  grid-column: 1 / -1;
+.catalog__empty {
+  flex: 1 1 auto;
   padding: var(--spacing-4) 0;
   color: var(--text-secondary);
   font-size: var(--font-size-sm);
 }
 
+.catalog__hint {
+  flex: 0 0 auto;
+  align-self: center;
+  padding: var(--spacing-4);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
 .product-card {
+  flex: 0 0 13rem;
+  width: 13rem;
   display: flex;
   flex-direction: column;
   background: var(--bg-surface);
@@ -2502,13 +2517,27 @@ legend {
 }
 
 .product-card__body {
+  /* flex:1 so the body (not the button) absorbs the height difference between
+   cards whose name/category text wraps to different line counts - keeps the
+   add-to-cart button's own bottom edge aligned across every card in the row,
+   instead of it drifting up/down depending on that card's own text length. */
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-1);
   padding: var(--spacing-3);
 }
 
+/* Always exactly 2 lines tall, regardless of the actual name length - a short
+   name leaves the second line blank, a long one is clamped with an ellipsis.
+   Keeps every card's name block the same height (on top of .product-card__body's
+   flex:1 fix above) instead of varying 1-2 lines by name length. */
 .product-card__name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 3em;
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-normal);
 }
@@ -2525,6 +2554,30 @@ legend {
 .product-card__price {
   font-family: var(--font-mono);
   color: var(--text-brand);
+}
+
+/* Stacked, not side-by-side: at the card's own width, a side-by-side qty input
+   left the button too little room for its own text ("In den Warenkorb"),
+   overflowing it. Stacking removes the width contest entirely - both children
+   fill the row's full width (column-flex default: align-items stretch). */
+.product-card__add-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  margin: 0 var(--spacing-3) var(--spacing-3);
+}
+
+.product-card__qty {
+  height: 2.25rem;
+  padding: 0 var(--spacing-2);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  border: 0.0625rem solid var(--border-strong);
+  border-radius: var(--radius-md);
+}
+
+.product-card__add-row .product-card__add-btn {
+  margin: 0;
 }
 
 .product-card__add-btn {
@@ -2628,6 +2681,88 @@ legend {
   cursor: pointer;
 }
 
+/* Read-only equivalent of .cart-line (Übersicht step - no quantity input,
+   no remove button, see cartSummaryHtml). */
+.cart-summary-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) 0;
+  border-bottom: 0.0625rem solid var(--border-default);
+}
+
+.cart-summary-line:last-child {
+  border-bottom: none;
+}
+
+.cart-summary-line__thumb {
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+}
+
+.cart-summary-line__thumb--empty {
+  background: var(--color-neutral-100);
+  border: 0.0625rem solid var(--border-default);
+}
+
+.cart-summary-line__name {
+  flex: 1;
+  min-width: 8rem;
+  overflow-wrap: anywhere;
+  font-size: var(--font-size-sm);
+}
+
+.cart-summary-line__qty {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+}
+
+.cart-summary-line__total {
+  flex-shrink: 0;
+  min-width: 4rem;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.kunde-details {
+  margin-bottom: var(--spacing-5);
+  padding: var(--spacing-4) var(--spacing-5);
+  background: var(--bg-surface);
+  border: 0.0625rem solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.kunde-details__heading {
+  margin: 0 0 var(--spacing-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.kunde-details__name {
+  margin: 0;
+  font-weight: var(--font-weight-medium);
+}
+
+.kunde-details__address,
+.kunde-details__contact {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
 .cart__totals {
   margin-top: var(--spacing-2);
   padding-top: var(--spacing-2);
@@ -2638,6 +2773,309 @@ legend {
   width: 100%;
   margin-top: var(--spacing-4);
   padding: var(--spacing-3);
+}
+
+/* ---- Order wizard: checkpoint bar, step transitions, confetti (partner-order-wizard) ---- */
+
+.wizard-checkpoints {
+  display: flex;
+  list-style: none;
+  margin: 0 0 var(--spacing-6);
+  padding: 0;
+  gap: var(--spacing-2);
+}
+
+.wizard-checkpoint {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Connector line leading into this checkpoint, spanning from the previous
+   marker's center to this one's (both centered in their equal-width flex
+   items) — 1.375rem = spacing-2 padding-top + half the 1.75rem marker.
+   The grey line is the track; the accent line on top animates in (scaleX)
+   once this checkpoint is reached. */
+.wizard-checkpoint:not(:first-child)::before,
+.wizard-checkpoint:not(:first-child)::after {
+  content: "";
+  position: absolute;
+  top: 1.375rem;
+  left: -50%;
+  width: 100%;
+  height: 0.125rem;
+}
+
+.wizard-checkpoint:not(:first-child)::before {
+  /* Deliberately a plain, desaturated grey rather than var(--border-strong) —
+     this app's whole neutral scale is green-tinted (brand consistency), which
+     reads as "too green" right next to the solid accent-green fill on top. */
+  background: #c7c7c7;
+}
+
+.wizard-checkpoint:not(:first-child)::after {
+  background: var(--color-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.wizard-checkpoint--current:not(:first-child)::after,
+.wizard-checkpoint--done:not(:first-child)::after {
+  transform: scaleX(1);
+}
+
+/* A CSS `transition` never plays here — the checkpoint bar is fully replaced
+   (innerHTML) on every step change, so an already-"done" segment is inserted
+   pre-filled with no prior frame to transition from. A keyframe animation runs
+   regardless of that (it animates a freshly-inserted element's own timeline),
+   so the fill-in plays only once, for the segment that *just* became done. */
+.wizard-checkpoint--just-done:not(:first-child)::after {
+  /* Noticeably slower than --duration-slow (250ms, tuned for ordinary hover/
+     focus transitions) - a "please notice this" completion cue needs to be
+     visible, not just technically present. */
+  animation: wizard-line-fill 700ms var(--ease-out) both;
+}
+
+@keyframes wizard-line-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.wizard-checkpoint__btn {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-1);
+  width: 100%;
+  padding: var(--spacing-2) var(--spacing-1);
+  border: none;
+  background: none;
+  font-family: var(--font-sans);
+  cursor: default;
+}
+
+.wizard-checkpoint--done .wizard-checkpoint__btn {
+  cursor: pointer;
+}
+
+.wizard-checkpoint__marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  border: 0.125rem solid var(--border-strong);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  transition: background var(--duration-normal) var(--ease-in-out), border-color var(--duration-normal) var(--ease-in-out), color var(--duration-normal) var(--ease-in-out);
+}
+
+.wizard-checkpoint__label {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.wizard-checkpoint--current .wizard-checkpoint__marker,
+.wizard-checkpoint--done .wizard-checkpoint__marker {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--text-inverse);
+}
+
+.wizard-checkpoint--current .wizard-checkpoint__label,
+.wizard-checkpoint--done .wizard-checkpoint__label {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Solid muted colors, not opacity: the marker's circle must stay fully opaque
+   (opacity would make its solid --bg-surface background translucent, letting
+   the connector line underneath show through it - the "line shines through
+   the pill" bug). Scoped to marker+label only, so the connector-line track
+   itself stays the same color everywhere, regardless of checkpoint state. */
+.wizard-checkpoint--unused .wizard-checkpoint__marker,
+.wizard-checkpoint--unused .wizard-checkpoint__label {
+  color: var(--text-disabled);
+}
+
+.wizard-checkpoint--unused .wizard-checkpoint__marker {
+  border-color: var(--border-default);
+}
+
+.wizard-checkpoint--just-done .wizard-checkpoint__marker {
+  /* See the connector-line animation above for why this needs a longer,
+     dedicated duration instead of --duration-slow. */
+  animation: wizard-checkmark-pop 700ms var(--ease-out);
+}
+
+@keyframes wizard-checkmark-pop {
+  0% { transform: scale(0.6); }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.wizard-step {
+  animation: wizard-step-in var(--duration-slow) var(--ease-out);
+}
+
+@keyframes wizard-step-in {
+  from { opacity: 0; transform: translateX(0.75rem); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.wizard-step__description {
+  margin: 0 0 var(--spacing-5);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.wizard-step__actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-6);
+}
+
+/* "Produkte wählen" step: cart preview (left, fixed width) + catalog (right,
+   remaining width). minmax(0, 1fr) is required, not just 1fr - it's what lets
+   .catalog__grid's overflow-x:auto actually clip/scroll instead of the grid
+   track growing to fit its content and blowing out the column.
+   An explicit height (not "auto" + align-items:stretch) is deliberate: a grid
+   row's auto size is computed from each item's own *unconstrained* content
+   size, and .cart--preview's cart__lines (many lines, overflow-y:auto) has no
+   real cap until something above it resolves to a definite height - so an
+   auto-sized row just grows to fit the longest cart instead of matching the
+   catalog column, and overflow:auto never engages. Sized to comfortably fit
+   the toolbar + one row of 11rem product cards. */
+.produkte-step-layout {
+  display: grid;
+  grid-template-columns: 21rem minmax(0, 1fr);
+  gap: var(--spacing-5);
+  height: 30rem;
+}
+
+/* Header (heading) and footer (totals) stay fixed; only the lines in between
+   scroll - so the box always matches the catalog's height instead of growing
+   with the cart, and "Gesamtwert" never scrolls out of view. */
+.cart--preview {
+  /* Overrides .cart's position:sticky - height already matches the catalog
+     column exactly (see produkte-step-layout above), so there's no extra
+     scroll room within the row for "stick while scrolling" to make sense. */
+  position: static;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.cart-preview__heading {
+  flex: 0 0 auto;
+  margin: 0 0 var(--spacing-3);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.cart--preview .cart-step-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.cart--preview .cart__lines {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.cart--preview .cart__totals {
+  flex: 0 0 auto;
+}
+
+/* "Übersicht" step: Endkunde details (left) + cart summary (right), side by
+   side - align-items: start (not stretch, unlike produkte-step-layout above)
+   since there's no shared reference height to match here; each box just sizes
+   itself, and .cart--summary below caps/scrolls independently so a long cart
+   doesn't grow the page instead of the box. */
+.uebersicht-layout {
+  display: grid;
+  grid-template-columns: 20rem minmax(0, 1fr);
+  align-items: start;
+  gap: var(--spacing-5);
+}
+
+.cart--summary {
+  display: flex;
+  flex-direction: column;
+  max-height: 24rem;
+}
+
+.cart--summary .cart-summary__lines {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.cart--summary .cart__totals {
+  flex: 0 0 auto;
+}
+
+.confetti {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* Per-piece width/height/--confetti-drift/animation-delay/animation-duration
+   come from inline style (randomized in JS) - only the shared timing curve and
+   fall distance live here. 115vh (not a fixed rem distance) guarantees every
+   piece falls past the bottom of the viewport regardless of screen height. */
+.confetti-piece {
+  position: absolute;
+  top: -5%;
+  border-radius: var(--radius-sm);
+  animation-name: confetti-fall;
+  animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  animation-fill-mode: forwards;
+}
+
+.confetti-piece--0 { background: var(--color-primary-500); }
+.confetti-piece--1 { background: var(--color-accent-600); }
+.confetti-piece--2 { background: var(--color-warning-600); }
+.confetti-piece--3 { background: var(--color-secondary-600); }
+.confetti-piece--4 { background: var(--color-error-500); }
+
+@keyframes confetti-fall {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate(var(--confetti-drift, 0), 115vh) rotate(720deg); opacity: 0; }
+}
+
+/* Respect the OS/browser motion preference across the whole app — the wizard's
+   step-transition/checkmark/confetti animations above, plus every existing
+   --duration-*/--ease-*-based transition (sidebar drawer, buttons, inputs, ...). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 .order-line input[type="number"] {
@@ -2681,6 +3119,15 @@ legend {
   border: 0.0625rem solid var(--border-default);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
+}
+
+/* Scoped to the "Erfolg" step only (not the company's use of the same card in
+   a modal) - the bill + simulated e-mail together can be taller than the
+   viewport once the checkpoint bar/description/actions are also on screen;
+   scroll inside the card itself rather than growing the whole page. */
+.wizard-step--erfolg .order-confirmation {
+  max-height: 60vh;
+  overflow-y: auto;
 }
 
 .simulated-email {
@@ -2939,16 +3386,29 @@ legend {
     position: static;
   }
 
-  .order-cart-layout {
-    grid-template-columns: 1fr;
-  }
-
   .cart {
     position: static;
   }
 
-  .catalog__grid {
-    grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  .produkte-step-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .uebersicht-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .product-card {
+    flex-basis: 10.5rem;
+    width: 10.5rem;
+  }
+
+  .wizard-checkpoint__label {
+    display: none;
+  }
+
+  .wizard-checkpoints {
+    gap: var(--spacing-1);
   }
 
   .app-root h1 {
