@@ -423,7 +423,6 @@ The project is functionally acceptable if the following can be demonstrated:
 
 ## 13. Open Questions
 
-- **Research-question supervisor sign-off:** wording approved by Chris on 2026-07-07 and ready to send to the supervisor; final supervisor confirmation still pending.
 - **Import file column formats:** the column sets of the real partner and article Excel/CSV files are not yet specified — waiting on sample data from the client. Needed to define the default column mapping and per-column validation rules for FR-04 (blocks final import implementation, not the rest of the MVP).
 
 ### Resolved (2026-07-03)
@@ -441,8 +440,8 @@ The project is functionally acceptable if the following can be demonstrated:
 - **Schema management:** decided — Hibernate auto-generation, no Flyway migrations for the prototype. Profiles: `drop-and-create` + seed script for dev/test, `update` for the demo/prod profile so demo data survives restarts.
 
 ### Resolved (2026-07-07)
-- **Research question wording:** approved by Chris for supervisor review:
-  > Wie kann ein webbasiertes Partnerportal gestaltet werden, das Unternehmen, Vertriebspartner und Endkunden in einem partnerbasierten Vertriebsmodell schrittweise verbindet und dabei Partnerverwaltung, Produktfreigabe, Bestellabwicklung, Provisionszuordnung und Auswertungen in einer benutzerfreundlichen und erweiterbaren Plattform zusammenfuehrt?
+- **Research question wording:** approved by Chris on 2026-07-07 and subsequently confirmed by the supervisor:
+  > Wie kann ein webbasiertes Partnerportal gestaltet werden, das Unternehmen, Vertriebspartner und Endkunden in einem partnerbasierten Vertriebsmodell schrittweise verbindet und dabei Partnerverwaltung, Produktfreigabe, Bestellabwicklung, Provisionszuordnung und Auswertungen in einer benutzerfreundlichen und erweiterbaren Plattform zusammenführt?
 
 ---
 

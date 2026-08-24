@@ -9,7 +9,7 @@
 
 ## 1. Scope-Verdikt
 
-**Chris is slightly beyond scope in the following areas:** (1) `add-product-image-upload` — Upload + Galerie gehen über die FSD-Anforderung „optionally … image reference" (FR-03, Z. 157) hinaus und sind laut eigenem Proposal „requested by Tobias, **not a client-meeting requirement**"; (2) `add-order-document-print` — kein Kunden-Ask, sondern eine interne Review-Entscheidung („Direction B Auftragsbeleg", 2026-07-09, von Chris freigegeben); (3) **B-08-Leakage** — der Dashboard-Trend „ggü. Vorperiode" ist im Code aktiv (Tobias' Commit `229a93e`), obwohl `phase2_backlog.md` B-08 als `CUT` führt.
+**Chris is slightly beyond scope in the following areas:** (1) `add-product-image-upload` — Upload + Galerie gehen über die FSD-Anforderung „optionally … image reference" (FR-03, Z. 157) hinaus und sind laut eigenem Proposal „requested by Tobias, **not a client-meeting requirement**"; (2) `add-order-document-print` — kein Kunden-Ask, sondern eine interne Review-Entscheidung („Direction B Auftragsbeleg", 2026-07-09, von Chris freigegeben). Die damals festgestellte **B-08-Leakage** ist seit 2026-08-24 aufgelöst: Der vorhandene Partner-Dashboard-Trend ist als `STUB` dokumentiert.
 
 Einordnung des Verdikts: Alle drei Punkte sind **klein, dokumentiert, freigegeben bzw. Tobias-authored** — kein Fall von unkontrolliertem Feature-Wildwuchs, keine verdeckte Teilimplementierung von B-01..B-07, keine spekulativen Abstraktionen. Die große Masse der Arbeit seit `8ef0d90` (7 von 10 Changes) ist direkt auf das Meeting vom 10.07., explizite FSD-Anforderungen oder notwendige Korrektheits-/Security-Härtung rückführbar. „Slightly", nicht „materially": die drei Ausreißer zusammen sind < 15 % des Aufwands im Audit-Fenster, alle bereits gemerged und getestet — Rückbau würde mehr kosten als Behalten.
 
@@ -41,7 +41,7 @@ Einordnung des Verdikts: Alle drei Punkte sind **klein, dokumentiert, freigegebe
 
 ## 3. Mögliches Deferred-Feature-Leakage (B-01..B-08)
 
-- **B-08 „ggü. Vorperiode"-Trend — EINZIGES echtes Leakage, Finding SCOPE-001.** `frontend/src/lib/dashboard-data.js:58-77` (`previousPeriod`, `trendInfo`) + aktive Nutzung in `partner-dashboard-page.js:204-209` (und Company-Pendant): Trend-Pfeile rendern, sobald ein expliziter Zeitraum gesetzt ist. `phase2_backlog.md` führt B-08 als `CUT`. **Aber:** Code stammt aus Tobias' `229a93e` (frontend-fixes-and-additions, 2026-07-08) — **nicht Chris' Scope-Verstoß** —, und die Implementierung ist exakt der im Backlog selbst als „cheapest path" beschriebene client-seitige Weg. `order-correctness-hardening` hat die Trend-Pfeile ausdrücklich unangetastet gelassen. Doku und Code widersprechen sich; einer muss nachziehen. **Empfehlung: behalten + Backlog auf `STUB (client-side, seit 229a93e)` aktualisieren** (1 Doku-Zeile) statt funktionierenden, getesteten Code zu entfernen. Entscheid: Chris.
+- **B-08 „ggü. Vorperiode"-Trend — Finding SCOPE-001, erledigt 2026-08-24.** `frontend/src/lib/dashboard-data.js:58-77` (`previousPeriod`, `trendInfo`) + aktive Nutzung in `partner-dashboard-page.js:204-209`: Trend-Pfeile rendern, sobald ein expliziter Zeitraum gesetzt ist. Der Code stammt aus Tobias' `229a93e` und bleibt bestehen. `phase2_backlog.md` dokumentiert den vorhandenen Partner-Dashboard-Teil nun als `STUB`; vollständige unternehmensweite Trendanalyse bleibt Phase 2.
 - **B-01 (externer Shop) — KEIN Leakage durch `partner-order-cart`:** Der Warenkorb ist das interne Kompositionswerkzeug des eingeloggten Partners (Keycloak-Auth, Enablement-gefiltert, Endkunde als Pflicht-Datensatz, keinerlei öffentliche Route). Das Proposal grenzt B-01 explizit ab. Ein „Warenkorb" macht kein Shop-Frontend.
 - **B-04 (echter E-Mail-Versand) — kein Leakage:** Print/PDF ist Browser-nativ, kein Versand; Bestätigungen bleiben simuliert; Dormant-View verschickt keine Reminders (im Proposal explizit ausgeschlossen).
 - **B-02, B-03, B-05, B-06, B-07 — keinerlei Spuren** in Code oder Changes des Audit-Fensters.
@@ -62,7 +62,7 @@ Alles Gemergte. Konkret: alle 7 meeting-/FSD-/härtungsgetriebenen Changes unein
 
 **Nichts entfernen.** Drei Pflege-/Entscheidungspunkte:
 
-1. **SCOPE-001 (Decision Required, Chris):** B-08-Backlog-Drift auflösen — empfohlen: Backlog-Update auf `STUB`, 1 Zeile, statt Code-Entfernung. Ggf. beim nächsten Termin dem Kunden zeigen (er hat es faktisch schon).
+1. **SCOPE-001 (erledigt 2026-08-24):** B-08-Backlog-Drift durch `STUB`-Dokumentation aufgelöst; Code bleibt bestehen.
 2. **SCOPE-002 (Confirmed, low):** `product-images` einfrieren — keine Erweiterungen (Cropping, Multi-Bild, Resizing bleiben out of scope wie im Proposal). Kein Rückbau.
 3. **SCOPE-003 (Confirmed, low, Prozess):** Künftige unerfragte Ideen (Muster `order-document-print`) vor dem Bauen als Vorschlag beim Kunden-Termin platzieren. Die nächste Implementierungswelle sollte ausschließlich von den echten Import-Daten (ausständig seit 10.07) und Termin-Feedback getrieben sein.
 

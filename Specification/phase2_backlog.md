@@ -52,11 +52,11 @@ Last updated: 2026-07-13
 **Why cut:** Out of scope all versions per FSD. MVP only shows commission transparently (own datensatz + dashboard sums).
 **Trigger:** "implement B-07".
 
-## B-08 — Dashboard "ggü. Vorperiode" trend indicators  `CUT`
-**What full version is:** Metric cards show a +/-x% delta vs the previous equal-length period (e.g. "+4.6% ggü. Vorperiode"), red/green trend arrow.
-**Why cut:** Tobias's redesign (`76bbe40 Frontend Design`) built the UI for it, but it needs period-over-period comparison logic and enough historical order data to be meaningful — marginal value for an internal ordering tool, not MVP. The frontend reads `dashboard.previous` which the backend does not provide.
-**MVP replacement:** metric cards show the current-period value only, no trend.
-**Trigger:** "implement B-08". Cheapest path: compute both periods client-side from the order list (no backend change).
+## B-08 — Dashboard "ggü. Vorperiode" trend indicators  `STUB`
+**What full version is:** Metric cards across the relevant dashboards show a +/-x% delta vs the previous equal-length period (e.g. "+4.6% ggü. Vorperiode"), with a red/green trend arrow and sufficient historical data for meaningful comparison.
+**MVP state (STUB):** The partner dashboard already computes the previous equal-length period client-side from the loaded order list and displays trend indicators when an explicit date range is selected. The company dashboard and a broader cross-dashboard trend analysis remain deferred.
+**Why stub:** The small partner-side comparison is implemented and useful without a backend change; complete company-wide analytics would add marginal MVP value and needs representative historical data.
+**Trigger to complete:** "implement full B-08".
 
 ---
 
@@ -83,3 +83,4 @@ Last updated: 2026-07-13
 - 2026-07-03: Phase 1 backend implemented on branch `phase-1/data-model-crud` (entities, Product/Partner CRUD + self-edit, programmatic dev/test seeder). Kunde records decided to be scoped to the creating partner (new requirement, was an unspecified gap).
 - 2026-07-06: Tobias pushed the visual design as working code (`76bbe40 Frontend Design`), which rewrote both dashboards and added widgets referencing backend data that doesn't exist. Scope call (Chris): reconcile via OpenSpec change `integrate-frontend-design` — keep the period-picker + the cheap client-side-derivable widgets (monthly chart, Bestellstatus-Donut, Top-Kunden — all computable from the order list), vendor+pin the Lucide icon dependency (was `unpkg.com/lucide@latest`), seed historical demo orders so the dashboards demo well. Only the "ggü. Vorperiode" trend is fully deferred → B-08. The planned change `add-dashboard-date-filter` is superseded by Tobias's period-picker (do not implement).
 - 2026-07-13: Client meeting 10.07.2026 (Teams; Prof. Hammer, Chris, Tobias, Firma) captured in `Documentation/Besprechungsprotokolle/Besprechungsprotokoll10_07_2026.txt`. MVP well received. New client priorities: (1) simple Benutzerführung + good mobile version (partners often not tech-savvy — Tobias's lane), (2) partner can see Endkunden who haven't ordered in a while, (3) product picker in the order form needs Suchleiste + Filter, (4) order-list filters by Endkunde/Partner (time filter re-confirmed from 07.07). Hosting: company provides **Hetzner** instances (Christian Bachl contacts Chris) — supersedes the Oracle-Cloud assumption in `ci-cd-deployment-with-gh-actions` (re-scope before building). Company delivers real data/Vorgehensweisen within 1–2 weeks → implement → new Termin. Also from Chris's Nachtrag: fix the quick Keycloak logout (→ change `add-keycloak-session-refresh`), remove the unclear "Keycloak-Username" field from partner create (repeat of 07.07; decided 2026-07-13: link via `Partner.partnerNumber` instead).
+- 2026-08-24: B-08 reclassified from `CUT` to `STUB` to match the existing client-side previous-period comparison in the partner dashboard. Full/company-wide trend analytics remain deferred.

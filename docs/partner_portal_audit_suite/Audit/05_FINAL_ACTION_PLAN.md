@@ -1,5 +1,7 @@
 # 05 — Finaler Aktionsplan (Audit-Synthese)
 
+> **Status 2026-08-24:** Batch A und B sind implementiert und regression-reviewed; 77/77 Backendtests sind grün. B-08 ist als `STUB` geklärt und die Forschungsfrage vom Betreuer bestätigt. Die folgenden Prioritäten dokumentieren weiterhin die Audit-Herleitung vom 17.07.; der aktuelle Arbeitsstand steht im Continuation Prompt.
+
 - **Audit-Datum:** 2026-07-17
 - **Geprüfter HEAD:** `cd6a025` (main, clean)
 - **Phase:** 5 von 5 (Synthese; read-only — kein Produktivcode geändert)
@@ -22,7 +24,7 @@
 | Funktional (FR-01..FR-25) | 24/25 complete; FR-04 wartet nur auf echte Kundendaten | Report 01 §3 |
 | Sicherheit / Isolation | Keine Critical/High; Isolation, RBAC, Inaktiv-Block, Upload-Härtung bestätigt | Report 03 §2/§4 |
 | Finanzkorrektheit | Byte-genau (BigDecimal HALF_UP ↔ `money.js` Integer-Cent); einziger Defekt: Anzeige-Off-by-one im Zeitraumfilter (TECH-001) | Report 03 §3 |
-| Tests | 76/76 grün (via Compose-Workaround); Standard-Dev-Services-Lauf lokal durch Docker-Desktop-gVisor blockiert — Infra, kein Code | Report 03 §6 |
+| Tests | Aktuell 77/77 grün; letzter vollständiger Batch-B-Lauf via Compose-Keycloak-Pfad | Batch-B Regression Review |
 | UX | Kernfluss trägt; 2 High-Defekte (UX-001/002) + 3 Medium vor Termin sinnvoll | Report 04 |
 | OpenSpec-Hygiene | 8 fertige Changes unarchiviert; `DATA_MODEL.md` re ProductImage stale | Report 01 §4 |
 
@@ -30,7 +32,7 @@
 
 ## 3. Finales Scope-Fazit
 
-Übernahme von Report 02 unverändert (re-verifiziert): **nichts entfernen, nichts zurückbauen.** `add-order-document-print` + `add-product-image-upload` bleiben (geliefert, getestet, Rückbau teurer); Bild-Feature **eingefroren** (kein Cropping/Multi-Bild/Resizing). Einziges echtes Leakage ist B-08 (Dashboard-Trend, Tobias-authored) — Doku-Entscheidung nötig, kein Code-Problem. Nächste Implementierungswelle ausschließlich: Audit-Fixes + echte Import-Daten + Termin-Feedback.
+Übernahme von Report 02 unverändert (re-verifiziert): **nichts entfernen, nichts zurückbauen.** `add-order-document-print` + `add-product-image-upload` bleiben (geliefert, getestet, Rückbau teurer); Bild-Feature **eingefroren** (kein Cropping/Multi-Bild/Resizing). B-08 ist seit 2026-08-24 als `STUB` dokumentiert; der vorhandene Partner-Dashboard-Trend bleibt. Nächste Implementierungswelle ausschließlich: Audit-Fixes + echte Import-Daten + Termin-Feedback.
 
 ## 4. Bestätigte Critical- & High-Findings
 
@@ -48,12 +50,11 @@ Höchstes verbleibendes technisches Finding: TECH-001 (Medium) — Dashboard-Zei
 - **REMOVE:** nichts.
 - **DEFER (Phase 2 / nach MVP):** SEC-001 (Bild-Enumeration, dokumentiert akzeptiert), SEC-002 (API-Doppel-Submit, Idempotenz = Enterprise-Ceremony), TECH-003 (precision-Überlauf, dokumentieren statt fixen), M-002 (Mobile Sticky-Cart — vor erstem Partner-Rollout, nicht vor Termin), SCOPE-002/003 (eingefroren bzw. Prozessregel, keine Arbeit).
 - **NO ACTION:** Company-Listen-Seed-Gruppierung, NEU-Badge-Doppelsignal (Report 04 §2, beobachten); Cross-Model-Review (Report 03 §9: nicht nötig, keine Critical/High-Technik-Findings).
+- **RESOLVED:** SCOPE-001 — B-08 als `STUB` dokumentiert; Forschungsfrage vom Betreuer bestätigt.
 - **DECISION REQUIRED:**
-  1. **SCOPE-001** — B-08-Trend: Backlog auf `STUB` updaten (empfohlen, 1 Doku-Zeile) oder Code raus. **Chris.**
-  2. Dormanz-Schwelle 60 Tage bestätigen. **Kunde (nächster Termin).**
-  3. Import-Spaltensets/echte Daten — „1–2 Wochen" vom 10.07. ist **jetzt (17.07.) abgelaufen → nachfassen**. **Chris → Kunde.**
-  4. A11Y-002 Primärbutton-Kontrast: Token-Entscheidung (primary-600/700). **Tobias.**
-  5. Forschungsfragen-Sign-off. **Betreuer (Prof. Hammer).**
+  1. Dormanz-Schwelle 60 Tage bestätigen. **Kunde (nächster Termin).**
+  2. Import-Spaltensets/echte Daten — „1–2 Wochen" vom 10.07. ist abgelaufen → nachfassen. **Chris → Kunde.**
+  3. A11Y-002 Primärbutton-Kontrast: Token-Entscheidung (primary-600/700). **Tobias.**
 
 ## 6. Priorisierter Aktionsplan
 
@@ -69,9 +70,9 @@ Kein P0 (nichts blockiert sofort: App läuft, Tests grün via Workaround, kein S
 | P1 | — | Import-Daten beim Kunden nachfassen (Frist 10.07.+1–2 Wochen abgelaufen) | FR-04-Abschluss + Termin-Planung hängen daran („dann umsetzen → dann neuen Termin") | Chris | XS | keine | Projektfluss stockt; Termin verschiebt sich | Antwort des Kunden liegt vor (Daten oder neues Datum) |
 | P2 | UX-005 | Import-Feedback: Bestätigen-Button gaten solange Pflicht-Zuordnung fehlt; Toast-Ton an Ergebnis koppeln (0 importiert ≠ grün); Fehlertext-Interpunktion | Wird kritisch, sobald echte Kundendateien eintreffen | Chris | S | sinnvoll NACH Eintreffen echter Daten (ein Change mit Spalten-Mapping-Finalisierung) | Anwender fehlinterpretiert Importergebnis mit Echtdaten | 0-Zeilen-Import → Warn-/Fehler-Toast; Button disabled bei fehlender Pflichtspalte |
 | P2 | TECH-002 | `ImportService.java:44` → `toLowerCase(Locale.ROOT)` | Konsistenz beider Dedupe-Pfade; Codebasis hat die Regel schon | Chris | XS | mit UX-005-Batch | Nur auf exotischer Server-Locale relevant | Eine Zeile geändert; bestehende Import-Tests grün |
-| P2 | INFRA-001 | Keycloak-Dev-Services-Workaround festhalten: dokumentiertes Skript/`%test-compose`-Profil ODER Docker-Desktop gVisor→legacy umstellen | Standard-`./mvnw test` lokal deterministisch rot (71/76) — täglicher Reibungsverlust, Verwechslungsgefahr mit echten Fehlern | Chris | S | keine; NICHT in Feature-Branches mischen | Jeder Testlauf braucht Insider-Wissen; falsche „Tests kaputt"-Schlüsse | Dokumentierter Ein-Befehl-Weg zu 76/76 lokal (docs/SETUP.md o.ä.) |
+| P2 | INFRA-001 | Keycloak-Dev-Services-Workaround festhalten: dokumentiertes Skript/`%test-compose`-Profil ODER Docker-Desktop gVisor→legacy umstellen | Standard-`./mvnw test` lokal deterministisch rot (72/77) — täglicher Reibungsverlust, Verwechslungsgefahr mit echten Fehlern | Chris | S | keine; NICHT in Feature-Branches mischen | Jeder Testlauf braucht Insider-Wissen; falsche „Tests kaputt"-Schlüsse | Dokumentierter Ein-Befehl-Weg zu 77/77 lokal (docs/SETUP.md o.ä.) |
 | P2 | HYG-001 | OpenSpec-Hygiene: `build-partnerportal-mvp` archivieren (nach 8.3/8.4-Klärung) → entsperrt `order-correctness-hardening`; die übrigen 7 fertigen Changes archivieren; `DATA_MODEL.md` re ProductImage nachziehen | Spec = Wahrheitsquelle der Diplomarbeit; Drift wächst | Chris | S | Reihenfolge: mvp zuerst (Spec-Sync) | Doku-Drift, Bewertungsrisiko Diplomarbeit | `openspec list` zeigt nur aktive Changes; `DATA_MODEL.md` enthält ProductImage |
-| P3 | SCOPE-001 | B-08-Entscheid ausführen (empfohlen: Backlog-Zeile auf `STUB (client-side, seit 229a93e)`) | Doku ↔ Code-Widerspruch auflösen | Chris | XS | Entscheidung §5 | Backlog lügt; Verwirrung bei Abgabe-Review | Backlog-Eintrag aktualisiert ODER Code entfernt |
+| Done | SCOPE-001 | B-08 als `STUB` dokumentiert; vorhandenen Partner-Dashboard-Trend behalten | Doku ↔ Code-Widerspruch aufgelöst | Chris | XS | — | — | Erledigt 2026-08-24 |
 | P3 | A11Y-001 | Klickbare Tabellenzeilen tastaturbedienbar (`tabindex`, `role`, Enter/Space in `data-table.js`) | Details/Beleg per Tastatur unerreichbar; Diplomarbeit-Anspruch | Chris | S | keine | A11y-Lücke in Abgabe-Bewertung | Enter auf fokussierter Zeile öffnet Details |
 | P3 | A11Y-002 | Primärbutton auf primary-600/700-Token heben | WCAG-AA-Fail (3,2:1) auf allen Primäraktionen | Tobias (Token), Chris (Umsetzung) | XS | Token-Entscheid §5 | Kontrast-Fail bleibt in jeder Ansicht | Kontrast ≥4,5:1 gemessen |
 | P3 | A11Y-003/004 | `aria-label` auf Filter-/Datums-Inputs + Galerie-Buttons; sichtbarer Selected-State Galerie | Kleine, billige A11y-Restposten | Chris | XS–S | keine | gering | DOM-Check: alle Inputs benannt |
@@ -97,7 +98,7 @@ Reihenfolge berücksichtigt Abhängigkeiten (Scope-Entscheidungen sind gefallen 
 
 ## 8. Erforderliche Entscheidungen
 
-Siehe §5: (1) B-08 → Chris (Empfehlung: Backlog-`STUB`-Zeile); (2) Dormanz 60 Tage → Kunde; (3) Import-Daten nachfassen → Chris sofort; (4) Button-Kontrast-Token → Tobias; (5) Forschungsfragen → Prof. Hammer. Keine davon blockiert Batch A/B.
+Siehe §5: offen bleiben (1) Dormanz 60 Tage → Kunde, (2) Import-Daten nachfassen → Chris sofort und (3) Button-Kontrast-Token → Tobias. B-08 und Forschungsfrage sind geklärt. Keine der offenen Entscheidungen blockiert Batch A/B.
 
 ## 9. Wenn nur drei Dinge vor dem Termin
 

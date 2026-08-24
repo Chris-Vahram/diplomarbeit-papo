@@ -51,6 +51,6 @@ Vollständige Priorisierung + Batches: `Audit/05_FINAL_ACTION_PLAN.md` (§6/§7)
 1. **Batch A (P1):** `fix-ux-reload-and-cart-overlap` implementieren (UX-001 + UX-002) — Change proposed, 0/9; Branch von aktuellem main → `/opsx:apply` (mit Sonnet). Muss vor jeder Live-Demo gefixt sein.
 2. **Batch B (P1):** UX-003 („Bitte wählen…") + UX-004 (Bestellliste neueste zuerst) + TECH-001 (Dashboard-Zeitraum ±1 Tag, beide Dashboards + Unit-Test) als kleiner gemeinsamer Fix-Change.
 3. **Import-Daten nachfassen** (Frist 10.07.+1–2 Wochen abgelaufen) — blockt Batch C (Mapping-Finalisierung + UX-005 + TECH-002) und Terminplanung.
-4. **Batch D (Hygiene, kein Code):** OpenSpec-Archivierung (mvp zuerst), `DATA_MODEL.md`, SCOPE-001-B-08-Backlog-Zeile, Dev-Services-Workaround dokumentieren (INFRA-001).
+4. **Batch D (Hygiene, kein Code):** OpenSpec-Archivierung (mvp zuerst), `DATA_MODEL.md` und Dev-Services-Workaround dokumentieren (INFRA-001). SCOPE-001/B-08 ist erledigt.
 5. **Batch E (vor Abgabe):** A11y (A11Y-001..004) + Test-Lücken (TEST-001) + Polish; Tobias: Kontrast-Token (A11Y-002), M-001, DS-001..004 in FD.4.
 6. **Deployment-Gate:** UX-008 (Demo-Credentials von Login-Seite) vor Hetzner-Go-Live; M-002 vor erstem Partner-Rollout.

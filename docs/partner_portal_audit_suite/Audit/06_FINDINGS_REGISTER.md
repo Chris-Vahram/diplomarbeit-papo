@@ -16,7 +16,7 @@
 
 | ID | Title | Category | Severity | Priority | Status | Owner | Source Report | Introduced Commit | Fix Commit | Verification Report |
 |---|---|---|---|---|---|---|---|---|---|---|
-| SCOPE-001 | B-08-Backlog-Drift: „ggü. Vorperiode"-Trend im Code aktiv, Backlog sagt CUT — Backlog auf STUB updaten oder Code entfernen | scope | low | P3 | Decision Required | Chris | `02_SCOPE_REVIEW_REPORT.md` §3 | `229a93e` (Tobias) | | |
+| SCOPE-001 | B-08-Backlog-Drift: vorhandenen Partner-Dashboard-Trend als STUB dokumentieren | scope | low | P3 | Fixed | Chris | `02_SCOPE_REVIEW_REPORT.md` §3 | `229a93e` (Tobias) | documentation update | |
 | SCOPE-002 | `product-images` (Upload+Galerie) über FSD FR-03 „image reference" hinaus; Team-Wunsch, kein Kunden-Ask — behalten, aber einfrieren (kein Cropping/Multi-Bild/Resizing) | scope | low | P4 | Confirmed | Chris | `02_SCOPE_REVIEW_REPORT.md` §2/§4 | `75ae88a` | | |
 | SCOPE-003 | Prozess: unerfragte Ideen (Muster `add-order-document-print`) künftig erst beim Kunden-Termin anbieten, dann bauen | scope / process | low | P4 | Confirmed | Chris | `02_SCOPE_REVIEW_REPORT.md` §6 | `032ec50` | | |
 | TECH-001 | Dashboard-Zeitraumfilter verschiebt Grenzdatum um 1 Tag (`toISOString` UTC-Konversion); beide Dashboards, nur bei explizitem Zeitraum | correctness | medium | P1 | Verified | Chris | `03_TECHNICAL_REVIEW_REPORT.md` §3 | — | `540d6fa` | `HISTORY/2026-07-19_REGRESSION_REVIEW_PRE_TERMIN_ORDER_DASHBOARD.md` |
@@ -42,6 +42,6 @@
 | A11Y-004 | Bildergalerie: Buttons ohne aria-label, kein sichtbarer Selected-State, Tab-Kontrast | accessibility | low | P3 | Confirmed | Chris/Tobias | `04_UX_REVIEW_REPORT.md` §4 | — | | |
 | DS-001..004 | Design-System-Inkonsistenzen: leere Metric-Card-Kreise, gemischte €-/％-Formate (kein `Intl.NumberFormat("de-AT")`), fehlendes Token `--color-neutral-0`, Badge-/Button-/Preisformat-Inkonsistenzen | visual | low | P3 | Confirmed | Chris + Tobias (FD.4) | `04_UX_REVIEW_REPORT.md` §6 | — | | |
 | DS-005 | Info: `Design/variables.css` lädt Google-Fonts per CDN-@import (nur Design-Quelle stale, kein Runtime-Problem) | docs | info | P3 | Confirmed | Tobias | `04_UX_REVIEW_REPORT.md` §6 | — | | |
-| INFRA-001 | Standard-`./mvnw test` lokal deterministisch 71/76 rot (Dev-Services Keycloak Production-Mode + Docker-Desktop-gVisor → „HTTPS required"); Compose-Workaround → 76/76 grün — Workaround dokumentieren oder Netzwerkmodus umstellen | infra / tests | medium | P2 | Confirmed | Chris | `03_TECHNICAL_REVIEW_REPORT.md` §6 | — | | |
+| INFRA-001 | Standard-`./mvnw test` lokal deterministisch 72/77 rot (Dev-Services Keycloak Production-Mode + Docker-Desktop-gVisor → „HTTPS required"); Compose-Workaround → 77/77 grün — Workaround dokumentieren oder Netzwerkmodus umstellen | infra / tests | medium | P2 | Confirmed | Chris | `03_TECHNICAL_REVIEW_REPORT.md` §6 | — | | |
 | HYG-001 | OpenSpec-Hygiene: 8 fertige Changes unarchiviert (mvp zuerst → entsperrt order-correctness-hardening); `DATA_MODEL.md` re ProductImage stale | docs / process | low | P2 | Confirmed | Chris | `01_PROJECT_OVERVIEW_REPORT.md` §4 | — | | |
 | TEST-001 | High-Value-Testlücken: `dashboard-data.js`-Zeitraumfilter (mit TECH-001), FR-25 POST bei 0 Enablements → 400, custom-%-Provision byte-genau, `sanitizeFormula` | tests | low | P3 | Confirmed | Chris | `03_TECHNICAL_REVIEW_REPORT.md` §7 | — | | |

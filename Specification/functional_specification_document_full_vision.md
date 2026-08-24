@@ -159,7 +159,7 @@ Same core entities as the MVP; the full vision does not require new entity types
 
 > Wie kann ein webbasiertes System gestaltet werden, das Unternehmen, Partner und Endkunden in einem partnerbasierten Vertriebsmodell sinnvoll verbindet und dabei Partnerverwaltung, Produktfreigabe, Partner-Shop, Bestelllogik und Provisionszuordnung in einer klaren und benutzerfreundlichen Plattform zusammenführt?
 
-Note: the MVP's research question is reframed toward the internal Partner ↔ Company relationship only (see FSD v2 §13), since the external shop is deferred. This is the original, whole-project version of the question, kept here for the diploma narrative and for Phase 2 framing — exact final wording (MVP vs. full vision) still to confirm with the supervisor.
+Note: the MVP's confirmed research question is reframed toward the internal Partner ↔ Company relationship first (see FSD v2 §13), since the external shop is deferred. This original whole-project version is retained only for the diploma narrative and Phase 2 framing.
 
 ---
 

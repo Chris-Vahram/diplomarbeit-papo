@@ -56,7 +56,7 @@ Chris dokumentiert, was technisch umgesetzt wurde, warum es so umgesetzt wurde u
   - serverseitige Rollenpruefung
   - Partner sieht nur eigene Daten
 - Testkapitel:
-  - Backend-Test-Suite: 46/46 Tests gruen
+  - Backend-Test-Suite: 77/77 Tests grün (0 Fehler, 0 Fehlschläge, 0 übersprungen)
   - Browserchecks/Demo-Flow
   - relevante Edge Cases: falsche Rolle, inaktiver Partner, nicht freigeschaltete Produkte, ungueltige Imports, XSS bei Bild-URLs
 - Deferred Scope:
@@ -86,9 +86,9 @@ Wichtig: Das langfristige Ziel enthaelt weiterhin einen Endkundenshop. Der aktue
 
 ### Empfohlene Formulierung
 
-Status: von Chris am 2026-07-07 genehmigt; zur Abstimmung mit dem Betreuer verwenden.
+Status: von Chris am 2026-07-07 genehmigt und vom Betreuer bestätigt.
 
-> Wie kann ein webbasiertes Partnerportal gestaltet werden, das Unternehmen, Vertriebspartner und Endkunden in einem partnerbasierten Vertriebsmodell schrittweise verbindet und dabei Partnerverwaltung, Produktfreigabe, Bestellabwicklung, Provisionszuordnung und Auswertungen in einer benutzerfreundlichen und erweiterbaren Plattform zusammenfuehrt?
+> Wie kann ein webbasiertes Partnerportal gestaltet werden, das Unternehmen, Vertriebspartner und Endkunden in einem partnerbasierten Vertriebsmodell schrittweise verbindet und dabei Partnerverwaltung, Produktfreigabe, Bestellabwicklung, Provisionszuordnung und Auswertungen in einer benutzerfreundlichen und erweiterbaren Plattform zusammenführt?
 
 ### Verstaendlich gesagt
 

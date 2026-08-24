@@ -12,7 +12,7 @@
 
 PAPO (Partnerportal) ist ein webbasiertes, **internes B2B-Bestellportal** für partnerbasierte Vertriebsmodelle (Kette: Firma → Partner → Endkunde). HTL-Diplomarbeit von **Chris (Implementierung: Backend + funktionales Frontend)** und **Tobias (visuelles Frontend-Design)**, mit realem, unbenanntem Referenzkunden (~200 Partner, ~800 Artikel; Bestellungen heute manuell per E-Mail/Telefon). **Reale Deployment-Absicht**: Hetzner-VM ist provisioniert, Deployment-Change (`ci-cd-deployment-with-gh-actions`) gehört Tobias.
 
-**Stand:** Der MVP ist funktional im Wesentlichen fertig (50/53 Tasks; die 3 offenen sind Doku/Design, kein Code). Alle Asks aus dem Kundenmeeting 10.07.2026 sind umgesetzt und gemerged. Testsuite: **76/76 grün** (verifiziert 2026-07-16, lokaler Lauf, Dev Services). Es wartet primär: echte Import-Daten vom Kunden (Spaltensets), Thesis-Writeup, Tobias' Design-Polish + Deployment.
+**Stand:** Der MVP ist funktional im Wesentlichen fertig (50/53 Tasks; die 3 offenen sind Doku/Design, kein Code). Alle Asks aus dem Kundenmeeting 10.07.2026 sind umgesetzt und gemerged. Aktueller verifizierter Stand: **77/77 Tests grün**. Es wartet primär: echte Import-Daten vom Kunden (Spaltensets), Thesis-Writeup, Tobias' Design-Polish + Deployment.
 
 ## 2. Architektur & Kernflüsse
 
@@ -71,7 +71,7 @@ Konfidenz: H = Code + Tests + Session-Verifikation; M = Code vorhanden, in diese
 ### Änderungen mit unklarem/prüfwürdigem Ursprung (→ Phase 2 Scope-Review)
 - `add-order-document-print` — kein Kunden-Ask; interne Review-Entscheidung „Direction B Auftragsbeleg" (2026-07-09, von Chris freigegeben).
 - `add-product-image-upload` — im Proposal selbst als „requested by Tobias, **not a client-meeting requirement**" markiert.
-- **B-08-Grauzone:** `frontend/src/lib/dashboard-data.js` (`previousPeriod`/`trendInfo`, „ggü. Vorperiode") stammt aus Tobias' `229a93e` (frontend-fixes-and-additions, 2026-07-08) und rendert Trend-Pfeile sobald ein expliziter Zeitraum gesetzt ist — `phase2_backlog.md` führt B-08 aber weiter als `CUT`. Backlog und Code widersprechen sich.
+- **B-08 (resolved 2026-08-24):** `frontend/src/lib/dashboard-data.js` (`previousPeriod`/`trendInfo`, „ggü. Vorperiode") stammt aus Tobias' `229a93e` und rendert Trend-Pfeile bei einem expliziten Zeitraum. Der Backlog dokumentiert diesen Partner-Dashboard-Teil nun als `STUB`; vollständige unternehmensweite Trendanalyse bleibt deferred.
 
 ### Tobias zuzuordnen
 `ci-cd-deployment-with-gh-actions` (0/40), `229a93e`/`8ef0d90` (frontend-fixes-and-additions inkl. B-08-Trend), Tasks 8.3 + FD.4, Design-Lane „einfache Benutzerführung + gute Mobile-Version" aus 10.07.
@@ -81,13 +81,13 @@ Konfidenz: H = Code + Tests + Session-Verifikation; M = Code vorhanden, in diese
 1. **Import-Feindaten fehlen** (FR-04): „1–2 Wochen" ab 10.07 läuft; ohne echte Spaltensets bleibt das Default-Mapping unbestätigt → Nachfassen.
 2. **Rollen-Isolation nie adversarial getestet** (in dieser Audit-Runde): Kunde-/Order-/Commission-/CSV-Export-Scoping ist implementiert und unit-getestet, aber ein aktiver Cross-Partner-Angriffstest steht aus → Phase 3.
 3. **Neue Angriffsfläche Bild-Upload**: Multipart-Upload, Content-Type-Validierung, Byte-Serving — sicherheitsrelevant, neu, erst oberflächlich geprüft → Phase 3.
-4. **Backlog-Drift (B-08)**: Doku sagt CUT, Code rendert Trend — kein Produktrisiko, aber Doku-/Scope-Wahrheit inkonsistent → Phase 2 entscheiden (behalten + Backlog updaten, oder entfernen).
+4. **B-08-Drift (erledigt):** vorhandenen Partner-Dashboard-Trend behalten und als `STUB` dokumentieren; vollständige Analyse bleibt Phase 2.
 5. **OpenSpec-Hygiene**: 8 fertige Changes unarchiviert; `DATA_MODEL.md` laut CONTINUATION_PROMPT bzgl. ProductImage stale.
 6. **Session-Refresh-Fluss** (`auth.js`): still-scheiternde Refreshes wären für nicht-technikaffine Partner besonders verwirrend → Phase 3 (Silent-Failure-Fokus).
 
 ## 6. Empfohlene Ziele für spätere Phasen
 
-- **Phase 2 (Scope):** Verdikt je Change der Liste in §4; B-08-Entscheid; Gold-Plating-Check Bild-Upload (Galerie nötig?) und Print; Komplexitätscheck order-cart.
+- **Phase 2 (Scope):** Verdikt je Change der Liste in §4; Gold-Plating-Check Bild-Upload (Galerie nötig?) und Print; Komplexitätscheck order-cart. B-08 ist als `STUB` geklärt.
 - **Phase 3 (Technik):** aktiver Cross-Partner-API-Angriff (Kunden/Orders/Commission/Export); `active`-Flag je Endpoint; Geld-Grenzfälle (krumme Summen × custom %, Integer-Cent vs. Backend byte-genau); Quantity-Clamp client+server; Dormant-Query (N+1, 60-Tage-Grenze); Bild-Upload (Magic Bytes, SVG, Größe, Serving-Content-Type); Print-Pagination mehrseitig; `auth.js`-Refresh-Fehlerpfade; Import-Parser-Kanten (leere Header-Zelle ist gefixt — Regression prüfen).
 - **Phase 4 (UX):** neue Screens (Katalog+Warenkorb, Meine Endkunden, Order-Filter, Bildergalerie, Beleg) auf Desktop **1920×1080 + 1440×900** UND Mobile **390×844**; Umlaut-Rendering; Verständlichkeit für nicht-technikaffine Partner; Token-Konformität gegen `Design/variables.css` + `base.css`.
 - **Phase 5:** Register konsolidieren, P0–P4/REMOVE/DEFER/DECISION, „3 Dinge vor dem Termin".
@@ -98,8 +98,8 @@ Konfidenz: H = Code + Tests + Session-Verifikation; M = Code vorhanden, in diese
 |---|---|---|
 | 1 | Dormanz-Schwelle 60 Tage bestätigen | Kunde (nächster Termin) |
 | 2 | Import-Spaltensets / echte Daten | Kunde (überfällig-nahe) |
-| 3 | B-08: Trend behalten (Backlog updaten) oder entfernen | Chris (+ ggf. Kunde) |
-| 4 | Forschungsfragen-Sign-off | Betreuer (Prof. Hammer) |
+| 3 | B-08-Entscheidung | Erledigt 2026-08-24: Partner-Trend bleibt als STUB |
+| 4 | Forschungsfragen-Sign-off | Erledigt: Forschungsfrage vom Betreuer bestätigt |
 | 5 | Firefox-Print-Check (Task 4.5) | Chris (eigene Maschine) |
 | 6 | Domain für Deployment | Bachl (bei Deployment-Start) |
 
