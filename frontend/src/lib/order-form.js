@@ -9,6 +9,22 @@ import { toCents, commissionCentsHalfUp } from "./money.js";
 const MAX_SUGGESTIONS = 20;
 const percentFormat = new Intl.NumberFormat("de-AT", { maximumFractionDigits: 2 });
 
+// Full Endkunde details (name, address, contact) — shown on the partner
+// wizard's "Übersicht" and "Erfolg" steps so the partner can double-check who
+// the order is for, without duplicating the (differently-shaped) one-line
+// mention already baked into renderOrderConfirmationHtml below.
+export function kundeDetailsHtml(kunde) {
+  const name = `${kunde.firstName ? escapeHtml(kunde.firstName) + " " : ""}${escapeHtml(kunde.lastName)}`;
+  return `
+    <div class="kunde-details">
+      <h2 class="kunde-details__heading">Endkunde</h2>
+      <p class="kunde-details__name">${name}</p>
+      <p class="kunde-details__address">${escapeHtml(formatAddress(kunde.address))}</p>
+      ${kunde.email ? `<p class="kunde-details__contact">${escapeHtml(kunde.email)}</p>` : ""}
+      ${kunde.phone ? `<p class="kunde-details__contact">${escapeHtml(kunde.phone)}</p>` : ""}
+    </div>`;
+}
+
 function customerOptionsHtml(customers) {
   return customers
     .map(

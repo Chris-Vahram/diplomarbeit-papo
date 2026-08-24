@@ -65,3 +65,11 @@ B-01 external end-customer shop (CUT) · B-02 shop design customization (CUT) ·
 
 ## Writing style
 Clear German for thesis documents, suitable for an HTL Diplomarbeit; precise, structured, no exaggerated corporate language. UI texts and validation messages in German, plain language.
+
+## Git commit attribution
+Do **not** add any Claude or Claude Code attribution to commits. Specifically:
+- No `Co-Authored-By: Claude ...` trailer in commit messages.
+- No "Generated with Claude Code" (or similar) lines in commit messages or PR descriptions.
+- Commit under the project's own git identity (Tobias), never a bot/Claude identity.
+Commit messages should contain only the actual change description, nothing about the tooling used to produce it.
+- Keep your commit-messages short (max 10 words), if not really needed
