@@ -8,7 +8,7 @@ Status legend:
 - `STUB` = partially in MVP (simulated / manual / mock), full version deferred.
 - `PLANNED` = agreed for later, not started.
 
-Last updated: 2026-07-13
+Last updated: 2026-08-25
 
 ---
 
@@ -33,9 +33,10 @@ Last updated: 2026-07-13
 **Trigger:** "implement B-03".
 
 ## B-04 — Real email sending  `STUB`
-**What full version is:** Real SMTP/service sends order confirmation + shipping confirmation to Endkunde.
+**What full version is:** Real SMTP/service sends an order confirmation to the Endkunde when an address is present, an order notice to the responsible partner users, and a new-order notice to the company. Shipping confirmation remains a later extension unless separately specified.
 **MVP state (STUB):** On-screen confirmation + simulated email rendered in-app (no real send).
 **Why stub:** Prototype-safe, no mail infra. Meeting wanted "automatisierte Bestellbestätigung + Versandbestätigung".
+**Decision 2026-08-25:** Chris confirmed the three order-related recipients above. The feature remains `STUB` until a separate OpenSpec change defines delivery status, retries, duplicate prevention, optional recipient addresses, privacy, and the SMTP integration.
 **Trigger:** "implement B-04".
 
 ## B-05 — Shop inquiry auto-forward (Anfragen)  `CUT`
@@ -84,3 +85,8 @@ Last updated: 2026-07-13
 - 2026-07-06: Tobias pushed the visual design as working code (`76bbe40 Frontend Design`), which rewrote both dashboards and added widgets referencing backend data that doesn't exist. Scope call (Chris): reconcile via OpenSpec change `integrate-frontend-design` — keep the period-picker + the cheap client-side-derivable widgets (monthly chart, Bestellstatus-Donut, Top-Kunden — all computable from the order list), vendor+pin the Lucide icon dependency (was `unpkg.com/lucide@latest`), seed historical demo orders so the dashboards demo well. Only the "ggü. Vorperiode" trend is fully deferred → B-08. The planned change `add-dashboard-date-filter` is superseded by Tobias's period-picker (do not implement).
 - 2026-07-13: Client meeting 10.07.2026 (Teams; Prof. Hammer, Chris, Tobias, Firma) captured in `Documentation/Besprechungsprotokolle/Besprechungsprotokoll10_07_2026.txt`. MVP well received. New client priorities: (1) simple Benutzerführung + good mobile version (partners often not tech-savvy — Tobias's lane), (2) partner can see Endkunden who haven't ordered in a while, (3) product picker in the order form needs Suchleiste + Filter, (4) order-list filters by Endkunde/Partner (time filter re-confirmed from 07.07). Hosting: company provides **Hetzner** instances (Christian Bachl contacts Chris) — supersedes the Oracle-Cloud assumption in `ci-cd-deployment-with-gh-actions` (re-scope before building). Company delivers real data/Vorgehensweisen within 1–2 weeks → implement → new Termin. Also from Chris's Nachtrag: fix the quick Keycloak logout (→ change `add-keycloak-session-refresh`), remove the unclear "Keycloak-Username" field from partner create (repeat of 07.07; decided 2026-07-13: link via `Partner.partnerNumber` instead).
 - 2026-08-24: B-08 reclassified from `CUT` to `STUB` to match the existing client-side previous-period comparison in the partner dashboard. Full/company-wide trend analytics remain deferred.
+- 2026-08-25: PAPO is to be designed company-independently; the reference company is a test case. A shared multi-company platform with company subdomains and Keycloak Organizations is the recommended target, but its thesis/MVP scope still requires supervisor confirmation. This is not the same as the B-01 end-customer shop.
+- 2026-08-31: The thesis result is a functioning, extensible product; the current one-company demo is not the permanent boundary. Multi-company tenancy/subdomains are the correct architecture when a second company is onboarded, but are explicitly not the next change and have no fixed delivery date yet.
+- 2026-08-31: Current partner access is one shared organizational login per partner company; personal partner-employee accounts remain later. User-facing terminology is `Artikel`; internal `Product` names may stay. BMD is the leading article-master source via import. Use its unique article number plus PAPO's technical DB id; no extra visible article id and no price-list-area field. Category remains relevant; Fachbereich, product groups, bundles/BOMs, training permissions and PP/margin logic are future directions pending a simplified company follow-up.
+- 2026-08-25: Real order-email recipients clarified for B-04: Endkunde if an address exists, responsible partner users, and company. Current code remains a simulation until B-04 is implemented.
+- 2026-08-25: Partner number target clarified: generated `P-####` within a company, imported legacy number as an external reference, and a global technical ID for relations. Whether a partner company receives one shared access or personal employee accounts remains open pending the supervisor's recommendation. The current MVP behavior remains documented in the FSD.

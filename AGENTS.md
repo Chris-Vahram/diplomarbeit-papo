@@ -4,19 +4,31 @@ This file is the Codex companion to `CLAUDE.md`. Keep all Claude files and `.cla
 
 ## Project and source of truth
 
-PAPO is the product/project name for a real internal B2B partner-ordering portal. The real client is unnamed. Core chain: Company → Partner → End Customer.
+PAPO is the product/project name for an extensible B2B partner-ordering platform. Its first operational stage replaces partner orders received by e-mail and telephone with a structured internal portal. The real reference client is unnamed. Core chain: Company → Partner → End Customer.
 
-For deep work, read only as far as the task requires, in this order:
+In every fresh deep-work session read the full continuation prompt first. Before a non-trivial change, read and analyze the remaining sources relevant to that change in this order:
 
-1. `CLAUDE.md` — stable product context, locked scope, stack, roles, and document routing. Its dated “Current status” section may be stale.
-2. `Specification/CONTINUATION_PROMPT.md` — newer operational status and handoff rules; verify volatile claims against Git and current files.
-3. `Specification/functional_specification_document_partnerportal_final.md` — authoritative MVP requirements.
-4. `Specification/phase2_backlog.md` — deferred features and decisions; do not pull them into the MVP.
-5. `openspec/changes/<active-change>/` and `openspec/specs/` — current proposal/design/tasks and merged capability behavior.
-6. `docs/CONVENTIONS.md`, `docs/SETUP.md`, and `docs/DATA_MODEL.md` — implementation, runtime, and data conventions.
-7. Newer meeting notes override older documents when they conflict.
+1. `Specification/CONTINUATION_PROMPT.md` — self-contained current handoff, required reading in every fresh session; verify its volatile Git/OpenSpec snapshot.
+2. `CLAUDE.md` — stable product context, locked scope, stack, roles, and document routing.
+3. `Documentation/Besprechungsprotokolle/` — newer meeting notes override older documents and the FSD when they conflict; newest is `Besprechungsprotokoll31_08_2026.md`.
+4. `Specification/functional_specification_document_partnerportal_final.md` — authoritative baseline requirements until synchronized by an approved documentation/OpenSpec change.
+5. `Specification/phase2_backlog.md` — deferred features and decisions; do not pull them into the current stage.
+6. `Specification/ROADMAP_2026-08-25.md` — persisted future plan, updated through the meeting of 31.08.2026; planning context, not implemented behavior.
+7. `openspec/changes/<active-change>/` and `openspec/specs/` — current proposal/design/tasks and merged capability behavior.
+8. `docs/CONVENTIONS.md`, `docs/SETUP.md`, and `docs/DATA_MODEL.md` — implementation, runtime, and data conventions.
 
 Do not copy old Claude memory facts into code or documentation without checking current primary sources. In particular, never call the client “PAPO” and do not rely on stale model names, branch status, environment diagnoses, or completed UI plans.
+
+## Current product direction
+
+- The thesis result is a functioning, extensible product, not a permanently single-company system. The current demo has one reference company only.
+- Multi-company tenancy with company subdomains is the correct architecture when a second company is onboarded, but it is explicitly not the next implementation step and has no fixed thesis deadline yet.
+- The current core remains partner-driven ordering. The public end-customer partner shop stays later/Phase 2.
+- For the current stage each partner company has one shared organizational login; personal employee accounts are not required.
+- User-facing and thesis language uses **Artikel**. Existing internal Java/entity/API names such as `Product` do not need a speculative rename.
+- BMD is the leading article-master system. PAPO currently receives data through Excel/CSV import; no direct BMD interface is approved.
+- The visible business identifier is the unique BMD article number. PAPO's database id remains technical; no second visible article id is needed. The price-list area is omitted.
+- Category is relevant. Fachbereich, product group A/B/C/D, bundles/BOMs, training permissions, and PP/margin-based commission logic are future directions only until the simplified company follow-up confirms a smaller scope.
 
 ## Team and Git boundaries
 
@@ -34,6 +46,7 @@ Do not copy old Claude memory facts into code or documentation without checking 
 - `tasks.md` is the progress source of truth for an active change.
 - For complex/high-stakes changes, independently review the proposal and final diff. Append review findings or intermediate phases; do not silently rewrite the original plan history.
 - After implementation, use the project `partnerportal-quality` skill and a generic correctness review.
+- KI usage is documented through `Documentation/KI-Nachweise/`. The automation plan is `automate-ai-evidence-log`; until it is implemented, do not claim that capture is automatic or invent missing verification evidence.
 
 ## Fixed stack
 
