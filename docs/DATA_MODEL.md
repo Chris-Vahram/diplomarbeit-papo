@@ -11,6 +11,7 @@ Modell selbst.
 erDiagram
     PARTNER ||--o{ PRODUCT_ENABLEMENT : "schaltet frei"
     PRODUCT ||--o{ PRODUCT_ENABLEMENT : "wird freigeschaltet"
+    PRODUCT_IMAGE o|--o{ PRODUCT : "wird referenziert"
     PARTNER ||--o{ KUNDE : "legt an (ownerPartner)"
     PARTNER ||--o{ ORDER : "erstellt"
     KUNDE ||--o{ ORDER : "ist Kunde von"
@@ -38,6 +39,16 @@ erDiagram
         boolean available
         String category
         String imageUrl
+        Long image_id FK "optional; gespeichertes Galeriebild"
+    }
+
+    PRODUCT_IMAGE {
+        Long id PK
+        bytea data "validierte PNG/JPEG/WEBP-Daten"
+        String contentType
+        String filename "nur Anzeige, nicht als Speicherpfad"
+        long sizeBytes
+        Instant uploadedAt
     }
 
     PRODUCT_ENABLEMENT {
@@ -108,7 +119,16 @@ Zentral von der Firma verwaltete Artikel. `available` steuert Bestellbarkeit
 unabhängig von der partnerspezifischen Freischaltung (`ProductEnablement`) —
 ein Produkt kann für einen Partner freigeschaltet, aber gerade nicht
 verfügbar sein (z. B. ausverkauft); beides muss zutreffen, damit ein Partner
-es bestellen kann.
+es bestellen kann. `imageUrl` bleibt für externe Bild-URLs erhalten; bei einem
+hochgeladenen oder aus der Galerie gewählten Bild verweist `image` optional auf
+einen gespeicherten `ProductImage`-Datensatz.
+
+### ProductImage
+Ein serverseitig gespeichertes Artikelbild. Die binären Daten liegen direkt in
+PostgreSQL als `bytea`; `contentType` wird aus dem Dateiinhalt validiert und
+nicht aus dem Dateinamen übernommen. Der ursprüngliche UTF-8-Dateiname dient
+nur zur Anzeige. Ein Bild kann von mehreren Artikeln aus der Galerie
+wiederverwendet werden.
 
 ### ProductEnablement
 Reine Zuordnungstabelle Partner × Product. Die Existenz einer Zeile bedeutet

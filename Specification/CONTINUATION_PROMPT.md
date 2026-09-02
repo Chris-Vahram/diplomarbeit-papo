@@ -272,58 +272,19 @@ git log -10 --oneline --decorate
 openspec list --json
 ```
 
-Snapshot beim Schreiben:
+Zuletzt verifizierter Snapshot (02.09.2026):
 
-- Branch `main`, zwei Commits vor `origin/main` (`94050cb`, `d0ab7d5`).
-- Dokumentationsänderungen/-neuanlagen sind noch nicht committed.
-- Untracked `tmp/` enthält gerenderte PDF-Arbeitsdateien und darf nicht mit `git add .` übernommen werden.
-- Chris führt Commit/Push/Merge selbst aus; ohne explizite Freigabe nichts davon ausführen.
-- Vor neuem Feature-Branch zuerst Dokumentationsstand und lokale Commits nachvollziehbar veröffentlichen.
+- `main` und `origin/main` waren nach `f498ec9`, `238ec05` und `cede8a9` synchron.
+- `automate-ai-evidence-log`, `place-order-redesign` und die neun zuvor fertigen Changes sind implementiert, geprüft und archiviert.
+- Untracked `tmp/` enthält gerenderte PDF-Arbeitsdateien und darf nicht mit `git add .` übernommen oder gelöscht werden.
+- Die Remote-Branches `feature/automate-ai-evidence-log` und `chore/archive-completed-changes` sind bereits in `main` enthalten.
+- Flüchtigen Git-Stand vor jeder weiteren Arbeit erneut prüfen; keine Claude-/Codex-Attribution in Commitmessages.
 
-Empfohlene getrennte Dokumentationscommits nach Review:
-
-- `docs: record August project decisions`
-- `docs(openspec): plan AI evidence automation`
-
-Keine Claude-/Codex-Attribution in Commitmessages.
-
-# 10. Aktive OpenSpec-Changes — priorisierte Reihenfolge
+# 10. Aktive OpenSpec-Changes — verbleibende Arbeit
 
 Taskzahlen sind Snapshotwerte und mit `openspec list --json` zu verifizieren.
 
-## Rang 1 — `place-order-redesign` (36/37)
-
-Nur Task 9.3 offen: manueller Smoke-Test mit bestehendem/neuem Endkunden, Rücknavigation ohne Datenverlust, leerem Warenkorb, fehlgeschlagener Übermittlung und `prefers-reduced-motion`. Danach validieren und archivieren. Keine neuen Features hineinziehen.
-
-## Rang 2 — `automate-ai-evidence-log` (0/18)
-
-Vollständig geplant und validiert, noch nicht implementiert. Früh umsetzen, damit weitere KI-unterstützte Arbeit automatisch nachweisbar wird:
-
-- Codex-/Claude-Code-JSONL projektgenau erkennen;
-- unveränderte private Belege und SHA-256-Manifest außerhalb Git;
-- normalisierte menschliche Prompts/sichtbare Antworten;
-- datensparsames Register plus `AUSSTEHEND`-Status;
-- rückwirkender lokaler Import;
-- optional bereitgestellte Webexporte;
-- Hintergrund-LaunchAgent nur nach ausdrücklicher Freigabe außerhalb des Repositories installieren.
-
-## Rang 3 — fertige, aber noch nicht archivierte Changes
-
-Jeweils Delta-Spec prüfen, einzeln validieren und archivieren, ohne erneut zu implementieren:
-
-- `add-order-document-print` 10/10;
-- `remove-keycloak-username-field` 25/25;
-- `partner-order-cart` 21/21;
-- `add-dormant-kunde-visibility` 18/18;
-- `add-order-list-filters` 15/15;
-- `improve-order-form` 21/21;
-- `add-keycloak-session-refresh` 14/14;
-- `self-host-fonts` 4/4;
-- `order-correctness-hardening` 19/19.
-
-Nicht erneut archivieren, was bereits unter `openspec/changes/archive/` liegt.
-
-## Rang 4 — `build-partnerportal-mvp` (50/53)
+## Rang 1 — `build-partnerportal-mvp` (50/53)
 
 Offen:
 
@@ -331,11 +292,16 @@ Offen:
 - 8.4 Traceability FSD -> Implementierung -> Tests plus B-01..B-08;
 - FD.4 visueller Polish der später ergänzten Screens.
 
-Außerdem `docs/DATA_MODEL.md` bezüglich ProductImage synchronisieren und den funktionierenden Keycloak-Testpfad in `docs/SETUP.md` festhalten. Erst nach den echten offenen Aufgaben archivieren.
+`docs/DATA_MODEL.md` ist bezüglich `ProductImage` synchronisiert. Der kanonische
+Dev-Services-Testpfad ist in `docs/SETUP.md` dokumentiert und am 02.09.2026 mit
+77/77 erfolgreichen Tests sowie erfolgreichem Paketbuild erneut bestätigt.
+Erst nach den drei echten offenen Aufgaben archivieren.
 
-## Rang 5 — `ci-cd-deployment-with-gh-actions` (25/41)
+## Rang 2 — `ci-cd-deployment-with-gh-actions` (25/41)
 
-Nicht blind fortsetzen: Der Change enthält ältere Oracle-/ARM-Annahmen. Tatsächlich gilt:
+Noch nicht implementierungsbereit: Der Change enthält ältere Oracle-/ARM-Annahmen
+und muss vor weiterer Umsetzung als Hetzner-x86_64-Plan überarbeitet und erneut
+reviewt werden. Tatsächlich gilt:
 
 - Ziel: Hetzner x86_64 VM mit Docker/Compose;
 - Domain `paportal.at` ist eingerichtet;
@@ -441,7 +407,13 @@ Gespeichertes Konzept in `Documentation/KI-Nachweise/`:
 6. repräsentative vollständige Dialoge später für den Anhang auswählen;
 7. keine Secrets, personenbezogenen Firmendaten oder privaten Rohverläufe in Git.
 
-Der OpenSpec-Change `automate-ai-evidence-log` ist der gespeicherte Automatisierungsplan. Bis er implementiert ist, relevante Arbeit im bestehenden Register ergänzen; nichts über Prüfungen erfinden.
+`automate-ai-evidence-log` ist implementiert und unter
+`openspec/changes/archive/2026-09-02-automate-ai-evidence-log/` archiviert. Der
+LaunchAgent `at.papo.ai-evidence-log` läuft im 15-Minuten-Intervall. Status am
+02.09.2026: 32 archivierte Sitzungen, 31 Registerzeilen `AUSSTEHEND`, kein
+Registerkonflikt; ChatGPT-/Claude-Webexporte wurden nicht bereitgestellt. Die
+ausstehenden Zeilen müssen weiterhin menschlich angereichert werden; nichts über
+Prüfungen erfinden.
 
 # 14. Offene Fragen und externe Abhängigkeiten
 
@@ -469,16 +441,10 @@ cd backend
 ./mvnw package
 ```
 
-Historisch funktionierender Testpfad mit lokalem Compose-Keycloak, nur bei aktuellem Bedarf und nach Prüfung von `docs/SETUP.md`:
-
-```bash
-cd backend
-./mvnw test \
-  -Dquarkus.http.test-port=8091 \
-  -Dquarkus.keycloak.devservices.enabled=false \
-  -Dquarkus.oidc.auth-server-url=http://localhost:8081/realms/partnerportal \
-  -Dquarkus.oidc.client-id=partnerportal-frontend
-```
+Der am 02.09.2026 erneut funktionierende Standardpfad nutzt im `%test`-Profil
+Quarkus Dev Services für eigene Wegwerf-Container; dafür ist keine manuelle
+Port-/OIDC-Überschreibung erforderlich. Docker muss laufen, der Quarkus-Devserver
+sollte vor dem Test beendet werden. Details stehen in `docs/SETUP.md`.
 
 Frontend hat keinen Build/Lint/npm-Schritt. UI-Änderungen real im Browser auf Desktop und Mobile prüfen. Lokaler Start laut `docs/SETUP.md`: Compose für PostgreSQL/Keycloak, Quarkus Dev, statischer Frontendserver.
 
@@ -500,7 +466,7 @@ Vor Handoff:
 3. `git log -10 --oneline --decorate`.
 4. `openspec list --json`.
 5. Relevante aktive Change-Artefakte vollständig lesen.
-6. Prüfen, ob `94050cb`, `d0ab7d5` und Dokumentationscommits bereits auf `origin/main` sind.
+6. Prüfen, ob lokales `main` und `origin/main` synchron sind und die Archive vom 02.09.2026 enthalten.
 7. Prüfen, ob vereinfachte Firmenmail, BMD-Daten, SMTP/S3-Antwort oder Tenant-Termin eingetroffen sind.
 8. Unrelated/uncommitted Benutzeränderungen bewahren; `tmp/` nicht pauschal stagen oder löschen.
 9. Vor nicht-trivialer Arbeit Spezifikation, Plan und Definition of Done nennen.
@@ -510,13 +476,11 @@ Vor Handoff:
 
 Wenn kein neuer externer Input vorliegt, gilt:
 
-1. Dokumentations-/Git-Stand sichern.
-2. letzten Bestell-Smoke-Test abschließen und `place-order-redesign` beenden.
-3. KI-Nachweisautomatisierung umsetzen.
-4. fertige Changes sauber archivieren.
-5. MVP-Dokumentation/Traceability/Polish abschließen.
-6. Hetzner-Deployment stabilisieren.
-7. danach den ersten bestätigten Stammdaten-Change starten.
+1. Tobias' UI/UX-Dokumentation (8.3) und visuellen Polish (FD.4) nicht ohne seine Designarbeit ersetzen.
+2. Für die gemeinsame Traceability/Diplomarbeit (8.4) zuerst Gliederung, Detailtiefe und Zuständigkeit abstimmen.
+3. Danach `build-partnerportal-mvp` validieren und archivieren.
+4. Den veralteten CI/CD-Change zuerst auf Hetzner x86_64 neu planen und reviewen; erst dann implementieren.
+5. Danach den ersten durch externe Entscheidungen bestätigten Produkt-Change als eigenen OpenSpec-Change planen.
 
 Mandantenfähigkeit, Partnershop und die umfangreichen zukünftigen Artikellogiken nicht vorziehen.
 ````
