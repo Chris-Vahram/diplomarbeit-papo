@@ -67,6 +67,10 @@ backend/*.ipr
 backend/*.iws
 backend/.idea/
 
+### Python tooling ###
+__pycache__/
+*.pyc
+
 ### Node (frontend tooling, if any) ###
 frontend/node_modules/
 frontend/dist/

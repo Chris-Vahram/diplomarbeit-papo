@@ -1,0 +1,3 @@
+{"type":"user","cwd":"/repo/papo","timestamp":"2026-09-02","message":{"role":"user","content":"Menschlicher Prompt"}}
+{"type":"assistant","cwd":"/repo/papo","timestamp":"2026-09-02","message":{"role":"assistant","content":[{"text":"Sichtbare Antwort"}]}}
+{"type":"assistant","cwd":"/repo/papo","isSidechain":true,"message":{"role":"assistant","content":"Subagent"}}

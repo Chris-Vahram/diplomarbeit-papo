@@ -84,7 +84,8 @@ B-01 external end-customer shop (CUT) · B-02 shop design customization (CUT) ·
 
 ## KI evidence
 - Rules and register: `Documentation/KI-Nachweise/`.
-- Planned automation: `openspec/changes/automate-ai-evidence-log/`; it is specified but not implemented yet.
+- Automatic local capture: `tools/ai_evidence_log.py`; its LaunchAgent periodically secures Codex and Claude Code sessions in the private archive.
+- After relevant PAPO work, run `python3 tools/ai_evidence_log.py sync`, then `python3 tools/ai_evidence_log.py enrich --purpose "<Zweck>" --result "<Ergebnis>" --check "<wirklich ausgeführte Prüfung>"`. Omit `--check` if none ran.
 - Preserve exact human prompts and visible answers privately, keep secrets/personal data out of Git, and document only real verification/eigenleistung. Never fabricate missing evidence.
 
 ## Writing style

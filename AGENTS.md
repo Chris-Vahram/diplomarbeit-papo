@@ -46,7 +46,8 @@ Do not copy old Claude memory facts into code or documentation without checking 
 - `tasks.md` is the progress source of truth for an active change.
 - For complex/high-stakes changes, independently review the proposal and final diff. Append review findings or intermediate phases; do not silently rewrite the original plan history.
 - After implementation, use the project `partnerportal-quality` skill and a generic correctness review.
-- KI usage is documented through `Documentation/KI-Nachweise/`. The automation plan is `automate-ai-evidence-log`; until it is implemented, do not claim that capture is automatic or invent missing verification evidence.
+- KI usage is documented through `Documentation/KI-Nachweise/`. The local LaunchAgent secures sessions automatically; never invent missing verification evidence.
+- After relevant PAPO work, run `python3 tools/ai_evidence_log.py sync`, then enrich the current session with `python3 tools/ai_evidence_log.py enrich --purpose "<Zweck>" --result "<Ergebnis>" --check "<wirklich ausgeführte Prüfung>"`. Omit `--check` when no technical verification ran.
 
 ## Fixed stack
 

@@ -108,6 +108,31 @@ Die lokale Inventur erfolgte nur über Metadaten; sensible Inhalte wurden nicht 
 
 Die Zahlen sind ein Inventurstand, keine Anzahl zitierwürdiger Prompts. Tool-Rückgaben, Wiederholungen, Compactions und rein operative Nachrichten werden bei der Kuratierung entfernt.
 
+## Lokale Automatisierung
+
+Das Standardbibliothek-Werkzeug sichert Codex- und Claude-Code-Sitzungen mit exakter PAPO-Projektzuordnung. Vollständige Quellen und normalisierte Dialoge bleiben unter `~/Documents/PAPO-KI-Roharchiv`; Git erhält nur das datensparsame Register.
+
+```bash
+python3 tools/ai_evidence_log.py sync
+python3 tools/ai_evidence_log.py status
+python3 tools/ai_evidence_log.py enrich \
+  --purpose "Zweck des Arbeitsblocks" \
+  --result "Tatsächlich verwendetes Ergebnis" \
+  --check "Wirklich ausgeführter Prüfungsbefehl: Ergebnis"
+```
+
+Ohne belegte technische Prüfung wird `--check` weggelassen. `enrich` wählt standardmäßig die zuletzt geänderte PAPO-Sitzung; bei Bedarf kann `--session-id <ID>` angegeben werden.
+
+Der macOS-Hintergrundlauf wird so verwaltet:
+
+```bash
+python3 tools/ai_evidence_log.py install
+python3 tools/ai_evidence_log.py agent-status
+python3 tools/ai_evidence_log.py uninstall
+```
+
+`uninstall` entfernt nur den LaunchAgent. Das private Archiv bleibt erhalten. Fehlende ChatGPT-/Claude-Webexporte werden im Status ausgewiesen und niemals automatisch angefordert oder heruntergeladen.
+
 ## Export in der deutschsprachigen Oberfläche
 
 ### ChatGPT
