@@ -3101,7 +3101,7 @@ legend {
 
 /* Respect the OS/browser motion preference across the whole app — the wizard's
    step-transition/checkmark/confetti animations above, plus every existing
-   --duration-*/--ease-*-based transition (sidebar drawer, buttons, inputs, ...). */
+   duration/easing-variable-based transition (sidebar drawer, buttons, inputs, ...). */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
