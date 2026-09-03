@@ -6,16 +6,15 @@ This file is the Codex companion to `CLAUDE.md`. Keep all Claude files and `.cla
 
 PAPO is the product/project name for an extensible B2B partner-ordering platform. Its first operational stage replaces partner orders received by e-mail and telephone with a structured internal portal. The real reference client is unnamed. Core chain: Company → Partner → End Customer.
 
-In every fresh deep-work session read the full continuation prompt first. Before a non-trivial change, read and analyze the remaining sources relevant to that change in this order:
+Start every fresh deep-work session with `Specification/CONTINUATION_PROMPT.md`. If the handoff points to an active work package, also read `Specification/NEXT_SESSION_PLAN.md`. Do not preload every project document. Route additional reading by task:
 
-1. `Specification/CONTINUATION_PROMPT.md` — self-contained current handoff, required reading in every fresh session; verify its volatile Git/OpenSpec snapshot.
-2. `CLAUDE.md` — stable product context, locked scope, stack, roles, and document routing.
-3. `Documentation/Besprechungsprotokolle/` — newer meeting notes override older documents and the FSD when they conflict; newest is `Besprechungsprotokoll31_08_2026.md`.
-4. `Specification/functional_specification_document_partnerportal_final.md` — authoritative baseline requirements until synchronized by an approved documentation/OpenSpec change.
-5. `Specification/phase2_backlog.md` — deferred features and decisions; do not pull them into the current stage.
-6. `Specification/ROADMAP_2026-08-25.md` — persisted future plan, updated through the meeting of 31.08.2026; planning context, not implemented behavior.
-7. `openspec/changes/<active-change>/` and `openspec/specs/` — current proposal/design/tasks and merged capability behavior.
-8. `docs/CONVENTIONS.md`, `docs/SETUP.md`, and `docs/DATA_MODEL.md` — implementation, runtime, and data conventions.
+- product/scope decision: `CLAUDE.md`, the newest relevant meeting note, and the affected FSD section;
+- active feature/change: only that change's proposal/design/spec/tasks plus affected canonical specs;
+- deployment/runtime: `docs/DEPLOYMENT.md`, `docs/SETUP.md`, and `openspec/changes/ci-cd-deployment-with-gh-actions/`;
+- implementation convention/data model: only the relevant parts of `docs/CONVENTIONS.md` and `docs/DATA_MODEL.md`;
+- future scope: `Specification/phase2_backlog.md` and `Specification/ROADMAP_2026-08-25.md`.
+
+Newer meeting notes override older documents and the FSD when they conflict; the newest is `Besprechungsprotokoll31_08_2026.md`. Verify volatile Git, test, infrastructure, and OpenSpec status with commands instead of trusting a handoff snapshot.
 
 Do not copy old Claude memory facts into code or documentation without checking current primary sources. In particular, never call the client “PAPO” and do not rely on stale model names, branch status, environment diagnoses, or completed UI plans.
 
@@ -47,7 +46,15 @@ Do not copy old Claude memory facts into code or documentation without checking 
 - For complex/high-stakes changes, independently review the proposal and final diff. Append review findings or intermediate phases; do not silently rewrite the original plan history.
 - After implementation, use the project `partnerportal-quality` skill and a generic correctness review.
 - KI usage is documented through `Documentation/KI-Nachweise/`. The local LaunchAgent secures sessions automatically; never invent missing verification evidence.
-- After relevant PAPO work, run `python3 tools/ai_evidence_log.py sync`, then enrich the current session with `python3 tools/ai_evidence_log.py enrich --purpose "<Zweck>" --result "<Ergebnis>" --check "<wirklich ausgeführte Prüfung>"`. Omit `--check` when no technical verification ran.
+- Once per substantive PAPO work block, run `python3 tools/ai_evidence_log.py sync`, then enrich the session with `python3 tools/ai_evidence_log.py enrich --purpose "<Zweck>" --result "<Ergebnis>" --check "<wirklich ausgeführte Prüfung>"`. Batch related tiny edits into one entry and omit `--check` when no technical verification ran.
+
+## Context and model efficiency
+
+- Keep one session to one bounded outcome. Start a fresh session after a completed feature, deployment phase, or major planning decision.
+- State each instruction once. Prefer links to source-of-truth files over copied summaries.
+- Read narrow sections and request bounded command output; never dump whole tool catalogs or unrelated directories.
+- Use only the skills/tools required by the task. For routine implementation from approved OpenSpec tasks, prefer the cost-efficient model; escalate for architecture, security, unclear requirements, stubborn failures, and final high-risk review.
+- Do not create subagents for serial work. Use them only for genuinely independent parallel scopes or an explicitly requested independent review.
 
 ## Fixed stack
 

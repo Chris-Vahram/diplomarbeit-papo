@@ -10,7 +10,8 @@
 
 
 
-| AUSSTEHEND-01a05dcf | 2026-09-01 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a05dcf-2be8-7021-89cc-07ddb9a4aaca` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+
+| AUSSTEHEND-01a05dcf | 2026-09-01 | Chris | Codex | PAPO Sessionplan Clockify Nachtrag und kontexteffizienten Handoff erstellen | lokale Sitzung `01a05dcf-2be8-7021-89cc-07ddb9a4aaca` | `EXAKT` | Continuation Prompt verschlankt Deployment und Firewallstatus synchronisiert Sonntagsplan und datierte Clockify Vorschlaege dokumentiert; Prüfungen: OpenSpec Change gueltig Git Diff sauber externe Ports 80 und 443 erreichbar UFW aktiv und SSH danach erreichbar |
 | AUSSTEHEND-019f72d2 | 2026-07-18 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f72d2-d09e-7382-ad24-52f329a30e94` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-019f75a8 | 2026-07-18 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f75a8-0fb0-7721-9c66-e0a221a69661` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-019f70fe | 2026-07-17 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f70fe-8ec1-7a51-85c0-9f029a0a1ec3` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |

@@ -11,6 +11,9 @@ Produktionstopologie, CI/CD-Pipeline und Rollback-Prozedur. Setup/Dev-Umgebung s
   (Reverse Proxy + automatisches HTTPS).
 - Ein Domain, pfadbasiertes Routing (Caddy): `/` → Frontend (statisch), `/api/*` → Backend,
   `/auth/*` → Keycloak. Dadurch **kein CORS** nötig — Frontend und API sind same-origin.
+- UFW ist seit 03.09.2026 aktiv: eingehend standardmäßig gesperrt, TCP 22/80/443 für
+  SSH, HTTP und HTTPS erlaubt. Externe Erreichbarkeit von 80/443 wurde mit kurzlebigen
+  Test-Listenern geprüft; der echte Caddy-/TLS-Test ist noch offen.
 
 ## Pipeline (`.github/workflows/ci-cd.yml`)
 
@@ -48,8 +51,9 @@ kein zusätzliches Secret nötig.
 | `IMAGE_TAG` | Welches Image-Tag `docker-compose.prod.yml` zieht (normal `latest`, siehe Rollback) |
 
 Das GHCR-Package ist **privat**; die VM authentifiziert sich einmalig per
-`docker login ghcr.io` mit einem VM-lokalen, read-only PAT (nicht in GitHub Secrets, nicht
-im Repo — von Tobias direkt auf der VM eingerichtet).
+`docker login ghcr.io` mit einem VM-lokalen, read-only PAT (nicht in GitHub Secrets und
+nicht im Repo). Chris erstellt den `read:packages`-PAT interaktiv; der Agent darf ihn nie
+in Ausgaben oder Dokumentation übernehmen.
 
 ## Verzeichnis auf der VM
 
@@ -82,9 +86,10 @@ offen):
 0 3 * * * /home/papo/papo-deploy/deploy/backup/backup.sh >> /home/papo/papo-deploy/deploy/backup/backup.log 2>&1
 ```
 
-Offsite-Kopie (S3-kompatibler Object-Storage-Bucket via `rclone`) ist bewusst auf
-"vor echtem Produktivbetrieb" verschoben (siehe design.md Decision 7) — lokale Backups
-grenzen das Risiko während der Evaluationsphase (Kunde/Betreuer) ausreichend ein.
+Offsite-Kopie erfolgt in der nächsten Deployment-Phase über einen S3-kompatiblen Bucket
+und VM-lokales `rclone`. Zugangsdaten wurden privat bereitgestellt. Vor der Einrichtung
+müssen Endpoint, Bucket und Schreibrecht geprüft werden; Werte gehören weder ins Repo
+noch in Terminal-/KI-Ausgaben. Danach ist ein Upload- und Restore-Test erforderlich.
 
 ## CORS
 

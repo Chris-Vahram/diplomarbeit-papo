@@ -33,32 +33,32 @@
 
 ## 5. Deploy job (VM provisioned 2026-08-23 — `papo-server-01`, 178.104.109.45)
 
-- [x] 5.1 (Tobias) Provision VM, install Docker + Docker Compose — done (4 vCPU / 7.6 GB RAM / x86_64 / Ubuntu 26.04 LTS / Docker 29.6.1 + Compose v5.3.1). Ports 80/443 confirmed open locally (`ufw` inactive, design.md Decision 11) — good enough for MVP; upstream/provider firewall still to be confirmed once Caddy is actually listening (task 6.3), and enabling `ufw` (22/80/443 only) is a deferred pre-production to-do alongside offsite backups.
-- [ ] 5.2 (Tobias) Generate a **dedicated deploy SSH keypair** (not the personal login key), append its public key to the VM's `authorized_keys` (append, don't overwrite existing keys). Can be done anytime now — not blocked on anything else.
-- [ ] 5.3 (Tobias) Once the build-and-push half (§3) is working: add GitHub Actions secrets — `VM_HOST` (178.104.109.45), `VM_SSH_KEY` (deploy key private half from 5.2), `DB_PASSWORD`, `KC_ADMIN_PASSWORD` (both strong random)
-- [ ] 5.4 (Tobias) Once the first image is in GHCR (after §3 runs once): one-time `docker login ghcr.io` on the VM using a `packages:read`-only PAT, so `docker compose pull` can authenticate against the private package
+- [x] 5.1 Provision VM, install Docker + Docker Compose — done (4 vCPU / 7.6 GB RAM / x86_64 / Ubuntu 26.04 LTS / Docker 29.6.1 + Compose v5.3.1). On 03.09.2026 temporary listeners proved external ingress on 80 and 443; UFW was then enabled with deny-by-default ingress and explicit 22/80/443 TCP allowances. A fresh SSH connection succeeded afterward (design.md Decision 11).
+- [ ] 5.2 Generate a **dedicated deploy SSH keypair** (not the personal login key), append its public key to the VM's `authorized_keys` (append, don't overwrite existing keys). Can be done anytime now — not blocked on anything else.
+- [ ] 5.3 Add GitHub Actions secrets — `VM_HOST` (178.104.109.45), `VM_SSH_KEY` (deploy key private half from 5.2), `DB_PASSWORD`, `KC_ADMIN_PASSWORD`. Chris owns any interactive repository action; secret values must not appear in logs or documentation.
+- [ ] 5.4 Once the first image is in GHCR: Chris creates a classic PAT limited to `read:packages`; use it once with `docker login ghcr.io --password-stdin` on the VM so `docker compose pull` can authenticate against the private package. Never expose the PAT in command history or output.
 - [x] 5.5 Add a `deploy` job (`needs: build-and-push`) to the workflow using `appleboy/ssh-action`, running `docker compose pull && docker compose up -d` in the production compose directory on the VM — targets `~/papo-deploy` on the VM (see task 5.6, still open) as `username: papo` (VM account per proposal.md), `VM_HOST`/`VM_SSH_KEY` secrets (task 5.3, still open — Tobias). **Job is temporarily `if: false`'d in `ci-cd.yml`** so the first merge to `main` runs test + build-and-push cleanly without the deploy job failing on the still-missing prerequisites below. Re-enable (swap `if: false` back to the commented-out branch/ref condition) once 5.3, 5.4, and 5.6 are all done.
 - [ ] 5.6 Copy `docker-compose.prod.yml` + Caddyfile + Postgres init script to the VM (one-time manual step or a `scp` step in the deploy job)
 - [ ] 5.7 Run the pipeline end-to-end against the real VM; verify only the Quarkus container restarts and Postgres/Keycloak data persists across the deploy
 
-## 6. HTTPS + domain (blocked on domain registration finishing — Tobias, `.at` domain in progress as of 2026-08-23)
+## 6. HTTPS + domain
 
-- [ ] 6.1 (Tobias) Finish registering the `.at` domain, point an A record at the VM's public IP (178.104.109.45)
+- [x] 6.1 Register `paportal.at` and point its A record at the VM's public IP — verified on 03.09.2026: `paportal.at` resolves to `178.104.109.45`
 - [ ] 6.2 Set `KC_HOSTNAME`, `redirectUris`, and `webOrigins` together as one work package (design.md Decision 4) — do not scaffold any of the three against a placeholder domain beforehand
-- [ ] 6.3 Verify Caddy successfully provisions a Let's Encrypt certificate and the site is reachable over HTTPS; also confirms whether an upstream/provider firewall blocks 80/443 beyond the local `ufw` check already done (5.1)
+- [ ] 6.3 Verify Caddy successfully provisions a Let's Encrypt certificate and the site is reachable over HTTPS. External ingress on 80/443 is already proven by task 5.1; this task verifies the real TLS/application path.
 - [ ] 6.4 Verify Keycloak login flow works end-to-end through the `/auth` path behind the proxy (no redirect loops, correct issuer URL in tokens)
 
-## 7. Backups — local now, offsite deferred (design.md Decision 7, resolved 2026-08-23)
+## 7. Backups — local and offsite before production-ready status (design.md Decision 7, updated 2026-09-03)
 
 **In scope now** (no provider decision needed, near-zero effort, shrinks risk window during eval period):
 - [x] 7.1 Write a backup script: `pg_dump` for both `partnerportal` and `keycloak` databases to a local directory — `deploy/backup/backup.sh`
 - [x] 7.4 Add local retention pruning (e.g. keep last 14 daily dumps locally) — same script, keeps last 14 per database
-- [ ] 7.5 Schedule the backup script via cron on the VM — script + crontab line ready (see script header / docs/DEPLOYMENT.md), actual `crontab -e` install needs VM access (Tobias)
+- [ ] 7.5 Schedule the backup script via cron on the VM — script + crontab line ready (see script header / docs/DEPLOYMENT.md); VM access is available
 - [ ] 7.6a Manually verify one local cycle: dump created, old dumps pruned on schedule
 
-**Deferred, post-MVP — required "before production use," not dropped:**
-- [ ] 7.2 (Tobias) Pick offsite object storage provider (Oracle no longer applies — VM changed providers), create bucket + S3-compatible credentials
-- [ ] 7.3 Add `rclone` config (VM-local, using Tobias's credentials) and extend the backup script to upload each dump to the bucket
+**Offsite hardening — now in scope before production-ready status:**
+- [ ] 7.2 S3-compatible access data was received through a private Vaultwarden Send; securely verify provider endpoint, bucket name, and write permission without copying secrets into Git, logs, or documentation
+- [ ] 7.3 Add VM-local `rclone` configuration using the supplied credentials and extend the backup script to upload each dump to the bucket
 - [ ] 7.6b Manually verify offsite cycle once 7.2/7.3 land: dump uploaded to bucket, old local dumps still pruned correctly alongside it
 
 ## 8. Documentation
