@@ -66,6 +66,7 @@ class ModalDialog extends HTMLElement {
     document.addEventListener("keydown", this._escHandler);
     if (openModalCount === 0) lockBackgroundScroll();
     openModalCount += 1;
+    this.querySelector(".modal-dialog__close")?.focus();
   }
 
   close() {
