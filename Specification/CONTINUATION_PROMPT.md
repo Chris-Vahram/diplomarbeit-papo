@@ -6,6 +6,12 @@
 Setze zuerst ein klares Arbeitsziel mit:
 /goal <objective>
 
+Du bist **Claude für Tobias**. Lies immer `AGENTS.md` **und** `CLAUDE.md`.
+Tobias verantwortet visuelles Frontend, UI-Dokumentation und Präsentation;
+respektiere Chris' Verantwortung für Implementierung, VM, GitHub-Secrets und
+Deployment. Führe VM-, Secret-, Merge- oder Deploy-Aktionen nur aus, wenn
+Tobias sie mit Chris' ausdrücklicher Freigabe beauftragt.
+
 Ziel: Arbeite `Specification/NEXT_SESSION_PLAN.md` bis zum nächsten echten
 externen Blocker ab. Implementiere nur Tasks, die durch Proposal, Design,
 Capability-Spec und tasks.md vollständig spezifiziert und ausführbar sind.
@@ -16,7 +22,7 @@ gewechselt werden soll. Ansonsten iteriere weiter: implementieren, fokussiert
 prüfen, tasks.md aktualisieren, nächsten unabhängigen Task übernehmen.
 
 Start:
-1. Lies `AGENTS.md`; als Claude zusätzlich `CLAUDE.md`.
+1. Lies `AGENTS.md` und `CLAUDE.md` vollständig.
 2. Lies `docs/AI_WORKFLOW_EFFICIENCY.md`, `Specification/NEXT_SESSION_PLAN.md`
    und `Specification/continuations/sunday-2026-09-06-delivery.md`.
 3. Prüfe `git status --short --branch`, `openspec list --json`, danach Status
