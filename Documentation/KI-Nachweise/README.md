@@ -71,6 +71,10 @@ Nach dem Export werden die Originaldateien schreibgeschützt abgelegt und mit SH
 | `REKONSTRUIERT` | Einsatz ist über Git, OpenSpec, Dokumente oder Screenshots belegbar, der genaue Wortlaut aber nicht mehr vorhanden. Keine erfundenen Prompttexte. |
 | `NICHT WIEDERHERSTELLBAR` | Der Einsatz ist bekannt, lässt sich aber nicht mehr ausreichend belegen. |
 
+## Laufender Prompt-Backlog
+
+`prompt-register.md` ist der zentrale Backlog für automatisch gesicherte, noch nicht kuratierte Sitzungen (`AUSSTEHEND-*`). Nach jedem substantiven PAPO-Arbeitsblock wird erst synchronisiert, der aktuelle Sitzungs-ID im Register verifiziert und nur dann mit `enrich --session-id <ID>` angereichert. Ohne aktuellen Eintrag bleibt der Backlog offen. Alte Einträge werden nur bearbeitet, wenn der aktuelle Auftrag ausreichende Primärbelege liefert; keine Rekonstruktion nach Erinnerung und kein Massendump.
+
 ## Rückwirkende Aufarbeitung
 
 1. ChatGPT- und Claude-Kontodaten exportieren.
@@ -121,7 +125,7 @@ python3 tools/ai_evidence_log.py enrich \
   --check "Wirklich ausgeführter Prüfungsbefehl: Ergebnis"
 ```
 
-Ohne belegte technische Prüfung wird `--check` weggelassen. `enrich` wählt standardmäßig die zuletzt geänderte PAPO-Sitzung; bei Bedarf kann `--session-id <ID>` angegeben werden.
+Ohne belegte technische Prüfung wird `--check` weggelassen. `enrich` wird nur mit der nach `sync` im Register verifizierten Option `--session-id <ID>` aufgerufen. Der Default darf nicht verwendet werden, weil er einen älteren Eintrag derselben fortlaufenden Sitzung überschreiben könnte.
 
 Der macOS-Hintergrundlauf wird so verwaltet:
 

@@ -34,27 +34,30 @@ Do not copy old Claude memory facts into code or documentation without checking 
 - Chris owns implementation. Tobias owns visual frontend design and still uses Claude.
 - Never delete, move, rename, or replace `CLAUDE.md`, `.claude/`, or Tobias-authored design work as part of Codex setup or normal implementation.
 - Chris runs `git commit`, `git push`, and `git merge`. Do not run them unless he explicitly authorizes that exact action.
+- Fully specified planned GitHub/VM apply actions are standing-authorized: execute them autonomously until a task's explicit stop condition, a new decision, or a separate commit/push/merge/deploy-activation/archive authorization is reached.
 - Use one branch per feature/change and preserve unrelated working-tree edits.
 - End implementation handoffs with the active branch and a ready commit message.
 - When a commit message contains a literal `"`, write it to a file and hand Chris `git commit -F <file>`; do not use `-m` or a pasted heredoc.
 
 ## Required workflow
 
-- Use OpenSpec for non-trivial features, behavior changes, and user-visible refactors: propose → review → apply tasks → validate → archive.
+- Use OpenSpec for non-trivial features, behavior changes, and user-visible refactors: propose → apply tasks → validate → archive.
 - Keep one OpenSpec change per feature or concern; do not create mega-changes.
 - `tasks.md` is the progress source of truth for an active change.
-- For complex/high-stakes changes, independently review the proposal and final diff. Append review findings or intermediate phases; do not silently rewrite the original plan history.
-- After implementation, use the project `partnerportal-quality` skill and a generic correctness review.
-- KI usage is documented through `Documentation/KI-Nachweise/`. The local LaunchAgent secures sessions automatically; never invent missing verification evidence.
-- Once per substantive PAPO work block, run `python3 tools/ai_evidence_log.py sync`, then enrich the session with `python3 tools/ai_evidence_log.py enrich --purpose "<Zweck>" --result "<Ergebnis>" --check "<wirklich ausgeführte Prüfung>"`. Batch related tiny edits into one entry and omit `--check` when no technical verification ran.
+- For complex/high-stakes changes, run one independent combined plan/readiness review and one final diff review. Do not add a separate self-sufficiency session after the plan review. Append findings or intermediate phases; do not silently rewrite the original plan history.
+- After ordinary implementation, use the project `partnerportal-quality` skill. Add a separate generic correctness/security review only for high-risk changes or unresolved findings.
+- KI usage is documented through `Documentation/KI-Nachweise/`. `prompt-register.md` is the documentation prompt backlog; the local LaunchAgent secures sessions automatically. Never invent missing prompt or verification evidence.
+- Once per substantive PAPO work block, run `python3 tools/ai_evidence_log.py sync`, inspect the `AUSSTEHEND-*` backlog, then enrich only the verified current-session ID with `--session-id <ID>`. If no current-session record exists, leave it in the backlog; never let default `enrich` overwrite a historical entry. Curate only entries whose evidence is available in the current task; do not mass-process old sessions. Batch related tiny edits into one entry and omit `--check` when no technical verification ran.
+- The detailed planning, FSD/OpenSpec audit, scratch, model-handoff, and cold-restart protocol lives in `docs/AI_WORKFLOW_EFFICIENCY.md`; do not duplicate it in session prompts.
 
 ## Context and model efficiency
 
-- Keep one session to one bounded outcome. Start a fresh session after a completed feature, deployment phase, or major planning decision.
+- Keep one session to one bounded outcome, but continue from planning into implementation when the plan is approved and enough context remains. Start a fresh session only for a genuinely new outcome, a deliberate model escalation, or context pressure.
 - State each instruction once. Prefer links to source-of-truth files over copied summaries.
 - Read narrow sections and request bounded command output; never dump whole tool catalogs or unrelated directories.
 - Use only the skills/tools required by the task. For routine implementation from approved OpenSpec tasks, prefer the cost-efficient model; escalate for architecture, security, unclear requirements, stubborn failures, and final high-risk review.
 - Do not create subagents for serial work. Use them only for genuinely independent parallel scopes or an explicitly requested independent review.
+- In clients with `/context`, prepare a cold-restart handoff around 75% and restart by 85%; do not create a handoff merely because a workflow phase ended. `openspec context` is unrelated to token usage.
 
 ## Fixed stack
 

@@ -1,82 +1,138 @@
-# Effizienter KI-Workflow für PAPO
+# Effizienter Spec-driven Workflow für PAPO
 
-**Analyse:** 03.09.2026
+**Stand:** 03.09.2026
+**Zweck:** Qualität dort absichern, wo Fehler teuer sind, ohne jede Phase in einer neuen Sitzung nochmals zu prüfen.
 
-## Befund
+## Grundsatz
 
-Der hohe Verbrauch kommt überwiegend von langen, wiederholt fortgesetzten Sitzungen, nicht von der eigentlichen Antwortlänge. Repräsentative lokale Codex-Protokolle zeigen:
+PAPO ist Brownfield. FSD, OpenSpec, Code und Tests existieren; pro Arbeitsblock wird nur der betroffene Ausschnitt gelesen. Eine Prüfung wird nicht unter einem neuen Namen wiederholt.
 
-- 39,15 Mio. Input-Tokens, davon 37,59 Mio. gecacht, 171.757 Output-Tokens und drei Compactions;
-- 38,70 Mio. Input-Tokens, davon 36,96 Mio. gecacht, 118.650 Output-Tokens und drei Compactions;
-- 27,96 Mio. Input-Tokens, davon 25,70 Mio. gecacht, 213.043 Output-Tokens und drei Compactions.
+```text
+klein:      prüfen -> ändern -> fokussierter Check
+normal:     planen -> apply -> fokussierte Checks -> validate/archive
+hohes Risiko: planen -> 1 unabhängiger Plan+Readiness-Review
+             -> apply/tests -> 1 finaler Review -> validate/archive
+```
 
-Rund 92–96 % des Inputs waren gecacht. Das reduziert Rechenkosten gegenüber neuem Input, verhindert aber nicht, dass ein großer Kontext bei sehr vielen Agenten-/Tool-Runden immer wieder verarbeitet wird. Die zuletzt protokollierte Plus-Auslastung lag bei 49 % im Fünf-Stunden-Fenster und 68 % im Wochenfenster; zusätzliche Credits waren nicht vorhanden. Diese Anzeigen sind Momentaufnahmen, keine Abrechnung und keine verlässliche Zuordnung zu einem einzelnen Plugin.
+Hohes Risiko umfasst insbesondere Authentifizierung/Autorisierung, Partnerisolation, Geld, Datenverlust, destruktive Migrationen, Secrets und produktives Deployment. Umfang allein macht einen Change nicht automatisch hochriskant.
 
-Konkrete Ursachen im bisherigen PAPO-Workflow:
+## Dokumentrollen
 
-1. Der alte Continuation Prompt hatte 486 Zeilen und verlangte danach zehn weitere, teilweise inhaltlich überlappende Dokumente.
-2. Mehrere große Arbeitsziele – Planung, neun Change-Reviews, Implementierung, Deployment und Dokumentation – liefen über Tage in denselben Sessions.
-3. Jeder Tool-Aufruf führt zu einer weiteren Modellrunde. Breite Ausgaben wie vollständige Logs, Verzeichnisbäume oder Toolkataloge vervielfachen den Kontext.
-4. Global sind zwölf Plugins plus mehrere MCP-Server aktiviert. Ihre verfügbaren Skills/Tools vergrößern die Instruktions- und Tooloberfläche, auch wenn sie für PAPO meist irrelevant sind.
-5. Wiederholte Benutzeranweisungen wie „continue“ erhalten den gesamten Alt-Kontext, definieren aber kein neues begrenztes Ergebnis.
-
-## Ponytail und andere Skills
-
-Ponytail ist nicht der Hauptverursacher. Es fügt Hooks und Skill-Anweisungen hinzu, kann bei Code aber Ausgabe und Implementierungsumfang reduzieren. Weil es für jede Coding-Aufgabe automatisch triggert, ist sein Overhead dauerhaft. Für PAPO ist die sparsamste Einstellung: standardmäßig deaktivieren oder nur ausdrücklich für Simplification/YAGNI-Reviews aktivieren. Ein exakter Tokenanteil pro Plugin ist aus den Sitzungslogs nicht messbar; belastbar wäre nur ein A/B-Test mit derselben kleinen Aufgabe in zwei frischen Sessions.
-
-Für normale PAPO-Arbeit werden typischerweise nur benötigt:
-
-- OpenSpec-Propose/Apply/Archive für nicht triviale Changes;
-- `partnerportal-quality` beim Abschluss;
-- Browser/Playwright nur bei UI- oder End-to-End-Prüfungen;
-- GitHub nur bei CI/PR/Repository-Arbeit.
-
-Für PAPO standardmäßig entbehrlich sind Blender, Node-REPL, Context7, Sites, Visualize, Documents, Spreadsheets, Presentations, PDF, Template Creator und Unified Computer Use. Diese globalen Plugins wurden nicht automatisch deaktiviert, weil das andere Projekte beeinflusst. Sinnvoll ist ein schlankes PAPO-Profil oder das manuelle Deaktivieren dieser Plugins, bevor eine neue PAPO-Session startet.
-
-## Neue Dokumentgrenzen
-
-| Datei | Einziger Zweck |
+| Quelle | Zweck |
 |---|---|
-| `AGENTS.md` | dauerhafte Arbeits-, Sicherheits-, Git- und Verifikationsregeln |
-| `CLAUDE.md` | Tobias' stabiler Produktkontext; nicht für Codex-Handoffs umbauen |
-| `Specification/CONTINUATION_PROMPT.md` | kurzer volatiler Snapshot und Startauftrag |
-| `Specification/NEXT_SESSION_PLAN.md` | aktuelles Arbeitspaket, Reihenfolge, DoD und Blocker |
-| Besprechungsprotokolle | Primärbelege neuer fachlicher Entscheidungen |
-| OpenSpec-Change | vollständige Planung und Taskfortschritt genau eines Features |
-| FSD / kanonische Specs | Anforderungen bzw. implementiertes Sollverhalten |
-| Roadmap / Phase-2-Backlog | Zukunft und bewusst aufgeschobener Scope |
+| `AGENTS.md` | dauerhafte Regeln, Quellenpriorität, Security, Git und Checks |
+| `Specification/CONTINUATION_PROMPT.md` | kurzer Router zum nächsten konkreten Ergebnis |
+| `Specification/NEXT_SESSION_PLAN.md` | aktuelles Arbeitspaket, Reihenfolge, DoD und externe Blocker |
+| `Specification/continuations/` | Handoff nur bei echtem Sitzungs-/Modellwechsel |
+| `openspec/changes/<id>/` | Proposal, Design, Delta-Spec und `tasks.md` eines Changes |
+| `openspec/specs/` | archiviertes Sollverhalten |
+| `Documentation/KI-Nachweise/prompt-register.md` | Prompt-Backlog: offene kuratierbare KI-Nachweise, kein Roharchiv |
+| Code und Tests | implementiertes Verhalten und Nachweis |
+| Besprechungsprotokolle/FSD | neuere Beschlüsse bzw. fachliche Baseline |
 
-Der Continuation Prompt kopiert diese Inhalte künftig nicht mehr. Er verweist auf die jeweils relevante Quelle.
+Information einmal an der zuständigen Stelle pflegen und sonst verlinken. Scratch, Handoffs und KI-Nachweise enthalten keine Zugangsdaten oder privaten Links.
 
-## Arbeitsweise ab der nächsten Session
+## Start eines Arbeitsblocks
 
-1. Pro Session genau ein Ergebnis: z. B. „Deployment fertigstellen“ oder „Change X planen“, nicht beides plus neue Features.
-2. Frische Session nach jedem abgeschlossenen Change bzw. nach einer großen Planungsentscheidung starten.
-3. Zu Beginn nur `AGENTS.md` (automatisch), Continuation Prompt und den aktuellen Plan lesen. Weitere Quellen nur nach dessen Routing.
-4. Einen Auftrag in einem Prompt vollständig formulieren: Ziel, Scope, bekannte Entscheidungen, verbotene Änderungen, DoD und gewünschte Verifikation.
-5. Bei einem vorhandenen OpenSpec-Plan das günstige Modell implementieren und testen lassen. Nach zwei erfolglosen Fix-Loops oder sobald eine neue Architektur-/Sicherheitsentscheidung entsteht, stoppen und auf ein starkes Modell wechseln.
-6. Starkes Modell nur für Anforderungsabgrenzung, OpenSpec-Design, Security/Deployment, schwierige Ursachenanalyse und Abschlussreview einsetzen.
-7. Tool-Ausgaben begrenzen: konkrete Dateien/Zeilen, fokussierte Tests und kurze Logs. Keine vollständigen Toollisten oder pauschalen Repository-Dumps.
-8. KI-Nachweis einmal pro sinnvollem Arbeitsblock anreichern, nicht nach jeder kleinen Änderung.
+Nur den aktuellen Zustand und die tatsächlich benötigten Quellen laden:
 
-## Promptvorlagen
-
-### Planung mit starkem Modell
-
-```text
-Lies CONTINUATION_PROMPT.md und NEXT_SESSION_PLAN.md. Plane ausschließlich <Feature> als eigenen OpenSpec-Change. Prüfe relevante aktuelle Quellen und bestehenden Code. Liefere Scope, Nicht-Ziele, Sicherheits-/Datenfolgen, Tasks und DoD. Noch nicht implementieren. Stoppe bei einer Entscheidung, die nur ich treffen kann.
+```bash
+git status --short --branch
+openspec list --json
+openspec status --change <change-id> --json
 ```
 
-### Umsetzung mit kostengünstigem Modell
+`git fetch`, Remote-/VM-Prüfungen und volatile Webrecherche nur ausführen, wenn sie für den aktuellen Task gebraucht werden. Keine vollständigen Verzeichnis-, Dokument- oder Toolkataloge laden.
+
+Skills, Plugins und CLI-Versionen nicht vor jedem Change inventarisieren. Wartung erfolgt nur bei Einrichtung, ausdrücklichem Wartungsauftrag, konkretem Fehler/Kompatibilitätshinweis oder wenn eine versionsabhängige Funktion tatsächlich gebraucht wird. Dann nur die betroffene Komponente prüfen und aktualisieren; globale Updates dokumentieren.
+
+## Risikobasierter Ablauf
+
+### Kleine/mechanische Arbeit
+
+Kein OpenSpec für Erklärungen, Diagnosen, Tippfehler, kleine Dokumentationskorrekturen oder offensichtlich verhaltensneutrale Änderungen. Relevante Datei lesen, minimal ändern, kleinsten aussagekräftigen Check ausführen.
+
+### Normaler Change
+
+1. Relevante FSD-/Protokollstelle, betroffene Spec sowie Code/Testpfad lesen.
+2. Einen vorhandenen OpenSpec-Change aktualisieren oder einen neuen kleinen Change anlegen.
+3. Proposal, Design nur bei echter Designentscheidung, Delta-Spec und ausführbare Tasks erstellen.
+4. Nach eigener Konsistenzprüfung direkt implementieren; benachbarte, unabhängige Tasks dürfen in einem Block erledigt werden.
+5. Fokussierte Tests während der Arbeit, kanonische Checks einmal vor Abschluss.
+6. `openspec validate <change-id>`, dann nach Freigabe archivieren.
+
+Kein verpflichtender Modellwechsel, kein separater Readiness- oder SELF-SUFFICIENT-Termin.
+
+Vollständig spezifizierte GitHub-/VM-Apply-Schritte laufen mit Chris' stehender Freigabe bis zur dokumentierten Stopbedingung. Commit, Push, Merge, Deploy-Aktivierung und Archivierung bleiben jeweils separate Git-/Release-Gates.
+
+### Hochrisiko-Change
+
+1. Wie beim normalen Change planen.
+2. Genau einen unabhängigen Review durchführen. Er prüft gleichzeitig Scope, Architektur, Security, Ausführbarkeit, Checks und Stopbedingungen. Ergebnis: `READY` oder konkrete Findings.
+3. Findings nachvollziehbar anhängen/einarbeiten und danach direkt applyen; nur eine neue fachliche oder sicherheitsrelevante Entscheidung geht zurück in den Review.
+4. Nach Tests genau einen finalen Diff-/Evidenzreview durchführen. Für PAPO: `partnerportal-quality` plus generischer Korrektheits-/Security-Review.
+5. Validieren und nach Chris' Freigabe archivieren.
+
+Damit ersetzt der unabhängige Planreview das frühere zusätzliche SELF-SUFFICIENT-Gate.
+
+## Tasks und Checks
+
+Ein Task enthält nur, was zur sicheren Ausführung nötig ist:
+
+- Ziel und echte Voraussetzungen,
+- betroffene Dateien/Systeme,
+- relevantes Verhalten, Daten- und Securityfolgen,
+- einen reproduzierbaren Check mit erwartetem Ergebnis,
+- DoD und Stopbedingung bei gefährlichen oder extern blockierten Schritten.
+
+Keine Mini-Plan-Bestätigung vor jedem bereits freigegebenen Task. Stoppen nur bei neuem Scope, fehlender Berechtigung, widersprüchlichem Bestand, Datenrisiko oder zwei erfolglosen Fix-Versuchen.
+
+Validierung sparsam staffeln:
+
+- fokussierter Test direkt nach geänderter Logik,
+- komplette Backend-Suite und Package einmal vor Abschluss eines Backend-Changes,
+- `openspec validate <change-id>` nach geänderten Change-Artefakten,
+- `openspec validate --all` nur vor Merge/Archivierung oder nach OpenSpec-/Schema-Wartung,
+- Browserprüfung nur bei betroffener UI bzw. Runtime.
+
+## Kontext und Handoffs
+
+- Eine Sitzung darf Planung und Apply desselben freigegebenen Changes enthalten.
+- `/context` nur am Start langer Blöcke, nach großen Reads oder bei sichtbarem Kontextdruck prüfen.
+- Handoff um etwa 75% vorbereiten und spätestens um 85% neu starten.
+- Kein Handoff bei bloßem Phasenwechsel oder für kleine abgeschlossene Änderungen.
+- Ein Handoff enthält nur Branch, Ziel, Entscheidungen, offene Task-ID, echte Checks, Blocker und nächsten Befehl/Prompt.
+
+## OpenSpec-Kurzreferenz
+
+| Absicht | Codex-Skill | CLI-Kontrolle |
+|---|---|---|
+| erkunden | `openspec-explore` | `openspec status --change <id> --json` |
+| vorschlagen | `openspec-propose` | `openspec validate <id>` |
+| umsetzen | `openspec-apply-change` | `openspec status --change <id>` |
+| Specs synchronisieren | `openspec-sync-specs` | `openspec validate --specs` |
+| abschließen | `openspec-archive-change` | `openspec archive <id>` |
+
+OpenSpec 1.12 synchronisiert beim normalen Archivieren die Delta-Specs. `--skip-specs` nur für Changes ohne Capability-Delta.
+
+## Kompakte Prompts
+
+Normal:
 
 ```text
-Wende den bereits geprüften OpenSpec-Change <change-id> taskweise an. Lies nur AGENTS.md, den kurzen Handoff, diesen Change und direkt betroffene Dateien. Keine neuen Produktentscheidungen, kein Refactoring außerhalb des Scopes. Führe fokussierte Tests, danach die vorgeschriebenen Gesamtchecks aus. Stoppe, sobald der Plan unklar oder falsch ist, statt Scope zu erfinden.
+Lies CONTINUATION_PROMPT.md und bearbeite <change-id> bis zum nächsten echten externen Blocker. Plane minimal, implementiere freigegebene Tasks direkt, teste fokussiert und halte tasks.md aktuell. Stoppe bei neuer fachlicher/Security-Entscheidung.
 ```
 
-### Kurzer Folgeauftrag
+Hohes Risiko — kombinierter Review:
 
 ```text
-Setze im selben Change nur bei Task <n> fort. Ergebnis dieser Runde: <konkretes Artefakt/Prüfung>. Gib am Ende erledigte Tasks, Testbefehle und den nächsten offenen Task an.
+Prüfe <change-id> unabhängig auf Scope, Architektur, Security, Ausführbarkeit und Tests. Hänge Findings an und korrigiere nur Planartefakte. Melde READY oder konkrete Blocker; kein separater Readiness-Review danach.
 ```
 
-OpenAI empfiehlt ebenfalls schlanke Prompts und Toolsets, ein ausgewogenes Reasoning-Level als Ausgangspunkt und höhere Denkstufen nur bei gemessenem Nutzen: <https://developers.openai.com/api/docs/guides/latest-model>.
+## Effizienzregeln
+
+- Dieselbe Quelle innerhalb eines Arbeitsblocks nicht erneut vollständig lesen, solange sie sich nicht geändert hat.
+- Toolausgaben nach Pfad, Trefferzahl oder Zeilen begrenzen.
+- Recherche parallelisieren, aber serielle Implementierung nicht an Subagents verteilen.
+- KI-Nachweis einmal pro substantivem Arbeitsblock synchronisieren; aktuelle Sitzungs-ID im `AUSSTEHEND-*`-Backlog prüfen und nur mit `enrich --session-id` anreichern. Danach nur belegbare, zum Block gehörende Einträge kuratieren. Keine erfundenen Prompts und keine Massenaufarbeitung alter Sitzungen.
+- Stärkere Modelle nur für echte Architektur-/Securityentscheidungen, hartnäckige Fehler und Hochrisiko-Reviews einsetzen.

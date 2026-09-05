@@ -1,0 +1,21 @@
+# ci-cd-deployment-with-gh-actions — Plan-Review
+
+> **Aktualisierung 05.09.2026:** Diese Review-Historie bleibt erhalten.
+> Decision 16 ersetzt den hier noch erwähnten `restrict`-only-/SCP-/Run-Number-
+> Ansatz. 5.9 widerrief den breiten Schlüssel, 5.10a implementierte den
+> deaktivierten Forced-Command-Gateway und 5.10b pushte ihn in PR #5.
+> `Test backend` ist dort grün; Build und Deploy sind übersprungen. Der aktuelle
+> nächste Task ist 5.11; maßgeblich sind `design.md`, die Delta-Spec und
+> `tasks.md` des Changes.
+
+- **Stand:** 03.09.2026, unabhängige Prüfung eingearbeitet, Branch `docs/next-session-plan`.
+- **Ergebnis:** Der unabhängige Planreview ist nach dem optimierten PAPO-Workflow zugleich das Readiness-Gate; eine weitere SELF-SUFFICIENT-Sitzung entfällt. Vor Apply werden vier zuletzt konkret gefundene Ausführungslücken direkt in die Change-Artefakte eingearbeitet. Bisher wurden weder Produktcode noch Workflow/Compose/VM verändert und weder Commit noch Push/Deploy ausgeführt.
+- **Ziel des Changes:** Ein erfolgreicher `main`-Commit erzeugt ein privates amd64-Backend-Image und ein commit-kohärentes Release aus Backend-Tag, Compose, `deploy/` und `frontend/`. Produktion läuft same-origin unter `https://paportal.at`; reguläre Releases ersetzen nur Backend und Caddy, nicht Postgres/Keycloak. Lokale und verschlüsselte externe Backups müssen isoliert wiederherstellbar sein.
+- **Entscheidungen:** Releases liegen unter `~/papo-deploy/releases/<sha>` und tragen denselben `RELEASE_SHA`; `.env.prod` bleibt persistent außerhalb. Es wird ausschließlich der Commit-SHA-Image-Tag verwendet. Actions und zustandsbehaftete Images sind unveränderlich gepinnt. SSH prüft den bekannten ED25519-Host-Fingerprint und nutzt einen `restrict`-Key. Das Produktions-Realm enthält keine Benutzer/Passwörter; Chris legt eine Company- und mindestens zwei synthetische Partner-Identitäten samt passenden Anwendungsdaten privat an. Backups verwenden `umask 077`, `rclone crypt` und einen isolierten PostgreSQL-16-Restore mit `papo-restore-`-Schutzpräfix.
+- **Unabhängige Prüfung:** Ursprünglich `NOT READY`: fehlende Release-Auslieferung, mutable/breite Deployments, bekannte Realm-Passwörter, fehlende zweite Partneridentität, unvollständige SSH-/Workflow-Härtung, unsicherer Restore, zirkuläre Tasks, nicht reproduzierbare Checks, mutable Basisimages und stale Dokumentaussagen. Alle Findings sind in `design.md` angehängt und durch Decisions 7, 9 und 11–15 sowie die neu geordneten Tasks aufgelöst.
+- **Letzte Pre-Apply-Korrekturen:** native Runner-Werkzeuge `ssh`/`scp` statt zusätzlicher Transfer-/SSH-Actions; serverseitiger Deploy-Lock plus monotone Workflow-Run-Nummer gegen überholte Releases; Healthcheck mit Frontend 200 und geschütztem Backend 401; persistentes `~/papo-deploy/backups` mit zentraler `.env.prod` und atomisch fertiggestellten Dumps.
+- **Live-Stand:** sechs letzte CI-Läufe grün; keine Actions-Secrets; `main` nicht geschützt; VM-Verzeichnis/Compose vorhanden, `.env.prod` fehlt, keine laufenden Container, kein Backup-Cron; `paportal.at` nicht über HTTP/HTTPS erreichbar. Der private Repo-Inhalt liegt nicht als Checkout auf der VM, weshalb der Workflow das vollständige Release-Bundle übertragen muss.
+- **OpenSpec:** Proposal, Design, Delta-Spec und Tasks sind synchron; 26/53 Tasks erledigt. Erste rein lokale Apply-Aufgaben sind 3.6, 4.6, 5.7, 5.8, 6.2 und 7.2. Externe/interaktive Gates beginnen bei 3.5, 5.2 und 5.3.
+- **Wartungs-Gate:** OpenSpec 1.5.0 → 1.12.0; sieben Caveman-Skills aktualisiert; Ponytail bereits 4.9.0. Vier abweichende alte `.codex/skills/openspec-*`-Kopien blieben gemäß Updater unangetastet; ihre Löschung braucht Chris' Freigabe. Weitere globale Skills ohne Herkunftsmetadaten wurden nicht blind überschrieben.
+- **Planungschecks:** `openspec validate ci-cd-deployment-with-gh-actions`, `openspec status --change ci-cd-deployment-with-gh-actions`, `openspec validate --all` und `git diff --check`. Keine Backend-/Browsertests, weil kein Produktcode geändert wurde.
+- **Nächster Schritt:** Im selben Arbeitsblock die vier Pre-Apply-Korrekturen in Design/Spec/Tasks einarbeiten, `openspec validate ci-cd-deployment-with-gh-actions` ausführen und danach direkt die lokalen Tasks ab 3.6/4.6 mit deaktiviertem Deploy-Job implementieren. Erst am nächsten echten externen oder interaktiven Gate stoppen.

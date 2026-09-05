@@ -11,7 +11,19 @@
 
 
 
-| AUSSTEHEND-01a05dcf | 2026-09-01 | Chris | Codex | PAPO Sessionplan Clockify Nachtrag und kontexteffizienten Handoff erstellen | lokale Sitzung `01a05dcf-2be8-7021-89cc-07ddb9a4aaca` | `EXAKT` | Continuation Prompt verschlankt Deployment und Firewallstatus synchronisiert Sonntagsplan und datierte Clockify Vorschlaege dokumentiert; Prüfungen: OpenSpec Change gueltig Git Diff sauber externe Ports 80 und 443 erreichbar UFW aktiv und SSH danach erreichbar |
+| AUSSTEHEND-01a05dcf | 2026-09-01 | Chris | Codex | PAPO-Sessionplan, Deploymentstatus und spec-driven Arbeitsweise aktualisieren | lokale Sitzung `01a05dcf-2be8-7021-89cc-07ddb9a4aaca` | `EXAKT` | Sonntagsplan, Deployment- und Firewallstatus sowie Clockify-Vorschläge synchronisiert; kompakten Startprompt, FSD-Trace-Workflow, Modellphasen, Cold-Restart-Handoff, Scratch-Schutz und OpenSpec-Konfiguration dokumentiert; Wartungs-Gate für OpenSpec, Caveman und weitere Skills/Plugins ergänzt.; Prüfungen: Lokales OpenSpec 1.5.0 und npm-Registry-Latest 1.12.0 geprüft; openspec doctor erfolgreich; openspec validate --all: 24 bestanden, 0 fehlgeschlagen; git diff --check erfolgreich; referenzierte Projektpfade vorhanden; zuvor externe Ports 80/443 und aktive UFW bei weiter erreichbarem SSH geprüft. |
+
+
+| AUSSTEHEND-01a0676e | 2026-09-03 | Chris | Codex | PAPO-Arbeitsworkflow auf geringeren Kontextverbrauch optimieren | lokale Sitzung `01a0676e-bfa1-7241-89c0-43de935e78ee` | `EXAKT` | Doppelte Readiness-Sitzung entfernt, risikobasierte Reviews eingeführt, Wartung und Handoffs an echte Anlässe gebunden sowie gezielte statt wiederholter Gesamtvalidierung festgelegt; Prüfungen: Prozessquellen abgeglichen und Git-Diff-Prüfung ohne Fehler |
+
+
+
+| AUSSTEHEND-01a06809 | 2026-09-03 | Chris | Codex | Cold-Handoff für frischen PAPO-Chat aktualisieren | lokale Sitzung `01a06809-6bda-70c3-922a-59e5eeeeff28` | `EXAKT` | Continuation Prompt, Sonntagsplan, Cold Handoff und Deployment-Taskkontext auf 34/53 Deployment, 52/53 MVP und nächsten Task 5.2 synchronisiert.; Prüfungen: Beide OpenSpec-Changes validiert; stale-status grep; git diff --check |
+
+
+| AUSSTEHEND-01a06ab1 | 2026-09-04 | Chris | Codex | PAPO-Deployment absichern, Apply-Plan prüfen und Prompt-Backlog dokumentieren | lokale Sitzung `01a06ab1-5040-7761-b84f-b202b6db6cc8` | `EXAKT` | Task 5.2 nach VM-Rechteprüfung umgesetzt: separater Ed25519-Key und `restrict`-Eintrag nachgewiesen; neue BatchMode-Keyverbindung und persönlicher SSH-Zugang grün, Port-Forwarding abgelehnt, `authorized_keys` mode 600. Danach Deploy-Plan auf Forced-Command-Grenze und ausführbare Tasks geprüft; AGENTS, Workflow-Doku, KI-README und aktive Handoffs auf den kuratierten `AUSSTEHEND-*`-Backlog synchronisiert. Task 5.9 widerrief danach exakt den interimistischen Actions-Key und `VM_SSH_KEY`; der alte Key ist abgelehnt, persönlicher SSH-Zugang weiterhin grün. Task 5.10a implementierte den deaktivierten Forced-Command-Workflow, Gateway, Sudoers-Vertrag und lokalen PATH-Stub-Harness. Task 5.10b pushte Commit `48ad4d8` in PR #5; `Test backend` erfolgreich, Build und Deploy übersprungen, kein Merge/Deploy.; Prüfungen: `sh -n` grün; 26 Harness-Prüfungen bestanden; Workflow-Bash- und YAML-Parse grün; statische Vertrags-/Security-Checks grün; GitHub-PR-/Workflow-Status geprüft; `git diff --check` ohne Ausgabe; OpenSpec-Change gültig. |
+
+
 | AUSSTEHEND-019f72d2 | 2026-07-18 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f72d2-d09e-7382-ad24-52f329a30e94` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-019f75a8 | 2026-07-18 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f75a8-0fb0-7721-9c66-e0a221a69661` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-019f70fe | 2026-07-17 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f70fe-8ec1-7a51-85c0-9f029a0a1ec3` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
