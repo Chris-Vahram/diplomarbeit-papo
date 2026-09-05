@@ -1,48 +1,24 @@
 schema: spec-driven
 
 context: |
-  Project: Web-based Partner Portal (HTL Diplomarbeit). Model: Company -> Partner -> End Customer.
-  Authoritative spec: Specification/functional_specification_document_partnerportal_final.md (v2).
-  Plan: Specification/IMPLEMENTATION_PLAN.md. Backlog: Specification/phase2_backlog.md.
-  MVP = INTERNAL B2B partner-ordering portal (partner logs in, selects/creates Endkunde, places order
-  with articles+quantities on the customer's behalf). NOT an external end-customer shop.
+  PAPO is an existing extensible B2B partner-ordering portal (brownfield).
+  Source priority and document routing are defined in AGENTS.md; read only the sources relevant to the active change.
+  Current core: Company -> Partner -> End Customer; one shared organizational login per partner company.
+  UI/thesis term: Artikel. BMD leads article master data; PAPO currently imports Excel/CSV only.
+  Stack: static HTML/CSS/JavaScript with native Web Components; Java 21/Quarkus/Panache/OIDC;
+  PostgreSQL; Keycloak roles company and partner. Money uses BigDecimal/numeric and frontend integer cents.
+  Protect role and partner/tenant boundaries. Never expose secrets or real private data.
+  Deferred scope is listed in Specification/phase2_backlog.md and must not enter a current change implicitly.
 
-  Fixed tech stack (NO alternatives allowed):
-    - Frontend: HTML, CSS, native Web Components / Custom Elements (no framework)
-    - Backend: Quarkus (Java)
-    - Database: PostgreSQL
-    - Auth: Keycloak (roles: company, partner)
-
-  Scale reference: ~200 partners, ~800 articles. Data enters via Excel/CSV import (no BMD interface).
-  Commission: field on Partner (Partner.commissionPercent), company sets via dropdown 5/10/15 + optional
-  custom value; percentage of total order value; stored as own CommissionRecord. No separate level entity.
-  Active status: DB-only flag Partner.active, enforced server-side after login (Keycloak stays simple).
-  Order status: submitted -> reviewed -> fulfilled (company-controlled). Confirmations simulated in-app (no real email).
-  Team: Chris + Tobias only (Julian left).
-
-  DEFERRED / OUT OF MVP (see phase2_backlog.md, do NOT plan these into MVP):
-    B-01 external partner shop + direct end-customer ordering
-    B-02 shop design customization
-    B-03 automatic commission level-up
-    B-04 real email sending
-    B-05 shop inquiry auto-forward
-    B-06 BMD interface (permanent)
-    B-07 commission settlement/payout
-
-# Per-artifact rules (optional)
 rules:
   proposal:
-    - Keep scope strictly to MVP; deferred B-01..B-07 stay out (mention only as non-goals).
+    - One feature or concern per change; update an existing change when the objective is the same.
+    - State source requirements, scope, non-goals, assumptions, and unresolved decisions.
+    - Do not regenerate the whole FSD or create a mega-change for general FSD synchronization.
+  design:
+    - Record architecture, security, data, deployment, rollback, and compatibility decisions that affect this change.
+    - Prefer the smallest design consistent with the fixed stack and existing conventions.
   tasks:
-    - Organize tasks into phases; mark essential vs optional; realistic for a 2-person school project.
-    - Use only the fixed tech stack.
-
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+    - Order tasks by dependency and make each task independently verifiable.
+    - For every task state objective, prerequisites, affected files, exact check, definition of done, and stop condition.
+    - Keep implementation, verification, documentation, and archive work explicit.
