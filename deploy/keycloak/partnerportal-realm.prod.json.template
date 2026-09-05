@@ -20,25 +20,5 @@
       "redirectUris": ["https://__DOMAIN__/*"],
       "webOrigins": ["https://__DOMAIN__"]
     }
-  ],
-  "users": [
-    {
-      "username": "company-demo",
-      "enabled": true,
-      "email": "company-demo@papo.local",
-      "firstName": "Company",
-      "lastName": "Demo",
-      "credentials": [{ "type": "password", "value": "company-demo", "temporary": false }],
-      "realmRoles": ["company"]
-    },
-    {
-      "username": "partner-demo",
-      "enabled": true,
-      "email": "partner-demo@papo.local",
-      "firstName": "Partner",
-      "lastName": "Demo",
-      "credentials": [{ "type": "password", "value": "partner-demo", "temporary": false }],
-      "realmRoles": ["partner"]
-    }
   ]
 }

@@ -18,7 +18,8 @@
 name: papo-prod
 services:
   postgres:
-    image: postgres:16
+    # postgres:16
+    image: postgres:16@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94
     container_name: papo-prod-postgres
     restart: unless-stopped
     mem_limit: 768m
@@ -36,7 +37,8 @@ services:
       retries: 10
 
   keycloak:
-    image: quay.io/keycloak/keycloak:26.0
+    # quay.io/keycloak/keycloak:26.0
+    image: quay.io/keycloak/keycloak:26.0@sha256:09a381c715ab0b111835b70f2905955274843a219c6f27efb348e4d9f4086858
     container_name: papo-prod-keycloak
     restart: unless-stopped
     mem_limit: 1024m
@@ -64,7 +66,7 @@ services:
     entrypoint: ["/bin/sh", "/opt/keycloak/render-and-start.sh"]
 
   backend:
-    image: ghcr.io/chris-vahram/diplomarbeit-papo-backend:${IMAGE_TAG:-latest}
+    image: ghcr.io/chris-vahram/diplomarbeit-papo-backend:${IMAGE_TAG:?IMAGE_TAG must be an exact git SHA}
     container_name: papo-prod-backend
     restart: unless-stopped
     mem_limit: 768m
@@ -85,7 +87,8 @@ services:
       KC_CLIENT_ID: partnerportal-frontend
 
   caddy:
-    image: caddy:2-alpine
+    # caddy:2-alpine
+    image: caddy:2-alpine@sha256:5f5c8640aae01df9654968d946d8f1a56c497f1dd5c5cda4cf95ab7c14d58648
     container_name: papo-prod-caddy
     restart: unless-stopped
     mem_limit: 128m

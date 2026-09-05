@@ -48,7 +48,8 @@ kein zusätzliches Secret nötig.
 | `DB_USER`, `DB_PASSWORD` | Postgres-Zugangsdaten (Datasource + Keycloak-DB) |
 | `KC_ADMIN_PASSWORD` | Keycloak-Admin-Passwort |
 | `DOMAIN` | Produktionsdomain — steuert `KC_HOSTNAME`, Caddy-TLS, Keycloak `redirectUris`/`webOrigins` (siehe `deploy/keycloak/render-and-start.sh`) |
-| `IMAGE_TAG` | Welches Image-Tag `docker-compose.prod.yml` zieht (normal `latest`, siehe Rollback) |
+| `IMAGE_TAG` | Exakte Backend-Commit-SHA; ohne Wert verweigert Compose die Konfiguration |
+| `BACKUP_RCLONE_DEST` | VM-lokales verschlüsseltes `rclone`-Ziel, z. B. `<crypt-remote>:partnerportal` |
 
 Das GHCR-Package ist **privat**; die VM authentifiziert sich einmalig per
 `docker login ghcr.io` mit einem VM-lokalen, read-only PAT (nicht in GitHub Secrets und
@@ -78,18 +79,31 @@ also für einen manuellen Rollback erreichbar, auch wenn `latest` inzwischen wei
 
 ## Backups
 
-`deploy/backup/backup.sh` dumpt beide Datenbanken (`partnerportal`, `keycloak`) lokal auf
-die VM und behält die letzten 14 Dumps pro Datenbank. Cron-Installation (VM-seitig, noch
-offen):
+`deploy/backup/backup.sh` liest ausschließlich die zentrale
+`/home/papo/papo-deploy/.env.prod` und schreibt außerhalb der unveränderlichen Releases
+nach `/home/papo/papo-deploy/backups`. Das Verzeichnis hat Modus 700. Jeder Dump wird mit
+`umask 077` zunächst unter einem temporären Namen erstellt und erst nach erfolgreichem
+`pg_dump` atomar als mode-600-Datei veröffentlicht. Danach kopiert `rclone copyto` ihn an
+`BACKUP_RCLONE_DEST`; ein Uploadfehler lässt den lokalen Dump bestehen und beendet das
+Skript mit einem Fehler. Pro Datenbank bleiben die neuesten 14 lokalen Dumps erhalten.
+
+Vor der Cron-Installation das persistente Ziel einmal anlegen:
+
+```bash
+install -d -m 700 /home/papo/papo-deploy/backups
+```
+
+Cron-Installation (VM-seitig, noch offen):
 
 ```
-0 3 * * * /home/papo/papo-deploy/deploy/backup/backup.sh >> /home/papo/papo-deploy/deploy/backup/backup.log 2>&1
+0 3 * * * /home/papo/papo-deploy/current/deploy/backup/backup.sh >> /home/papo/papo-deploy/backups/backup.log 2>&1
 ```
 
-Offsite-Kopie erfolgt in der nächsten Deployment-Phase über einen S3-kompatiblen Bucket
-und VM-lokales `rclone`. Zugangsdaten wurden privat bereitgestellt. Vor der Einrichtung
-müssen Endpoint, Bucket und Schreibrecht geprüft werden; Werte gehören weder ins Repo
-noch in Terminal-/KI-Ausgaben. Danach ist ein Upload- und Restore-Test erforderlich.
+`BACKUP_RCLONE_DEST` verweist auf ein VM-lokales `rclone crypt`-Remote über dem privaten
+S3-kompatiblen Basis-Remote. Endpoint, Bucket, Zugangsdaten und Crypt-Parameter gehören
+nur in die mode-600-rclone-Konfiguration; Recovery-Parameter werden zusätzlich außerhalb
+der VM verwahrt. Vor Produktivbetrieb sind Schreib-/Lese-/Löschtest und der isolierte
+Restore beider Datenbanken nachzuweisen.
 
 ## CORS
 

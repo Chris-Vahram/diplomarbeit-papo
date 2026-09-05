@@ -2,7 +2,8 @@
 // Frontend is a public client ("partnerportal-frontend") with directAccessGrantsEnabled=true,
 // so the login form can POST credentials straight to the token endpoint (no redirect flow needed).
 
-const KEYCLOAK_BASE = "http://localhost:8081";
+const LOCAL_DEV = ["localhost", "127.0.0.1"].includes(location.hostname) && location.port === "3000";
+const KEYCLOAK_BASE = LOCAL_DEV ? `http://${location.hostname}:8081` : "/auth";
 const REALM = "partnerportal";
 const CLIENT_ID = "partnerportal-frontend";
 const TOKEN_ENDPOINT = `${KEYCLOAK_BASE}/realms/${REALM}/protocol/openid-connect/token`;

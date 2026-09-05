@@ -88,3 +88,6 @@ frontend/dist/
 deploy/backup/*.dump
 deploy/backup/*.log
 deploy/rclone.conf
+
+### Local AI scratch (never committed) ###
+.scratch/
