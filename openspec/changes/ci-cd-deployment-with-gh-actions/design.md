@@ -1,101 +1,174 @@
 ## Context
 
-The Partnerportal currently only exists as a local dev environment: `docker compose up` starts Postgres + Keycloak, `mvnw quarkus:dev` runs the backend against them, and the frontend is served by any static file server (`python3 -m http.server`). There is no build artifact, no image registry, no deployment target, and no automation. This design covers everything needed to get from "push to `main`" to "running, HTTPS-reachable instance" on a single VPS: `papo-server-01` (`papo@178.104.109.45`), 4 vCPU, 7.6 GB RAM, `x86_64`, Ubuntu 26.04 LTS, Docker 29.6.1 + Docker Compose v5.3.1 already installed.
+See `proposal.md` for motivation. Current verified state on 2026-09-03: tests and backend image publication already run successfully on `main`; the deploy job exists but is disabled. The private repository is not cloned on the VM. `~/papo-deploy` has partial copied assets but no `.env.prod`, no running containers and no backup cron. `paportal.at` resolves to the VM, while HTTP and HTTPS are not yet serving.
 
-**Provider change (2026-08-23):** earlier drafts of this design targeted an Oracle Cloud Free Tier VM (`VM.Standard.A1.Flex`, ARM/Ampere, 2 OCPU / 12 GB RAM, Ubuntu 24.04). That VM was never provisioned; the project moved to the VPS described above instead. The architecture shift (arm64 → x86_64) reopens Decision 2 below. Decision 7 (backup destination) also needs a new answer since it was Oracle-Object-Storage-specific.
+Target: `papo-server-01` (`papo@178.104.109.45`), 4 vCPU, 7.6 GB RAM, `x86_64`, Ubuntu 26.04 LTS, Docker 29.6.1 and Compose v5.3.1. The VM replaces the never-provisioned Oracle/ARM target from the first design draft.
 
-Constraint that shapes most decisions below: **7.6 GB total RAM shared across every long-running process on the box** (Postgres, Keycloak, Quarkus, Caddy, backup cron) — resource-consciousness is a first-class requirement, not a nice-to-have. Tighter than the 12 GB originally planned for, so explicit `mem_limit` per service (Risk 1 below) matters more than it did on paper.
-
-Division of labour (updated 2026-09-03): Chris owns implementation and deployment. The agent may perform explicitly authorized VM and repository setup; Chris remains responsible for interactive account actions such as creating a GitHub PAT and for approving any unavailable external access. Tobias owns visual frontend design, not production infrastructure. The pipeline gets only a dedicated deploy key; personal login keys are not reused.
+Chris owns implementation, deployment and interactive account actions. Tobias owns visual frontend design, not production infrastructure. No private value is recorded in these artifacts.
 
 ## Goals / Non-Goals
 
 **Goals:**
-- Push to `main` → tested, built, and deployed automatically, with zero manual steps on the happy path.
-- Redeploy touches only the Quarkus container; Postgres and Keycloak keep running (and keep their data) across every deploy.
-- Fit comfortably inside 7.6 GB RAM with headroom, on x86_64.
-- No secret ever committed to the repo; every credential is either a GitHub Actions secret or a VM-local credential supplied through a private channel.
-- Postgres data survives container restarts through volumes and VM loss through local `pg_dump` plus an S3-compatible offsite copy (Decision 7).
+
+- A successful push to `main` deploys one commit-coherent backend/frontend/config release without updating Postgres or Keycloak on routine redeploys.
+- First startup and later redeploys are distinguishable, fail visibly and preserve persistent state.
+- Browser traffic is same-origin through `https://paportal.at`; local frontend development retains the documented ports.
+- Workflow, SSH, demo identities and backups follow least privilege and contain no committed live credential.
+- Both databases can be restored from an offsite backup without touching production Postgres.
 
 **Non-Goals:**
-- Native-image builds (see Decision 2).
-- Multi-VM, HA, blue-green/canary deploys, autoscaling.
-- GitHub Pages or any CDN-hosted frontend.
-- Real email sending, external end-customer shop, or any other `phase2_backlog.md` deferred feature — this change is infrastructure-only and touches no application capability.
-- Secrets management systems (Vault, etc.) — GitHub Actions secrets + VM-local env files are sufficient at this scale.
+
+- Native image, multiple VMs, HA, blue-green/canary deployment, autoscaling or automatic rollback.
+- GitHub Pages/CDN hosting, a general secret-management platform, SMTP or any deferred product feature.
+- Automatic production demo seeding in application code.
 
 ## Decisions
 
-### 1. Frontend hosting: same VM via Caddy, not GitHub Pages
-Static assets cost negligible RAM/CPU regardless of host, so GitHub Pages buys no real resource saving. Hosting on the same origin as the API means the browser's calls to `/api/*` are same-origin — no CORS configuration, no separate Keycloak `webOrigins`/`redirectUris` entry for a second domain. This also lets the change **retire** the current CORS setup (`docs/SETUP.md` flags wildcard-ish localhost CORS as a prototype shortcut) rather than extend it to a new cross-origin case.
-**Alternative considered**: GitHub Pages — rejected, adds CORS + redirect-URI complexity for no measurable benefit at this scale.
+### 1. Same-origin frontend via Caddy
 
-### 2. Quarkus build mode: JVM (reopened 2026-08-23, re-confirmed same day)
-**Original reasoning (no longer applies):** the previously-planned VM was arm64; GitHub-hosted Actions runners are x86_64. Cross-compiling native-image for arm64 from an x86_64 runner needs either an arm64 builder or QEMU-emulated compilation (CPU/memory-heavy, slow, prone to OOM on a standard GH-hosted runner). JVM mode sidestepped this: `mvn package` produces portable bytecode, and `docker buildx build --platform linux/arm64` only had to copy that jar plus a pre-built arm64 JDK base image — no emulated execution.
+Caddy serves the static frontend and proxies `/api/*` and `/auth/*` without stripping the paths. Production JavaScript uses relative `/api` and `/auth`; only a frontend served on port 3000 uses the local backend and Keycloak ports. CORS remains enabled only in `%dev`.
 
-**Reopened:** the actual VM (`papo-server-01`) is **x86_64** — same architecture as GitHub-hosted runners — so the cross-arch friction that drove the original JVM choice is gone, and native-image runtime footprint (~50-100 MB vs. JVM's ~300-400 MB) matters more on the tighter 7.6 GB budget than it would have on the originally-planned 12 GB.
+### 2. Quarkus remains a JVM image for `linux/amd64`
 
-**Re-confirmed: stay JVM.** Reasoning (Tobias, 2026-08-23): the RAM native would save (~300 MB) is slack the box already has — rough footprint estimate is ~2.5-3 GB total on a 7.6 GB box, comfortable headroom either way. Native-image's reflection risk lands squarely on this stack (OIDC, Hibernate/Panache, Jackson all use runtime reflection) and isn't guaranteed to build clean without dedicated testing — a time cost with no payoff when the RAM it would save isn't needed. Native remains a valid future optimization if real-load footprint turns out larger than estimated, not a requirement now.
-**Build target**: `linux/amd64` (not arm64 — architecture assumption from the original Oracle plan no longer applies).
-**Reuse**: `backend/src/main/docker/Dockerfile.jvm` already exists from Quarkus scaffolding, used as-is.
+The VM and GitHub-hosted runner share the architecture. The measured capacity leaves enough headroom for JVM mode, while native compilation would add reflection/build risk to OIDC, Hibernate/Panache and Jackson. Native remains a later optimization only if observed memory demands it.
 
-### 3. Keycloak database: shared Postgres instance, separate database
-One Postgres **container**, two **databases** (`partnerportal`, `keycloak`) created via a Postgres init script (`POSTGRES_MULTIPLE_DATABASES`-style entrypoint script, or a plain `CREATE DATABASE keycloak;` in an init `.sql` mounted to `/docker-entrypoint-initdb.d/`). Saves a second container's baseline memory and halves the backup surface (one Postgres process to pg_dump, looped over two DB names). Isolation loss (shared instance = shared blast radius for e.g. a Postgres crash) is acceptable for a single-VM Diplomarbeit deployment.
-**Alternative considered**: separate Postgres container for Keycloak — rejected, doubles container overhead for isolation benefits that don't matter at this scale.
+### 3. One Postgres process, two databases
 
-### 4. Domain routing: single domain, path-based, no CORS
-Caddy routes by path on one domain: `/` → static frontend files, `/api/*` → Quarkus, `/auth/*` → Keycloak (`KC_HTTP_RELATIVE_PATH=/auth`, `KC_PROXY_HEADERS=xforwarded`, `KC_HOSTNAME=<domain>`). One TLS cert, one DNS A record, and — combined with Decision 1 — zero CORS configuration anywhere in the stack. Keycloak `redirectUris`/`webOrigins` in the realm export narrow to the single production domain (currently `*` in the dev-only realm — production realm config must not reuse the dev wildcard).
-**Alternative considered**: subdomains (`app.`/`api.`/`auth.`) — Caddy would handle the extra certs trivially, but it reintroduces cross-origin CORS and multi-origin OIDC config for a benefit (cleaner per-service Caddy blocks) that isn't worth it here.
+One container hosts `partnerportal` and `keycloak`. The processes connect only to their database. This reduces memory at the accepted cost of a shared failure domain.
 
-**Status (2026-08-23):** a `.at` domain is being registered (procurement in progress, not yet final) — this is not a design decision, just a pending fact. `KC_HOSTNAME`, `redirectUris`, and `webOrigins` must be set together as **one work package**, only once the domain is final — don't scaffold any of the three against a placeholder domain, since a later swap risks leaving one of the three stale (wrong token-issuer URL or a redirect loop that only shows up in production). Everything else in this change is domain-agnostic and should be built/verified first.
+### 4. One production domain from one variable
 
-### 5. `%prod` config externalization
-`application.properties` currently hardcodes `%prod.quarkus.datasource.jdbc.url=jdbc:postgresql://localhost:5432/...` and `%prod.quarkus.oidc.auth-server-url=http://localhost:8081/...`. Inside `docker-compose.prod.yml`, Postgres and Keycloak are reachable by Compose service name (e.g. `postgres:5432`, `keycloak:8080`), not `localhost` — the hardcoded values would simply fail to connect. Fix: replace the `%prod` block's fixed values with env-var placeholders (`${DB_URL}`, `${DB_USER}`, `${DB_PASSWORD}`, `${KC_URL}`, `${KC_CLIENT_ID}`), injected via `docker-compose.prod.yml`'s `environment:` block, values sourced from a VM-local `.env` file (not committed) that Tobias populates. `%dev` and `%test` blocks are untouched — `mvnw quarkus:dev` keeps working exactly as documented in `docs/SETUP.md`.
+`DOMAIN=paportal.at` in VM-local `.env.prod` drives Caddy, `KC_HOSTNAME`, the external token issuer and the rendered realm origins. `paportal.at` already resolves to the VM; TLS and issuer behavior remain verification gates.
 
-### 6. GHCR package visibility: private, with VM-side PAT
-The image is set to a **private** GHCR package. The VM authenticates with `docker login ghcr.io` using a read-only (`packages:read`) Personal Access Token before `docker compose pull`. This PAT is created and placed on the VM by Tobias directly (e.g. `docker login` once, credential persisted in the VM's Docker config) — it is explicitly **not** a GitHub Actions secret, since it's consumed by the VM's Docker daemon, not by a workflow run. Private visibility is an access control, not obfuscation — no bytecode protection is implied or needed, since only the VM (holding the PAT) can pull.
+### 5. `%prod` configuration is environment-driven
 
-### 7. Backup: local and offsite (updated 2026-09-03)
-Split into two independently testable halves:
-- **Local `pg_dump` cron — in scope now, own small task (tasks.md §7.1, 7.4, 7.5 minus offsite).** `pg_dump` looped over both databases (`partnerportal`, `keycloak`) to a local directory on the VM, with retention pruning (e.g. keep last 14 daily dumps). No provider decision blocks this — near-zero effort, and it shrinks the risk window during the client/supervisor evaluation period where real-ish partner/order data may accumulate before the offsite half exists. This is standard scope for this change, not a stretch goal.
-- **Offsite sync (`rclone` → S3-compatible bucket) — in scope before declaring the public instance production-ready.** S3 credentials were supplied privately on 03.09.2026. Configuration remains VM-local; implementation must first validate endpoint, bucket and write access without exposing values, then prove upload and restore. The public synthetic demo may be brought up while this is being completed, but a real production go-live is not declared before the offsite test passes.
+Compose supplies database and OIDC values to the implemented `%prod` configuration. `%dev` and `%test` stay independent. The internal Keycloak address is used for JWKS access, while the external HTTPS issuer is validated separately.
 
-### 8. CI test gating
-`./mvnw test` (Quarkus Dev Services — needs Docker on the runner, which GitHub-hosted runners provide) runs on every push and PR. The `build-and-push` and `deploy` jobs both declare `needs: test`, so a failing test suite never reaches production. Test and build-and-push are otherwise independent of the VM's existence — this half of the pipeline is fully exercisable before the VM is provisioned.
+### 6. Private GHCR with VM-local read access
 
-### 9. Image tagging
-Every build pushes two tags: `latest` (what `docker-compose.prod.yml` pulls) and `<git-sha>` (immutable, for audit trail / manual rollback via `docker compose up -d` after editing the compose file's tag). No separate rollback automation in this change — manual SHA pin is the rollback path, documented in tasks.md.
+The package is private. Chris creates a classic PAT limited to `read:packages` and enters it through `docker login ghcr.io --password-stdin` on the VM. It is not an Actions secret. Builds publish and deploy only the immutable commit-SHA image tag; this change does not publish or resolve `latest`.
 
-### 10. Per-service `mem_limit` in `docker-compose.prod.yml` (resolved 2026-08-23)
-Set generous per-service memory limits for every container (Quarkus, Postgres, Keycloak, Caddy) as standard part of writing `docker-compose.prod.yml` (tasks.md §2.3), not a separate later hardening task. Reasoning: even though the RAM budget has comfortable headroom on paper (Decision 2), limits are cheap insurance against one runaway container (e.g. a Keycloak memory leak under load) starving the others with no guardrail — a safety net, not a tight leash. Sized generously enough not to throttle normal operation.
+### 7. Secure local and offsite backups
 
-### 11. Firewall / ports (resolved and verified 2026-09-03)
-Temporary listeners on ports 80 and 443 returned HTTP 200 from outside the VM, proving that no upstream/provider firewall blocks either port. UFW is active with default-deny incoming traffic and explicit TCP allowances for 22, 80, and 443 (IPv4 and IPv6); outgoing traffic remains allowed. A new SSH connection succeeded after activation. Caddy TLS still requires its own end-to-end check, but no question to the infrastructure contact is needed for firewall access.
+The backup script reads the central `~/papo-deploy/.env.prod`, sets `umask 077`, ensures the persistent `~/papo-deploy/backups` directory is mode 700 and creates each plain-SQL dump through a mode-600 temporary file that is atomically renamed only after `pg_dump` succeeds. It keeps the newest 14 completed local dumps per database. `BACKUP_RCLONE_DEST` addresses a VM-local `rclone crypt` remote layered over the private S3-compatible bucket; both storage and crypt parameters live only in mode-600 rclone configuration, with recovery parameters retained by Chris outside the VM.
+
+After each successful dump, `rclone copyto` uploads it. Upload failure retains the local file and exits non-zero. Restore proof downloads one object per database into a mode-700 temporary directory and restores it into a separate short-lived Postgres 16 container using Decision 13's digest and a temporary volume. Cleanup is allowed only for names with an explicit `papo-restore-` prefix; production Postgres is never a restore target.
+
+### 8. CI test gate
+
+Pull requests and pushes to `main` run the complete backend test suite. Build and deploy depend on that test. A failing test never publishes or deploys an image.
+
+### 9. Exact image and rollback identity
+
+Each backend build publishes the commit SHA. Deploy passes `${{ github.sha }}` as `IMAGE_TAG`; rollback and forward recovery also name exact SHAs. A non-secret `RELEASE_SHA` file in each release directory records the source commit.
+
+### 10. Resource limits
+
+All long-running services retain generous `mem_limit` values so one process cannot starve the 7.6 GB VM. Limits are adjusted only from observed use.
+
+### 11. Network boundary and SSH identity
+
+UFW allows incoming TCP 22/80/443 only. External ingress and a new SSH connection were verified. The deploy job must validate the VM's independently checked ED25519 fingerprint `SHA256:9zt3nKCzspeSB08IBsqS5hRnnfLKdq9inQgrJ3J9+z4`, stored as a non-secret repository variable, before native `scp` or `ssh` connects.
+
+The first implementation appended an Actions key to the personal `papo` account with OpenSSH `restrict`. Verification proved that `restrict` disables forwarding, PTY and related features but does not prevent arbitrary remote commands. That key therefore still has the effective file and Docker access of `papo`, including indirect access to VM-local secrets. It must be revoked before deployment and is superseded by Decision 16.
+
+### 12. Immutable, least-privilege Actions and native SSH transport
+
+The workflow declares top-level `permissions: contents: read`; only the image job adds `packages: write`. All Actions use verified full SHAs with tag comments:
+
+- `actions/checkout@11d5960a326750d5838078e36cf38b85af677262` (`v4`)
+- `actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3` (`v4`)
+- `docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f` (`v3`)
+- `docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9` (`v3`)
+- `docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8` (`v6`)
+
+Release transfer and remote execution use the runner's native OpenSSH client. The workflow writes the dedicated forced-command key to a mode-600 temporary file, builds a temporary `known_hosts` file only after matching the scanned ED25519 fingerprint against `VM_HOST_FINGERPRINT`, and removes both files through a shell trap. No additional third-party transport Action receives the key. Decision 16 defines the server-side command and identity boundary.
+
+Major-version upgrades are separate from this completion change.
+
+### 13. Immutable stateful container inputs
+
+The tested multi-platform image indexes are pinned in Compose:
+
+- `postgres:16@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94`
+- `quay.io/keycloak/keycloak:26.0@sha256:09a381c715ab0b111835b70f2905955274843a219c6f27efb348e4d9f4086858`
+- `caddy:2-alpine@sha256:5f5c8640aae01df9654968d946d8f1a56c497f1dd5c5cda4cf95ab7c14d58648`
+
+Digest changes require an explicit tested dependency update; routine deploys never pull or recreate Postgres/Keycloak.
+
+### 14. Commit-coherent release bundle
+
+The deploy job checks out its triggering commit and creates an uncompressed Git archive with exactly `git archive --format=tar <sha> -- docker-compose.prod.yml deploy frontend`. It rejects an archive larger than 25 MiB and streams the archive to the gateway operation `upload <sha>`. `RELEASE_SHA` is not trusted from the runner: the server writes that marker only after the archive has matched the same commit in its read-only repository mirror. `.env.prod` remains at `~/papo-deploy/.env.prod` and is never uploaded or removed.
+
+The root-owned gateway uses `/run/lock/papo-deploy.lock` for upload, verification and activation. Under that lock it fetches only `refs/heads/main` through the VM-local read-only GitHub deploy key into `/var/lib/papo-deploy/repository.git`, requires the requested SHA to equal `refs/remotes/origin/main`, rejects non-blob entries in the three allowlisted Git paths, produces its own canonical archive with the same command and requires byte equality with the uploaded archive. It never extracts the untrusted upload. Only the server-generated canonical archive is extracted into a root-created temporary directory, receives a server-written `RELEASE_SHA`, and is atomically promoted to `~/papo-deploy/releases/<sha>` with ownership `papo:papo`. The single pending archive is root-owned at `/var/lib/papo-deploy/incoming/release.tar`; every accepted upload replaces it atomically, so the key cannot fill the disk with arbitrary archive names.
+
+The activation program then supplies `IMAGE_TAG=<sha>` explicitly. On the first deployment it starts the complete pinned stack. On routine deployments it pulls only `backend` and applies only `backend` plus `caddy` with `--no-deps`, so Caddy binds the frontend from the new release while Postgres/Keycloak remain untouched. It retries until the frontend returns HTTP 200 and the protected backend probe returns HTTP 401, then atomically updates `~/papo-deploy/current`. A delayed workflow for an older SHA fails because that SHA is no longer `origin/main`. Any failed command fails the job; it does not claim automatic rollback.
+
+### 15. Production demo identities and data are provisioned, not seeded
+
+The production realm template contains roles/client configuration but no users or credentials. After first startup Chris creates one company and at least two partner organizational accounts through the Keycloak admin UI with privately stored random passwords. Partner usernames equal canonical partner numbers.
+
+Using existing company UI/import functions, the demo receives matching active partner records, synthetic articles, per-partner enablements and separate synthetic customers. No real company/person data or new seeding code is introduced. Two partner identities make cross-partner denial observable.
+
+### 16. Forced-command deploy boundary
+
+The Actions key belongs to a dedicated `papo-deploy` operating-system account, not to `papo`. The account has a locked password, `/bin/sh` only so OpenSSH can execute the forced command, no Docker-group membership, no readable access to `/home/papo`, and no general sudo rule. Its root-owned mode-600 `authorized_keys` entry combines `restrict` with exactly `command="/usr/bin/sudo -n /usr/local/libexec/papo-deploy-gateway"`. The only sudoers entries are `Defaults:papo-deploy env_keep += "SSH_ORIGINAL_COMMAND"` and `papo-deploy ALL=(root) NOPASSWD: /usr/local/libexec/papo-deploy-gateway ""` in root-owned mode-440 `/etc/sudoers.d/papo-deploy`; the explicit empty argument string forbids gateway arguments. The root program reads `SSH_ORIGINAL_COMMAND` as untrusted data and validates it before any other action. Direct shell commands, forwarding, arbitrary download/read operations and every other sudo or filesystem operation are rejected.
+
+The mode-755 root-owned gateway accepts exactly three full command forms and no extra whitespace or arguments: `upload <sha>`, `verify <sha>` and `activate <sha>`, where `<sha>` is exactly 40 lowercase hexadecimal characters. `upload` reads at most 25 MiB plus one byte from standard input, rejects an oversized or non-canonical archive, and atomically replaces the one pending root-owned archive. `verify` repeats current-`main` and archive equality checks without creating a release or invoking Docker. `activate` repeats the same checks, promotes the canonical release, then performs only the Decision 14 Compose and health sequence through `runuser --user papo --`; it never evaluates client text or executes an uploaded script. Status output contains only the operation, SHA and non-sensitive failure reason.
+
+The repository mirror is the bare root-owned mode-700 directory `/var/lib/papo-deploy/repository.git` with only `git@github.com:Chris-Vahram/diplomarbeit-papo.git` as `origin`. Its root-owned mode-600 read-only GitHub deploy key and pinned `github.com` host keys live under `/var/lib/papo-deploy/ssh/` and are selected by a fixed `GIT_SSH_COMMAND`; `papo-deploy` cannot read them. `/var/lib/papo-deploy/incoming/`, the mirror, gateway, sudoers rule and repository key are root-owned and not writable or readable by `papo-deploy`. The workflow connects only as `papo-deploy` and calls `upload`, then `activate`; `verify` exists solely for the no-deploy boundary proof.
+
+This boundary limits a stolen Actions SSH key to requesting deployment of the current protected `main` commit. It cannot read production secrets, select an arbitrary historical commit, upload different executable content, invoke Docker directly or obtain an interactive shell. Chris's personal key remains separate and is used for explicitly authorized manual rollback and administration.
 
 ## Risks / Trade-offs
 
-- **[Risk] JVM Quarkus RAM footprint under real load is higher than estimated, crowding Keycloak/Postgres on the 7.6 GB box (tighter than the 12 GB originally planned for).** → Mitigation: `mem_limit` per service (Decision 10) so one process can't starve the others; native-image (Decision 2) remains a documented fallback if real-load footprint exceeds the estimate.
-- **[Risk] Single Postgres instance means a Postgres failure takes down both the app and auth simultaneously.** → Mitigation: accepted trade-off per Decision 3, scale-appropriate; local `pg_dump` backups (Decision 7) bound the damage now, offsite copy bounds VM-loss specifically once implemented post-MVP.
-- **[Risk] Path-based Keycloak routing (`/auth`) under a reverse proxy is a known source of subtle misconfiguration (redirect loops, wrong issuer URL in tokens).** → Mitigation: `KC_HOSTNAME` and `KC_HTTP_RELATIVE_PATH` set explicitly and tested against a real HTTPS request before declaring the deploy job done; documented as its own task with a manual verification step.
-- **[Risk] Deploy job has no automated rollback or health check — a bad image can go live and stay live until someone notices.** → Mitigation: out of scope for this change (see Non-Goals); document the manual SHA-rollback procedure (Decision 9) so it's at least possible.
-- **[Risk] GHCR private package + VM-side PAT is a credential Tobias must remember to rotate/manage outside the "everything is a GH secret" model.** → Mitigation: explicitly documented in proposal.md's Impact section and called out as a VM-local (not repo, not GH Actions) credential.
+- **[Risk] A routine deploy replaces backend and Caddy without automatic rollback.** → The job fails on the first error, checks HTTPS, and retains the previous SHA release for manual rollback.
+- **[Risk] The runner handles the deploy private key.** → Only native OpenSSH receives the dedicated forced-command key through a mode-600 temporary file; fingerprint validation happens before connection, a trap removes temporary material, and Decision 16 prevents general VM access.
+- **[Risk] Shared Postgres takes application and identity down together.** → Accepted for one VM; local and encrypted offsite backups plus isolated restore proof bound data loss.
+- **[Risk] Loss of rclone crypt recovery parameters makes offsite copies unusable.** → Chris retains them separately from the VM and proves restore before readiness.
+- **[Risk] Public synthetic accounts can be abused.** → Passwords are random/private, data is synthetic, roles remain server-enforced and no credential is documented.
 
 ## Migration Plan
 
-1. Externalize `%prod` config (Decision 5) — safe, additive, no behavior change to `%dev`/`%test`.
-2. Stand up the full stack locally via Docker Compose (Quarkus container included) to validate the Dockerfile and env-var wiring before anything touches GitHub Actions or the VM.
-3. Add the `test` → `build-and-push` workflow (Decisions 8, 9, 6) — independently testable via a throwaway public/private GHCR package, no VM required.
-4. Author `docker-compose.prod.yml` + Caddy config (Decisions 1, 3, 4) — testable locally by running it against `localhost` before pointing it at a real domain.
-5. Add the `deploy` job (SSH via `appleboy/ssh-action`) — VM already exists (`papo-server-01`); gate its rollout on Tobias entering the deploy secrets (tasks.md §5.2-5.4).
-6. Add the local `pg_dump` backup cron and S3-compatible offsite sync (Decision 7), then verify dump, retention, upload and restore independently of the deploy job.
+1. Finish same-origin frontend logic, remove production realm users, pin Actions/container digests and implement the SHA release-bundle workflow while deploy remains disabled.
+2. Revoke the interim `papo` Actions key and implement Decision 16's still-disabled workflow, gateway and deterministic local harness.
+3. Push that disabled implementation to the feature branch only after Chris authorizes commit/push, then prove the required PR check without merging.
+4. Install the dedicated forced-command identity, root-owned gateway and VM-local read-only repository key and prove the boundary without deploying. Enable deploy only in a later reviewed commit after every transport and VM preflight passes; merge that commit with Chris's authorization to start the first exact-SHA release.
+5. Verify HTTPS/OIDC, provision synthetic accounts/data and prove role/partner isolation.
+6. Configure secure local/offsite backups and prove restore in the isolated container.
+7. Prove routine deploy, persistence, rollback and forward recovery; synchronize docs, run reviews/checks, then archive after approval.
 
-No live traffic exists yet to migrate — this is a first deployment, not a cutover. Rollback (if a deploy breaks the VM) is: SSH in manually (Tobias), edit `docker-compose.prod.yml`'s image tag to a known-good SHA, `docker compose up -d`.
+There are no remaining architecture decisions after Decision 16. Missing root access, GitHub deploy-key administration, external credentials or a check that contradicts these decisions is a stop condition, not permission to weaken the design.
 
-## Open Questions
+## Independent Plan Review — 2026-09-03
 
-All items from the previous revision are resolved except the two genuinely external ones:
+The independent review returned `NOT READY` with ten findings. They are retained here instead of silently rewriting history:
 
-- **Production domain validation** — `paportal.at` already resolves to the VM; the real Caddy/Keycloak HTTPS path remains to be brought up and tested.
-- **Offsite backup access validation** — S3-compatible credentials have been supplied privately. Endpoint, bucket and write access must be verified during secure VM configuration; ask the contact only if one of those concrete parameters is missing.
+1. Release artifacts were not commit-coherently delivered → resolved by Decision 14.
+2. Mutable `latest`, broad Compose deploy and false-green shell behavior → resolved by Decisions 9, 13 and 14.
+3. Committed production demo passwords → resolved by Decision 15.
+4. No production data or second partner identity → resolved by Decision 15 and dedicated tasks.
+5. Missing SSH fingerprint and inherited workflow permissions → resolved by Decisions 11 and 12.
+6. Unsafe dump permissions and restore on production Postgres → resolved by Decision 7.
+7. Cyclic task DoDs → task dependencies/checks reordered.
+8. Non-self-sufficient checks → open tasks now name inputs, expected results, evidence and guarded cleanup.
+9. Mutable stateful image tags → resolved by Decision 13.
+10. Stale context/document statements → current context corrected; final documentation sync follows proven deployment evidence.
 
-Resolved and no longer open: JVM vs native (→ JVM, Decision 2), `mem_limit` (→ yes, standard, Decision 10), external ports and local firewall (→ ingress proven; UFW 22/80/443, Decision 11), local backup (→ in scope now, Decision 7).
+## Final Pre-Apply Corrections — 2026-09-03
+
+Four execution findings discovered after the combined review are incorporated without adding another readiness gate:
+
+1. Third-party SCP/SSH Actions are replaced by native runner `scp`/`ssh` with explicit fingerprint verification and temporary-key cleanup (Decisions 11, 12 and 14).
+2. A server-side deployment lock plus monotone workflow run marker prevents concurrent or delayed older runs from replacing a newer release (Decision 14).
+3. Activation requires both a frontend HTTP 200 and a protected backend HTTP 401, so proxy and backend reachability are checked together (Decision 14).
+4. Backups live outside immutable releases, use the central VM-local environment, and expose only atomically completed mode-600 dumps (Decision 7).
+
+## Apply-Self-Sufficiency Review — 2026-09-05
+
+The review returned `NOT READY` because OpenSSH `restrict` did not provide the claimed command boundary and several remaining tasks mixed implementation, human authorization and evidence. The plan now incorporates these corrections:
+
+1. Decision 16 replaces the personal-account deploy key with a dedicated forced-command identity and fixes its exact commands, paths, size bound, sudo boundary and canonical protected-`main` archive verification before activation.
+2. Branch-protection configuration is proven by API state; its practical PR gate is checked by the intermediate feature-branch PR, avoiding a prohibited direct push to `main`.
+3. First deployment, synthetic data, S3/rclone setup, restore, second deployment, smoke tests and rollback are split into independently verifiable tasks with explicit human gates.
+4. Final deployment documentation follows rollback/forward-recovery evidence, and MVP traceability uses a fixed source inventory and matrix schema.
