@@ -1,9 +1,5 @@
 import { ensureValidSession, refreshSession, logout } from "./auth.js";
-
-// Absolute base: the frontend is served as a separate static site (e.g. :3000),
-// so relative "/api" would hit the static server instead of Quarkus. CORS is
-// enabled in the backend for localhost origins (see docs/SETUP.md).
-const API_BASE = "http://localhost:8080/api";
+import { API_BASE } from "./config.js";
 
 // Error responses are JSON ({"message": "...", "details"?: [...]}) from ApiExceptionMapper/
 // ValidationExceptionMapper (see backend/.../common/*ExceptionMapper.java) - extract the
