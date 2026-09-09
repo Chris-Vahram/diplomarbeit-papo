@@ -83,6 +83,24 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
+      # Uploads into a scratch dir, never the live one - if this step fails partway,
+      # frontend-new is left incomplete but frontend/ (still serving traffic) is
+      # completely untouched. rm:true only ever wipes the scratch dir, which is a
+      # from-scratch mirror of the repo on every run anyway, so nothing of value is
+      # ever lost by wiping it first.
+      - name: Sync frontend to VM (staging dir)
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: papo
+          key: ${{ secrets.VM_SSH_KEY }}
+          fingerprint: ${{ vars.VM_HOST_FINGERPRINT }}
+          source: "frontend/*"
+          target: "~/papo-deploy/frontend-new"
+          rm: true
+
       - name: SSH and redeploy
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -92,5 +110,13 @@ jobs:
           fingerprint: ${{ vars.VM_HOST_FINGERPRINT }}
           script: |
             cd ~/papo-deploy
+            # Atomic-ish swap: only reached if the scp step above fully succeeded
+            # (default fail-fast job behaviour), so frontend-new is always complete
+            # here. Two sequential renames on the same filesystem - sub-millisecond,
+            # no window where frontend/ is missing or partially written.
+            rm -rf frontend-old
+            mv frontend frontend-old
+            mv frontend-new frontend
+            rm -rf frontend-old
             docker compose -f docker-compose.prod.yml --env-file .env.prod pull
             docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
