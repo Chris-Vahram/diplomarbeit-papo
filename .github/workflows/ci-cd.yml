@@ -80,11 +80,7 @@ jobs:
   deploy:
     name: Deploy to production VM
     needs: build-and-push
-    # TEMPORARILY DISABLED: VM-side deploy prerequisites not done yet (tasks.md
-    # 5.3 GH Actions secrets, 5.4 GHCR PAT login on VM, 5.6 compose/Caddy/init files
-    # copied to VM). Re-enable by restoring the line below once those land.
-    # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    if: false
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: SSH and redeploy
@@ -93,6 +89,7 @@ jobs:
           host: ${{ secrets.VM_HOST }}
           username: papo
           key: ${{ secrets.VM_SSH_KEY }}
+          fingerprint: ${{ vars.VM_HOST_FINGERPRINT }}
           script: |
             cd ~/papo-deploy
             docker compose -f docker-compose.prod.yml --env-file .env.prod pull
