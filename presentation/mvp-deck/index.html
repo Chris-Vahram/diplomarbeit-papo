@@ -22,7 +22,85 @@
         </p>
       </section>
 
-      <!-- 2. Problem -->
+      <!-- 2. Akteure & Kette -->
+      <section>
+        <p class="eyebrow">Akteure &amp; Kette</p>
+        <h2>Unternehmen → Partner → Endkunde</h2>
+
+        <div class="chain">
+          <span class="node hot">Unternehmen</span>
+          <span class="arrow">→</span>
+          <span class="node">Partner</span>
+          <span class="arrow">→</span>
+          <span class="node">Endkunde</span>
+        </div>
+        <p class="chain-note">1 Unternehmen : n Partner · 1 Partner : n Endkunden – keine 1:1-Beziehung</p>
+
+        <div class="actors">
+          <div class="actor hot">
+            <h3>Unternehmen</h3>
+            <ul>
+              <li>Verwaltet Partner &amp; Produkte zentral</li>
+              <li>Importiert Excel/CSV-Daten</li>
+              <li>Schaltet Produkte pro Partner frei</li>
+              <li>Sieht alle Bestellungen, setzt Status</li>
+            </ul>
+          </div>
+          <div class="flow">→</div>
+          <div class="actor">
+            <h3>Partner</h3>
+            <ul>
+              <li>Wickelt Bestellungen für Endkunden ab</li>
+              <li>Sieht nur freigeschaltete Produkte</li>
+              <li>Produkte werden individuell pro Partner freigeschaltet</li>
+              <li>Dashboard: Überblick über Bestellungen &amp; Provisionen</li>
+              <li>Bearbeitet eigene Stammdaten &amp; die der zugeordneten Endkunden</li>
+              <li>Perspektivisch: eigene Partnershop-Homepage <em>(außerhalb MVP)</em></li>
+            </ul>
+          </div>
+          <div class="flow">→</div>
+          <div class="actor quiet">
+            <h3>Endkunde</h3>
+            <ul>
+              <li>Kann nicht direkt bestellen</li>
+              <li>Wird vom Partner angelegt</li>
+              <li>Bestellung wird vom Partner für ihn getätigt</li>
+              <li>Erhält die Ware</li>
+              <li>Erhält Bestätigung</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. USP -->
+      <section>
+        <p class="eyebrow">Der USP</p>
+        <h2>PAPO wird die Drehscheibe des Unternehmens</h2>
+        <p class="lead">Kernprozess der Anwendung: <strong>der Partner führt die Bestellung für seinen Endkunden durch.</strong></p>
+
+        <div class="usp-compare">
+          <div class="usp-col before">
+            <h4>Bisher</h4>
+            <ul>
+              <li>Bestellungen per E-Mail oder Telefon</li>
+              <li>Keine zentrale Übersicht</li>
+              <li>Zuordnung &amp; Provision manuell</li>
+            </ul>
+          </div>
+          <div class="usp-col after">
+            <h4>Mit PAPO</h4>
+            <ul>
+              <li>Bestellung direkt im Portal</li>
+              <li>Zentrale Partner- &amp; Produktverwaltung</li>
+              <li>Automatische Zuordnung &amp; Provision</li>
+            </ul>
+          </div>
+        </div>
+
+        <p class="kernsatz">„Dieses Partnerportal (PAPO) wird zukünftig die Drehscheibe für das ganze Unternehmen bilden.“</p>
+      </section>
+
+      <!-- 4. Problem -->
       <section>
         <p class="eyebrow">Ausgangslage</p>
         <h2>Bestellungen laufen heute manuell</h2>
@@ -42,53 +120,7 @@
         </ul>
       </section>
 
-      <!-- 3. Akteure & Kette -->
-      <section>
-        <p class="eyebrow">Akteure &amp; Kette</p>
-        <h2>Unternehmen → Partner → Endkunde</h2>
-
-        <div class="chain">
-          <span class="node hot">Unternehmen</span>
-          <span class="arrow">→</span>
-          <span class="node">Partner</span>
-          <span class="arrow">→</span>
-          <span class="node">Endkunde</span>
-        </div>
-
-        <div class="actors">
-          <div class="actor hot">
-            <h3>Unternehmen</h3>
-            <ul>
-              <li>Verwaltet Partner &amp; Produkte zentral</li>
-              <li>Importiert Excel/CSV-Daten</li>
-              <li>Schaltet Produkte pro Partner frei</li>
-              <li>Sieht alle Bestellungen, setzt Status</li>
-            </ul>
-          </div>
-          <div class="flow">→</div>
-          <div class="actor">
-            <h3>Partner</h3>
-            <ul>
-              <li>Sieht nur freigeschaltete Produkte</li>
-              <li>Legt Bestellungen für Endkunden an</li>
-              <li>Sieht eigene Bestellungen &amp; Provision</li>
-              <li>Bearbeitet eigene Kontaktdaten</li>
-            </ul>
-          </div>
-          <div class="flow">→</div>
-          <div class="actor quiet">
-            <h3>Endkunde</h3>
-            <ul>
-              <li>Nutzt das Portal <strong>nicht</strong> (MVP)</li>
-              <li>Wird vom Partner angelegt/ausgewählt</li>
-              <li>Empfänger der Ware</li>
-              <li>Erhält simulierte Bestätigungen</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <!-- 4. Kernablauf -->
+      <!-- 5. Kernablauf -->
       <section>
         <p class="eyebrow">Use Case</p>
         <h2>Kernablauf: Partner bestellt für Endkunde</h2>
@@ -96,9 +128,9 @@
         <ol class="steps">
           <li>Partner meldet sich an<small>Login über Keycloak, Rolle „partner“</small></li>
           <li>Endkunde auswählen oder neu anlegen<small>Pflicht: Nachname + Adresse</small></li>
-          <li>Bestellung mit mehreren Artikeln + Mengen aufgeben<small>nur freigeschaltete, verfügbare Artikel</small></li>
-          <li>Automatische Zuordnung zum Partner<small>Provision wird als eigener Datensatz berechnet</small></li>
-          <li>Bildschirmbestätigung + simulierte Bestell-E-Mail<small>kein echter Versand</small></li>
+          <li>Bestellung mit einem oder mehreren Artikeln + Mengen zusammenstellen<small>nur freigeschaltete, verfügbare Artikel</small></li>
+          <li>Provision wird berechnet und angezeigt<small>Prozentsatz des Partners, sichtbar vor dem Absenden</small></li>
+          <li>Bestellung aufgeben<small>löst automatische Partnerzuordnung + simulierte Bestell-E-Mail aus</small></li>
         </ol>
 
         <div class="status-chain">
@@ -111,7 +143,7 @@
         </div>
       </section>
 
-      <!-- 5. Funktionsumfang -->
+      <!-- 6. Funktionsumfang -->
       <section>
         <p class="eyebrow">Funktionsumfang</p>
         <h2>Was das MVP leistet</h2>
@@ -144,10 +176,10 @@
         </div>
       </section>
 
-      <!-- 6. Technologie-Stack -->
+      <!-- 7. Technologie-Stack -->
       <section>
         <p class="eyebrow">Technologie</p>
-        <h2>Fixer Technologie-Stack</h2>
+        <h2>Technologie-Stack</h2>
 
         <table class="stack">
           <tr>
@@ -173,14 +205,60 @@
         </table>
       </section>
 
-      <!-- 7. Live-Demo (Übergang) -->
+      <!-- 8. Architektur -->
+      <section>
+        <p class="eyebrow">Architektur</p>
+        <h2>Wie die Komponenten zusammenarbeiten</h2>
+
+        <div class="arch">
+          <div class="arch-box">
+            <div class="name">Partner / Unternehmen</div>
+            <div class="sub">Browser</div>
+          </div>
+          <div class="arch-arrow">↓<span class="label">HTTPS</span></div>
+          <div class="arch-box wide">
+            <div class="name">Caddy</div>
+            <div class="sub">Reverse Proxy + TLS · routet nach Pfad</div>
+          </div>
+          <div class="arch-arrows3">
+            <div class="arch-arrow">↓<span class="label">/*</span></div>
+            <div class="arch-arrow">↓<span class="label">/api/*</span></div>
+            <div class="arch-arrow">↓<span class="label">/auth/*</span></div>
+          </div>
+          <div class="arch-row3">
+            <div class="arch-box">
+              <div class="name">Frontend</div>
+              <div class="sub">statisch · Web Components</div>
+            </div>
+            <div class="arch-box">
+              <div class="name">Backend</div>
+              <div class="sub">Quarkus REST</div>
+            </div>
+            <div class="arch-box">
+              <div class="name">Keycloak</div>
+              <div class="sub">OIDC</div>
+            </div>
+          </div>
+          <div class="arch-arrows3">
+            <div class="arch-arrow empty"></div>
+            <div class="arch-arrow">↓<span class="label">JDBC</span></div>
+            <div class="arch-arrow">↓<span class="label">JDBC</span></div>
+          </div>
+          <div class="arch-box wide">
+            <div class="name">PostgreSQL</div>
+            <div class="sub">eine Instanz, getrennte Schemas</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. Live-Demo (Übergang) -->
       <section class="dark">
         <p class="eyebrow">Ab hier live</p>
         <h1>Live-Demo</h1>
         <p class="lead">Partner-Login → Bestellung aufgeben → Status durch das Unternehmen ändern.</p>
       </section>
 
-      <!-- 8. Out of scope / Phase-2-Backlog -->
+      <!-- 10. Out of scope / Phase-2-Backlog -->
       <section>
         <p class="eyebrow">Bewusst nicht gebaut</p>
         <h2>Out of Scope / Phase-2-Backlog</h2>
@@ -196,14 +274,14 @@
         </ul>
       </section>
 
-      <!-- 9. Phase 2 – Zwischentitel -->
+      <!-- 11. Phase 2 – Zwischentitel -->
       <section class="dark">
         <p class="eyebrow">Phase 2</p>
         <h1>Seit dem Termin am 10.07.</h1>
         <p class="lead">Was seither umgesetzt wurde – und was noch aussteht.</p>
       </section>
 
-      <!-- 10. Feedback umgesetzt -->
+      <!-- 12. Feedback umgesetzt -->
       <section>
         <p class="eyebrow">Feedback umgesetzt</p>
         <h2>Alle konkreten Wünsche aus dem Meeting sind erledigt</h2>
@@ -218,7 +296,7 @@
         </ul>
       </section>
 
-      <!-- 11. Hosting -->
+      <!-- 13. Hosting -->
       <section>
         <p class="eyebrow">Hosting</p>
         <h2>Deployment: bereit bis auf die Domain</h2>
@@ -230,7 +308,7 @@
         </ul>
       </section>
 
-      <!-- 12. Ausblick -->
+      <!-- 14. Ausblick -->
       <section class="dark">
         <p class="eyebrow">Ausblick</p>
         <h2>Nächste Schritte</h2>
