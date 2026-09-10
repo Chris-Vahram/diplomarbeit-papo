@@ -17,9 +17,11 @@
 		reverse_proxy backend:8080
 	}
 
-	# Static frontend - everything else. Bind-mounted into the Caddy container (docker-compose.prod.yml).
+	# Static frontend - everything else. /srv/frontend-live is bind-mounted into the Caddy
+	# container (docker-compose.prod.yml); `current` is a symlink deploy repoints per release
+	# (ci-cd.yml), so this always serves the latest release without needing a container restart.
 	handle {
-		root * /srv/frontend
+		root * /srv/frontend-live/current
 		try_files {path} /index.html
 		file_server
 	}

@@ -57,6 +57,13 @@ Der `deploy`-Job erwartet `docker-compose.prod.yml`, `deploy/` (Caddyfile, Postg
 Skript, Keycloak-Realm-Template, Backup-Skript) und `.env.prod` unter `~/papo-deploy` auf
 der VM (einmalig kopiert/geklont, nicht Teil der Pipeline selbst).
 
+Frontend-Dateien werden vom `deploy`-Job selbst nach `~/papo-deploy/frontend-live/releases/<sha>`
+synchronisiert; `frontend-live/current` ist ein Symlink auf die jeweils aktive Release. Caddy
+bindet `frontend-live/` (nicht die einzelne Release) - der Symlink wird pro Deploy atomar
+umgehängt, ohne dass der Caddy-Container neu erstellt werden muss. Ältere Reste aus dem
+früheren Verzeichnis-Swap-Schema (`frontend/`, `frontend-old/`, `frontend-new/`) können von
+Hand entfernt werden, sobald der erste Deploy mit diesem Schema durchgelaufen ist.
+
 ## Rollback (manuell)
 
 Kein automatisches Rollback in dieser Pipeline. Bei einem fehlerhaften Deploy:

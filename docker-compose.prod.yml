@@ -99,7 +99,13 @@ services:
       DOMAIN: ${DOMAIN}
     volumes:
       - ./deploy/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./frontend:/srv/frontend:ro
+      # Mount the stable parent dir, not a directory that deploy replaces wholesale.
+      # A bind mount is resolved once at container start; if the mounted path itself
+      # gets swapped out (mv/rename) afterwards, Caddy keeps pointing at the old,
+      # now-orphaned inode and serves an empty dir. frontend-live/ itself is never
+      # replaced - only the `current` symlink inside it is repointed per deploy
+      # (see .github/workflows/ci-cd.yml), which Caddy resolves fresh on every request.
+      - ./frontend-live:/srv/frontend-live:ro
       - papo-caddy-data:/data
       - papo-caddy-config:/config
 
