@@ -4,15 +4,27 @@
 
 Maßgeblich: [vollständiger Ergebnisreport](../openspec/PLANNING_REVIEW_2026-09-11.md). Der genehmigte Plan wurde in sechs getrennten neuen OpenSpec-Changes umgesetzt; elf aktive Changes insgesamt. Der Endkundenplan erhält einen präzisen UI-Submit-/HTTP-401-Retry-Vertrag. Vorherige Kandidaten-/READY-Tabellen unten sind historisch.
 
+## Nächster Start — kurz
+
+Die drei abgeschlossenen Changes sind unter `openspec/changes/archive/2026-09-11-*` archiviert und weiterhin nicht committed. `add-standalone-customer-creation` ist **6/6 fertig**, Java-21-Fokuslauf 9/9, vollständige Suite und Package jeweils 79/79; Strict-Validate und Diff-Check grün. Browser 1440/390 prüfte Anlage, Filterreset, Text-Escaping, Pending-/Fehler-/Refreshpfade, Wizard-Wiederverwendung und Rollenrouten. Nächster Change nach dem Commit: `show-partner-company-name`.
+
+`align-visible-article-terminology` ist mit 2/2 Tasks fertig und archiviert. Sichtbare Begriffe lauten Artikel/Artikelkategorie; technische Namen, IDs, APIs und Importaliasnamen blieben kompatibel. Java-21-Fokuslauf: 26/26. `./mvnw test` und `./mvnw package`: jeweils 77/77, 0 Fehler. Browserprüfung 1440/390 für Company-/Partner-Artikel, Import und Bestellung einschließlich Fehlerpfaden; Projekt-, Funktions- und Securityreview ohne Blocker.
+
+`fix-partner-create-commission-default` ist mit 2/2 Tasks fertig und archiviert. `openCreate()` startet bei 5 %; API, Import, Berechnung und bestehende Daten blieben unverändert. Browser 1440/390 prüfte 5-%-POST, Abbruchreset, 10 % beim Bearbeiten und individuellen 7,5-%-Wert; `./mvnw package` 77/77, Strict-Validate und Diff-Check grün; Reviews ohne Findings.
+
+Nächster Change: `show-partner-company-name`. Start: `git status --short --branch`, `openspec status --change show-partner-company-name --json`, `openspec instructions apply --change show-partner-company-name --json`; nur dessen Context-Files lesen. Kein automatisches Archivieren oder Committen.
+
 Bestätigt: bestehender Partnername als Firmenname; synthetische Huemer GmbH; verwaltete Kategorien mit kontrolliertem Import; Kundensuche/Neuanlagebutton; Kundenbezug und links/rechts-Anordnung. Keycloak-ID statt Nummer als künftige Loginbindung; vorhandene Partnernummern bleiben. Kundenbearbeitung nur nach Schutz historischer Kundendaten.
 
-Kein Produktcode dieser Sitzung. Neue Changes besitzen Proposal, Design, Delta-Spec und Tasks mit Akzeptanz, Daten/Security, Tests, DoD und Stop. Finale Status im Ergebnisreport; kein bedingtes READY. MVP-Abschluss und CI/CD bleiben mit konkreten fremden Nachweisen offen.
+Die Produktumsetzung der drei Changes ist abgeschlossen; diese Sitzung synchronisiert Specs, archiviert die drei Changes und aktualisiert die Handoffs. Neue Changes besitzen Proposal, Design, Delta-Spec und Tasks mit Akzeptanz, Daten/Security, Tests, DoD und Stop. MVP-Abschluss und CI/CD bleiben mit konkreten fremden Nachweisen offen.
+
+**Umsetzungsstand 11.09.2026:** Der Keycloak-Dev-Service-Blocker für `align-visible-article-terminology` ist gelöst. Der Change steht bei 2/2 Tasks, mit Java-21-Gesamttest/Package, Browserprüfung und Reviews ohne Blocker; unter `openspec/changes/archive/2026-09-11-align-visible-article-terminology` archiviert, nicht committed.
 
 ### Nächste Sitzung
 
 1. Branch/Worktree prüfen und vorhandene Änderungen bewahren. Aktueller Planungsbranch `docs/openspec-planning-2026-09-11`; kein automatischer Stash/Branchwechsel/Pull.
 2. Ergebnisreport und seitdem geänderte Quellen lesen; neuestes Protokoll ist `Besprechungsprotokoll_10.9.md`.
-3. Nur beauftragten READY-Change umsetzen. Empfohlene Reihenfolge im Report; eine Capability je Change.
+3. Nach dem Commit den Change `show-partner-company-name` beginnen; zuerst Status und Apply-Instructions lesen, dann ausschließlich dessen Context-Files.
 4. Snapshot: Chris entscheidet Altbestandsquelle oder Umstellungsstand. Login: verifiziertes issuer/sub-Mapping und Bindungsprozess fehlen. Ohne Antworten keine Migration beginnen.
 5. Neue Verifikation exakt dokumentieren; historisches 11/11-Validierungsergebnis oder alte Browserchecks sind keine neue Produktregression.
 
@@ -20,6 +32,12 @@ Kein Produktcode dieser Sitzung. Neue Changes besitzen Proposal, Design, Delta-S
 
 ```text
 /goal Implementiere die bestätigten PAPO-OpenSpec-Changes taskweise mit Terra medium. Lies zuerst vollständig AGENTS.md, CLAUDE.md, Specification/CONTINUATION_PROMPT.md, Specification/NEXT_SESSION_PLAN.md und openspec/PLANNING_REVIEW_2026-09-11.md. Prüfe Branch, git status und openspec list; bewahre alle fremden und uncommitteten Änderungen. Kein Fetch/Pull bei Dirty Worktree. Kein Commit, Push, Merge, Deployment, VM-, Secret-, SSH-, Backup- oder GitHub-Secrets-Zugriff. Nutze für jeden Change einzeln openspec-apply-change: Change ankündigen; openspec status --change <change> --json und openspec instructions apply --change <change> --json ausführen; alle dort genannten Context-Files vollständig lesen; dann offene Tasks der Reihe nach umsetzen und jede Checkbox unmittelbar nach erfüllten Akzeptanzkriterien, Tests und DoD setzen. Bei Stopbedingung, unklarer Anforderung oder Designfehler nicht raten: genauen Blocker im Change dokumentieren und den Change pausieren. Reihenfolge: align-visible-article-terminology, fix-partner-create-commission-default, add-standalone-customer-creation, show-partner-company-name, use-huemer-demo-partner, search-order-customers, clarify-order-customer-context, manage-article-categories, define-mvp-traceability-format. Pro Change nur dessen Scope; keine Mandantenfähigkeit, Subdomains, öffentlichen Partnershop, direkte BMD-Schnittstelle, Fachbereiche, Produktgruppen, Paketlogik oder KI-Features ergänzen. Nach jedem Task passende fokussierte Tests ausführen. Nach jedem fertigen Change openspec validate <change> --strict, relevante Backend-Gesamttests und package bzw. Desktop-/Mobile-Browserprüfung ausführen. Danach partnerportal-quality, unabhängigen Funktions-/Test-/Sinnhaftigkeitsreview und bei Daten-, Auth-, Rollen- oder Eingabeänderungen unabhängigen Securityreview durchführen; Findings beheben, erneut testen und validieren. Einen Change erst als fertig melden, wenn alle Tasks, Akzeptanzkriterien, Daten-/Securityfolgen, Tests und DoD belegt sind. Nicht automatisch archivieren; fertigen Change samt exakten Prüfergebnissen und nächstem Change melden und weiter iterieren. Am Ende CONTINUATION_PROMPT.md, NEXT_SESSION_PLAN.md, RESTARBEITSPLAN_2026-09-09.md und den Planning-Report mit dem tatsächlichen Stand aktualisieren, KI-Nachweis synchronisieren/anreichern und sichere, kurze Commit-Vorschläge mit expliziten git-add-Pfaden liefern. Keine Prüfung erfinden.
+```
+
+## Neuer Start-Prompt für die nächste Session
+
+```text
+/goal Setze die PAPO-Implementierung nach dem archivierten Stand vom 11.09.2026 fort. Lies zuerst AGENTS.md, CLAUDE.md, Specification/CONTINUATION_PROMPT.md, Specification/NEXT_SESSION_PLAN.md, docs/RESTARBEITSPLAN_2026-09-09.md und openspec/PLANNING_REVIEW_2026-09-11.md; prüfe danach Branch, git status und openspec list. Bewahre alle fremden uncommitteten Änderungen und führe keinen Fetch, Pull, Commit, Push, Merge, Deployment-, VM-, Secret-, SSH- oder Backup-Zugriff aus. Die Changes align-visible-article-terminology, fix-partner-create-commission-default und add-standalone-customer-creation sind archiviert und abgeschlossen. Aktiver nächster Change ist show-partner-company-name: führe openspec status --change show-partner-company-name --json und openspec instructions apply --change show-partner-company-name --json aus, lies dessen Context-Files vollständig und implementiere nur dessen offene Tasks in Reihenfolge. Setze jede Checkbox erst nach Akzeptanzkriterien, Daten-/Securityfolgen, Tests und DoD. Bei Unklarheit stoppen und den konkreten Blocker dokumentieren. Danach Strict-Validate, fokussierte und passende Gesamttests, Package beziehungsweise Browserprüfung sowie partnerportal-quality, Funktions-/Testreview und bei Auth-, Rollen-, Daten- oder Eingabeänderungen Securityreview ausführen. Aktualisiere am Ende die vier Handoff-Dateien und den KI-Nachweis mit ausschließlich echten Ergebnissen. Melde exakte Prüfungen und sichere git-add-/commit-/push-Befehle; führe sie nicht aus.
 ```
 
 Der alte nächste Astra-Goal darunter ist durch diese abgeschlossene Planung ersetzt; nicht dieselben Entwürfe erneut von null erstellen.

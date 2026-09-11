@@ -12,7 +12,7 @@ class CompanyImportPage extends HTMLElement {
           Typ
           <select id="entity-select">
             <option value="partners">Partner</option>
-            <option value="products">Produkte</option>
+            <option value="products">Artikel</option>
           </select>
         </label>
         <label>

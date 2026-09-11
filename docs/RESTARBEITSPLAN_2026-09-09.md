@@ -4,6 +4,14 @@
 
 Diese Fortschreibung hat Vorrang vor den historischen Tabellen darunter. [Kanonischer Ergebnisreport](../openspec/PLANNING_REVIEW_2026-09-11.md) enthält Status je Change, genaue offene Entscheidungen, Reviews und tatsächlich ausgeführte Checks.
 
+## Aktueller Umsetzungspunkt — 11.09.2026
+
+`add-standalone-customer-creation`: **6/6 Tasks fertig**, unter `openspec/changes/archive/2026-09-11-add-standalone-customer-creation` archiviert. Lokale Endkundenanlage, partner-scoped Persistierung, Pending-/Fehler-/GET-only-Refreshschutz und Wiederverwendung im Bestellwizard sind umgesetzt. Fokustest 9/9, Gesamttest und Package jeweils 79/79, Strict-Validate und Diff-Check grün. Browser 1440/390 sowie Projekt-, Funktions- und Securityreview ohne Blocker. Nächster Change: `show-partner-company-name`.
+
+`align-visible-article-terminology`: **2/2 Tasks fertig**, unter `openspec/changes/archive/2026-09-11-align-visible-article-terminology` archiviert. Sichtbare Frontendtexte und Backendfehler verwenden Artikel/Artikelkategorie; technische Namen, IDs, APIs und Importaliasnamen blieben unverändert. Java-21-Fokuslauf 26/26, vollständiges `./mvnw test` und `./mvnw package` jeweils 77/77 ohne Fehler. Browserprüfung 1440/390 deckte Company-/Partner-Artikel, Import und Bestellwizard einschließlich Fehlerpfaden ab; strict Validate, `git diff --check`, Projekt-, Funktions- und Securityreview ohne Blocker.
+
+`fix-partner-create-commission-default`: **2/2 Tasks fertig**, unter `openspec/changes/archive/2026-09-11-fix-partner-create-commission-default` archiviert. Nur manuelle Neuanlage startet mit 5 %; API, Import, Berechnung und bestehende Daten sind unverändert. Browser 1440/390 belegt 5-%-POST, Abbruchreset, 10-%-Bearbeiten und gespeicherten individuellen 7,5-%-Wert. `./mvnw package` lief mit 77/77; Strict-Validate, Diff-Check sowie Projekt-/Korrektheitsreview ohne Findings. Nächster Change nach dem Commit: `show-partner-company-name`.
+
 Sechs zusätzliche kleine OpenSpec-Changes vollständig geplant: Firmenanzeige, synthetischer Huemer-Seed, Kundensuche im Wizard, Kundenkontext/Anordnung, Kategorienverwaltung, Artikelsprache. Zusammen mit Endkundenanlage, 5-%-Vorauswahl und Traceability-Format ergeben sich neun Produkt-/Dokumentationspläne; MVP/CI-CD bleiben getrennt.
 
 **Korrigierte Grundlage:** Kategorienverwaltung ist seit 25.08. gefordert und jetzt von Chris konkret bestätigt. Sie wartet nicht auf BMD-Artikelnummern. Unabhängige Endkundenanlage fehlt weiterhin im Produktcode. Kundenbearbeitung wurde im Original zusätzlich genannt und bleibt bis zur Altbestands-Snapshotentscheidung offen. Partnernummer wird im Profil bereits angezeigt; fehlend sind sichere Loginentkopplung und automatische Vergabe, keine reine UI-Korrektur.
@@ -12,7 +20,11 @@ Sechs zusätzliche kleine OpenSpec-Changes vollständig geplant: Firmenanzeige, 
 
 **Betrieb:** Lokaler Stand enthält Frontendreparaturmerge `fea0e5b`. Alte 404/502 sind historische Befunde; aktueller Betrieb nicht geprüft. Tobias liefert Betriebs- und Zugriffsgrenzennachweise; Chris übernimmt weder VM-Aufgaben noch Präsentationsgestaltung.
 
-**Workspace:** eigener Planungsbranch `docs/openspec-planning-2026-09-11`, vorhandene Änderungen bewahrt, kein Fetch/Pull/Commit/Push/Merge. Nur OpenSpec/Übergabedokumente geändert, keine Produktimplementierung. Detaillierte Tests stehen als spätere Tasks; aktuelle Prüfung ist Artefaktvalidierung/Review.
+**Workspace:** eigener Planungsbranch `docs/openspec-planning-2026-09-11`, vorhandene Änderungen bewahrt, kein Fetch/Pull/Commit/Push/Merge. Die Terminologieänderung ergänzt sichtbare Frontend-/Backendtexte; fremde Frontend-/Präsentationsänderungen bleiben erhalten.
+
+**Umsetzungsstand 11.09.2026:** Der Keycloak-Dev-Service-Blocker für `align-visible-article-terminology` ist gelöst. Ursache war die von Docker Desktop als öffentlich präsentierte Quell-IP; Testprofil-Hostname, dynamischer Backchannel, Issuer und Timeout wurden angepasst. Der Change ist 2/2 fertig und durch Fokus-/Gesamttests, Package, Browser, Strict-Validate und Reviews belegt; unter `openspec/changes/archive/2026-09-11-align-visible-article-terminology` archiviert, nicht committed.
+
+**Ausführungsregel:** Die neun READY-Changes werden ausschließlich einzeln in der im [Next Session Plan](../Specification/NEXT_SESSION_PLAN.md) festgelegten Reihenfolge umgesetzt. Je Change sind OpenSpec-Status und -Apply-Kontext, strikte Taskreihenfolge mit sofortiger Checkbox, fokussierte Tests sowie danach Strict-Validate, passende Gesamtprüfung, Qualitäts-/Funktionsreview und bei Auth-/Daten-/Rollen-/Input-Scope Securityreview Pflicht. Bei Unklarheit wird der genaue Blocker dokumentiert, nicht geraten. Die ausgeschlossenen Themen und externen Blocker bleiben unverändert; kein Auto-Archivieren/Committen. Handoff-Dokumente enthalten nur echte Checks und am Ende lediglich Vorschläge mit exakten `git add`-Pfaden/Push-Befehl.
 
 > **Fortschreibung 10.09.2026:** Die folgende Ergänzung hat Vorrang vor älteren `Geplant?`-Angaben weiter unten. Vollständiger Review: `../openspec/PLANNING_REVIEW_2026-09-10.md`. Der ursprüngliche Restarbeitsplan bleibt als Historie erhalten.
 
@@ -22,8 +34,8 @@ Der genehmigte Plan „PAPO: OpenSpec-Planung abschließen“ wurde ausschließl
 
 | Change | Stand | Ergebnis |
 |---|---:|---|
-| `add-standalone-customer-creation` | 0/6 | READY für Terra medium; Entwurf fachlich, funktional und sicherheitlich korrigiert |
-| `fix-partner-create-commission-default` | 0/2 | READY für Terra medium; nur manuelle Formularvorauswahl 5 % |
+| `add-standalone-customer-creation` | 6/6 | FERTIG; nach Spec-Sync archiviert, nicht automatisch committed |
+| `fix-partner-create-commission-default` | 2/2 | FERTIG; nach Spec-Sync archiviert, nicht automatisch committed |
 | `define-mvp-traceability-format` | 0/3 | READY für Terra medium; Format/33 Quellenzeilen, kein Abschluss von MVP-8.4 |
 | `build-partnerportal-mvp` | 50/53 | BLOCKIERT für Abschluss durch 8.3/FD.4 (Tobias) und gemeinsame 8.4-Ausfüllung |
 | `ci-cd-deployment-with-gh-actions` | 30/41 | BLOCKIERT; P0-Ausfall, Frontendpfad und PR #5 benötigen getrennte Tobias-Nachweise |

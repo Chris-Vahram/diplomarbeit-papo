@@ -7,12 +7,12 @@ import { escapeHtml } from "./html.js";
 const routes = {
   "/login": { tag: "login-page", role: null, title: "Anmeldung" },
   "/company/dashboard": { tag: "company-dashboard-page", role: "company", title: "Firmen-Dashboard" },
-  "/company/products": { tag: "company-product-list-page", role: "company", title: "Produkte" },
+  "/company/products": { tag: "company-product-list-page", role: "company", title: "Artikel" },
   "/company/partners": { tag: "company-partner-list-page", role: "company", title: "Partnerverwaltung" },
   "/company/orders": { tag: "company-order-list-page", role: "company", title: "Bestellungen" },
   "/company/import": { tag: "company-import-page", role: "company", title: "Datenimport" },
   "/partner/dashboard": { tag: "partner-dashboard-page", role: "partner", title: "Partner-Dashboard" },
-  "/partner/products": { tag: "partner-product-list-page", role: "partner", title: "Produkte" },
+  "/partner/products": { tag: "partner-product-list-page", role: "partner", title: "Artikel" },
   "/partner/orders": { tag: "partner-order-list-page", role: "partner", title: "Meine Bestellungen" },
   "/partner/orders/new": { tag: "partner-order-new-page", role: "partner", title: "Neue Bestellung" },
   "/partner/customers": { tag: "partner-customer-list-page", role: "partner", title: "Meine Endkunden" },
@@ -134,14 +134,14 @@ function renderNav() {
         ["/company/dashboard", "Dashboard"],
         ["/company/orders", "Bestellungen"],
         ["/company/partners", "Partnerverwaltung"],
-        ["/company/products", "Produkte"],
+        ["/company/products", "Artikel"],
         ["/company/import", "Datenimport"],
       ]
     : [
         ["/partner/dashboard", "Dashboard"],
         ["/partner/orders", "Meine Bestellungen"],
         ["/partner/customers", "Endkunden"],
-        ["/partner/products", "Produkte"],
+        ["/partner/products", "Artikel"],
       ];
 
   const path = currentPath();

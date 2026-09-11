@@ -4,7 +4,23 @@
 
 Diese Fortschreibung ersetzt widersprechende Status-/Blockerangaben weiter unten; ältere Abschnitte bleiben historische Herleitung. Kanonisches Ergebnis: [Planungsreview 11.09.2026](../openspec/PLANNING_REVIEW_2026-09-11.md).
 
-Der genehmigte Plan wurde ausschließlich als OpenSpec-/Dokumentationsarbeit umgesetzt. Sechs neue Changes: `show-partner-company-name`, `use-huemer-demo-partner`, `search-order-customers`, `clarify-order-customer-context`, `manage-article-categories`, `align-visible-article-terminology`. Bestehenden Endkundenentwurf um korrekten 401-Retry-Vertrag präzisiert. Keine Produktimplementierung dieser Sitzung.
+## Aktueller Fortsetzungspunkt — 11.09.2026
+
+`add-standalone-customer-creation` ist mit **6/6 Tasks fertig**, unter `openspec/changes/archive/2026-09-11-add-standalone-customer-creation` archiviert und nicht committed. Die Partnerübersicht erstellt Endkunden lokal im nativen Dialog über den vorhandenen partner-scoped Endpunkt; Pflichtdaten, Pending-Sperre, konservativer unklarer Speicherstatus, GET-only-Refresh und Wiederverwendung im Bestellwizard sind umgesetzt. Partnerisolation, Rollen, Inaktivstatus und Adressvalidierung sind in `KundeResourceTest` belegt.
+
+Belegt: fokussiert **9/9**, vollständiges `./mvnw test` und `./mvnw package` jeweils **79/79, 0 Fehler**; Strict-Validate und Diff-Check grün. Browser 1440/390 deckte Anlage mit leeren optionalen Kontakten, Filterreset, Sonderzeichen als Text, Pending-/Fehler-/Refreshpfade, Wizard-Wiederverwendung sowie anonyme/falsche Rollenrouten ab. Projekt-, Funktions- und Securityreview ohne Blocker. Nur erwarteter `favicon.ico`-404 des temporären Static-Servers. Nächster Change: `show-partner-company-name`.
+
+`align-visible-article-terminology` ist mit **2/2 Tasks** fertig und unter `openspec/changes/archive/2026-09-11-align-visible-article-terminology` archiviert. Der bestehende Frontenddiff blieb erhalten; sichtbare Navigation, Listen, Formulare, Bestellschritte und Backendfehler verwenden „Artikel“ beziehungsweise „Artikelkategorie“. Technische Keys, URLs, `productId` und Importaliasnamen einschließlich `produktname` blieben unverändert; keine sichtbare zusätzliche Artikel-ID wurde ergänzt.
+
+Belegt: Java 21, Fokuslauf `./mvnw test -Dtest=EnablementResourceTest,ProductResourceTest,OrderResourceTest` — **26/26**; vollständiges `./mvnw test` und `./mvnw package` — jeweils **77/77, 0 Fehler**; `openspec validate align-visible-article-terminology --strict` und `git diff --check` erfolgreich. Browserprüfung lief bei 1440/390 für Company-/Partner-Artikel, Import und Bestellwizard einschließlich lokaler Fehlerpfade. Projekt-, Funktions- und Securityreview ohne Blocker. Einziger Browserkonsolenbefund: erwarteter `favicon.ico`-404 des temporären Python-Static-Servers.
+
+`fix-partner-create-commission-default` ist ebenfalls mit **2/2 Tasks** fertig und unter `openspec/changes/archive/2026-09-11-fix-partner-create-commission-default` archiviert. Nur die manuelle Formularvorauswahl in `openCreate()` startet bei 5 %; API, Import, Datenmodell, bestehende Partner und Provisionen blieben unverändert. Browserprüfung 1440/390 belegt 5-%-POST, Abbruchreset, 10-%-Bearbeiten sowie gespeicherte individuelle 7,5 %; `./mvnw package` bestand mit 77/77, Strict-Validate und Diff-Check sind grün. Projekt- und Korrektheitsreview ohne Findings.
+
+Nach der Archivierung und dem selektiven Commit beginnt als Nächstes `show-partner-company-name`. Kein Fetch/Pull bei Dirty Worktree, kein Commit/Push/Merge/Deployment und keine VM-/Secret-/SSH-/Backup-Zugriffe. Fremde Frontend- und Präsentationsänderungen bewahren.
+
+Die drei Changes `align-visible-article-terminology`, `fix-partner-create-commission-default` und `add-standalone-customer-creation` sind implementiert, getestet und archiviert. Danach bleibt `show-partner-company-name` der nächste aktive Change. Fremde uncommittete Produkt- und Präsentationsänderungen wurden bewahrt.
+
+**Umsetzungsstand 11.09.2026:** Der lokale Keycloak-Dev-Service-Blocker für `align-visible-article-terminology` ist gelöst. Docker Desktop präsentierte Hostzugriffe mit einer öffentlichen Quell-IP; Testprofil-Hostname, dynamischer Backchannel, Issuer und Timeout wurden passend gesetzt. Der Change ist nun 2/2 fertig, strict validiert, vollständig getestet und unter `openspec/changes/archive/2026-09-11-align-visible-article-terminology` archiviert; nicht committed.
 
 Neueste Primärquelle ist `Documentation/Besprechungsprotokolle/Besprechungsprotokoll_10.9.md`; auch die Originale 25.08./31.08. wurden vollständig abgeglichen. Die Partnerfirma kommt vorerst aus `Partner.name`; Huemer GmbH ist synthetisch. Kategorienverwaltung ist ausdrücklich bestätigt und nicht mehr pauschal durch BMD blockiert. Kundensuche, ausdrücklicher Neuanlagebutton, Kundenüberschriften und Katalog links sind geplant. Kundenbearbeitung braucht zuerst entschiedene Altbestands-Snapshots. Keycloak-sub als Ziel bestätigt; Kontomapping und Betriebsprozess fehlen. Bestandsnummern erhalten.
 
@@ -12,9 +28,17 @@ Stand: elf aktive Changes; abschließende READY-/Entscheidungsübersicht und exa
 
 Branch dieses Planungsblocks: `docs/openspec-planning-2026-09-11`, Ausgangsrevision `fea0e5b`. Bereits unsauberer Worktree vollständig erhalten, kein Fetch/Pull, kein Commit/Push/Merge. Frontendreparatur lokal vorhanden; Produktivzustand nicht geprüft. Keine VM-/SSH-/Secret-/Backup-/Realmzugriffe.
 
-Nächster Schritt: die READY-Changes taskweise nach dem Terra-medium-Goal in `Specification/NEXT_SESSION_PLAN.md` umsetzen. Alle Umsetzungstasks bleiben offen. Snapshot-, Login-, Nummern-, Upload-, BMD- und Betriebsblocker nicht durch Annahmen schließen. Visuelles Design/Präsentation bei Tobias belassen; 8.4 bleibt gemeinsam offen.
+Nächster Schritt: nach dem Commit `show-partner-company-name` taskweise nach dem neuen Start-Prompt in `Specification/NEXT_SESSION_PLAN.md` umsetzen. Die drei archivierten Changes nicht erneut implementieren. Snapshot-, Login-, Nummern-, Upload-, BMD- und Betriebsblocker nicht durch Annahmen schließen. Visuelles Design/Präsentation bei Tobias belassen; 8.4 bleibt gemeinsam offen.
 
-**Dokumentstand:** 10.09.2026
+### Verbindliches Apply-Protokoll
+
+- READY-Reihenfolge: `align-visible-article-terminology`, `fix-partner-create-commission-default`, `add-standalone-customer-creation`, `show-partner-company-name`, `use-huemer-demo-partner`, `search-order-customers`, `clarify-order-customer-context`, `manage-article-categories`, `define-mvp-traceability-format`; niemals mehrere gleichzeitig.
+- Je Change: `openspec status --change <name> --json`, dann `openspec instructions apply --change <name> --json`; ausschließlich dessen Context-Files lesen, Tasks streng nacheinander umsetzen und Checkboxen sofort nach erfüllter Task setzen.
+- Pro Task fokussiert testen. Nach einem Change strikt validieren, passende Backendtests/Package oder Desktop-/Mobile-Browserprüfung ausführen sowie `partnerportal-quality` und Funktions-/Test-/Sinnhaftigkeitsreview durchführen; bei Auth, Daten, Rollen oder Eingaben zusätzlich Securityreview. Findings beheben und erneut prüfen.
+- Nicht einplanen: Mandantenfähigkeit, Subdomains, öffentlicher Partnershop, direkte BMD-Schnittstelle, Fachbereiche, Produktgruppen, Paketlogik, KI-Feature. Bei Stopbedingung nicht raten: exakten Blocker im Change dokumentieren und pausieren.
+- Nicht archivieren oder committen. Zum Handoff nur tatsächlichen Stand in Continuation Prompt, Next Session Plan, Restarbeitsplan und Planning-Report nachziehen; keine Prüfungen erfinden. Nur Vorschläge mit exakten `git add`-Pfaden und Push-Befehl ausgeben, nichts davon ausführen.
+
+**Dokumentstand:** 11.09.2026
 
 **Zweck:** vollständiger operativer Handoff für eine neue Claude-/Codex-Session
 

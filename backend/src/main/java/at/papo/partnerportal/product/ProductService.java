@@ -73,7 +73,7 @@ public class ProductService {
     Product findOrThrow(Long id) {
         Product product = Product.findById(id);
         if (product == null) {
-            throw new ApiException(404, "Produkt nicht gefunden.");
+            throw new ApiException(404, "Artikel nicht gefunden.");
         }
         return product;
     }

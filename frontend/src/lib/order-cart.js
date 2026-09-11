@@ -79,8 +79,8 @@ export function catalogStepHtml(products) {
     <div class="catalog">
       <div class="catalog__toolbar">
         <input type="search" class="catalog__search" placeholder="Artikel suchen…" aria-label="Artikel suchen" />
-        <select class="catalog__category-filter" aria-label="Kategorie">
-          <option value="">Alle Kategorien</option>
+        <select class="catalog__category-filter" aria-label="Artikelkategorie">
+          <option value="">Alle Artikelkategorien</option>
           ${categoryOptionsHtml(products)}
         </select>
       </div>

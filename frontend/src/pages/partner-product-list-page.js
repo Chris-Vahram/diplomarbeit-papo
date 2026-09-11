@@ -7,7 +7,7 @@ class PartnerProductListPage extends HTMLElement {
   connectedCallback() {
     this.classList.add("area--partner");
     this.innerHTML = `
-      <h1>Produkte</h1>
+      <h1>Artikel</h1>
       <data-table id="product-table"></data-table>
     `;
 
@@ -16,9 +16,9 @@ class PartnerProductListPage extends HTMLElement {
       { key: "imageUrl", label: "Bild", image: true },
       { key: "name", label: "Name" },
       { key: "priceLabel", label: "Preis (€)" },
-      { key: "category", label: "Kategorie" },
+      { key: "category", label: "Artikelkategorie" },
     ];
-    this.table.emptyMessage = "Noch keine Produkte für Sie freigeschaltet.";
+    this.table.emptyMessage = "Noch keine Artikel für Sie freigeschaltet.";
     this.table.searchKeys = ["name"];
     this.table.pageSize = 20;
 
@@ -30,7 +30,7 @@ class PartnerProductListPage extends HTMLElement {
       const products = await apiFetch("/partner/products");
       const categories = [...new Set(products.map((p) => p.category).filter(Boolean))].sort();
       this.table.filters = [
-        { key: "category", type: "select", label: "Kategorie", options: categories.map((c) => ({ value: c, label: c })) },
+        { key: "category", type: "select", label: "Artikelkategorie", options: categories.map((c) => ({ value: c, label: c })) },
       ];
       const rows = products.map((p) => ({
         imageUrl: p.imageUrl ?? "",

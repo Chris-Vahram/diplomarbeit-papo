@@ -17,7 +17,7 @@ const STEPS = ["kunde", "neuerKunde", "produkte", "uebersicht", "erfolg"];
 const STEP_LABELS = {
   kunde: "Endkunde wählen",
   neuerKunde: "Neuer Endkunde",
-  produkte: "Produkte wählen",
+  produkte: "Artikel wählen",
   uebersicht: "Übersicht",
   erfolg: "Erfolg",
 };
@@ -68,7 +68,7 @@ class PartnerOrderNewPage extends HTMLElement {
       this.customers = customers;
       this.commissionPercent = profile.commissionPercent;
       if (products.length === 0) {
-        this.content.innerHTML = `<p>Für Sie sind noch keine Produkte freigeschaltet. Eine Bestellung ist erst möglich, sobald die Firma Produkte für Sie freischaltet.</p>`;
+        this.content.innerHTML = `<p>Für Sie sind noch keine Artikel freigeschaltet. Eine Bestellung ist erst möglich, sobald die Firma Artikel für Sie freischaltet.</p>`;
         return;
       }
       this.products = await resolveImageUrls(products);

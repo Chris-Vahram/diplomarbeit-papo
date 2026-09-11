@@ -226,7 +226,7 @@ class PartnerDashboardPage extends HTMLElement {
       <metric-card label="Provision (abgeschlossen)" value="${formatEuro(commission)}" icon="percent" ${trendAttrs(commissionTrend)}></metric-card>
       <metric-card label="Umsatz (abgeschlossen)" value="${formatEuro(revenue)}" icon="trending-up" ${trendAttrs(revenueTrend)}></metric-card>
       <metric-card label="Abgeschlossene Bestellungen" value="${count}" icon="check-circle" ${trendAttrs(countTrend)}></metric-card>
-      <metric-card label="Freigeschaltete Produkte" value="${this.base.enabledProductCount}" ring="${ringPct}" ring-layout="full" ring-caption="von ${total} Produkten"></metric-card>
+      <metric-card label="Freigeschaltete Artikel" value="${this.base.enabledProductCount}" ring="${ringPct}" ring-layout="full" ring-caption="von ${total} Artikeln"></metric-card>
       ${renderMonthChart("Umsatz nach Monat", labels, monthly)}
     `;
 

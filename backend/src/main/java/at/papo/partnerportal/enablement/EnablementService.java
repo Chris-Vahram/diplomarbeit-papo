@@ -68,7 +68,7 @@ public class EnablementService {
     private Product findProductOrThrow(Long productId) {
         Product product = Product.findById(productId);
         if (product == null) {
-            throw new ApiException(404, "Produkt nicht gefunden.");
+            throw new ApiException(404, "Artikel nicht gefunden.");
         }
         return product;
     }

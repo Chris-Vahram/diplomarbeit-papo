@@ -1,5 +1,15 @@
 # OpenSpec-Planungsreview — 11.09.2026
 
+## Umsetzungsnachtrag — 11.09.2026
+
+`add-standalone-customer-creation` ist **6/6 implementiert** und unter `openspec/changes/archive/2026-09-11-add-standalone-customer-creation` archiviert. Die Umsetzung verwendet den bestehenden partner-scoped Kundenendpunkt und die gemeinsamen Adressfelder; kein Schema-, Realm- oder API-Umbau. Belegt sind fokussierte Kunden-Tests (9/9), vollständige Backendtests und Package (je 79/79), Strict-Validate und Diff-Check. Browserprüfungen 1440/390 decken Anlage, Filterreset, Escaping, Pending-/Fehler-/Refreshpfade, Wizard-Wiederverwendung und anonyme/falsche Rollenrouten ab. Partnerportal-Quality, Korrektheits- und Securityreview: keine offenen Findings.
+
+`align-visible-article-terminology` ist bei **2/2 Tasks fertig** und unter `openspec/changes/archive/2026-09-11-align-visible-article-terminology` archiviert. Der vorhandene Frontenddiff blieb erhalten; Navigation, Listen, Formulare, Bestellschritte und sechs sichtbare Backendfehler verwenden „Artikel“ beziehungsweise „Artikelkategorie“. Technische Names/URLs/Keys, `productId` und Importaliasnamen einschließlich `produktname` blieben unverändert; keine sichtbare Artikel-ID ergänzt. Der lokale Keycloak-Dev-Service-Fehler wurde auf Docker Desktops öffentliche NAT-Quell-IP zurückgeführt und ausschließlich im `%test`-Profil behoben (sicherer Frontend-Hostname, dynamischer Backchannel, erwarteter Issuer, 30-Sekunden-Timeout).
+
+Belegt unter Java 21: Fokuslauf `EnablementResourceTest,ProductResourceTest,OrderResourceTest` 26/26; vollständiges `./mvnw test` und `./mvnw package` jeweils 77/77 ohne Fehler. Browserprüfung 1440/390 deckte Company-/Partner-Artikel, Import und Bestellwizard einschließlich Fehlerpfaden ab. `openspec validate align-visible-article-terminology --strict` und `git diff --check` erfolgreich; partnerportal-quality, unabhängiger Funktions-/Test-/Sinnhaftigkeitsreview und Securityreview ohne Blocker. Kein Commit/Push/Merge/Deployment.
+
+`fix-partner-create-commission-default` ist ebenfalls bei **2/2 Tasks fertig** und unter `openspec/changes/archive/2026-09-11-fix-partner-create-commission-default` archiviert. Die einzige eigene Codeänderung setzt die manuelle `openCreate()`-Vorauswahl auf 5 %. API, Import, bestehende Partner, historische Provisionen, Berechnung, Login und Datenmodell blieben unverändert. Browser 1440/390 belegt 5-%-POST, Abbruchreset, Bearbeiten eines 10-%-Partners, bewusste 15-%-Wahl und gespeicherten individuellen Wert 7,5 %. `./mvnw package` bestand unter Java 21 mit 77/77; `openspec validate fix-partner-create-commission-default --strict` und `git diff --check` erfolgreich. partnerportal-quality und unabhängiger Korrektheitsreview ohne Findings.
+
 ## Auftrag und geprüfte Grundlage
 
 Freigegeben wurde die Umsetzung des Plans **ausschließlich in OpenSpec und Übergabedokumentation**. Kein Produktcode wurde in diesem Arbeitsblock geändert; vorhandene uncommittete Benutzeränderungen bleiben bestehen. Keine Commit-/Push-/Merge-/Deploymentaktion, kein VM-, SSH-, Secret-, Realm-, Backup- oder GitHub-Secrets-Zugriff.
@@ -24,21 +34,24 @@ Start: main bei lokalem `fea0e5b`, identisch zum lokal gespeicherten origin/main
 
 | Change | Umsetzungstasks | Ergebnis |
 |---|---:|---|
-| add-standalone-customer-creation | 0/6 | READY für Terra medium |
-| fix-partner-create-commission-default | 0/2 | READY für Terra medium |
+| add-standalone-customer-creation | 6/6 | FERTIG, archiviert unter `openspec/changes/archive/2026-09-11-add-standalone-customer-creation` |
+| fix-partner-create-commission-default | 2/2 | FERTIG, archiviert unter `openspec/changes/archive/2026-09-11-fix-partner-create-commission-default` |
 | define-mvp-traceability-format | 0/3 | READY für Terra medium |
 | show-partner-company-name | 0/3 | READY für Terra medium |
 | use-huemer-demo-partner | 0/2 | READY für Terra medium |
 | search-order-customers | 0/3 | READY für Terra medium |
 | clarify-order-customer-context | 0/3 | READY für Terra medium |
 | manage-article-categories | 0/6 | READY für Terra medium |
-| align-visible-article-terminology | 0/2 | READY für Terra medium; vorhandener Textdiff ist Vorarbeit, kein neuer Implementierungsnachweis |
+| align-visible-article-terminology | 2/2 | FERTIG, archiviert unter `openspec/changes/archive/2026-09-11-align-visible-article-terminology`: sichtbare Artikel-/Artikelkategoriesprache; Java-21-Fokuslauf 26/26, Gesamttest/Package jeweils 77/77, Browser 1440/390, strict Validate und Reviews ohne Blocker. |
+| fix-partner-create-commission-default | 2/2 | FERTIG, archiviert unter `openspec/changes/archive/2026-09-11-fix-partner-create-commission-default`: manuelle 5-%-Vorauswahl; Browser 1440/390 und Package 77/77, strict Validate und Reviews ohne Findings. |
 | build-partnerportal-mvp | 50/53 | Offen: Tobias liefert 8.3/FD.4; gemeinsame 8.4-Ausfüllung/Abnahme fehlt |
 | ci-cd-deployment-with-gh-actions | 30/41 | Offen: Tobias liefert datierte Betriebs-, Frontend-Reparatur- und Zugriffsgrenzennachweise |
 
 Die sechs neuen Changes besitzen je proposal.md, design.md, mindestens eine Delta-Spec und tasks.md. Jede Task enthält Voraussetzung, Komponenten, Akzeptanz, Daten/Security, Tests, DoD und Stop. Checkboxen bezeichnen spätere Umsetzung, nicht erfolgreiche Planung. READY ist Planreife, keine Produkt- oder Betriebsabnahme.
 
 Empfohlene Apply-Reihenfolge: Artikelsprache; 5-%-Vorauswahl; unabhängige Kundenanlage; Firmenanzeige und Huemer-Seed; Kundensuche; Kundenkontext; Kategorien. Traceability-Format unabhängig. Gemeinsame Dateiberührung erfordert Integration bestehender Änderungen, keinen pauschalen Reset.
+
+Für jeden Apply gilt: erst `openspec status --change <name> --json` und `openspec instructions apply --change <name> --json`, dann nur dessen vollständigen Kontext lesen und Tasks in Reihenfolge erfüllen. Checkboxen folgen unmittelbar auf erfüllte Akzeptanz, Daten-/Securityfolgen, Tests und DoD. Danach: fokussierte Tests je Task; pro Change Strict-Validate, passende Gesamtprüfung, `partnerportal-quality`, Funktions-/Test-/Sinnhaftigkeitsreview sowie bei Auth-/Daten-/Rollen-/Input-Scope Securityreview. Findings werden vor dem nächsten Change behoben und erneut geprüft. Bei ungeklärter Stopbedingung wird der konkrete Blocker dokumentiert und pausiert; kein Raten, Archivieren oder Committen. Handoffs dokumentieren ausschließlich echte Prüfungen.
 
 ## Präzise offene Entscheidungen — keine ausführbaren Terra-Changes
 

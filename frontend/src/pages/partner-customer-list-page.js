@@ -1,6 +1,7 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import { formatAddress, formatDate } from "../lib/format.js";
+import { addressFieldsHtml, readAddress } from "../lib/address-fields.js";
 
 // Decided (Chris, 2026-07-13): 60 days for now, revisit with the client at the
 // next Termin (design.md, decision 5).
@@ -25,8 +26,37 @@ class PartnerCustomerListPage extends HTMLElement {
   connectedCallback() {
     this.classList.add("area--partner");
     this.innerHTML = `
-      <h1>Meine Endkunden</h1>
+      <div class="list-header">
+        <h1>Meine Endkunden</h1>
+        <button type="button" class="button-primary" id="new-customer-btn">Neuer Endkunde</button>
+      </div>
       <data-table id="customer-table"></data-table>
+      <dialog class="customer-create-dialog" id="customer-create-dialog" aria-labelledby="customer-create-title">
+        <form id="customer-create-form" class="entity-form entity-form--grid">
+          <div class="customer-create-dialog__header">
+            <h2 id="customer-create-title">Neuer Endkunde</h2>
+            <button type="button" aria-label="Schließen" data-customer-dialog-close>&times;</button>
+          </div>
+          <form-field label="Nachname" name="lastName" required></form-field>
+          <form-field label="Vorname" name="firstName"></form-field>
+          ${addressFieldsHtml("customerAddress")}
+          <form-field label="E-Mail" name="email" type="email"></form-field>
+          <form-field label="Telefon" name="phone"></form-field>
+          <div class="customer-create-dialog__unconfirmed" id="customer-unconfirmed-actions" hidden>
+            <p>Speicherstatus unklar. Bitte zuerst die Endkundenliste prüfen.</p>
+            <button type="button" data-customer-check-list>Liste prüfen</button>
+          </div>
+          <div class="entity-form__actions">
+            <button type="button" data-customer-dialog-close>Abbrechen</button>
+            <button type="submit" class="button-primary">Speichern</button>
+          </div>
+        </form>
+      </dialog>
+      <div class="customer-create-status" id="customer-create-status" role="status" hidden>
+        <p id="customer-create-status-message"></p>
+        <button type="button" data-customer-retry-list hidden>Liste erneut laden</button>
+        <button type="button" data-customer-resume hidden>Eingabe fortsetzen</button>
+      </div>
     `;
 
     this.table = this.querySelector("#customer-table");
@@ -50,18 +80,122 @@ class PartnerCustomerListPage extends HTMLElement {
     this.table.searchKeys = ["name"];
     this.table.pageSize = 20;
 
+    this.createButton = this.querySelector("#new-customer-btn");
+    this.createDialog = this.querySelector("#customer-create-dialog");
+    this.createForm = this.querySelector("#customer-create-form");
+    this.unconfirmedActions = this.querySelector("#customer-unconfirmed-actions");
+    this.createStatus = this.querySelector("#customer-create-status");
+    this.createStatusMessage = this.querySelector("#customer-create-status-message");
+    this.retryListButton = this.querySelector("[data-customer-retry-list]");
+    this.resumeButton = this.querySelector("[data-customer-resume]");
+    this.createPending = false;
+    this.createdCustomerId = null;
+    this.refreshPending = false;
+    this.loadGeneration = 0;
+    this.createButton.addEventListener("click", () => this.openCreateDialog());
+    this.createDialog.querySelectorAll("[data-customer-dialog-close]").forEach((button) => {
+      button.addEventListener("click", () => this.closeCreateDialog());
+    });
+    this.createDialog.addEventListener("cancel", (event) => {
+      event.preventDefault();
+      this.closeCreateDialog();
+    });
+    this.createDialog.addEventListener("close", () => this.createButton.focus());
+    this.createForm.addEventListener("submit", (event) => this.createCustomer(event));
+    this.querySelector("[data-customer-check-list]").addEventListener("click", () => {
+      this.closeCreateDialog();
+      this.showStatus("Speicherstatus unklar. Bitte zuerst die Endkundenliste prüfen.", { resume: true });
+      this.load();
+    });
+    this.retryListButton.addEventListener("click", () => this.load(this.createdCustomerId));
+    this.resumeButton.addEventListener("click", () => this.resumeCreateDialog());
+
     this.load();
   }
 
-  async load() {
+  openCreateDialog() {
+    if (this.refreshPending) return;
+    this.createForm.reset();
+    this.unconfirmedActions.hidden = true;
+    this.hideStatus();
+    this.createDialog.showModal();
+    this.createForm.elements.lastName.focus();
+  }
+
+  resumeCreateDialog() {
+    this.createDialog.showModal();
+    this.createForm.elements.lastName.focus();
+  }
+
+  closeCreateDialog() {
+    if (this.createPending) return;
+    this.createDialog.close();
+  }
+
+  setCreatePending(pending) {
+    this.createPending = pending;
+    this.createForm.querySelectorAll("input, button").forEach((control) => {
+      control.disabled = pending;
+    });
+  }
+
+  showStatus(message, { retry = false, resume = false } = {}) {
+    this.createStatus.hidden = false;
+    this.createStatusMessage.textContent = message;
+    this.retryListButton.hidden = !retry;
+    this.resumeButton.hidden = !resume;
+  }
+
+  hideStatus() {
+    this.createStatus.hidden = true;
+  }
+
+  async createCustomer(event) {
+    event.preventDefault();
+    if (this.createPending || !this.createForm.reportValidity()) return;
+
+    const payload = {
+      lastName: this.createForm.elements.lastName.value,
+      firstName: this.createForm.elements.firstName.value || null,
+      address: readAddress(this.createForm, "customerAddress"),
+      email: this.createForm.elements.email.value || null,
+      phone: this.createForm.elements.phone.value || null,
+    };
+    this.setCreatePending(true);
+
+    try {
+      const customer = await apiFetch("/partner/customers", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+      this.setCreatePending(false);
+      this.closeCreateDialog();
+      showToast("Endkunde angelegt.", "success");
+      this.createdCustomerId = customer.id;
+      this.refreshPending = true;
+      this.createButton.disabled = true;
+      this.load(customer.id);
+    } catch (error) {
+      this.setCreatePending(false);
+      this.unconfirmedActions.hidden = false;
+      this.showStatus("Speicherstatus unklar. Bitte zuerst die Endkundenliste prüfen.", { resume: true });
+      showToast(error.message, "error");
+      showToast("Speicherstatus unklar. Bitte zuerst die Endkundenliste prüfen.", "error");
+    }
+  }
+
+  async load(createdCustomerId = null) {
+    const generation = ++this.loadGeneration;
     try {
       const kunden = await apiFetch("/partner/customers");
+      if (!this.isConnected || generation !== this.loadGeneration) return;
       const rows = kunden
         .map((k) => {
           const dormant = isDormant(k.lastOrderDate);
           const dateText = k.lastOrderDate ? formatDate(k.lastOrderDate) : "Noch keine Bestellung";
           const badge = dormant ? ` <span class="dormant-badge">Inaktiv</span>` : "";
           return {
+            id: k.id,
             name: `${k.firstName ? k.firstName + " " : ""}${k.lastName}`,
             addressLabel: formatAddress(k.address),
             lastOrderCell: `${dateText}${badge}`,
@@ -73,12 +207,26 @@ class PartnerCustomerListPage extends HTMLElement {
         // Oldest-first default: never-ordered (null) Endkunden first, then oldest
         // to newest last order (design.md, decision 6).
         .sort((a, b) => {
+          if (createdCustomerId && a.id === createdCustomerId) return -1;
+          if (createdCustomerId && b.id === createdCustomerId) return 1;
           if (!a.lastOrderDate) return b.lastOrderDate ? -1 : 0;
           if (!b.lastOrderDate) return 1;
           return a.lastOrderDate < b.lastOrderDate ? -1 : a.lastOrderDate > b.lastOrderDate ? 1 : 0;
         });
       this.table.rows = rows;
+      if (createdCustomerId) {
+        this.table.querySelector("[data-table-reset]")?.click();
+        this.createdCustomerId = null;
+        this.refreshPending = false;
+        this.createButton.disabled = false;
+        this.hideStatus();
+      }
     } catch (error) {
+      if (!this.isConnected || generation !== this.loadGeneration) return;
+      if (createdCustomerId) {
+        this.showStatus("Endkunde angelegt. Liste konnte nicht aktualisiert werden.", { retry: true });
+        return;
+      }
       showToast(error.message, "error");
     }
   }

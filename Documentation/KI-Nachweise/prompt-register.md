@@ -10,6 +10,26 @@
 
 
 
+
+| AUSSTEHEND-01a08640 | 2026-09-09 | Chris | Codex | Astra-Handoff korrigieren | lokale Sitzung `01a08640-2b93-7ac1-9cc4-e82d5b782de9` | `EXAKT` | Vorzeitigen OpenSpec-Entwurf als unreviewt markiert; Astra muss ihn zuerst unabhängig prüfen und erst danach weitere Changes planen.; Prüfungen: git diff --check |
+
+
+
+
+
+| AUSSTEHEND-01a0897e | 2026-09-10 | Chris | Codex | PAPO-OpenSpec-Planung abschließen und Kontext-Handoff aktualisieren | lokale Sitzung `01a0897e-af71-7b53-9ffd-949fa51204bf` | `EXAKT` | Drei kleine Changes vollständig geplant; Endkundenentwurf korrigiert; MVP-/CI-CD-Status und Kontextdateien synchronisiert.; Prüfungen: Fünf aktive Changes mit openspec validate --strict geprüft; git diff --check erfolgreich. |
+
+| AUSSTEHEND-01a090bb | 2026-09-11 | Chris | Codex | OpenSpec-Changes archivieren und Handoffs aktualisieren | lokale Sitzung `01a090bb-36cf-7863-abd7-8124845fc62f` | `EXAKT` | Drei abgeschlossene Changes archiviert, Spezifikationen synchronisiert und Next-Session-Goal aktualisiert; Prüfungen: openspec validate --changes --strict: 8/8 gültig; git diff --check erfolgreich |
+
+
+
+| AUSSTEHEND-01a06809 | 2026-09-03 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a06809-6bda-70c3-922a-59e5eeeeff28` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-01a0676e | 2026-09-03 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a0676e-bfa1-7241-89c0-43de935e78ee` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-01a06ab1 | 2026-09-04 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a06ab1-5040-7761-b84f-b202b6db6cc8` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-01a09091 | 2026-09-11 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a09091-5137-7b23-a8d6-e4f4d9b828d3` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-01a08c1f | 2026-09-10 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a08c1f-1fa4-7e11-badb-e05b02722b26` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-01a07969 | 2026-09-07 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a07969-fb4c-7442-b106-45b8188208b5` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-01a0863c | 2026-09-09 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a0863c-505a-7f30-b0f4-ac430c1866cb` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a05dcf | 2026-09-01 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a05dcf-2be8-7021-89cc-07ddb9a4aaca` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-019f72d2 | 2026-07-18 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f72d2-d09e-7382-ad24-52f329a30e94` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-019f75a8 | 2026-07-18 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f75a8-0fb0-7721-9c66-e0a221a69661` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
