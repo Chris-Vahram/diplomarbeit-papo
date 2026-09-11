@@ -1,12 +1,51 @@
 # Continuation Prompt — PAPO Partnerportal
 
-**Dokumentstand:** 01.09.2026
+## Maßgeblicher Handoff — 11.09.2026
+
+Diese Fortschreibung ersetzt widersprechende Status-/Blockerangaben weiter unten; ältere Abschnitte bleiben historische Herleitung. Kanonisches Ergebnis: [Planungsreview 11.09.2026](../openspec/PLANNING_REVIEW_2026-09-11.md).
+
+Der genehmigte Plan wurde ausschließlich als OpenSpec-/Dokumentationsarbeit umgesetzt. Sechs neue Changes: `show-partner-company-name`, `use-huemer-demo-partner`, `search-order-customers`, `clarify-order-customer-context`, `manage-article-categories`, `align-visible-article-terminology`. Bestehenden Endkundenentwurf um korrekten 401-Retry-Vertrag präzisiert. Keine Produktimplementierung dieser Sitzung.
+
+Neueste Primärquelle ist `Documentation/Besprechungsprotokolle/Besprechungsprotokoll_10.9.md`; auch die Originale 25.08./31.08. wurden vollständig abgeglichen. Die Partnerfirma kommt vorerst aus `Partner.name`; Huemer GmbH ist synthetisch. Kategorienverwaltung ist ausdrücklich bestätigt und nicht mehr pauschal durch BMD blockiert. Kundensuche, ausdrücklicher Neuanlagebutton, Kundenüberschriften und Katalog links sind geplant. Kundenbearbeitung braucht zuerst entschiedene Altbestands-Snapshots. Keycloak-sub als Ziel bestätigt; Kontomapping und Betriebsprozess fehlen. Bestandsnummern erhalten.
+
+Stand: elf aktive Changes; abschließende READY-/Entscheidungsübersicht und exakte Prüfungen im verlinkten Report. Nicht erneut alte Roadmap-Aussagen („unabhängige Kundenverwaltung erledigt“, „Kategorieverwaltung unbestätigt“) übernehmen. Vor Apply tatsächlichen aktuellen Workspace und Report lesen.
+
+Branch dieses Planungsblocks: `docs/openspec-planning-2026-09-11`, Ausgangsrevision `fea0e5b`. Bereits unsauberer Worktree vollständig erhalten, kein Fetch/Pull, kein Commit/Push/Merge. Frontendreparatur lokal vorhanden; Produktivzustand nicht geprüft. Keine VM-/SSH-/Secret-/Backup-/Realmzugriffe.
+
+Nächster Schritt: die READY-Changes taskweise nach dem Terra-medium-Goal in `Specification/NEXT_SESSION_PLAN.md` umsetzen. Alle Umsetzungstasks bleiben offen. Snapshot-, Login-, Nummern-, Upload-, BMD- und Betriebsblocker nicht durch Annahmen schließen. Visuelles Design/Präsentation bei Tobias belassen; 8.4 bleibt gemeinsam offen.
+
+**Dokumentstand:** 10.09.2026
 
 **Zweck:** vollständiger operativer Handoff für eine neue Claude-/Codex-Session
 
 **Repository:** `/Users/mitgl/Desktop/Schule/4CHITM/Diplomarbeit/diplomarbeit-papo`
 
 Diese Datei ist so geschrieben, dass ein neues Modell nach vollständigem Lesen das Projekt, den implementierten Stand, die fachlichen Grenzen und die nächste Reihenfolge versteht. Flüchtige Angaben zu Git, Tests, Infrastruktur und OpenSpec müssen trotzdem vor jeder Arbeit neu verifiziert werden.
+
+**Aktueller Planungshandoff:** Für die nächste Astra-Planungssitzung zusätzlich `Specification/NEXT_SESSION_PLAN.md` und `docs/AI_WORKFLOW_EFFICIENCY.md` lesen. Der Handoff verlangt OpenSpec-Planung und Reviews, keine Implementierung oder Infrastrukturarbeit.
+
+## Fortsetzungspunkt nach Astra-Planung — 10.09.2026
+
+Nicht von vorn beginnen. Die Planungssitzung hat den Endkundenentwurf korrigiert und zwei kleine Changes vollständig erstellt. Kanonischer Ergebnisreport: `openspec/PLANNING_REVIEW_2026-09-10.md`.
+
+- `add-standalone-customer-creation` 0/6: **READY für Terra medium**. Bestehende API, partnerseitige Eigentümerauflösung und Formularhilfen; kein Realm-/Schemaumbau. Filter/Pagination, Pending, Tastatur, unklarer Speicherstatus und GET-only Retry sind spezifiziert.
+- `fix-partner-create-commission-default` 0/2: **READY für Terra medium**. Nur manuelle 5-%-Vorauswahl; keine API-/Import-/Bestandsänderung.
+- `define-mvp-traceability-format` 0/3: **READY für Terra medium**. Liefert später 33 Quellenzeilen und Evidenzformat; MVP-8.4 bleibt offen.
+- `build-partnerportal-mvp` 50/53: **BLOCKIERT für Abschluss** durch Tobias 8.3/FD.4 und gemeinsame 8.4-Ausfüllung. Aufgaben 10.1–10.5 wurden nur formal richtig nummeriert.
+- `ci-cd-deployment-with-gh-actions` 30/41: **BLOCKIERT**. P0-Ausfall, Frontendpfad und geschlossener PR #5 bleiben getrennt; aktuelle Tobias-Diagnose und datierte Betriebs-/Securitynachweise fehlen.
+
+Alle fünf Changes bestanden am 10.09.2026 `openspec validate <change> --strict`; `git diff --check` war sauber. Unabhängige Security-/Funktionsreviews des Endkundenplans wurden eingearbeitet. Die beiden kleinen Folgechanges wurden gegen dieselben vorab unabhängig geprüften Scope-/Securityentscheidungen und abschließend lokal reviewt. Keine Produkt-, Backend-, Browser-, Infrastruktur- oder externe Prüfung wurde ausgeführt.
+
+### Pflichtstart der nächsten Session
+
+1. Workspace und Branch prüfen; uncommittete Arbeit vollständig bewahren.
+2. Nur nach sicherem Sichern/sauberem Arbeitsbaum `git fetch --prune` und `git pull --ff-only`; bei Divergenz oder Konflikt stoppen und konkreten Blocker melden. Nicht automatisch stashen.
+3. Per Dateiliste das neueste Besprechungsprotokoll bestimmen, vollständig lesen und gegen den Stand 10.09 analysieren. Ein neueres Protokoll überschreibt ältere Planung, bedeutet aber nicht automatisch implementierten Code.
+4. `AGENTS.md`, diesen Handoff, `NEXT_SESSION_PLAN.md`, `RESTARBEITSPLAN`, FSD, Roadmap, Backlog, kanonische Specs und alle aktiven OpenSpec-Artefakte nur gezielt nach Revision/Betroffenheit lesen. Keine unnötigen Wiederholungsreads.
+5. Zuerst die drei READY-Changes auf Drift durch Git-/Besprechungsänderungen prüfen. Neue bestätigte Anforderungen sofort als getrennte kleine OpenSpec-Proposals planen; betroffene vorhandene Proposals korrigieren oder blockieren.
+6. Danach restliche Chris-Kandidaten vollständig durchplanen oder mit exakter fehlender Entscheidung blockieren. Abschlussziel und wortgetreuer `/goal` stehen oben in `NEXT_SESSION_PLAN.md`.
+
+Workspace beim letzten Check: Branch `main`, Tracking `origin/main`, zahlreiche vorhandene/uncommittete Benutzer- und Planänderungen. Kein Pull ausgeführt, weil der Arbeitsbaum nicht sauber war. Remote-Stand daher in der nächsten Session neu und sicher prüfen.
 
 ````text
 Du setzt die Arbeit am PAPO-Partnerportal fort. Lies diesen Continuation Prompt vollständig, bevor du Änderungen vorschlägst oder ausführst. Übernimm keine alten Erinnerungen ungeprüft.
@@ -25,7 +64,8 @@ Lies und analysiere in einer frischen Session mindestens diese Dateien, bevor du
 8. `Specification/ROADMAP_2026-08-25.md` — gespeicherter Zukunftsplan, aktualisiert durch die Entscheidungen vom 31.08.2026.
 9. `Specification/IMPLEMENTATION_PLAN.md` — ursprüngliche Arbeitspakete und Risiken.
 10. `docs/CONVENTIONS.md`, `docs/SETUP.md`, `docs/DATA_MODEL.md` — Code-, Runtime- und Datenmodellregeln.
-11. `openspec list --json`, danach Proposal/Design/Specs/Tasks jedes für die Aufgabe relevanten Changes.
+11. `docs/AI_WORKFLOW_EFFICIENCY.md` und bei Planung `Specification/NEXT_SESSION_PLAN.md`.
+12. `openspec list --json`, danach Proposal/Design/Specs/Tasks jedes für die Aufgabe relevanten Changes.
 
 Nur bei Arbeit am späteren Gesamtprodukt zusätzlich `Specification/functional_specification_document_full_vision.md` lesen. Dieses ältere Visionsdokument darf neuere Besprechungen oder die Roadmap nicht überstimmen.
 
@@ -284,7 +324,7 @@ Zuletzt verifizierter Snapshot (02.09.2026):
 
 Taskzahlen sind Snapshotwerte und mit `openspec list --json` zu verifizieren.
 
-## Rang 1 — `build-partnerportal-mvp` (50/53)
+## Rang 1 — `build-partnerportal-mvp` (50/53, bestätigt am 10.09.2026)
 
 Offen:
 
@@ -297,7 +337,11 @@ Dev-Services-Testpfad ist in `docs/SETUP.md` dokumentiert und am 02.09.2026 mit
 77/77 erfolgreichen Tests sowie erfolgreichem Paketbuild erneut bestätigt.
 Erst nach den drei echten offenen Aufgaben archivieren.
 
-## Rang 2 — `ci-cd-deployment-with-gh-actions` (25/41)
+## Rang 1a — `add-standalone-customer-creation` (0/5, geplant am 10.09.2026)
+
+Dieser uncommittete Entwurf untersucht eine Code-/Roadmap-Lücke: Die Partnerseite „Meine Endkunden" zeigt bisher nur eine Liste, obwohl API und Bestellwizard Endkunden anlegen können. Die nächste Astra-Session muss Proposal, Design, Delta-Spec, Tasks und Sicherheitsannahmen unabhängig prüfen; erst danach ist eine Terra-Freigabe möglich.
+
+## Rang 2 — `ci-cd-deployment-with-gh-actions` (30/41, bestätigt am 10.09.2026)
 
 Noch nicht implementierungsbereit: Der Change enthält ältere Oracle-/ARM-Annahmen
 und muss vor weiterer Umsetzung als Hetzner-x86_64-Plan überarbeitet und erneut

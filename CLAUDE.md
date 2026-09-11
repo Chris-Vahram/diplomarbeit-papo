@@ -8,7 +8,7 @@ Web-based, extensible **B2B partner-ordering platform** for partner-driven sales
 
 ## Authoritative documents (read in this order for deep work)
 1. `Specification/CONTINUATION_PROMPT.md` — **self-contained current operational handoff**; read it fully in every fresh session, then verify volatile Git/OpenSpec claims.
-2. `Documentation/Besprechungsprotokolle/` — newer meeting notes override older documents when they conflict; newest is `Besprechungsprotokoll31_08_2026.md`.
+2. `Documentation/Besprechungsprotokolle/` — newer meeting notes override older documents when they conflict; newest is `Besprechungsprotokoll_10.9.md`.
 3. `Specification/functional_specification_document_partnerportal_final.md` — authoritative baseline for the implemented internal ordering stage (FR-01..FR-25) until synchronized with newer decisions.
 4. `Specification/phase2_backlog.md` — deferred features **B-01..B-08** + decisions log. Honor it; do not silently promote future directions.
 5. `Specification/ROADMAP_2026-08-25.md` — persisted future plan, updated through 31.08.2026; planning context, not implemented behavior.
@@ -18,7 +18,8 @@ Web-based, extensible **B2B partner-ordering platform** for partner-driven sales
 
 **Hard rule:** meetings override the FSD when they conflict (newer = authoritative). The FSD may lag behind the meetings of 25.08/31.08 until an explicit documentation sync; use the continuation prompt and roadmap for that delta. Do not reintroduce v1 assumptions (external shop as current stage, one-product orders, 3-person team).
 
-## Current status (2026-09-01; verify volatile claims)
+## Current status (2026-09-11; verify volatile claims)
+- The 10.09 meeting decisions and the reviewed implementation-ready OpenSpec changes are summarized in `openspec/PLANNING_REVIEW_2026-09-11.md`. This report supersedes older candidate/READY tables where they conflict.
 - MVP implementation and the meeting-driven July feature wave are merged to `main`. Audit Fix Batches A and B are implemented, regression-reviewed and `Verified` (UX-001..004, TECH-001).
 - Batch B is archived and synced to the main specs in the current local-history commit `94050cb`. The verified backend suite contains 77 tests (0 failures/errors/skips).
 - `build-partnerportal-mvp` is at 50/53 tasks. Only UI/UX documentation (8.3), thesis traceability (8.4) and final visual polish (FD.4) remain.

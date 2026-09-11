@@ -1,5 +1,7 @@
 ## 1. Config externalization (prerequisite, no VM/CI needed)
 
+> Review 10.09.2026: **BLOCKIERT**, keine Task in diesem Change für Terra freigegeben. Alle bisherigen Checkboxen bleiben historische Fortschrittsangaben (30/41 erledigt), keine aktuelle Betriebsabnahme. `review.md` enthält die fehlenden Entscheidungen/Nachweise; keine Infrastrukturarbeit in dieser Sitzung.
+
 - [x] 1.1 Replace `%prod` datasource values in `backend/src/main/resources/application.properties` with env-var placeholders (`${DB_URL}`, `${DB_USER}`, `${DB_PASSWORD}`)
 - [x] 1.2 Replace `%prod` OIDC values (`quarkus.oidc.auth-server-url`, `quarkus.oidc.client-id`) with env-var placeholders (`${KC_URL}`, `${KC_CLIENT_ID}`)
 - [x] 1.3 Verify `%dev` and `%test` blocks are unchanged; run `cd backend && ./mvnw quarkus:dev` locally to confirm dev mode still works exactly as before — ran it against the existing dev containers, boots clean, `%dev` config untouched, `/api/company/products` correctly 401s unauthenticated
@@ -41,9 +43,9 @@
 - [x] 5.6 Copy `docker-compose.prod.yml` + Caddyfile + Postgres init script to the VM (one-time manual step or a `scp` step in the deploy job)
 - [x] 5.7 Run the pipeline end-to-end against the real VM; verify only the Quarkus container restarts and Postgres/Keycloak data persists across the deploy — done (PR #6). Hit one issue on the first real run: the VM presents RSA/ECDSA/Ed25519 host keys, and `appleboy/ssh-action` negotiates by `golang.org/x/crypto/ssh`'s default order (ECDSA before Ed25519), so it checked the fingerprint against the ECDSA key while `VM_HOST_FINGERPRINT` was still the Ed25519 one — fixed by updating the stored variable to the ECDSA fingerprint (confirmed via `ssh-keyscan`). Pipeline now runs clean end-to-end.
 
-## 6. HTTPS + domain (blocked on domain registration finishing — Tobias, `.at` domain in progress as of 2026-08-23)
+## 6. HTTPS + domain (domain name confirmed; current operating evidence pending — Tobias)
 
-- [ ] 6.1 (Tobias) Finish registering the `.at` domain, point an A record at the VM's public IP (178.104.109.45)
+- [ ] 6.1 (Tobias) Domain name `paportal.at` confirmed by meeting 25.08.2026; obtain dated evidence of its actual DNS target. Original task combined procurement and DNS, so name confirmation alone does not complete it.
 - [ ] 6.2 Set `KC_HOSTNAME`, `redirectUris`, and `webOrigins` together as one work package (design.md Decision 4) — do not scaffold any of the three against a placeholder domain beforehand
 - [ ] 6.3 Verify Caddy successfully provisions a Let's Encrypt certificate and the site is reachable over HTTPS; also confirms whether an upstream/provider firewall blocks 80/443 beyond the local `ufw` check already done (5.1)
 - [ ] 6.4 Verify Keycloak login flow works end-to-end through the `/auth` path behind the proxy (no redirect loops, correct issuer URL in tokens)
@@ -65,3 +67,10 @@
 
 - [x] 8.1 Update `docs/SETUP.md` (or add `docs/DEPLOYMENT.md`) describing the production topology, required secrets/env vars, and manual rollback procedure (edit image tag in `docker-compose.prod.yml` to a known-good SHA, `docker compose up -d`) — added `docs/DEPLOYMENT.md`; rollback edits `IMAGE_TAG` in `.env.prod` (not the compose file directly) so the compose file stays generic
 - [x] 8.2 Document that CORS is intentionally disabled/unused in `%prod` (same-origin), contrasting with the documented dev-mode CORS shortcut
+
+## Review supplement — 10.09.2026
+
+- 3.5/3.6: Restarbeitsplan 09.09 reports GHCR private/branch protection as already present. No fresh remote evidence was obtained; checkboxes are deliberately unchanged. Record source/revision with Tobias's confirmation before adopting that status.
+- 5.7: historical successful Action does not prove current HTTP/OIDC/login/order behavior. The contrary 404/502 report is also historical, not a new live check.
+- PR #5: closed/conflicted status comes only from the Restarbeitsplan. Its mentioned tasks 5.11/5.12 do not exist in this task list and must not be treated as current task IDs.
+- P0 outage, frontend archive/path/swap and PR-#5 gateway boundary remain three separate evidence requests in review.md. No repair tasks are added before diagnosis.

@@ -1,5 +1,7 @@
 ## ADDED Requirements
 
+> Review gate 10.09.2026: this historical delta is **BLOCKIERT**, not an executable Terra plan. The desired service continuity and failure safety below are unverified acceptance goals, not guarantees supplied by Compose. Required evidence is listed in `../../review.md`.
+
 ### Requirement: Automated build on push to main
 The system SHALL automatically run the backend test suite on every push to `main` and on every pull request, using a GitHub Actions workflow.
 
@@ -37,7 +39,7 @@ The system SHALL build a Quarkus JVM-mode container image targeting `linux/amd64
 - **THEN** it SHALL be built for the `linux/amd64` platform to match the deployment VM's architecture (VM is `x86_64`, same as GitHub-hosted runners — no cross-arch build needed)
 
 ### Requirement: Automated deployment via SSH
-The system SHALL deploy the newly built image to the production VM by connecting over SSH and running `docker compose pull && docker compose up -d`, without requiring the pipeline to hold standing access to the VM outside of the workflow run.
+The system SHALL deploy the newly built image to the production VM through an explicitly authorized deployment path. Keeping the deploy key in a GitHub Actions secret SHALL NOT be described as proof of temporary access or command restrictions. The actual access boundary remains a blocking decision/evidence item in the review; no replacement deployment mechanism is approved here.
 
 #### Scenario: Deploy job runs after successful build
 - **WHEN** the build-and-push job completes successfully for a push to `main`
@@ -97,7 +99,7 @@ The system SHALL persist Postgres data via a Docker volume so that data survives
 - **THEN** all previously stored data (partners, products, orders, Keycloak realm state) is still present
 
 ### Requirement: Database backups, local now, offsite deferred
-The system SHALL run a scheduled backup job that dumps both production databases and stores copies locally on the VM, with local retention pruning. Offsite replication to an S3-compatible object storage bucket via `rclone` is designed but deferred to a follow-up, provider TBD (design.md Decision 7) — not a requirement of this change; local backup bounds the VM-loss risk window for the evaluation period.
+The system SHALL run a scheduled backup job that dumps both production databases and stores copies locally on the VM, with local retention pruning. Offsite replication is deferred under design Decision 7 and is not a requirement of this change. Local copies SHALL NOT be represented as protection against loss of the VM and its storage. This review does not verify or authorize backup operations.
 
 #### Scenario: Scheduled local dump
 - **WHEN** the backup schedule triggers

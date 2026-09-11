@@ -10,7 +10,7 @@ In every fresh deep-work session read the full continuation prompt first. Before
 
 1. `Specification/CONTINUATION_PROMPT.md` — self-contained current handoff, required reading in every fresh session; verify its volatile Git/OpenSpec snapshot.
 2. `CLAUDE.md` — stable product context, locked scope, stack, roles, and document routing.
-3. `Documentation/Besprechungsprotokolle/` — newer meeting notes override older documents and the FSD when they conflict; newest is `Besprechungsprotokoll31_08_2026.md`.
+3. `Documentation/Besprechungsprotokolle/` — newer meeting notes override older documents and the FSD when they conflict; newest is `Besprechungsprotokoll_10.9.md`.
 4. `Specification/functional_specification_document_partnerportal_final.md` — authoritative baseline requirements until synchronized by an approved documentation/OpenSpec change.
 5. `Specification/phase2_backlog.md` — deferred features and decisions; do not pull them into the current stage.
 6. `Specification/ROADMAP_2026-08-25.md` — persisted future plan, updated through the meeting of 31.08.2026; planning context, not implemented behavior.

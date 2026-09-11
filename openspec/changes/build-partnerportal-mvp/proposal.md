@@ -1,5 +1,7 @@
 ## Why
 
+> Quellenreview 11.09.2026: Der folgende Text ist der historische MVP-Ausgangspunkt. Größenangaben 200/800 und Tagesmengen sind keine neu verifizierten Zahlen; Original 31.08 nennt rund 100 Partner, Artikel-/Bestellmengen bleiben unbelegt. PAPO ist Produktname, der Referenzkunde bleibt ungenannt. Aktueller Kern: interner partnergetriebener Mehrartikelprozess. Neue bestätigte Anforderungen werden getrennt geplant, siehe `../../PLANNING_REVIEW_2026-09-11.md`; MVP-Abschluss bleibt wegen 8.3/8.4/FD.4 offen.
+
 Partner orders at the reference client arrive manually by e-mail (~10–15/day) and phone (~3–4/day) across ~200 partners and ~800 articles, with no central coordination of article data, partner data, product visibility, order assignment, or commission. The MVP replaces this with a web-based internal B2B partner-ordering portal following the chain **Company -> Partner -> End Customer**, making the core ordering process fast, assignable, and traceable.
 
 ## What Changes

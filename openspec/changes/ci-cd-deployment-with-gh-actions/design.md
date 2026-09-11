@@ -1,12 +1,14 @@
 ## Context
 
+> Current gate, 10.09.2026: **BLOCKIERT**. Historical decisions/phases remain below; `review.md` records unresolved evidence and overrides old readiness claims. No VM, SSH, secret, backup or deployment operation is authorized by this planning review.
+
 The Partnerportal currently only exists as a local dev environment: `docker compose up` starts Postgres + Keycloak, `mvnw quarkus:dev` runs the backend against them, and the frontend is served by any static file server (`python3 -m http.server`). There is no build artifact, no image registry, no deployment target, and no automation. This design covers everything needed to get from "push to `main`" to "running, HTTPS-reachable instance" on a single VPS: `papo-server-01` (`papo@178.104.109.45`), 4 vCPU, 7.6 GB RAM, `x86_64`, Ubuntu 26.04 LTS, Docker 29.6.1 + Docker Compose v5.3.1 already installed.
 
 **Provider change (2026-08-23):** earlier drafts of this design targeted an Oracle Cloud Free Tier VM (`VM.Standard.A1.Flex`, ARM/Ampere, 2 OCPU / 12 GB RAM, Ubuntu 24.04). That VM was never provisioned; the project moved to the VPS described above instead. The architecture shift (arm64 → x86_64) reopens Decision 2 below. Decision 7 (backup destination) also needs a new answer since it was Oracle-Object-Storage-specific.
 
 Constraint that shapes most decisions below: **7.6 GB total RAM shared across every long-running process on the box** (Postgres, Keycloak, Quarkus, Caddy, backup cron) — resource-consciousness is a first-class requirement, not a nice-to-have. Tighter than the 12 GB originally planned for, so explicit `mem_limit` per service (Risk 1 below) matters more than it did on paper.
 
-Division of labour (per project owner): this change's code/config is written entirely by the agent. Anything touching live secrets or the live VM (creating the VM, SSH key generation, entering GitHub Actions secrets, creating the GHCR PAT, DNS records) is done by Tobias. The pipeline never gets standing SSH access — only the GitHub Actions run itself uses the deploy key, scoped to the workflow.
+Division of labour: historical implementation steps below belong to the deployment change; live VM and credential operations belong to Tobias. Review 10.09.2026 authorizes only OpenSpec corrections. A key in authorized_keys can remain usable outside a workflow run; secret storage alone supplies neither an expiry nor a forced-command boundary. Actual restrictions are an unresolved evidence gate in review.md.
 
 ## Goals / Non-Goals
 
@@ -15,7 +17,7 @@ Division of labour (per project owner): this change's code/config is written ent
 - Redeploy touches only the Quarkus container; Postgres and Keycloak keep running (and keep their data) across every deploy.
 - Fit comfortably inside 7.6 GB RAM with headroom, on x86_64.
 - No secret ever committed to the repo; every credential is either a GitHub Actions secret or a VM-local credential entered by Tobias.
-- Postgres data survives container restarts (volumes) and survives VM loss via local `pg_dump` backups (now, in scope); offsite copy is deferred post-MVP (Decision 7) — accepted risk window until then, not a goal cut entirely.
+- Persistent volumes are intended to preserve data across container restarts. Local dumps only help while their storage remains available; they do not protect against loss of the VM and its disk. Offsite remains deferred under Decision 7. No verified data-loss guarantee is claimed.
 
 **Non-Goals:**
 - Native-image builds (see Decision 2).
@@ -47,7 +49,7 @@ One Postgres **container**, two **databases** (`partnerportal`, `keycloak`) crea
 Caddy routes by path on one domain: `/` → static frontend files, `/api/*` → Quarkus, `/auth/*` → Keycloak (`KC_HTTP_RELATIVE_PATH=/auth`, `KC_PROXY_HEADERS=xforwarded`, `KC_HOSTNAME=<domain>`). One TLS cert, one DNS A record, and — combined with Decision 1 — zero CORS configuration anywhere in the stack. Keycloak `redirectUris`/`webOrigins` in the realm export narrow to the single production domain (currently `*` in the dev-only realm — production realm config must not reuse the dev wildcard).
 **Alternative considered**: subdomains (`app.`/`api.`/`auth.`) — Caddy would handle the extra certs trivially, but it reintroduces cross-origin CORS and multi-origin OIDC config for a benefit (cleaner per-service Caddy blocks) that isn't worth it here.
 
-**Status (2026-08-23):** a `.at` domain is being registered (procurement in progress, not yet final) — this is not a design decision, just a pending fact. `KC_HOSTNAME`, `redirectUris`, and `webOrigins` must be set together as **one work package**, only once the domain is final — don't scaffold any of the three against a placeholder domain, since a later swap risks leaving one of the three stale (wrong token-issuer URL or a redirect loop that only shows up in production). Everything else in this change is domain-agnostic and should be built/verified first.
+**Status correction (10.09.2026):** `paportal.at` is confirmed by the meeting of 25.08.2026. Domain procurement is no longer open. Actual DNS/HTTPS/OIDC configuration and end-to-end behavior remain unverified in this session; Tobias must provide dated evidence for the deployed revision before readiness. No configuration or infrastructure change is authorized here.
 
 ### 5. `%prod` config externalization
 `application.properties` currently hardcodes `%prod.quarkus.datasource.jdbc.url=jdbc:postgresql://localhost:5432/...` and `%prod.quarkus.oidc.auth-server-url=http://localhost:8081/...`. Inside `docker-compose.prod.yml`, Postgres and Keycloak are reachable by Compose service name (e.g. `postgres:5432`, `keycloak:8080`), not `localhost` — the hardcoded values would simply fail to connect. Fix: replace the `%prod` block's fixed values with env-var placeholders (`${DB_URL}`, `${DB_USER}`, `${DB_PASSWORD}`, `${KC_URL}`, `${KC_CLIENT_ID}`), injected via `docker-compose.prod.yml`'s `environment:` block, values sourced from a VM-local `.env` file (not committed) that Tobias populates. `%dev` and `%test` blocks are untouched — `mvnw quarkus:dev` keeps working exactly as documented in `docs/SETUP.md`.
@@ -58,7 +60,7 @@ The image is set to a **private** GHCR package. The VM authenticates with `docke
 ### 7. Backup: local now, offsite deferred (resolved 2026-08-23)
 Split into two independent halves:
 - **Local `pg_dump` cron — in scope now, own small task (tasks.md §7.1, 7.4, 7.5 minus offsite).** `pg_dump` looped over both databases (`partnerportal`, `keycloak`) to a local directory on the VM, with retention pruning (e.g. keep last 14 daily dumps). No provider decision blocks this — near-zero effort, and it shrinks the risk window during the client/supervisor evaluation period where real-ish partner/order data may accumulate before the offsite half exists. This is standard scope for this change, not a stretch goal.
-- **Offsite sync (`rclone` → S3-compatible bucket) — deferred, post-MVP.** Reasoning (Tobias, 2026-08-23): this is an operational/production-hardening concern, not an MVP concern — the MVP goal is a live instance for evaluation, and local backup already bounds the VM-loss risk window reasonably for that purpose. The mechanism stays designed as-is (`rclone`, provider TBD — Oracle Object Storage no longer applies since the VM moved off Oracle); only the provider choice and implementation are deferred, not the concept, so no rework is expected when it's picked up. Tracked as a required "before production use" to-do (tasks.md §7.2, 7.3, 7.6), not dropped.
+- **Offsite sync — deferred, post-MVP (historical decision, Tobias, 23.08.2026).** Local dumps do not survive loss of the VM and its storage. This corrects the earlier contrary risk claim, without expanding scope or validating any backup. Provider and operational evidence remain external; no backup access or work is part of this review.
 
 ### 8. CI test gating
 `./mvnw test` (Quarkus Dev Services — needs Docker on the runner, which GitHub-hosted runners provide) runs on every push and PR. The `build-and-push` and `deploy` jobs both declare `needs: test`, so a failing test suite never reaches production. Test and build-and-push are otherwise independent of the VM's existence — this half of the pipeline is fully exercisable before the VM is provisioned.
@@ -77,7 +79,7 @@ Set generous per-service memory limits for every container (Quarkus, Postgres, K
 - **[Risk] JVM Quarkus RAM footprint under real load is higher than estimated, crowding Keycloak/Postgres on the 7.6 GB box (tighter than the 12 GB originally planned for).** → Mitigation: `mem_limit` per service (Decision 10) so one process can't starve the others; native-image (Decision 2) remains a documented fallback if real-load footprint exceeds the estimate.
 - **[Risk] Single Postgres instance means a Postgres failure takes down both the app and auth simultaneously.** → Mitigation: accepted trade-off per Decision 3, scale-appropriate; local `pg_dump` backups (Decision 7) bound the damage now, offsite copy bounds VM-loss specifically once implemented post-MVP.
 - **[Risk] Path-based Keycloak routing (`/auth`) under a reverse proxy is a known source of subtle misconfiguration (redirect loops, wrong issuer URL in tokens).** → Mitigation: `KC_HOSTNAME` and `KC_HTTP_RELATIVE_PATH` set explicitly and tested against a real HTTPS request before declaring the deploy job done; documented as its own task with a manual verification step.
-- **[Risk] Deploy job has no automated rollback or health check — a bad image can go live and stay live until someone notices.** → Mitigation: out of scope for this change (see Non-Goals); document the manual SHA-rollback procedure (Decision 9) so it's at least possible.
+- **[Risk] The historical plan excluded health checks/automatic rollback, but the 09.09 handoff reports pipeline success with HTTP 404/502.** This contradiction blocks readiness. Tobias must establish the current cause, verifiable success criteria and recovery evidence before a revised implementation plan; do not infer runtime success from an Action result.
 - **[Risk] GHCR private package + VM-side PAT is a credential Tobias must remember to rotate/manage outside the "everything is a GH secret" model.** → Mitigation: explicitly documented in proposal.md's Impact section and called out as a VM-local (not repo, not GH Actions) credential.
 
 ## Migration Plan
@@ -89,13 +91,13 @@ Set generous per-service memory limits for every container (Quarkus, Postgres, K
 5. Add the `deploy` job (SSH via `appleboy/ssh-action`) — VM already exists (`papo-server-01`); gate its rollout on Tobias entering the deploy secrets (tasks.md §5.2-5.4).
 6. Add the local `pg_dump` backup cron (Decision 7, local half) — independent of the VM's deploy job, can be scheduled directly on the VM at any point once the VM is reachable. Offsite sync is deferred post-MVP, not part of this migration.
 
-No live traffic exists yet to migrate — this is a first deployment, not a cutover. Rollback (if a deploy breaks the VM) is: SSH in manually (Tobias), edit `docker-compose.prod.yml`'s image tag to a known-good SHA, `docker compose up -d`.
+Historical migration outline only: the claim that no deployment exists is superseded by the local workflow and 09.09 handoff. Current running revision and data state were not checked. Recovery and service-recreation guarantees need Tobias's evidence; the commands above are not authorized actions for this session.
 
 ## Open Questions
 
-All items from the previous revision are resolved except the two genuinely external ones:
+Readiness is blocked by the evidence/decisions in review.md; the historical two-item list was incomplete.
 
-- **Production domain name** — a `.at` domain is being registered (procurement in progress, not final yet). Blocks only the final Caddy/Keycloak-hostname work package (Decision 4) and the deploy job's first real HTTPS run; everything else is domain-agnostic and buildable now.
+- **Production domain behavior** — domain name `paportal.at` is settled. Missing: dated DNS/HTTPS/OIDC/API/login/order checks for the actual deployed revision and the current P0 diagnosis from Tobias.
 - **Offsite backup provider** — deferred post-MVP by design (Decision 7), not blocking. To be picked later from real dump sizes and provider options once it's revisited; not needed for this change to ship.
 
 Resolved and no longer open: JVM vs native (→ JVM, Decision 2), `mem_limit` (→ yes, standard, Decision 10), ports 80/443 (→ open locally via inactive `ufw`, Decision 11), local backup (→ in scope now, Decision 7).

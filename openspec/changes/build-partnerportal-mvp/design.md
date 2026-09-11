@@ -1,5 +1,7 @@
 ## Context
 
+> Quellenreview 11.09.2026: Historische Phasen/Entscheidungen unten bleiben erhalten. Die Forschungsfrage ist gemäß FSD §13 bestätigt und keine offene neue Entscheidung. Alte 200/800-Skalierungsannahmen sind kein aktueller Datenbeleg. Chris verantwortet Implementierung, Tobias visuelles Design; alte Schema-/Teamzuordnungen sind nicht neu zu übernehmen. Aktuelle getrennte Planentscheidungen stehen in `../../PLANNING_REVIEW_2026-09-11.md`. Kein Greenfield-Neustart oder automatischer Rückbau vorhandener Daten.
+
 HTL Diplomarbeit, 2-person team (Chris, Tobias). Authoritative requirements: `Specification/functional_specification_document_partnerportal_final.md` (v2), `Specification/IMPLEMENTATION_PLAN.md`, and the capability specs in this change. Reference scale ~200 partners / ~800 articles, data loaded via Excel/CSV import. Fixed stack (no alternatives): HTML + CSS + native Web Components/Custom Elements (frontend), Quarkus/Java (backend), PostgreSQL (DB), Keycloak (auth). Deferred features B-01..B-07 are out of scope (`Specification/phase2_backlog.md`).
 
 ## Goals / Non-Goals

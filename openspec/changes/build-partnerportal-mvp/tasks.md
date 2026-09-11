@@ -1,5 +1,7 @@
 # Tasks — build-partnerportal-mvp
 
+> Fortschreibung 11.09.2026: unverändert 50/53. 8.3/FD.4 bei Tobias, 8.4 gemeinsam. Originalprotokolle 25.08./31.08./10.09 abgeglichen; neue bestätigte Arbeit ist in getrennten Changes geplant. Historische Testzahlen unten bleiben historisch. Aktueller Planungsreview: `../../PLANNING_REVIEW_2026-09-11.md`.
+
 Owners (updated 2026-07-02): **C** = Chris (implementation: backend + functional frontend), **T** = Tobias (frontend design + UI/UX docs), **C+T** = joint. `[opt]` = optional enhancement (do only if time allows).
 Phases run top-to-bottom; within a phase, tasks are ordered by dependency. Implementation does not wait for the frontend design (Phase FD) — screens are built plain and restyled via `base.css`.
 
@@ -90,10 +92,12 @@ Tobias produces the visual design (Claude design) in parallel; screens are built
 
 ## 10. Optional Enhancements (only if time allows) — do NOT block MVP
 
-- [x] 9.1 [opt] Company overview dashboard (totals across partners) — done via `add-company-dashboard`
-- [x] 9.2 [opt] Per-partner settlement overview (sales count, revenue, total commission) — done via `add-company-dashboard`
-- [x] 9.3 [opt] Product category/image support in UI — done via `add-product-category-image`
-- [x] 9.4 [opt] Search/filter/pagination on large product/partner lists (~800 articles) — done via `add-list-search-pagination`
-- [x] 9.5 [opt] Export order/commission lists (CSV) — done via `add-csv-export`
+- [x] 10.1 [opt] Company overview dashboard (totals across partners) — done via `add-company-dashboard`
+- [x] 10.2 [opt] Per-partner settlement overview (sales count, revenue, total commission) — done via `add-company-dashboard`
+- [x] 10.3 [opt] Product category/image support in UI — done via `add-product-category-image`
+- [x] 10.4 [opt] Search/filter/pagination on large product/partner lists (~800 articles) — done via `add-list-search-pagination`
+- [x] 10.5 [opt] Export order/commission lists (CSV) — done via `add-csv-export`
+
+Dokumentationsreview 10.09.2026: bisherige IDs 9.1–9.5 entsprechen jetzt 10.1–10.5, passend zur unveränderten Phase 10. Keine Erledigt-Markierung geändert (weiterhin 50/53 erledigt). Der separate Change `define-mvp-traceability-format` plant nur das gemeinsame Format; er schließt 8.4 nicht ab. 8.3 und FD.4 bleiben bei Tobias. Aktuelle Prüfbelege und externe Entscheidungen stehen in `../../PLANNING_REVIEW_2026-09-10.md`.
 
 > Deferred to Phase-2 backlog (NOT part of this change): external shop (B-01), shop customization (B-02), auto level-up (B-03), real e-mail (B-04), shop inquiry forward (B-05), BMD (B-06), payout (B-07).
