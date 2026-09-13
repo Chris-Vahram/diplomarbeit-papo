@@ -12,6 +12,7 @@ erDiagram
     PARTNER ||--o{ PRODUCT_ENABLEMENT : "schaltet frei"
     PRODUCT ||--o{ PRODUCT_ENABLEMENT : "wird freigeschaltet"
     PRODUCT_IMAGE o|--o{ PRODUCT : "wird referenziert"
+    ARTICLE_CATEGORY o|--o{ PRODUCT : "klassifiziert"
     PARTNER ||--o{ KUNDE : "legt an (ownerPartner)"
     PARTNER ||--o{ ORDER : "erstellt"
     KUNDE ||--o{ ORDER : "ist Kunde von"
@@ -37,7 +38,8 @@ erDiagram
         BigDecimal price "10.2"
         String description
         boolean available
-        String category
+        String category "Legacywert, synchron zum FK"
+        Long article_category_id FK "optional"
         String imageUrl
         Long image_id FK "optional; gespeichertes Galeriebild"
     }
@@ -49,6 +51,13 @@ erDiagram
         String filename "nur Anzeige, nicht als Speicherpfad"
         long sizeBytes
         Instant uploadedAt
+    }
+
+    ARTICLE_CATEGORY {
+        Long id PK
+        String name UK "1–255 Zeichen, normalisiert eindeutig"
+        String normalized_name UK
+        boolean active "deaktivierte Bestandszuordnung bleibt erlaubt"
     }
 
     PRODUCT_ENABLEMENT {
@@ -119,9 +128,22 @@ Zentral von der Firma verwaltete Artikel. `available` steuert Bestellbarkeit
 unabhängig von der partnerspezifischen Freischaltung (`ProductEnablement`) —
 ein Produkt kann für einen Partner freigeschaltet, aber gerade nicht
 verfügbar sein (z. B. ausverkauft); beides muss zutreffen, damit ein Partner
-es bestellen kann. `imageUrl` bleibt für externe Bild-URLs erhalten; bei einem
+es bestellen kann. `articleCategory` ist eine optionale Zuordnung zu einer von
+der Firma verwalteten Artikelkategorie. `category` bleibt als synchroner
+Legacy-String für Import-/Bestandskompatibilität erhalten; neue Zuordnungen
+verwenden eine Kategorie-ID oder den eindeutigen Legacy-Namen, niemals beides.
+`imageUrl` bleibt für externe Bild-URLs erhalten; bei einem
 hochgeladenen oder aus der Galerie gewählten Bild verweist `image` optional auf
 einen gespeicherten `ProductImage`-Datensatz.
+
+### ArticleCategory
+Eine von der Firma verwaltete Artikelkategorie. `name` wird nach Trim und
+Unicode-validierter Längenprüfung gespeichert; `normalized_name` ist
+case-insensitive eindeutig. `active=false` verhindert neue Artikelzuordnungen
+und Importzeilen, lässt bestehende Artikelzuordnungen aber unverändert. Es
+gibt keinen DELETE-Endpunkt. Die additive ORM-Übernahme liest vorhandene
+Legacy-Strings nach dem Seed, erstellt nur eindeutig belegte Kategorien und
+bricht bei Kollisionen oder inkonsistentem FK ohne Teilübernahme ab.
 
 ### ProductImage
 Ein serverseitig gespeichertes Artikelbild. Die binären Daten liegen direkt in

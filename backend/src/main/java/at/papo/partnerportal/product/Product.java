@@ -1,5 +1,6 @@
 package at.papo.partnerportal.product;
 
+import at.papo.partnerportal.category.Category;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,6 +26,10 @@ public class Product extends PanacheEntity {
     public boolean available = true;
 
     public String category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "article_category_id")
+    public Category articleCategory;
 
     public String imageUrl;
 

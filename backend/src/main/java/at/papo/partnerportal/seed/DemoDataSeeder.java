@@ -1,5 +1,6 @@
 package at.papo.partnerportal.seed;
 
+import at.papo.partnerportal.category.CategoryMigrationService;
 import at.papo.partnerportal.commission.CommissionService;
 import at.papo.partnerportal.common.Address;
 import at.papo.partnerportal.customer.Kunde;
@@ -39,29 +40,33 @@ public class DemoDataSeeder {
     @Inject
     ProductImageService productImageService;
 
+    @Inject
+    CategoryMigrationService categoryMigrationService;
+
     @Transactional
     void onStart(@Observes StartupEvent event) {
-        if (LaunchMode.current() == LaunchMode.NORMAL) {
-            return;
+        if (shouldSeed(LaunchMode.current(), Partner.count())) {
+            seedPartners();
+            seedProducts();
+            seedProductImages();
+            seedEnablements();
+            // Demo orders only in dev/demo — tests assume a clean order baseline
+            // (specific partners with zero orders), so don't seed them under %test.
+            if (LaunchMode.current() == LaunchMode.DEVELOPMENT) {
+                seedOrders();
+            }
         }
-        if (Partner.count() > 0) {
-            return;
-        }
-        seedPartners();
-        seedProducts();
-        seedProductImages();
-        seedEnablements();
-        // Demo orders only in dev/demo — tests assume a clean order baseline
-        // (specific partners with zero orders), so don't seed them under %test.
-        if (LaunchMode.current() == LaunchMode.DEVELOPMENT) {
-            seedOrders();
-        }
+        categoryMigrationService.migrate();
+    }
+
+    static boolean shouldSeed(LaunchMode launchMode, long partnerCount) {
+        return launchMode != LaunchMode.NORMAL && partnerCount == 0;
     }
 
     private void seedPartners() {
         // Canonical (upper-case) partner number == the Keycloak demo user "partner-demo"
         // (resolve() upper-cases the login claim), so login -> dashboard works out of the box.
-        persistPartner("PARTNER-DEMO", "Elektro Huber GmbH", address("Hauptstraße", "12", "4020", "Linz"),
+        persistPartner("PARTNER-DEMO", "Huemer GmbH", address("Hauptstraße", "12", "4020", "Linz"),
                 "partner-demo@example.at", "+43 660 1234567", "10.00", true);
         // No linked Keycloak user yet — demonstrates the manual-provisioning gap (design.md).
         persistPartner("P-1002", "Sanitär Bauer KG", address("Ringstraße", "5", "8010", "Graz"),

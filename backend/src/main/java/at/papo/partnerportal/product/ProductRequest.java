@@ -13,6 +13,7 @@ public record ProductRequest(
         String description,
         Boolean available,
         String category,
-        String imageUrl
+        String imageUrl,
+        Long categoryId
 ) {
 }

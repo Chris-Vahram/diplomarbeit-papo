@@ -8,6 +8,7 @@ const routes = {
   "/login": { tag: "login-page", role: null, title: "Anmeldung" },
   "/company/dashboard": { tag: "company-dashboard-page", role: "company", title: "Firmen-Dashboard" },
   "/company/products": { tag: "company-product-list-page", role: "company", title: "Artikel" },
+  "/company/categories": { tag: "company-category-list-page", role: "company", title: "Artikelkategorien" },
   "/company/partners": { tag: "company-partner-list-page", role: "company", title: "Partnerverwaltung" },
   "/company/orders": { tag: "company-order-list-page", role: "company", title: "Bestellungen" },
   "/company/import": { tag: "company-import-page", role: "company", title: "Datenimport" },
@@ -22,6 +23,7 @@ const routes = {
 const NAV_ICONS = {
   "/company/dashboard": "layout-dashboard",
   "/company/products": "package",
+  "/company/categories": "tags",
   "/company/partners": "users",
   "/company/orders": "shopping-cart",
   "/company/import": "upload",
@@ -135,6 +137,7 @@ function renderNav() {
         ["/company/orders", "Bestellungen"],
         ["/company/partners", "Partnerverwaltung"],
         ["/company/products", "Artikel"],
+        ["/company/categories", "Artikelkategorien"],
         ["/company/import", "Datenimport"],
       ]
     : [
@@ -184,6 +187,8 @@ function renderNav() {
     button.setAttribute("aria-expanded", String(!isOpen));
   });
   menu.querySelector('[data-action="logout"]').addEventListener("click", () => {
+    ++renderGeneration;
+    setPartnerPortalLabel();
     logout();
     location.hash = "#/login";
   });
@@ -194,6 +199,35 @@ function renderNav() {
 
   window.lucide?.createIcons();
   refreshOrdersBadge();
+}
+
+function setPartnerPortalLabel(name) {
+  appRole.textContent = name ? `Partnerportal der Firma ${name}` : "Partnerportal";
+}
+
+function showPartnerPortalRetry() {
+  setPartnerPortalLabel();
+  const retry = document.createElement("button");
+  retry.type = "button";
+  retry.className = "portal-label-retry";
+  retry.textContent = "Name nicht verfügbar – erneut laden";
+  retry.addEventListener("click", () => loadPartnerPortalLabel(renderGeneration));
+  appRole.appendChild(retry);
+}
+
+async function loadPartnerPortalLabel(generation) {
+  const session = await ensureValidSession();
+  if (!session?.isPartner || generation !== renderGeneration) return;
+  const accessToken = session.accessToken;
+  try {
+    const profile = await apiFetch("/partner/profile");
+    const current = getSession();
+    if (generation !== renderGeneration || !current?.isPartner || current.accessToken !== accessToken) return;
+    setPartnerPortalLabel(profile.name);
+  } catch {
+    const current = getSession();
+    if (generation === renderGeneration && current?.isPartner && current.accessToken === accessToken) showPartnerPortalRetry();
+  }
 }
 
 // Unread-order count for the company sidebar "Bestellungen" nav item
@@ -228,6 +262,7 @@ let renderGeneration = 0;
 
 async function render() {
   const myGeneration = ++renderGeneration;
+  setPartnerPortalLabel();
   closeMobileNav();
   const path = currentPath();
   const route = routes[path];
@@ -262,6 +297,7 @@ async function render() {
   appRoot.innerHTML = "";
   appRoot.appendChild(document.createElement(route.tag));
   renderNav();
+  if (route.role === "partner") loadPartnerPortalLabel(myGeneration);
 }
 
 window.addEventListener("DOMContentLoaded", async () => {
@@ -269,6 +305,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   import("../pages/login-page.js");
   import("../pages/company-dashboard-page.js");
   import("../pages/company-product-list-page.js");
+  import("../pages/company-category-list-page.js");
   import("../pages/company-partner-list-page.js");
   import("../pages/company-order-list-page.js");
   import("../pages/company-import-page.js");

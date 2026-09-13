@@ -20,7 +20,9 @@ class CompanyProductListPage extends HTMLElement {
           <form-field class="form-field--wide" label="Beschreibung" name="description">
             <textarea name="description"></textarea>
           </form-field>
-          <form-field label="Artikelkategorie" name="category"></form-field>
+          <form-field label="Artikelkategorie" name="categoryId">
+            <select name="categoryId"><option value="">Keine Artikelkategorie</option></select>
+          </form-field>
           <image-chooser name="imageUrl" class="form-field--wide"></image-chooser>
           <label class="checkbox-field">
             <input type="checkbox" name="available" checked />
@@ -62,7 +64,10 @@ class CompanyProductListPage extends HTMLElement {
 
   async load() {
     try {
-      this.products = await apiFetch("/company/products");
+      [this.products, this.categories] = await Promise.all([
+        apiFetch("/company/products"),
+        apiFetch("/company/categories"),
+      ]);
       const categories = [...new Set(this.products.map((p) => p.category).filter(Boolean))].sort();
       this.table.filters = [
         { key: "category", type: "select", label: "Artikelkategorie", options: categories.map((c) => ({ value: c, label: c })) },
@@ -76,6 +81,7 @@ class CompanyProductListPage extends HTMLElement {
           ],
         },
       ];
+      this.renderCategoryOptions();
       const rows = this.products.map((p) => ({
         imageUrl: p.imageUrl ?? "",
         name: p.name,
@@ -93,6 +99,7 @@ class CompanyProductListPage extends HTMLElement {
   openCreate() {
     this.form.reset();
     this.form.elements.id.value = "";
+    this.renderCategoryOptions();
     this.imageChooser.reset();
     this.modal.setAttribute("title", "Neuer Artikel");
     this.modal.open();
@@ -105,7 +112,7 @@ class CompanyProductListPage extends HTMLElement {
     this.form.elements.name.value = product.name;
     this.form.elements.price.value = product.price;
     this.form.elements.description.value = product.description ?? "";
-    this.form.elements.category.value = product.category ?? "";
+    this.renderCategoryOptions(product.categoryId ?? "");
     this.imageChooser.value = product.imageUrl ?? "";
     this.form.elements.available.checked = product.available;
     this.modal.setAttribute("title", "Artikel bearbeiten");
@@ -120,7 +127,7 @@ class CompanyProductListPage extends HTMLElement {
       name: data.get("name"),
       price: Number(data.get("price")),
       description: data.get("description") || null,
-      category: data.get("category") || null,
+      categoryId: data.get("categoryId") ? Number(data.get("categoryId")) : null,
       imageUrl: data.get("imageUrl") || null,
       available: this.form.elements.available.checked,
     };
@@ -138,6 +145,20 @@ class CompanyProductListPage extends HTMLElement {
     } catch (error) {
       showToast(error.message, "error");
     }
+  }
+
+  renderCategoryOptions(selectedId = this.form.elements.categoryId.value) {
+    const select = this.form.elements.categoryId;
+    select.innerHTML = `<option value="">Keine Artikelkategorie</option>`;
+    for (const category of this.categories ?? []) {
+      if (category.active || String(category.id) === String(selectedId)) {
+        const option = document.createElement("option");
+        option.value = category.id;
+        option.textContent = `${category.name}${category.active ? "" : " (deaktiviert)"}`;
+        select.appendChild(option);
+      }
+    }
+    select.value = selectedId;
   }
 }
 

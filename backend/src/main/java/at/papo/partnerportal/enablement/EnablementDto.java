@@ -13,7 +13,8 @@ public record EnablementDto(
         boolean enabled
 ) {
     public static EnablementDto from(Product product, boolean enabled) {
-        return new EnablementDto(product.id, product.name, product.price, product.category,
+        return new EnablementDto(product.id, product.name, product.price,
+                product.articleCategory == null ? null : product.articleCategory.name,
                 product.available, enabled);
     }
 }

@@ -1,7 +1,11 @@
 package at.papo.partnerportal.importer;
 
+import at.papo.partnerportal.category.Category;
+import at.papo.partnerportal.category.CategoryNames;
+import at.papo.partnerportal.category.CategoryService;
 import at.papo.partnerportal.product.Product;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -19,6 +23,9 @@ import static at.papo.partnerportal.importer.ImportValueParsing.parseDecimal;
 @ApplicationScoped
 public class ProductImportDefinition implements ImportDefinition {
 
+    @Inject
+    CategoryService categoryService;
+
     private static final List<ImportField> FIELDS = List.of(
             new ImportField("name", "Name", true, List.of("artikel", "artikelname", "bezeichnung", "produktname")),
             new ImportField("price", "Preis", true, List.of("price", "preis netto", "verkaufspreis")),
@@ -31,6 +38,22 @@ public class ProductImportDefinition implements ImportDefinition {
     @Override
     public List<ImportField> fields() {
         return FIELDS;
+    }
+
+    @Override
+    public void prepare(List<Map<String, String>> mappedRows) {
+        java.util.Set<Long> categoryIds = new java.util.HashSet<>();
+        for (Map<String, String> mappedValues : mappedRows) {
+            String normalizedName = normalizedCategory(mappedValues.get("category"));
+            if (normalizedName == null) {
+                continue;
+            }
+            Category category = Category.find("normalizedName", normalizedName).firstResult();
+            if (category != null) {
+                categoryIds.add(category.id);
+            }
+        }
+        categoryService.lockCategories(categoryIds);
     }
 
     @Override
@@ -62,6 +85,22 @@ public class ProductImportDefinition implements ImportDefinition {
     }
 
     @Override
+    public List<String> validatePreparedRow(Map<String, String> mappedValues) {
+        String normalizedName = normalizedCategory(mappedValues.get("category"));
+        if (normalizedName == null) {
+            return isBlank(mappedValues.get("category")) ? List.of() : List.of("Artikelkategorie ist ungültig.");
+        }
+        Category category = Category.find("normalizedName", normalizedName).firstResult();
+        if (category == null) {
+            return List.of("Artikelkategorie ist unbekannt.");
+        }
+        if (!category.active) {
+            return List.of("Artikelkategorie ist deaktiviert.");
+        }
+        return List.of();
+    }
+
+    @Override
     public String identifierValue(Map<String, String> mappedValues) {
         return mappedValues.get("name") != null ? mappedValues.get("name").trim() : null;
     }
@@ -79,8 +118,27 @@ public class ProductImportDefinition implements ImportDefinition {
         product.description = blankToNull(mappedValues.get("description"));
         Boolean available = parseBoolean(mappedValues.get("available"));
         product.available = available == null || available;
-        product.category = blankToNull(mappedValues.get("category"));
+        String categoryName = blankToNull(mappedValues.get("category"));
+        if (categoryName == null) {
+            product.articleCategory = null;
+            product.category = null;
+        } else {
+            Category category = Category.find("normalizedName", CategoryNames.normalized(categoryName)).firstResult();
+            product.articleCategory = category;
+            product.category = category.name;
+        }
         product.imageUrl = blankToNull(mappedValues.get("imageUrl"));
         product.persist();
+    }
+
+    private String normalizedCategory(String value) {
+        if (isBlank(value)) {
+            return null;
+        }
+        try {
+            return CategoryNames.normalized(value);
+        } catch (RuntimeException exception) {
+            return null;
+        }
     }
 }

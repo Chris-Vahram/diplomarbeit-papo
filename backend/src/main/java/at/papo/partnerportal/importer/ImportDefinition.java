@@ -10,8 +10,15 @@ public interface ImportDefinition {
 
     List<ImportField> fields();
 
+    default void prepare(List<Map<String, String>> mappedRows) {
+    }
+
     // mappedValues: system field key -> raw file cell value (may be blank).
     List<String> validateRow(Map<String, String> mappedValues);
+
+    default List<String> validatePreparedRow(Map<String, String> mappedValues) {
+        return List.of();
+    }
 
     // Value used for duplicate detection, both within the file and against the DB.
     String identifierValue(Map<String, String> mappedValues);
