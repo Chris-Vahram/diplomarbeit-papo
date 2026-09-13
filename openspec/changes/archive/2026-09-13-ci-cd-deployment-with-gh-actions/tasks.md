@@ -21,7 +21,7 @@
 - [x] 3.3 Configure the job to push to `ghcr.io/<owner>/<repo>-backend` tagged `latest` and `${{ github.sha }}` — image name is `ghcr.io/chris-vahram/diplomarbeit-papo-backend` (owner/repo lowercased, GHCR requirement)
 - [x] 3.4 Grant the workflow `packages: write` permission
 - [ ] 3.5 Set the resulting GHCR package to private once first published
-- [ ] 3.6 Enable branch protection on `main` (require the `test` job to pass before merge)
+- [ ] 3.6 Enable branch protection on `main` (require the `test` job to pass before merge) — blocked: not achievable by current collaborator (not the repo owner/admin); needs Chris to enable via repo Settings → Branches (required check name confirmed: `Test backend`)
 
 ## 4. Frontend + reverse proxy config
 
@@ -43,10 +43,10 @@
 
 ## 6. HTTPS + domain (blocked on domain registration finishing — Tobias, `.at` domain in progress as of 2026-08-23)
 
-- [ ] 6.1 (Tobias) Finish registering the `.at` domain, point an A record at the VM's public IP (178.104.109.45)
-- [ ] 6.2 Set `KC_HOSTNAME`, `redirectUris`, and `webOrigins` together as one work package (design.md Decision 4) — do not scaffold any of the three against a placeholder domain beforehand
-- [ ] 6.3 Verify Caddy successfully provisions a Let's Encrypt certificate and the site is reachable over HTTPS; also confirms whether an upstream/provider firewall blocks 80/443 beyond the local `ufw` check already done (5.1)
-- [ ] 6.4 Verify Keycloak login flow works end-to-end through the `/auth` path behind the proxy (no redirect loops, correct issuer URL in tokens)
+- [x] 6.1 (Tobias) Finish registering the `.at` domain, point an A record at the VM's public IP (178.104.109.45) — `paportal.at` live, resolving to the VM
+- [x] 6.2 Set `KC_HOSTNAME`, `redirectUris`, and `webOrigins` together as one work package (design.md Decision 4) — `DOMAIN=paportal.at` wired through `.env.prod`, realm template renders real values, no placeholder left
+- [x] 6.3 Verify Caddy successfully provisions a Let's Encrypt certificate and the site is reachable over HTTPS; also confirms whether an upstream/provider firewall blocks 80/443 beyond the local `ufw` check already done (5.1) — confirmed live 2026-09-13, Caddy serving valid HTTPS on `paportal.at`
+- [x] 6.4 Verify Keycloak login flow works end-to-end through the `/auth` path behind the proxy (no redirect loops, correct issuer URL in tokens) — confirmed live 2026-09-13: `company-demo`/`partner-demo` login through `/auth`, token issuer `https://paportal.at/auth/realms/partnerportal`, no redirect loop
 
 ## 7. Backups — local now, offsite deferred (design.md Decision 7, resolved 2026-08-23)
 
