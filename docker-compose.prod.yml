@@ -83,6 +83,9 @@ services:
       KC_URL: http://keycloak:8080/auth/realms/partnerportal
       KC_ISSUER: https://${DOMAIN}/auth/realms/partnerportal
       KC_CLIENT_ID: partnerportal-frontend
+      # Opt-in demo data seed (partners/products/enablements/orders) under LaunchMode.NORMAL -
+      # off unless set true in .env.prod (docs/DEPLOYMENT.md); never bake true into the image.
+      SEED_DEMO_DATA: ${SEED_DEMO_DATA:-false}
 
   caddy:
     image: caddy:2-alpine
