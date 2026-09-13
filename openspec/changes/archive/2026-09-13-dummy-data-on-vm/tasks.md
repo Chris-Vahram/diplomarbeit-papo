@@ -15,8 +15,8 @@
 
 - [x] 3.1 Add `SEED_DEMO_DATA` to the `backend` service's `environment:` block in `docker-compose.prod.yml`, sourced from `.env.prod`
 - [x] 3.2 Document `SEED_DEMO_DATA` in `.env.prod.example` (commented out / default `false`, with a one-line explanation)
-- [ ] 3.3 (Tobias/Chris) On the real VM: set `SEED_DEMO_DATA=true` in the VM's `.env.prod`, `docker compose -f docker-compose.prod.yml pull && up -d`, confirm seed ran (check partner/product counts)
-- [ ] 3.4 (Tobias/Chris) Verify `company-demo`/`partner-demo` Keycloak logins on the VM now show populated dashboards/order lists/article catalog
+- [x] 3.3 (Tobias/Chris) On the real VM: set `SEED_DEMO_DATA=true` in the VM's `.env.prod`, `docker compose -f docker-compose.prod.yml pull && up -d`, confirm seed ran (check partner/product counts)
+- [x] 3.4 (Tobias/Chris) Verify `company-demo`/`partner-demo` Keycloak logins on the VM now show populated dashboards/order lists/article catalog
 
 ## 4. Documentation
 
