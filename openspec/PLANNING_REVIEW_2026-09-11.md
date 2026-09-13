@@ -1,5 +1,56 @@
 # OpenSpec-Planungsreview — 11.09.2026
 
+## Abschlussstand nach Review und Archivierung — 12.09.2026
+
+`define-mvp-traceability-format` ist **3/3 fertig und archiviert** unter `openspec/changes/archive/2026-09-12-define-mvp-traceability-format`. `manage-article-categories` ist **6/6 fertig und archiviert** unter `openspec/changes/archive/2026-09-12-manage-article-categories`. Die dokumentierten Nachweise und Reviews sind auf den echten Stand nachgezogen; die aktive OpenSpec-Liste enthält nur noch die beiden folgenden Changes.
+
+| Change | Stand / Entscheidung |
+|---|---|
+| `build-partnerportal-mvp` | **50/53, nicht abgeschlossen.** Offen: 8.3 Tobias UI/UX-Doku, 8.4 gemeinsame Diplomarbeits-/Traceability-Ausfüllung, FD.4 Tobias-Polish später ergänzter Screens. Technisch weitgehend umgesetzt, aber ohne die zuständigen Inputs nicht selbstständig abschließbar; keine neue Planungsphase begonnen. |
+| `ci-cd-deployment-with-gh-actions` | **30/41, BLOCKIERT.** Offen: 3.5/3.6, 6.1–6.4, 7.5/7.6a und post-MVP 7.2/7.3/7.6b. Zusätzlich fehlen aktuelle Nachweise zu P0-Ursache/Laufzeit, Frontend-Archiv-/Index-/Recoverypfad und PR-#5-Gateway-/Schlüsselgrenzen. Nicht Terra-ready; vor Umsetzung braucht es neue Nachweise/Entscheidungen. |
+
+Keine Implementierung, VM-/Secret-/SSH-/Backup-/GitHub-Secrets-, Deployment-, Commit- oder Pushaktion für diese beiden Changes.
+
+## Abschlussnachtrag define-mvp-traceability-format — 12.09.2026
+
+Der Change `define-mvp-traceability-format` ist **3/3 fertig**, nicht archiviert. Die Matrix umfasst exakt 33 eindeutige IDs, acht spezifizierte Spalten, Legende, relative FSD-/Backlog-Links und transparente offene Zuordnungen; das TODO benennt Zuständigkeiten und lässt MVP 8.3/8.4/FD.4 offen. Quellen-/Link-/Status-/Strukturcheck, `openspec validate define-mvp-traceability-format --strict`, `git diff --check` sowie Funktions-/Evidenz-/Securityreview ohne Findings. Keine Backendprüfung erforderlich und keine privaten oder externen Nachweise verwendet. Nächster zulässiger Arbeitsschritt nur nach neuer Freigabe; keine Archivierung, kein Commit/Push/Merge/Deployment.
+
+## Abschlussnachtrag manage-article-categories — 12.09.2026
+
+Der Change `manage-article-categories` ist **6/6 fertig**, nicht archiviert. Die Kategorieverwaltung ist additiv umgesetzt: normalisierte eindeutige Namen, idempotente Legacy-Übernahme, Company-Rollen/Locking, optionale Product-Zuordnung, aktive Importauflösung und native Company-Oberfläche. Fokussiert 27/27, Full-Test 79/79, Package, Strict-Validate, Diff-Check, Browser 1440/390 sowie `partnerportal-quality`, Funktions-/Test-/Sinnhaftigkeits- und Securityreview waren ohne Findings. Nächster zulässiger Change: `define-mvp-traceability-format`. Keine Produktabnahme oder Evidenz für blockierte MVP-/CI/CD-Themen daraus ableiten.
+
+## Arbeitsstopp nach Auto-Compact — 12.09.2026
+
+`manage-article-categories` ist aktuell **3/6**: Tasks 1.1, 1.2 und 2.1 sind nach fokussierten Backendläufen abgehakt. Die Import-Pipeline wurde um vorbereitendes Kategorie-Locking und finale Zeilenvalidierung erweitert; diese letzte Änderung ist real im Worktree, aber noch ohne anschließenden fokussierten Importtest. Task 2.2 ist deshalb offen. Vor der Fortsetzung den letzten Diff prüfen und den dokumentierten Refresh-/Race-Punkt für manuelle Product-Zuordnung verifizieren. Danach Import, UI und Abschluss strikt sequenziell erledigen; keine Nachweise vorwegnehmen.
+
+`search-order-customers`, `clarify-order-customer-context`, `show-partner-company-name` und `use-huemer-demo-partner` sind fertig geprüft und unter `openspec/changes/archive/2026-09-12-*` archiviert. Branch `docs/openspec-planning-2026-09-11` bleibt dirty; kein Fetch/Pull, Commit, Push, Merge, Deployment oder Archivieren im nächsten Arbeitsblock. Screenshots unter `output/playwright/` bewahren.
+
+## Implementierungsnachtrag — Arbeitsstand 12.09.2026
+
+Dieser Nachtrag ersetzt für `search-order-customers`, `clarify-order-customer-context`, `show-partner-company-name` und `use-huemer-demo-partner` die ältere Arbeitsstopp-Tabelle; die ursprüngliche Planungsbewertung und die übrigen historischen Statusangaben bleiben erhalten.
+
+| Change | Verifizierter Implementierungsstand | Offen / keine behauptete Abnahme |
+|---|---|---|
+| `search-order-customers` | **3/3 Tasks fertig und archiviert** unter `openspec/changes/archive/2026-09-12-search-order-customers`: lokale Suche/Select, explizite Neuanlage, Draft-/Weitergate, lokale Kunden-ID-Prüfung sowie Partner-/Company-Regression. Browser 1440/390: >20/0 Treffer, Umlaute, Tastaturauswahl, Filter-/Kundenwechsel, Warenkorb/Payload, Draft, Abbruch, Mehrartikel und Fehler/Erfolg. `node --check`, Java-21-`./mvnw package` 79/79, Strict-Validate, Diff-Check, `partnerportal-quality`, Funktions-/Sinnhaftigkeits-, Securityreview und unabhängiger Abschlussreview ohne Blocker. | Erfolgspfade waren temporäre Playwright-Mocks; keine echten Testbestellungen persistiert. Keine weitere offene Task in diesem Change. |
+| `clarify-order-customer-context` | **3/3 Tasks fertig und archiviert** unter `openspec/changes/archive/2026-09-12-clarify-order-customer-context`: Kundenüberschriften, exakter Prüfhint, Katalog-vor-Bestellpanel, responsive DOM-Reihenfolge und unveränderter Ordervertrag. Browser 1440/390: Mengen/Summen, Safe-Text, Mock-POST, Erfolg und Reset. `node --check`, Java-21-`./mvnw package` 79/79, Strict-Validate, Diff-Check, `partnerportal-quality`, Funktions-/Sinnhaftigkeits-, Securityreview und unabhängiger Abschlussreview ohne Blocker. | Order-Erfolgspfad war ein temporärer Playwright-Mock; keine echte Testbestellung persistiert. Keine weitere offene Task in diesem Change. |
+| `show-partner-company-name` | **3/3 Tasks fertig und archiviert** unter `openspec/changes/archive/2026-09-12-show-partner-company-name`: Portal-/Dashboardname, Retry, Rendergeneration, Logout-/Navigations-Races, Sitzungsrotation und Mobile-Wrap. Browser 1440/390: echter Huemer-Name, Profilnavigation, Fehler-/Retrypfad und synthetische Raceantworten. `node --check`, Java-21-`./mvnw package` 79/79, Strict-Validate, Diff-Check, `partnerportal-quality`, Funktions-/Sinnhaftigkeits-, Securityreview und unabhängiger Abschlussreview ohne Blocker. | Profilantworten der Racefälle waren temporäre Playwright-Mocks; keine Authänderung oder persistente Profildaten. Keine weitere offene Task in diesem Change. |
+| `use-huemer-demo-partner` | **2/2 Tasks fertig und archiviert** unter `openspec/changes/archive/2026-09-12-use-huemer-demo-partner`: bestehender `PARTNER-DEMO`-Seed auf `Huemer GmbH`, unveränderte Partnernummer/Beziehungen/Seed-Gating und aktualisierte Namensassertionen. `PartnerResourceTest` 12/12, Java-21-`./mvnw test` und `./mvnw package` 79/79, Strict-Validate, Diff-Check, lokaler Browsernachweis sowie `partnerportal-quality`, Funktions-/Sinnhaftigkeits- und Securityreview ohne Blocker. | Keine weitere offene Task in diesem Change. |
+
+Nächster Change: `manage-article-categories`. Kein Commit, Push, Merge oder Deployment.
+
+## Implementierungsnachtrag — Arbeitsstopp 11.09.2026
+
+Dieser Nachtrag ersetzt ausschließlich Statusangaben zu den vier unten genannten Changes; die ursprüngliche Planungsbewertung bleibt historische Grundlage.
+
+| Change | Verifizierter Implementierungsstand | Offen / keine behauptete Abnahme |
+|---|---|---|
+| `show-partner-company-name` | Firmenlabel im Router/Dashboard, neutraler Fehlerzustand, Retry, Escaping und Basis-Browserprüfungen; Java-21-Package 79/79, Strict-Validate, Diff-Check | Verzögerte P1→Logout→P2/Company- und parallele Refresh-Races nicht abschließend belegt; Tasks 1.2/2.1 offen; keine formalen Abschlussreviews dokumentiert |
+| `use-huemer-demo-partner` | `PARTNER-DEMO` heißt `Huemer GmbH`; Namensassertions angepasst; Fokus 18/18, späteres Package 79/79, Strict-Validate, Diff-Check, sichtbare lokale Demo | Task 2.1 offen, da formale Korrektheits-/Securityreviews nicht dokumentiert sind |
+| `search-order-customers` | Native Suche/Select, explizite Neuanlage, lokaler Entwurf und Weitergate im Partnerwizard; Teil-Browserfälle; Package 79/79, Strict-Validate, Diff-Check | Alle Tasks offen: vollständige Such-, Tastatur-, Wechsel-/Payload-, Company-, Mobil- und Review-DoDs fehlen |
+| `clarify-order-customer-context` | Uncommitteter Vorlauf für dynamische Kundenüberschriften, Prüfhint sowie Katalog-vor-Bestellung; `node --check`, Strict-Validate, Diff-Check | Alle Tasks offen, keine Browser- oder Abschlussprüfung |
+
+Reihenfolge der Wiederaufnahme: erst `search-order-customers` ehrlich abschließen, dann `clarify-order-customer-context`; die überlappende Datei nicht zurücksetzen. Branch `docs/openspec-planning-2026-09-11` ist schmutzig. Kein Commit/Push/Merge/Archivieren/Deployment. Die zwei untracked Screenshots unter `output/playwright/` bewahren. KI-Evidence-Sync/Enrich wurde nicht ausgeführt; keine Evidenz erfinden.
+
 ## Umsetzungsnachtrag — 11.09.2026
 
 `add-standalone-customer-creation` ist **6/6 implementiert** und unter `openspec/changes/archive/2026-09-11-add-standalone-customer-creation` archiviert. Die Umsetzung verwendet den bestehenden partner-scoped Kundenendpunkt und die gemeinsamen Adressfelder; kein Schema-, Realm- oder API-Umbau. Belegt sind fokussierte Kunden-Tests (9/9), vollständige Backendtests und Package (je 79/79), Strict-Validate und Diff-Check. Browserprüfungen 1440/390 decken Anlage, Filterreset, Escaping, Pending-/Fehler-/Refreshpfade, Wizard-Wiederverwendung und anonyme/falsche Rollenrouten ab. Partnerportal-Quality, Korrektheits- und Securityreview: keine offenen Findings.

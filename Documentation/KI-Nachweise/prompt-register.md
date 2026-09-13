@@ -23,14 +23,28 @@
 
 
 
+
+| AUSSTEHEND-01a09252 | 2026-09-11 | Chris | Codex | search-order-customers finalen Reviewstand dokumentiert | lokale Sitzung `01a09252-c148-7fc2-946c-7757df61684e` | `EXAKT` | Gate-Fix geprüft; Such-, Draft-, Partner- und Company-Flows erneut verifiziert; 3 Tasks fertig; Prüfungen: node --check frontend/src/pages/partner-order-new-page.js; cd backend && ./mvnw package; openspec validate search-order-customers --strict; git diff --check |
+
+
+
+| AUSSTEHEND-01a0953c | 2026-09-12 | Chris | Codex | define-mvp-traceability-format implementieren und abschließend prüfen | lokale Sitzung `01a0953c-57b0-7ae1-8ed1-313137c1ffdc` | `EXAKT` | 3 von 3 Tasks fertig; 33-zeilige Requirements-Matrix und Dokumentationsverantwortlichkeiten erstellt; Prüfungen: Quellen-/ID-/Link-/Tabellenstrukturabgleich, Strict-Validate, git diff --check sowie Funktions-/Evidenz-/Securityreview |
+
+
+
+
+
+
 | AUSSTEHEND-01a06809 | 2026-09-03 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a06809-6bda-70c3-922a-59e5eeeeff28` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a0676e | 2026-09-03 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a0676e-bfa1-7241-89c0-43de935e78ee` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a06ab1 | 2026-09-04 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a06ab1-5040-7761-b84f-b202b6db6cc8` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-01a090fe | 2026-09-11 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a090fe-6739-7501-8459-f9bf920f3bda` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a09091 | 2026-09-11 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a09091-5137-7b23-a8d6-e4f4d9b828d3` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a08c1f | 2026-09-10 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a08c1f-1fa4-7e11-badb-e05b02722b26` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a07969 | 2026-09-07 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a07969-fb4c-7442-b106-45b8188208b5` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a0863c | 2026-09-09 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a0863c-505a-7f30-b0f4-ac430c1866cb` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a05dcf | 2026-09-01 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a05dcf-2be8-7021-89cc-07ddb9a4aaca` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-01a0959b | 2026-09-12 | Chris | Codex | Abschlussprüfung und Archivierung von define-mvp-traceability-format und manage-article-categories; Readinessbewertung der zwei verbleibenden OpenSpec-Changes | lokale Sitzung `01a0959b-2b41-7692-9f86-58cf2190a737` | `EXAKT` | Beide Changes geprüft, strict validiert und archiviert; verbleibende build/CI-CD-Changes nicht implementiert und auf offene Tasks/Blocker bewertet.; Prüfungen: openspec validate manage-article-categories --strict; Java-21 fokussierte Tests 27/27; ./mvnw test 100/100; ./mvnw package 100/100; node --check der geänderten Kategorie-Seiten; git diff --check; Playwright Desktop/Mobile-Kategorie-CRUD, Deaktivierung/Reaktivierung, deaktivierte Bestandszuordnung und Partnerisolation |
 | AUSSTEHEND-019f72d2 | 2026-07-18 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f72d2-d09e-7382-ad24-52f329a30e94` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-019f75a8 | 2026-07-18 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f75a8-0fb0-7721-9c66-e0a221a69661` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-019f70fe | 2026-07-17 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f70fe-8ec1-7a51-85c0-9f029a0a1ec3` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |

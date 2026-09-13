@@ -49,8 +49,9 @@ Chris dokumentiert, was technisch umgesetzt wurde, warum es so umgesetzt wurde u
 - Datenmodell:
   - auf `docs/DATA_MODEL.md` aufbauen
   - wichtige Entscheidungen erklaeren: Unit-Price-Snapshot, kein CommissionLevel, Partner/Kunde-Scoping
-- Requirements-Mapping:
-  - Tabelle mit `Anforderung | Umsetzung | Code/Modul | Test/Nachweis | Status`
+  - Requirements-Mapping:
+  - zentrale Matrix in [`docs/REQUIREMENTS_TRACEABILITY.md`](REQUIREMENTS_TRACEABILITY.md) mit Quelle, Verhalten/Abgrenzung, Code, Test/Beleg, Implementierungs- und Prüfstatus sowie Zuständigkeit/Blocker
+  - Chris pflegt die technische Zuordnung und ausführbaren Nachweise; Tobias ergänzt UI-/UX-Belege; die spätere fachliche Endabnahme erfolgt gemeinsam
 - Sicherheits- und Rollenmodell:
   - Company vs Partner
   - serverseitige Rollenpruefung
@@ -62,6 +63,11 @@ Chris dokumentiert, was technisch umgesetzt wurde, warum es so umgesetzt wurde u
 - Deferred Scope:
   - B-01 bis B-08 aus `Specification/phase2_backlog.md`
   - klar schreiben: nicht vergessen, sondern bewusst aus dem MVP geschnitten
+
+### Offene Abnahme- und Dokumentationspunkte
+
+- Die Traceability-Matrix ist das gemeinsame Arbeitsformat; offene Zuordnungen bleiben ausdrücklich offen.
+- Die MVP-Punkte 8.3, 8.4 und FD.4 bleiben bis zu einer separaten fachlichen Prüfung offen.
 
 ### Beispiel fuer Requirements-Mapping
 
