@@ -213,7 +213,7 @@ class PartnerOrderNewPage extends HTMLElement {
   }
 
   // The step before `step` in the actual (per-partner) flow — skips "neuerKunde"
-  // when it was never used, so "Vorheriger Schritt" from "Artikel wählen" never lands
+  // when it was never used, so "Zurück" from "Artikel wählen" never lands
   // on a step the partner didn't go through.
   prevStepFor(step) {
     let prevIndex = STEPS.indexOf(step) - 1;
@@ -289,17 +289,16 @@ class PartnerOrderNewPage extends HTMLElement {
           <form-field label="Endkunden suchen" name="kundeSearch">
             <input type="search" name="kundeSearch" autocomplete="off" placeholder="Name oder Adresse" />
           </form-field>
-          <form-field label="Endkunde" name="kundeId">
-            <select name="kundeId" required>
-              <option value="">Bitte Endkunden wählen…</option>
-            </select>
-          </form-field>
+        </div>
+        <div class="kunde-list-field">
+          <span class="kunde-list-field__label" id="kunde-list-label">Endkunde</span>
+          <ul class="kunde-list" role="listbox" aria-labelledby="kunde-list-label" id="kunde-list"></ul>
         </div>
         <p id="kunde-search-empty" hidden>Keine Endkunden gefunden.</p>
         <div class="wizard-step__actions">
           <button type="button" class="button-secondary" id="new-kunde-btn">Neuen Kunden anlegen</button>
           ${this.state.newKunde ? '<button type="button" class="button-secondary" id="resume-kunde-btn">Kundenentwurf fortsetzen</button>' : ""}
-          <button type="submit" class="button-primary">Nächster Schritt</button>
+          <button type="submit" class="button-primary">Weiter</button>
         </div>
       </form>`;
   }
@@ -307,44 +306,50 @@ class PartnerOrderNewPage extends HTMLElement {
   wireKundeStep() {
     const form = this.content.querySelector("#kunde-form");
     const search = form.elements.kundeSearch;
-    const select = form.elements.kundeId;
+    const list = this.content.querySelector("#kunde-list");
     const empty = form.querySelector("#kunde-search-empty");
+
     const renderOptions = () => {
-      const selectedId = select.value || (this.state.kundeMode === "existing" ? String(this.state.kundeId ?? "") : "");
       const needle = search.value.trim().toLocaleLowerCase("de-AT");
       const matches = this.customers.filter((kunde) =>
         [kunde.firstName, kunde.lastName, ...Object.values(kunde.address ?? {})]
           .filter(Boolean).join(" ").toLocaleLowerCase("de-AT").includes(needle),
       );
-      select.replaceChildren(new Option("Bitte Endkunden wählen…", ""));
-      matches.forEach((kunde) => {
+
+      list.innerHTML = matches.map((kunde) => {
         const name = `${kunde.firstName ? `${kunde.firstName} ` : ""}${kunde.lastName}`;
         const address = Object.values(kunde.address ?? {}).filter(Boolean).join(" ");
-        select.add(new Option(`${name} – ${address}`, String(kunde.id)));
-      });
+        const selected = this.state.kundeMode === "existing" && this.state.kundeId === kunde.id;
+        return `
+          <li>
+            <button type="button" role="option" class="kunde-list__row${selected ? " is-selected" : ""}"
+              data-id="${kunde.id}" aria-selected="${selected}">${escapeHtml(`${name} – ${address}`)}</button>
+          </li>`;
+      }).join("");
+
       empty.hidden = matches.length > 0;
-      if (matches.some((kunde) => String(kunde.id) === selectedId)) {
-        select.value = selectedId;
-      } else {
-        select.value = "";
-        if (this.state.kundeMode === "existing" && this.state.kundeId != null) {
-          this.state.kundeId = null;
-          this.refreshCheckpointBar();
-          this.refreshOrderHeading();
-        }
+
+      if (this.state.kundeMode === "existing" && this.state.kundeId != null
+          && !matches.some((kunde) => kunde.id === this.state.kundeId)) {
+        this.state.kundeId = null;
+        this.refreshCheckpointBar();
+        this.refreshOrderHeading();
       }
     };
-    renderOptions();
-    search.addEventListener("input", renderOptions);
-    select.addEventListener("change", () => {
-      if (this.state.kundeMode === "existing") {
-        this.state.kundeId = null;
-      } else if (this.state.kundeMode === "new" && this.state.newKunde) {
-        this.state.newKundeDirty = true;
-      }
+
+    list.addEventListener("click", (event) => {
+      const row = event.target.closest(".kunde-list__row");
+      if (!row) return;
+      this.state.kundeMode = "existing";
+      this.state.kundeId = Number(row.dataset.id);
+      renderOptions();
       this.refreshCheckpointBar();
       this.refreshOrderHeading();
     });
+
+    renderOptions();
+    search.addEventListener("input", renderOptions);
+
     this.content.querySelector("#new-kunde-btn").addEventListener("click", () => {
       this.state.kundeMode = "new";
       this.state.kundeId = null;
@@ -357,11 +362,8 @@ class PartnerOrderNewPage extends HTMLElement {
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
-      if (!select.value) return;
-      const selectedId = Number(select.value);
-      if (!this.customers.some((kunde) => kunde.id === selectedId)) return;
-      this.state.kundeMode = "existing";
-      this.state.kundeId = selectedId;
+      if (this.state.kundeMode !== "existing" || this.state.kundeId == null) return;
+      if (!this.customers.some((kunde) => kunde.id === this.state.kundeId)) return;
       this.advanceTo("produkte");
     });
   }
@@ -379,8 +381,8 @@ class PartnerOrderNewPage extends HTMLElement {
           <form-field label="Telefon" name="phone"></form-field>
         </div>
         <div class="wizard-step__actions">
-          <button type="button" class="button-secondary" id="wizard-prev-btn">Vorheriger Schritt</button>
-          <button type="submit" class="button-primary">Nächster Schritt</button>
+          <button type="button" class="button-secondary" id="wizard-prev-btn">Zurück</button>
+          <button type="submit" class="button-primary">Weiter</button>
         </div>
       </form>`;
   }
@@ -436,9 +438,9 @@ class PartnerOrderNewPage extends HTMLElement {
         </div>
       </div>
       <div class="wizard-step__actions">
-        <button type="button" class="button-secondary" id="wizard-prev-btn">Vorheriger Schritt</button>
+        <button type="button" class="button-secondary" id="wizard-prev-btn">Zurück</button>
         <button type="button" id="produkte-weiter-btn" class="button-primary" ${this.state.cart.length === 0 ? "disabled" : ""}>
-          Nächster Schritt
+          Weiter
         </button>
       </div>`;
   }
@@ -486,7 +488,7 @@ class PartnerOrderNewPage extends HTMLElement {
           <div class="cart cart--summary" id="cart-step-root">${cartSummaryHtml(this.state.cart, this.commissionPercent, { showSubmit: false })}</div>
         </div>
         <div class="wizard-step__actions">
-          <button type="button" class="button-secondary" id="wizard-prev-btn">Vorheriger Schritt</button>
+          <button type="button" class="button-secondary" id="wizard-prev-btn">Zurück</button>
           <button type="button" id="cart-submit-btn" class="button-primary">Bestellung aufgeben</button>
         </div>
       </div>`;

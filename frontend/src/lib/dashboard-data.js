@@ -69,6 +69,25 @@ export function previousPeriod(from, to) {
   return { from: prevFrom, to: prevTo };
 }
 
+// Trailing-window trend (last `days` vs. the `days` before that), for the
+// metric-card arrows when no explicit period is picked. Independent of the
+// headline totals, which stay the backend's all-time values.
+export function trailingWindowTrend(orders, days = 30) {
+  const now = new Date();
+  const to = now;
+  const from = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+  const prev = previousPeriod(from, to);
+
+  const current = fulfilledTotals(filterByPeriod(orders, toLocalIsoDate(from), toLocalIsoDate(to)));
+  const previous = fulfilledTotals(filterByPeriod(orders, toLocalIsoDate(prev.from), toLocalIsoDate(prev.to)));
+
+  return {
+    revenueTrend: trendInfo(current.revenue, previous.revenue),
+    commissionTrend: trendInfo(current.commission, previous.commission),
+    countTrend: trendInfo(current.count, previous.count),
+  };
+}
+
 // metric-card's trend="up"|"down" + trend-label props from a current vs.
 // previous-period value. null when there's nothing meaningful to compare
 // (both zero) — the caller then omits the trend attributes and gets no arrow.

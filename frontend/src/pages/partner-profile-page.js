@@ -10,7 +10,7 @@ class PartnerProfilePage extends HTMLElement {
     this.innerHTML = `
       <h1>Mein Profil</h1>
       <dl class="profile-readonly">
-        <dt>Partnernummer</dt><dd id="profile-number">–</dd>
+        <dt>Benutzername</dt><dd id="profile-number">–</dd>
         <dt>Provision</dt><dd id="profile-commission">–</dd>
         <dt>Status</dt><dd id="profile-status">–</dd>
       </dl>
