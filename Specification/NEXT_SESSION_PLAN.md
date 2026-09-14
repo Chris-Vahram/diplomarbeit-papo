@@ -4,6 +4,8 @@
 
 ### Verbindlicher nächster Arbeitsauftrag
 
+Addon: Je nach 5.9-Befund entweder einen konkreten Folgeprompt an den Gateway-Security-Agenten senden oder den fehlenden Tobias-Nachweis als Blocker festhalten. Danach Dirty-Worktree-Aufräumtask ohne OpenSpec-Change durchführen: Änderungen einzeln prüfen, sauber committen oder nach Freigabe entfernen und den Status bereinigen. Push, Pull, Merge, Deployment, VM-Zugriff und Commits mit sauberer Commitmessage sind für diesen Auftrag ausdrücklich freigegeben; keine Secrets oder Datenvolumes ausgeben/löschen.
+
 1. 5.9 zuerst anhand sanitiserter VM-/Key-/Host-Key-/sudoers-/Remote-Negativnachweise prüfen. Der Agent soll mit den freigegebenen VM-, Git-Pull/Push/Merge- und Deployment-Rechten selbst entscheiden, ob er 5.9 ausführen darf; fehlende Sicherheitsbelege bleiben ein Stop.
 2. Bei ausreichender Evidenz 5.9 selbst umsetzen und Subagents für unabhängige Remote-Security-, Browser-, Live- und gekoppelten Rollbacktests einsetzen. Keine Secrets ausgeben; laufende Daten/Volumes schützen.
 3. Danach finale Security-/OpenSpec-/Live-Abnahme und Präsentationsfinalisierung nach Lehreranforderungen und neuesten Protokollen. Präsentation: **Artikel**, nicht Produkte.

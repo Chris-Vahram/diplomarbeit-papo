@@ -4,6 +4,8 @@
 
 ### Nächster-session Auftrag — Tobias-5.9 und Abschluss
 
+**Addon:** Nach dem Ergebnis der 5.9-Prüfung soll der neue Agent dem Gateway-Security-Agenten nur dann einen konkreten Folgeprompt schicken, wenn dessen unabhängige Prüfung noch benötigt wird; fehlen Tobias-Nachweise, soll er stattdessen den exakten Blocker dokumentieren. Zusätzlich ist der bestehende Dirty Worktree als eigener Aufräumtask zu bereinigen (ohne neuen OpenSpec-Change): Dateien einzeln zuordnen, gewünschte Arbeit sauber committen, unnötige Artefakte nur nach Prüfung entfernen und den Status nachvollziehbar clean machen. Für diese Arbeiten sind Push, Pull, Merge, Deployment, VM-Zugriff und Commits mit sauberen Commitmessages ausdrücklich freigegeben; Secrets, Datenvolumes und unklare Fremdänderungen bleiben geschützt.
+
 - Chris muss aktuell nichts weiter tun, außer diesen Fortsetzungsauftrag zu bestätigen. Der nächste Agent soll zuerst prüfen, ob Tobias Task 5.9 bereits mit belastbaren VM-, Deploy-Key-, Host-Key-, Eigentümer-, sudoers- und Remote-Negativnachweisen belegt hat.
 - Der Agent darf die ausdrücklich freigegebenen VM-, Git-Pull/Push/Merge- und Deployment-Rechte nutzen und soll selbst bewerten, ob er 5.9 sicher übernehmen kann. Keine Annahme von Nachweisen: fehlende oder unsichere Belege konkret benennen und vor riskanten Secret-/Produktionsschritten stoppen.
 - Wenn 5.9 belegbar ausführbar ist, soll der Agent die Arbeit selbst erledigen und passende Subagents für unabhängige finale Remote-Security-, Browser-, Live- und gekoppelten Rollbacktests einsetzen. Ergebnisse, Revisionen und Grenzen sanitisiert dokumentieren.
