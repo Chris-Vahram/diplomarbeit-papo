@@ -1,5 +1,32 @@
 # PAPO-Planungs- und Umsetzungshandoff – 13.09.2026
 
+## Verbindlicher Startpunkt nächste Session — Protokoll 14.9 / Präsentation
+
+Das vollständige neue Protokoll liegt unter `Documentation/Besprechungsprotokolle/Besprechungsprotokoll_14.9.md` und ist zuerst zu lesen. Der nächste Arbeitsblock betrifft die Präsentation, nicht den nächsten Produkt-OpenSpec-Change. Fertiger Company-Notiz-Change: archiviert und in die Haupt-Spec synchronisiert.
+
+### Copy-paste-Prompt für die nächste Session
+
+```text
+/goal PAPO Präsentation nach Besprechungsprotokoll 14.9 finalisieren.
+
+Lies zuerst vollständig AGENTS.md, CLAUDE.md, Specification/CONTINUATION_PROMPT.md, Specification/NEXT_SESSION_PLAN.md, Specification/WORK_PLAN_2026-09-14.md, openspec/PLANNING_REVIEW_2026-09-11.md, docs/RESTARBEITSPLAN_2026-09-09.md, presentation/README.md und besonders Documentation/Besprechungsprotokolle/Besprechungsprotokoll_14.9.md. Prüfe danach git status --short --branch und openspec list --json. Bewahre fremde/uncommittete Änderungen; nichts still verwerfen und keine Secrets ausgeben.
+
+Arbeite zuerst ausschließlich an Planung und Umsetzung der Präsentation in presentation/mvp-deck/. Die aktuelle Quelle ist presentation/mvp-deck/index.html mit 15 Folien; vorhandene Screenshots und Offline-Assets prüfen und wiederverwenden. Setze die Protokollpunkte um:
+1. Einstiegsfolie: bis „Vertriebsmodelle“, danach neue Zeile; „intern“ entfernen; Formulierung „PaPo ist ein B2B-Bestellportal …“ verwenden.
+2. „Kette“ überall durch „Struktur“ ersetzen und unnötig negative/hemmende Formulierungen sprachlich verbessern, ohne fachliche Aussagen zu verfälschen.
+3. Akteursfolie: Unternehmen „verwaltet Partner & Artikel“ ohne „zentral“; Endkunde wird vom Partner angelegt und verwaltet; Bestellung wird vom Partner für den Endkunden durchgeführt; passenden Satz „bezahlt dem Unternehmen“ aufnehmen.
+4. Folie 4 unverändert lassen, wenn sie dem Protokoll entspricht.
+5. „Bestellungen laufen heute manuell“ auf „derzeit“ ändern.
+6. Auf der Use-Case-Folie „Kernablauf:“ entfernen.
+7. Funktionsumfang nur prüfen, nicht unnötig verändern.
+8. Technologie-Stack: aktuelle GitHub-Stars verifizieren und ergänzen. Danach 2–3 gut lesbare Folien zur digitalen Souveränität ergänzen; mit einer sachlichen Formulierung wie „PaPo auf Basis digitaler Souveränität“ beginnen. Keine unbelegten Marketingbehauptungen.
+9. Zwei weitere Screenshot-Folien ergänzen. Nur echte, passende Screenshots verwenden; Bildquellen/Alttexte und Offline-Laden prüfen.
+10. Eine Clockify-Gesamtübersicht als Präsentationsfolie ergänzen. Zeiten aus dem angemeldeten Zen-Browser/Workspace DA und vorhandenen Nachweisen zusammentragen; nichts erfinden und Schätzungen klar als retrospektiv geschätzt kennzeichnen.
+11. Ein kurzes Demo-Drehbuch für den Probe-Gallopp schreiben: Artikel anlegen → ändern → löschen; Partner anlegen → ändern → löschen; Endkunde anlegen/verwalten; Bestellung für Endkunden simulieren; passende Status-/Rollenhinweise nennen. Als eigene gut auffindbare Markdown-Datei unter presentation/ ablegen.
+
+Vor dem Editieren einen kompakten Folienplan erstellen und dann direkt umsetzen. Keine Backend-/BMD-Features ergänzen. Danach mit Browserprüfung Desktop und Mobile rendern, 15+ Folien auf Überlauf/Lesbarkeit prüfen, alle Assets/Links und Offline-Fähigkeit prüfen, „Artikel“ konsequent verwenden und git diff --check ausführen. Geeignete Präsentations-/Dokumentationschecks ausführen und Ergebnisse exakt dokumentieren. Erst nach sauberem Review committen, pushen und über PR nach main mergen. Danach ist der nächste technische Andockpunkt harden-deployment-gateway 3/4 mit der externen SSH-Negativmatrix; die archivierte Company-Notiz nicht wieder öffnen.
+```
+
 ## Aktueller Andockpunkt — 14.09.2026, nach Abschluss des Company-Notiz-Changes
 
 - `add-company-internal-partner-note` ist **4/4 erledigt** und über PR #18 (`e061ab8c1e3cc41cae57b7fbe17a8f9e65664b5d`) nach `main` gemergt. Der Request unterscheidet jetzt ausgelassene Notizfelder von explizitem `null`: Auslassen bewahrt die bestehende Notiz, `null`/leer löscht. Die Notiz bleibt Company-only und maximal 4.000 Zeichen.

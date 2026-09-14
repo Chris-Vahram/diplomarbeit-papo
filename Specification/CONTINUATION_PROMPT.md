@@ -1,5 +1,12 @@
 # Continuation Prompt — PAPO Partnerportal
 
+## Verbindlicher Next-Session-Handoff — 14.09.2026, Protokoll 14.9 gelesen
+
+- Das neue Protokoll `Documentation/Besprechungsprotokolle/Besprechungsprotokoll_14.9.md` ist vollständig gelesen und mitgepusht. Der fertige Change `add-company-internal-partner-note` ist archiviert unter `openspec/changes/archive/2026-09-14-add-company-internal-partner-note`; die Delta-Spec ist in `openspec/specs/partner-management/spec.md` synchronisiert.
+- **Nächster Hauptschritt:** Präsentation planen und direkt umsetzen. Quelle ist `presentation/mvp-deck/index.html` mit derzeit 15 Folien. Protokollanforderungen: präzisere Einstiegs-/Akteursformulierungen, „Struktur“ statt „Kette“, keine unnötig negativen Wörter, „derzeit“ statt „heute“, „Kernablauf:“ entfernen, GitHub-Stars ergänzen, 2–3 Folien zu digitaler Souveränität, zwei weitere Screenshot-Folien, Clockify-Gesamtüberblick sowie ein kurzes Demo-Drehbuch für den Probe-Gallopp.
+- Die Präsentationssession soll zuerst nur Deck, Screenshots, Clockify-Auswertung und Demo-Drehbuch bearbeiten; keine neuen Produkt- oder BMD-Features hineininterpretieren. Danach Desktop/Mobile rendern und alle Folien, Links, Assets, Terminologie „Artikel“ und Offline-Fähigkeit prüfen.
+- Weiter offen nach der Präsentation: `harden-deployment-gateway` 3/4, insbesondere die externe SSH-Negativmatrix mit autorisiertem Deploy-Key; danach `complete-thesis-documentation` und die vier geplanten Stammdaten-/BMD-Changes einzeln. BMD-Nummern bleiben bis Beispieldaten/Vertrag begrenzt, keine direkte BMD-API.
+
 ## Authoritative update — 14.09.2026, company internal partner note completed
 
 - `add-company-internal-partner-note` is now **4/4 tasks complete** and merged via PR #18 (`e061ab8c1e3cc41cae57b7fbe17a8f9e65664b5d`). Omitted `internalNote` preserves an existing value; explicit `null`, blank text and an empty form value clear it. Company and partner response DTOs remain separated.

@@ -1,5 +1,11 @@
 # PAPO Restarbeitsplan – 09.09.2026
 
+## Neuer verbindlicher Next Step — Präsentation / Protokoll 14.9
+
+Das neue Protokoll `Documentation/Besprechungsprotokolle/Besprechungsprotokoll_14.9.md` ist vollständig gelesen und eingecheckt. Vor weiteren technischen OpenSpec-Changes wird die Präsentation in `presentation/mvp-deck/` überarbeitet: Formulierungen und Struktur, digitale Souveränität, GitHub-Stars, zwei zusätzliche Screenshots, Clockify-Gesamtübersicht und kurzes Demo-Drehbuch. Danach Browser-/Offline-/Lesbarkeitsprüfung und PR-Merge.
+
+Archiviert und abgeschlossen: `add-company-internal-partner-note` unter `openspec/changes/archive/2026-09-14-add-company-internal-partner-note`; Haupt-Spec synchronisiert. Offen danach: Gateway 3/4 mit SSH-Negativmatrix, Thesis-Dokumentation und die vier Stammdaten-/BMD-Changes.
+
 ## Aktueller Abschlussstand — 14.09.2026
 
 `add-company-internal-partner-note` ist **4/4 fertig** und über PR #18 (`e061ab8c1e3cc41cae57b7fbe17a8f9e65664b5d`) gemergt. Ausgelassene Notizfelder erhalten die bestehende Notiz, explizites `null`/Leertext leert sie; die Company-only-Grenze ist getestet. Nachweise: 13/13 fokussiert, 101/101 vollständig, Package, JS-Syntax, Strict-Validate, Diff-Check, Browser Desktop/Mobile sowie Qualitäts-/Java-/Securityreview.
