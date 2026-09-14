@@ -28,6 +28,7 @@ erDiagram
         String address
         String email
         String phone
+        String internalNote "nullable, max. 4.000 Zeichen, nur Company-DTO"
         BigDecimal commissionPercent "5.2, Preset 5/10/15 + individuell"
         boolean active "DB-Flag, nicht mit Keycloak synced"
     }
@@ -122,6 +123,10 @@ Groß-/Kleinschreibungs-Duplikate wirklich verhindert; `resolve()` gleicht den
 `partnerNumber` ab. Ein Partner ohne passenden Keycloak-Login kann sich nicht
 anmelden. Eine Änderung der Partnernummer ändert damit auch den Login — die
 Firma wird im Bearbeiten-Formular entsprechend gewarnt.
+`internalNote` ist eine optionale Plain-Text-Notiz mit maximal 4.000 Zeichen,
+die ausschließlich in Company-Partnerantworten enthalten ist. Partner-
+Self-Service, Importe, Exporte, Bestellungen und Provisionsantworten erhalten
+dieses Feld nicht.
 
 ### Product
 Zentral von der Firma verwaltete Artikel. `available` steuert Bestellbarkeit

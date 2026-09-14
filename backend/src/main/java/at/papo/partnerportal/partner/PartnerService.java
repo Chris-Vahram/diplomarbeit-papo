@@ -10,33 +10,33 @@ import java.util.Locale;
 @ApplicationScoped
 public class PartnerService {
 
-    public List<PartnerDto> list() {
-        return Partner.<Partner>listAll().stream().map(PartnerDto::from).toList();
+    public List<CompanyPartnerDto> list() {
+        return Partner.<Partner>listAll().stream().map(CompanyPartnerDto::from).toList();
     }
 
-    public PartnerDto get(Long id) {
-        return PartnerDto.from(findOrThrow(id));
+    public CompanyPartnerDto get(Long id) {
+        return CompanyPartnerDto.from(findOrThrow(id));
     }
 
     @Transactional
-    public PartnerDto create(PartnerRequest request) {
+    public CompanyPartnerDto create(PartnerRequest request) {
         String partnerNumber = PartnerNumber.canonicalize(request.partnerNumber());
         assertPartnerNumberFree(partnerNumber, null);
         Partner partner = new Partner();
         partner.partnerNumber = partnerNumber;
         applyCompanyFields(partner, request);
         partner.persist();
-        return PartnerDto.from(partner);
+        return CompanyPartnerDto.from(partner);
     }
 
     @Transactional
-    public PartnerDto update(Long id, PartnerRequest request) {
+    public CompanyPartnerDto update(Long id, PartnerRequest request) {
         Partner partner = findOrThrow(id);
         String partnerNumber = PartnerNumber.canonicalize(request.partnerNumber());
         assertPartnerNumberFree(partnerNumber, id);
         partner.partnerNumber = partnerNumber;
         applyCompanyFields(partner, request);
-        return PartnerDto.from(partner);
+        return CompanyPartnerDto.from(partner);
     }
 
     @Transactional
@@ -65,6 +65,8 @@ public class PartnerService {
         partner.email = request.email();
         partner.phone = request.phone();
         partner.commissionPercent = request.commissionPercent();
+        partner.internalNote = request.internalNote() == null || request.internalNote().isBlank()
+                ? null : request.internalNote();
         partner.active = request.active() == null || request.active();
     }
 

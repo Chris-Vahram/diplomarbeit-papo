@@ -6,6 +6,7 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 
@@ -20,6 +21,7 @@ public record PartnerRequest(
         @NotNull(message = "Provision ist erforderlich.")
         @DecimalMin(value = "0.0", message = "Provision darf nicht negativ sein.")
         @DecimalMax(value = "100.0", message = "Provision darf 100% nicht überschreiten.") BigDecimal commissionPercent,
+        @Size(max = 4000, message = "Interne Notiz darf höchstens 4.000 Zeichen enthalten.") String internalNote,
         Boolean active
 ) {
 }

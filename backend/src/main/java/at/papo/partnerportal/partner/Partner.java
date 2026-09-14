@@ -24,6 +24,9 @@ public class Partner extends PanacheEntity {
 
     public String phone;
 
+    @Column(length = 4000)
+    public String internalNote;
+
     @Column(nullable = false, precision = 5, scale = 2)
     public BigDecimal commissionPercent;
 
