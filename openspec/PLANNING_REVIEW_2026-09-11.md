@@ -1,5 +1,11 @@
 # OpenSpec-Planungsreview — 11.09.2026
 
+## Neuer Next-Session-Plan — Besprechungsprotokoll 14.9
+
+Das neue Protokoll `Documentation/Besprechungsprotokolle/Besprechungsprotokoll_14.9.md` ist gelesen. Die nächste Session priorisiert die Präsentation: `presentation/mvp-deck/index.html` sprachlich anpassen, digitale Souveränität mit 2–3 Folien erklären, GitHub-Stars und zwei echte Screenshots ergänzen, Clockify-Gesamtzeit darstellen und ein kurzes Probe-Gallopp-Drehbuch erstellen. Danach Desktop/Mobile und Offline-Assets prüfen und über PR mergen.
+
+Der Company-Notiz-Change ist archiviert und nicht erneut zu starten. Der nächste technische Andockpunkt nach der Präsentation bleibt `harden-deployment-gateway` 3/4 mit fehlender externer SSH-Negativmatrix; BMD-Nummern bleiben bis Beispieldaten/Vertrag begrenzt.
+
 ## Aktueller Abschlussnachtrag — 14.09.2026
 
 `add-company-internal-partner-note` ist **4/4 erledigt** und über PR #18 (`e061ab8c1e3cc41cae57b7fbe17a8f9e65664b5d`) gemergt. Die finale Request-Semantik bewahrt Notizen bei ausgelassenem Feld und löscht bei explizitem `null`, Leertext oder leerem Formular. Die Antwortgrenzen bleiben Company-only; relevante Partner-, Order-, Dashboard-, Produkt- und Exportpfade sind negativ geprüft. Backend 13/13 fokussiert und 101/101 vollständig, Package, JS-Syntax, Strict-Validate, Diff-Check, Browser Desktop/Mobile sowie PAPO-/Java-/Securityreview sind grün.

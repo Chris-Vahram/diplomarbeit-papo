@@ -20,5 +20,8 @@ externen Schriftarten oder CDN-Links, System-Font-Stack).
 
 ## Status
 
-Die Präsentation verwendet die fachliche Terminologie „Artikel“. Produktive Deployment- und
-Live-Nachweise bleiben bis zur VM-Prüfung ausdrücklich offen.
+Die Präsentation verwendet die fachliche Terminologie „Artikel“ und wird nach dem
+Besprechungsprotokoll 14.9 weiterbearbeitet. Nächster Block: Sprachkorrekturen, digitale
+Souveränität, GitHub-Stars, zusätzliche Screenshots, Clockify-Gesamtübersicht und Demo-Drehbuch.
+Die aktuelle Quelle umfasst 15 Folien; produktive Deployment-/Live-Nachweise sind inzwischen
+über CI/CD und Live-Smoke belegt.
