@@ -1,0 +1,136 @@
+#!/bin/sh
+set -eu
+
+fail() { printf '%s\n' 'Deployment-Anfrage abgelehnt' >&2; exit 1; }
+
+MAX_ARCHIVE_BYTES=26214400
+ORIGIN_URL='git@github.com:Chris-Vahram/diplomarbeit-papo.git'
+STATE_ROOT='/var/lib/papo-deploy'
+DEPLOY_ROOT='/home/papo/papo-deploy'
+LOCK_FILE='/run/lock/papo-deploy.lock'
+LOCK_WAIT=300
+DEPLOY_USER='papo'
+
+if [ "${PAPO_DEPLOY_TESTING-}" = 1 ]; then
+    [ "$(id -u)" -ne 0 ] && [ -n "${PAPO_TEST_ROOT-}" ] && [ -n "${PAPO_TEST_ORIGIN-}" ] || fail
+    STATE_ROOT="$PAPO_TEST_ROOT/state"
+    DEPLOY_ROOT="$PAPO_TEST_ROOT/deploy"
+    LOCK_FILE="$PAPO_TEST_ROOT/deploy.lock"
+    LOCK_WAIT=0
+    DEPLOY_USER="$(id -un)"
+    ORIGIN_URL="$PAPO_TEST_ORIGIN"
+    TESTING=1
+else
+    TESTING=0
+fi
+
+REPOSITORY="$STATE_ROOT/repository.git"
+INCOMING_DIR="$STATE_ROOT/incoming"
+PENDING_ARCHIVE="$INCOMING_DIR/frontend.tar"
+DEPLOY_KEY="$STATE_ROOT/ssh/id_ed25519"
+KNOWN_HOSTS="$STATE_ROOT/ssh/known_hosts"
+ENV_FILE="$DEPLOY_ROOT/.env.prod"
+FRONTEND_ROOT="$DEPLOY_ROOT/frontend-live"
+RELEASES_DIR="$FRONTEND_ROOT/releases"
+CURRENT_LINK="$FRONTEND_ROOT/current"
+
+command_line=${SSH_ORIGINAL_COMMAND-}
+case "$command_line" in *' '*) operation=${command_line%% *}; sha=${command_line#* } ;; *) fail ;; esac
+[ "$command_line" = "$operation $sha" ] || fail
+case "$operation" in upload|verify|activate) ;; *) fail ;; esac
+[ "${#sha}" -eq 40 ] || fail
+case "$sha" in *[!0-9a-f]*|'') fail ;; esac
+[ -d "$INCOMING_DIR" ] && [ -d "$RELEASES_DIR" ] || fail
+exec 9>"$LOCK_FILE"
+flock -w "$LOCK_WAIT" 9 || fail
+
+cleanup_file=
+cleanup_file2=
+cleanup_dir=
+cleanup() { [ -z "$cleanup_file" ] || rm -f -- "$cleanup_file"; [ -z "$cleanup_file2" ] || rm -f -- "$cleanup_file2"; [ -z "$cleanup_dir" ] || rm -rf -- "$cleanup_dir"; }
+trap cleanup EXIT HUP INT TERM
+git_repo() { git --git-dir="$REPOSITORY" "$@"; }
+
+fetch_main() {
+    [ "$(git_repo remote get-url origin 2>/dev/null)" = "$ORIGIN_URL" ] || fail
+    if [ "$TESTING" = 1 ]; then
+        git_repo fetch --force --no-tags origin refs/heads/main:refs/remotes/origin/main >/dev/null 2>&1 || fail
+    else
+        GIT_SSH_COMMAND="ssh -i $DEPLOY_KEY -o BatchMode=yes -o IdentitiesOnly=yes -o UserKnownHostsFile=$KNOWN_HOSTS -o StrictHostKeyChecking=yes" \
+            git_repo fetch --force --no-tags origin refs/heads/main:refs/remotes/origin/main >/dev/null 2>&1 || fail
+    fi
+    [ "$(git_repo rev-parse --verify 'refs/remotes/origin/main^{commit}' 2>/dev/null)" = "$sha" ] || fail
+}
+
+make_archive() {
+    [ "$(git_repo cat-file -t "$sha:frontend" 2>/dev/null)" = tree ] || fail
+    entries=$(git_repo ls-tree -r --format='%(objectmode) %(objecttype)' "$sha" -- frontend 2>/dev/null) || fail
+    [ -n "$entries" ] || fail
+    while IFS=' ' read -r mode type; do [ "$type" = blob ] && { [ "$mode" = 100644 ] || [ "$mode" = 100755 ]; } || fail; done <<EOF
+$entries
+EOF
+    cleanup_file=$(mktemp "$INCOMING_DIR/.canonical.XXXXXX") || fail
+    git_repo archive --format=tar --output="$cleanup_file" "$sha" -- frontend 2>/dev/null || fail
+}
+
+validate_pending() {
+    [ -f "$PENDING_ARCHIVE" ] && [ ! -L "$PENDING_ARCHIVE" ] || fail
+    [ "$(wc -c < "$PENDING_ARCHIVE" | tr -d ' ')" -le "$MAX_ARCHIVE_BYTES" ] || fail
+    make_archive
+    cmp -s "$PENDING_ARCHIVE" "$cleanup_file" || fail
+}
+
+upload() {
+    fetch_main
+    make_archive
+    canonical=$cleanup_file
+    cleanup_file2=$canonical
+    incoming=$(mktemp "$INCOMING_DIR/.upload.XXXXXX") || fail
+    cleanup_file=$incoming
+    chmod 600 "$incoming"
+    head -c "$((MAX_ARCHIVE_BYTES + 1))" > "$incoming" || fail
+    [ "$(wc -c < "$incoming" | tr -d ' ')" -le "$MAX_ARCHIVE_BYTES" ] || fail
+    cmp -s "$incoming" "$canonical" || fail
+    mv -f -- "$incoming" "$PENDING_ARCHIVE"
+    cleanup_file=
+    rm -f -- "$canonical"
+    cleanup_file2=
+    printf '%s\n' 'Upload geprüft'
+}
+
+verify() { fetch_main; validate_pending; printf '%s\n' 'Release geprüft'; }
+
+run_as_papo() { if [ "$TESTING" = 1 ]; then "$@"; else runuser --user "$DEPLOY_USER" -- "$@"; fi; }
+file_mode() { stat -c '%a' "$1" 2>/dev/null || stat -f '%Lp' "$1" 2>/dev/null; }
+
+activate() {
+    fetch_main
+    validate_pending
+    canonical=$cleanup_file
+    [ -f "$ENV_FILE" ] && [ ! -L "$ENV_FILE" ] || fail
+    [ "$(file_mode "$ENV_FILE")" = 600 ] || fail
+    if [ "$TESTING" = 0 ]; then [ "$(stat -c '%U:%G' "$ENV_FILE" 2>/dev/null)" = papo:papo ] || fail; fi
+    [ ! -e "$CURRENT_LINK" ] || [ -L "$CURRENT_LINK" ] || fail
+    release="$RELEASES_DIR/$sha"
+    cleanup_dir=$(mktemp -d "$RELEASES_DIR/.release-$sha.XXXXXX") || fail
+    tar -xf "$canonical" --strip-components=1 -C "$cleanup_dir" || fail
+    [ -f "$cleanup_dir/index.html" ] && [ ! -L "$cleanup_dir/index.html" ] || fail
+    if [ "$TESTING" = 0 ]; then chown -R papo:papo "$cleanup_dir"; fi
+    if [ -e "$release" ]; then
+        [ -d "$release" ] && [ ! -L "$release" ] && diff -r "$cleanup_dir" "$release" >/dev/null 2>&1 || fail
+        rm -rf -- "$cleanup_dir"; cleanup_dir=
+    else
+        mv -- "$cleanup_dir" "$release"; cleanup_dir=$release
+    fi
+    rm -f -- "$canonical"; cleanup_file=
+    run_as_papo sh -c 'cd "$1" && exec env IMAGE_TAG="$2" docker compose -f docker-compose.prod.yml --env-file "$3" pull backend' sh "$DEPLOY_ROOT" "$sha" "$ENV_FILE" || fail
+    run_as_papo sh -c 'cd "$1" && exec env IMAGE_TAG="$2" docker compose -f docker-compose.prod.yml --env-file "$3" up -d --no-deps backend' sh "$DEPLOY_ROOT" "$sha" "$ENV_FILE" || fail
+    next_link="$FRONTEND_ROOT/.current.$sha.$$"
+    ln -s "releases/$sha" "$next_link"
+    if [ "$TESTING" = 1 ]; then mv -fh -- "$next_link" "$CURRENT_LINK"; else mv -Tf -- "$next_link" "$CURRENT_LINK"; fi
+    cleanup_dir=
+    ls -1dt "$RELEASES_DIR"/* 2>/dev/null | tail -n +6 | while IFS= read -r old; do rm -rf -- "$old"; done
+    printf '%s\n' 'Release aktiviert'
+}
+
+case "$operation" in upload) upload ;; verify) verify ;; activate) activate ;; esac

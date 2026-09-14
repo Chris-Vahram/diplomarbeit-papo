@@ -2,7 +2,9 @@
 
 ## Purpose
 TBD - created by archiving change add-list-search-pagination. Update Purpose after archive.
+
 ## Requirements
+
 ### Requirement: Product list search, filter, and pagination
 The company product list SHALL support searching by name, filtering by availability, and pagination, to remain usable at the client's catalog scale (~800 articles).
 
@@ -48,3 +50,57 @@ The company product form SHALL let the company set a product's image by uploadin
 - **WHEN** a product's image is set by upload or gallery pick
 - **THEN** the company product list and the partner enabled-products list show that image as the row thumbnail
 
+### Requirement: Controlled article category assignment
+Company article creation and editing SHALL support one optional category identifier. Article responses SHALL retain the category display name and add its identifier. Legacy category-name writes SHALL resolve only known categories; simultaneous nonnull category name and identifier SHALL be rejected with 400. Omitting or clearing both SHALL remove the optional assignment under the existing full-update contract.
+
+#### Scenario: Category selected by identifier
+- **WHEN** the company saves an article with a known active category identifier
+- **THEN** the article response contains that identifier and the current category name
+
+#### Scenario: Legacy name compatibility
+- **WHEN** a legacy client submits only a known category name
+- **THEN** the same controlled assignment rules apply without creating a category
+
+#### Scenario: Conflicting or unknown input
+- **WHEN** both category inputs are nonnull or the selected category is unknown
+- **THEN** the API rejects the request with 400 and no article change
+
+#### Scenario: Category removed
+- **WHEN** the company submits an article without a category
+- **THEN** the article remains valid and its category fields are null
+
+#### Scenario: Concurrent deactivation
+- **WHEN** article assignment races with deactivation of the selected category
+- **THEN** assignment either commits while the category is active or is rejected after deactivation, never bypassing the active-state rule
+
+### Requirement: Company manages products
+The company SHALL be able to create, view, edit, and manage products/articles centrally. Each product SHALL store at least name, price, description, and availability status, and optionally category and image reference.
+
+#### Scenario: Create product
+- **WHEN** the company submits a product with name, price, description, and availability
+- **THEN** the system stores the product and shows a success confirmation
+
+#### Scenario: Edit product price
+- **WHEN** the company changes a product's price
+- **THEN** the system saves the new price as the single central price used everywhere
+
+### Requirement: Central product content control
+Product price and description SHALL be controlled solely by the company. Partners SHALL NOT modify central product master data.
+
+#### Scenario: Partner cannot edit product
+- **WHEN** a partner attempts to modify a product's price or description
+- **THEN** the system rejects the action (unauthorized / not editable)
+
+### Requirement: Product availability
+A product marked unavailable SHALL NOT be orderable, even if it is enabled for a partner.
+
+#### Scenario: Order attempt on unavailable product
+- **WHEN** a partner attempts to add an unavailable product to a new order
+- **THEN** the system prevents adding it and shows a clear message
+
+### Requirement: Product validation
+The system SHALL validate required product fields before saving and prevent duplicate product identifiers where used.
+
+#### Scenario: Missing required product field
+- **WHEN** the company saves a product with a required field empty
+- **THEN** the system rejects the save and shows an understandable validation message

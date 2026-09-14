@@ -583,9 +583,7 @@ table.stack td.v small {
   margin: 0;
 }
 
-/* --- Screenshot-Platzhalter (Browser-Rahmen) ----------------------------
-   Echte Screenshots später einfach als <img> in .shot-body einsetzen und
-   die Wireframe-Divs (.wf) entfernen – Rahmen und Tag bleiben unverändert. */
+/* --- Screenshot-Karten (Browser-Rahmen) -------------------------------- */
 
 .shots {
   display: grid;
@@ -667,7 +665,7 @@ table.stack td.v small {
   z-index: 2;
 }
 
-/* Wireframe-Bausteine innerhalb der Platzhalter */
+/* Optionaler Wireframe-Bausteine für künftige Mockups */
 .wf { background: #e4eaf4; border-radius: 4px; }
 .wf.line-lg { height: 18px; width: 55%; margin-bottom: 12px; }
 .wf.line    { height: 11px; width: 90%; margin-bottom: 9px; }

@@ -44,7 +44,7 @@ class CompanyPartnerListPage extends HTMLElement {
           </div>
         </form>
       </modal-dialog>
-      <modal-dialog id="enablement-modal" title="Produkte freischalten">
+      <modal-dialog id="enablement-modal" title="Artikel freischalten">
         <data-table id="enablement-table"></data-table>
       </modal-dialog>
     `;
@@ -83,10 +83,10 @@ class CompanyPartnerListPage extends HTMLElement {
     this.enablementTable.columns = [
       { key: "name", label: "Name" },
       { key: "priceLabel", label: "Preis (€)" },
-      { key: "category", label: "Kategorie" },
+      { key: "category", label: "Artikelkategorie" },
       { key: "enabledCheckbox", label: "Freigeschaltet", html: true },
     ];
-    this.enablementTable.emptyMessage = "Noch keine Produkte angelegt.";
+    this.enablementTable.emptyMessage = "Noch keine Artikel angelegt.";
 
     this.presetSelect.addEventListener("change", () => this.toggleCustomField());
 
@@ -127,7 +127,7 @@ class CompanyPartnerListPage extends HTMLElement {
         statusBadge: `<status-badge status="${p.active ? "active" : "inactive"}"></status-badge>`,
         actions: `<div class="row-actions">
           <button type="button" data-edit-id="${p.id}">Partnerdaten Bearbeiten</button>
-          <button type="button" class="row-actions__secondary" data-manage-id="${p.id}">Produkte</button>
+          <button type="button" class="row-actions__secondary" data-manage-id="${p.id}">Artikel</button>
         </div>`,
       }));
     } catch (error) {
@@ -138,7 +138,7 @@ class CompanyPartnerListPage extends HTMLElement {
   openCreate() {
     this.form.reset();
     this.form.elements.id.value = "";
-    this.presetSelect.value = "10";
+    this.presetSelect.value = "5";
     this.toggleCustomField();
     this.partnerNumberHint.hidden = true;
     this.modal.setAttribute("title", "Neuer Partner");
@@ -174,7 +174,7 @@ class CompanyPartnerListPage extends HTMLElement {
     const partner = this.partners.find((p) => String(p.id) === String(partnerId));
     if (!partner) return;
     this.enablementPartnerId = partnerId;
-    this.enablementModal.setAttribute("title", `Produkte freischalten – ${partner.name}`);
+    this.enablementModal.setAttribute("title", `Artikel freischalten – ${partner.name}`);
     this.enablementModal.open();
     await this.loadEnablement();
   }
@@ -198,7 +198,7 @@ class CompanyPartnerListPage extends HTMLElement {
       await apiFetch(`/company/partners/${this.enablementPartnerId}/products/${productId}`, {
         method: enabled ? "PUT" : "DELETE",
       });
-      showToast(enabled ? "Produkt freigeschaltet." : "Produkt gesperrt.", "success");
+      showToast(enabled ? "Artikel freigeschaltet." : "Artikel gesperrt.", "success");
     } catch (error) {
       showToast(error.message, "error");
       await this.loadEnablement();

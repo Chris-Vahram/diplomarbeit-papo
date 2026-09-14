@@ -32,12 +32,15 @@ public class ImportService {
         ParsedFile parsed = ImportedFileParser.parse(fileBytes, filename);
         List<ImportRowResultDto> results = new ArrayList<>();
         Set<String> seenInFile = new HashSet<>();
+        List<Map<String, String>> mappedRows = parsed.rows().stream()
+                .map(fileRow -> mapRow(definition.fields(), mapping, fileRow)).toList();
+        definition.prepare(mappedRows);
         int rowNumber = 1;
 
-        for (Map<String, String> fileRow : parsed.rows()) {
+        for (Map<String, String> mappedValues : mappedRows) {
             rowNumber++; // row 1 is the header
-            Map<String, String> mappedValues = mapRow(definition.fields(), mapping, fileRow);
             List<String> errors = new ArrayList<>(definition.validateRow(mappedValues));
+            errors.addAll(definition.validatePreparedRow(mappedValues));
 
             String identifier = definition.identifierValue(mappedValues);
             if (errors.isEmpty() && identifier != null && !identifier.isBlank()) {

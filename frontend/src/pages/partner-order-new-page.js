@@ -1,8 +1,8 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import { resolveImageUrls } from "../lib/product-images.js";
-import { kundePickerHtml, wireKundePicker, renderOrderConfirmationHtml, kundeDetailsHtml } from "../lib/order-form.js";
-import { addressFieldsHtml, readAddress, fillAddress, setAddressRequired } from "../lib/address-fields.js";
+import { renderOrderConfirmationHtml, kundeDetailsHtml } from "../lib/order-form.js";
+import { addressFieldsHtml, readAddress, fillAddress } from "../lib/address-fields.js";
 import {
   catalogStepHtml,
   wireCatalogStep,
@@ -17,7 +17,7 @@ const STEPS = ["kunde", "neuerKunde", "produkte", "uebersicht", "erfolg"];
 const STEP_LABELS = {
   kunde: "Endkunde wählen",
   neuerKunde: "Neuer Endkunde",
-  produkte: "Produkte wählen",
+  produkte: "Artikel wählen",
   uebersicht: "Übersicht",
   erfolg: "Erfolg",
 };
@@ -35,7 +35,7 @@ class PartnerOrderNewPage extends HTMLElement {
     this.classList.add("area--partner");
     this.innerHTML = `
       <a href="#/partner/orders" class="back-link">&laquo; Zurück zu Meine Bestellungen</a>
-      <h1>Neue Bestellung</h1>
+      <h1 id="order-heading">Neue Bestellung</h1>
       <div id="order-content"></div>
     `;
     this.content = this.querySelector("#order-content");
@@ -49,10 +49,10 @@ class PartnerOrderNewPage extends HTMLElement {
       kundeMode: null,
       kundeId: null,
       newKunde: null,
+      newKundeDirty: false,
       cart: [],
       order: null,
     };
-    this.pendingKundeMode = null;
     this.justCompletedStep = null;
     this.submitting = false;
   }
@@ -68,7 +68,7 @@ class PartnerOrderNewPage extends HTMLElement {
       this.customers = customers;
       this.commissionPercent = profile.commissionPercent;
       if (products.length === 0) {
-        this.content.innerHTML = `<p>Für Sie sind noch keine Produkte freigeschaltet. Eine Bestellung ist erst möglich, sobald die Firma Produkte für Sie freischaltet.</p>`;
+        this.content.innerHTML = `<p>Für Sie sind noch keine Artikel freigeschaltet. Eine Bestellung ist erst möglich, sobald die Firma Artikel für Sie freischaltet.</p>`;
         return;
       }
       this.products = await resolveImageUrls(products);
@@ -84,8 +84,15 @@ class PartnerOrderNewPage extends HTMLElement {
     if (this.state.step === "erfolg") return;
     const targetIndex = STEPS.indexOf(step);
     if (targetIndex > this.state.maxStepReached) return;
+    if (targetIndex >= STEPS.indexOf("produkte") && !this.hasConfirmedKunde()) return;
     this.state.step = step;
     this.renderStep();
+  }
+
+  hasConfirmedKunde() {
+    return this.state.kundeMode === "existing"
+      ? this.customers.some((kunde) => kunde.id === this.state.kundeId)
+      : this.state.kundeMode === "new" && this.state.newKunde != null && !this.state.newKundeDirty;
   }
 
   // Advancing past the current step raises maxStepReached (unlocking that
@@ -106,6 +113,11 @@ class PartnerOrderNewPage extends HTMLElement {
     return `${k.firstName ? k.firstName + " " : ""}${k.lastName}`;
   }
 
+  kundeDisplayName() {
+    const kunde = this.selectedKunde();
+    return kunde ? `${kunde.firstName ? `${kunde.firstName} ` : ""}${kunde.lastName}` : "";
+  }
+
   // The Endkunde this order is for, resolved from wizard state - an existing
   // Kunde looked up by id, or the new-Kunde draft itself. Used to show full
   // Endkunde details on "Übersicht" (kundeDetailsHtml expects this shape).
@@ -121,17 +133,17 @@ class PartnerOrderNewPage extends HTMLElement {
 
   // Whether `step`'s own data is still valid right now — not just "was this step
   // reached before". A step reached earlier can become invalid later (e.g. the
-  // partner goes back to "Produkte wählen" and removes every item from the
+  // partner goes back to "Artikel wählen" and removes every item from the
   // cart) - its checkpoint must stop showing as completed once that happens.
   isStepDataValid(step) {
     switch (step) {
       case "kunde":
-        return this.state.kundeMode === "existing" ? this.state.kundeId != null : this.state.kundeMode === "new";
+        return this.hasConfirmedKunde();
       case "neuerKunde":
         // "existing" here means the partner deliberately bypassed this step —
         // that counts as resolved (see the "skipped" checkpoint label handling
         // in checkpointBarHtml), not incomplete.
-        return this.state.kundeMode === "new" ? this.state.newKunde != null : this.state.kundeMode === "existing";
+        return this.state.kundeMode === "new" ? this.state.newKunde != null && !this.state.newKundeDirty : this.state.kundeMode === "existing";
       case "produkte":
       case "uebersicht":
         return this.state.cart.length > 0;
@@ -144,11 +156,6 @@ class PartnerOrderNewPage extends HTMLElement {
 
   checkpointBarHtml() {
     const currentIndex = STEPS.indexOf(this.state.step);
-    // While actively on "Endkunde wählen" (currentIndex 0), preview the
-    // *currently ticked* radio (not yet submitted) so "Neuer Endkunde"'s
-    // dimming updates live as the partner toggles it, instead of only once
-    // "Weiter" commits state.kundeMode.
-    const livePreviewMode = this.pendingKundeMode ?? this.state.kundeMode;
     const items = STEPS.map((step, i) => {
       // "Neuer Endkunde" is only truly unreachable (greyed) before the partner has
       // decided how to pick an Endkunde at all; once "bestehenden Kunden wählen" is
@@ -156,12 +163,15 @@ class PartnerOrderNewPage extends HTMLElement {
       // done checkpoint, just labelled in parentheses to show it was bypassed.
       const isSkippedNeuerKunde = step === "neuerKunde" && this.state.kundeMode === "existing";
       let state;
-      if (step === "neuerKunde" && currentIndex === 0 && livePreviewMode !== "new") state = "unused";
+      if (step === "neuerKunde" && currentIndex === 0 && this.state.kundeMode !== "new") state = "unused";
       else if (i === currentIndex) state = "current";
       else if (i <= this.state.maxStepReached && this.isStepDataValid(step)) state = "done";
       else state = "upcoming";
 
-      const clickable = state === "done" && this.state.step !== "erfolg";
+      const clickable =
+        state === "done" &&
+        this.state.step !== "erfolg" &&
+        (i < STEPS.indexOf("produkte") || this.hasConfirmedKunde());
       const label =
         i === 0 && this.state.kundeMode === "new" && this.state.newKunde
           ? `Endkunde: ${escapeHtml(this.newKundeDisplayName())}`
@@ -195,9 +205,6 @@ class PartnerOrderNewPage extends HTMLElement {
     });
   }
 
-  // Re-renders just the checkpoint bar in place (not the whole step) — used for
-  // the live "Neuer Endkunde" dimming preview, which must not disrupt the
-  // "Endkunde wählen" form (focus, scroll position) while the partner is using it.
   refreshCheckpointBar() {
     const bar = this.content.querySelector(".wizard-checkpoints");
     if (!bar) return;
@@ -206,7 +213,7 @@ class PartnerOrderNewPage extends HTMLElement {
   }
 
   // The step before `step` in the actual (per-partner) flow — skips "neuerKunde"
-  // when it was never used, so "Vorheriger Schritt" from "produkte" never lands
+  // when it was never used, so "Vorheriger Schritt" from "Artikel wählen" never lands
   // on a step the partner didn't go through.
   prevStepFor(step) {
     let prevIndex = STEPS.indexOf(step) - 1;
@@ -222,6 +229,7 @@ class PartnerOrderNewPage extends HTMLElement {
   }
 
   renderStep() {
+    this.refreshOrderHeading();
     this.content.innerHTML = `
       ${this.checkpointBarHtml()}
       <div class="wizard-step" id="wizard-step">
@@ -233,6 +241,11 @@ class PartnerOrderNewPage extends HTMLElement {
     this.wireStepBody();
     this.wirePrevButton();
     this.justCompletedStep = null;
+  }
+
+  refreshOrderHeading() {
+    const heading = this.querySelector("#order-heading");
+    if (heading) heading.textContent = this.hasConfirmedKunde() ? `Neue Bestellung für ${this.kundeDisplayName()}` : "Neue Bestellung";
   }
 
   stepBodyHtml() {
@@ -272,9 +285,20 @@ class PartnerOrderNewPage extends HTMLElement {
   kundeStepHtml() {
     return `
       <form id="kunde-form">
-        ${kundePickerHtml(this.customers)}
+        <div class="entity-form--grid">
+          <form-field label="Endkunden suchen" name="kundeSearch">
+            <input type="search" name="kundeSearch" autocomplete="off" placeholder="Name oder Adresse" />
+          </form-field>
+          <form-field label="Endkunde" name="kundeId">
+            <select name="kundeId" required>
+              <option value="">Bitte Endkunden wählen…</option>
+            </select>
+          </form-field>
+        </div>
+        <p id="kunde-search-empty" hidden>Keine Endkunden gefunden.</p>
         <div class="wizard-step__actions">
-          <span></span>
+          <button type="button" class="button-secondary" id="new-kunde-btn">Neuen Kunden anlegen</button>
+          ${this.state.newKunde ? '<button type="button" class="button-secondary" id="resume-kunde-btn">Kundenentwurf fortsetzen</button>' : ""}
           <button type="submit" class="button-primary">Nächster Schritt</button>
         </div>
       </form>`;
@@ -282,50 +306,63 @@ class PartnerOrderNewPage extends HTMLElement {
 
   wireKundeStep() {
     const form = this.content.querySelector("#kunde-form");
-    const mode = this.state.kundeMode ?? (this.customers.length > 0 ? "existing" : "new");
-    this.pendingKundeMode = mode;
-    for (const radio of form.elements.kundeMode) radio.checked = radio.value === mode;
-    if (this.state.kundeId != null) form.elements.kundeId.value = String(this.state.kundeId);
-
-    wireKundePicker(form);
-
-    // The wizard has its own dedicated "Neuer Endkunde" step (next), so the
-    // inline new-Kunde block that kundePickerHtml/wireKundePicker toggle visible
-    // for "neu anlegen" would just duplicate it right here — keep it hidden AND
-    // not required. Required-but-invisible fields still count for the browser's
-    // native constraint validation, which can't scroll/focus a hidden field to
-    // show its error bubble — the submit was silently blocked with no visible
-    // feedback until `required` was cleared here too.
-    const newKundeBlock = form.querySelector("#new-kunde-block");
-    const suppressNewKundeBlock = () => {
-      newKundeBlock.hidden = true;
-      form.elements.newLastName.required = false;
-      setAddressRequired(form, "newAddress", false);
-    };
-    suppressNewKundeBlock();
-    for (const radio of form.elements.kundeMode) {
-      radio.addEventListener("change", () => {
-        suppressNewKundeBlock();
-        this.pendingKundeMode = form.elements.kundeMode.value;
-        this.refreshCheckpointBar();
+    const search = form.elements.kundeSearch;
+    const select = form.elements.kundeId;
+    const empty = form.querySelector("#kunde-search-empty");
+    const renderOptions = () => {
+      const selectedId = select.value || (this.state.kundeMode === "existing" ? String(this.state.kundeId ?? "") : "");
+      const needle = search.value.trim().toLocaleLowerCase("de-AT");
+      const matches = this.customers.filter((kunde) =>
+        [kunde.firstName, kunde.lastName, ...Object.values(kunde.address ?? {})]
+          .filter(Boolean).join(" ").toLocaleLowerCase("de-AT").includes(needle),
+      );
+      select.replaceChildren(new Option("Bitte Endkunden wählen…", ""));
+      matches.forEach((kunde) => {
+        const name = `${kunde.firstName ? `${kunde.firstName} ` : ""}${kunde.lastName}`;
+        const address = Object.values(kunde.address ?? {}).filter(Boolean).join(" ");
+        select.add(new Option(`${name} – ${address}`, String(kunde.id)));
       });
-    }
-    // The checkpoint bar was rendered before this method ran (renderStep() calls
-    // checkpointBarHtml() first), so its first paint used the pre-wiring default —
-    // sync it now that `mode` (and therefore pendingKundeMode) is settled.
-    this.refreshCheckpointBar();
+      empty.hidden = matches.length > 0;
+      if (matches.some((kunde) => String(kunde.id) === selectedId)) {
+        select.value = selectedId;
+      } else {
+        select.value = "";
+        if (this.state.kundeMode === "existing" && this.state.kundeId != null) {
+          this.state.kundeId = null;
+          this.refreshCheckpointBar();
+          this.refreshOrderHeading();
+        }
+      }
+    };
+    renderOptions();
+    search.addEventListener("input", renderOptions);
+    select.addEventListener("change", () => {
+      if (this.state.kundeMode === "existing") {
+        this.state.kundeId = null;
+      } else if (this.state.kundeMode === "new" && this.state.newKunde) {
+        this.state.newKundeDirty = true;
+      }
+      this.refreshCheckpointBar();
+      this.refreshOrderHeading();
+    });
+    this.content.querySelector("#new-kunde-btn").addEventListener("click", () => {
+      this.state.kundeMode = "new";
+      this.state.kundeId = null;
+      this.advanceTo("neuerKunde");
+    });
+    this.content.querySelector("#resume-kunde-btn")?.addEventListener("click", () => {
+      this.state.kundeMode = "new";
+      this.advanceTo("neuerKunde");
+    });
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
-      if (form.elements.kundeMode.value === "existing") {
-        this.state.kundeMode = "existing";
-        this.state.kundeId = Number(form.elements.kundeId.value);
-        this.state.newKunde = null;
-        this.advanceTo("produkte");
-      } else {
-        this.state.kundeMode = "new";
-        this.advanceTo("neuerKunde");
-      }
+      if (!select.value) return;
+      const selectedId = Number(select.value);
+      if (!this.customers.some((kunde) => kunde.id === selectedId)) return;
+      this.state.kundeMode = "existing";
+      this.state.kundeId = selectedId;
+      this.advanceTo("produkte");
     });
   }
 
@@ -358,8 +395,7 @@ class PartnerOrderNewPage extends HTMLElement {
       form.elements.phone.value = this.state.newKunde.phone ?? "";
     }
 
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
+    const saveDraft = () => {
       this.state.newKunde = {
         lastName: form.elements.lastName.value,
         firstName: form.elements.firstName.value || null,
@@ -367,23 +403,36 @@ class PartnerOrderNewPage extends HTMLElement {
         email: form.elements.email.value || null,
         phone: form.elements.phone.value || null,
       };
+    };
+    form.addEventListener("input", () => {
+      saveDraft();
+      this.state.newKundeDirty = true;
+      this.refreshCheckpointBar();
+      this.refreshOrderHeading();
+    });
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      saveDraft();
       this.state.kundeMode = "new";
       this.state.kundeId = null;
+      this.state.newKundeDirty = false;
       this.advanceTo("produkte");
     });
   }
 
-  // ---- Step: Produkte wählen ----
+  // ---- Step: Artikel wählen ----
 
   produkteStepHtml() {
+    const kundeName = escapeHtml(this.kundeDisplayName());
     return `
       <div class="produkte-step-layout">
-        <div class="cart cart--preview">
-          <h2 class="cart-preview__heading">Ihr Warenkorb</h2>
-          <div class="cart-step-body" id="produkte-cart-step-root">${cartStepHtml(this.state.cart, this.commissionPercent, { showSubmit: false })}</div>
-        </div>
         <div class="produkte-catalog-panel">
           ${catalogStepHtml(this.products)}
+        </div>
+        <div class="cart cart--preview">
+          <h2 class="cart-preview__heading">Bestellung für ${kundeName}</h2>
+          <div class="cart-step-body" id="produkte-cart-step-root">${cartStepHtml(this.state.cart, this.commissionPercent, { showSubmit: false })}</div>
         </div>
       </div>
       <div class="wizard-step__actions">
@@ -431,6 +480,7 @@ class PartnerOrderNewPage extends HTMLElement {
     const kunde = this.selectedKunde();
     return `
       <div class="wizard-step--uebersicht">
+        <p>Bitte Bestellung überprüfen und kostenpflichtig aufgeben</p>
         <div class="uebersicht-layout">
           ${kunde ? kundeDetailsHtml(kunde) : "<div></div>"}
           <div class="cart cart--summary" id="cart-step-root">${cartSummaryHtml(this.state.cart, this.commissionPercent, { showSubmit: false })}</div>

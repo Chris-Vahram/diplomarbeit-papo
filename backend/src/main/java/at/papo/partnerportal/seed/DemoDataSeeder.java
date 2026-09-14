@@ -1,5 +1,6 @@
 package at.papo.partnerportal.seed;
 
+import at.papo.partnerportal.category.CategoryMigrationService;
 import at.papo.partnerportal.commission.CommissionService;
 import at.papo.partnerportal.common.Address;
 import at.papo.partnerportal.customer.Kunde;
@@ -43,33 +44,41 @@ public class DemoDataSeeder {
     @Inject
     ProductImageService productImageService;
 
+    @Inject
+    CategoryMigrationService categoryMigrationService;
+
     @ConfigProperty(name = "papo.seed-demo-data", defaultValue = "false")
     boolean seedDemoData;
 
     @Transactional
     void onStart(@Observes StartupEvent event) {
-        boolean normal = LaunchMode.current() == LaunchMode.NORMAL;
-        if (normal && !seedDemoData) {
-            return;
+        LaunchMode launchMode = LaunchMode.current();
+        if (shouldSeed(launchMode, Partner.count(), seedDemoData)) {
+            seedPartners();
+            seedProducts();
+            seedProductImages();
+            seedEnablements();
+            // Tests assume a clean order baseline, so seed orders only in dev or
+            // in the explicit NORMAL+flag demo path.
+            if (launchMode == LaunchMode.DEVELOPMENT || launchMode == LaunchMode.NORMAL) {
+                seedOrders();
+            }
         }
-        if (Partner.count() > 0) {
-            return;
-        }
-        seedPartners();
-        seedProducts();
-        seedProductImages();
-        seedEnablements();
-        // Demo orders in dev and in the opt-in NORMAL+flag path; tests assume a clean
-        // order baseline (specific partners with zero orders), so skip them under %test.
-        if (LaunchMode.current() == LaunchMode.DEVELOPMENT || (normal && seedDemoData)) {
-            seedOrders();
-        }
+        categoryMigrationService.migrate();
+    }
+
+    static boolean shouldSeed(LaunchMode launchMode, long partnerCount) {
+        return shouldSeed(launchMode, partnerCount, false);
+    }
+
+    static boolean shouldSeed(LaunchMode launchMode, long partnerCount, boolean seedDemoData) {
+        return partnerCount == 0 && (launchMode != LaunchMode.NORMAL || seedDemoData);
     }
 
     private void seedPartners() {
         // Canonical (upper-case) partner number == the Keycloak demo user "partner-demo"
         // (resolve() upper-cases the login claim), so login -> dashboard works out of the box.
-        persistPartner("PARTNER-DEMO", "Elektro Huber GmbH", address("Hauptstraße", "12", "4020", "Linz"),
+        persistPartner("PARTNER-DEMO", "Huemer GmbH", address("Hauptstraße", "12", "4020", "Linz"),
                 "partner-demo@example.at", "+43 660 1234567", "10.00", true);
         // No linked Keycloak user yet — demonstrates the manual-provisioning gap (design.md).
         persistPartner("P-1002", "Sanitär Bauer KG", address("Ringstraße", "5", "8010", "Graz"),

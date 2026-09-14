@@ -192,7 +192,7 @@ class CompanyOrderListPage extends HTMLElement {
         .filter((p) => p.enabled)
         .map((p) => ({ id: p.productId, name: p.name, price: p.price, category: p.category, available: p.available }));
       if (products.length === 0) {
-        container.innerHTML = `<p>Für diesen Partner sind noch keine Produkte freigeschaltet.</p>`;
+        container.innerHTML = `<p>Für diesen Partner sind noch keine Artikel freigeschaltet.</p>`;
         return;
       }
       const partner = this.manualOrderPartners.find((p) => String(p.id) === String(partnerId));

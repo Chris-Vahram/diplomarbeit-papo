@@ -1,12 +1,189 @@
 # Continuation Prompt — PAPO Partnerportal
 
-**Dokumentstand:** 01.09.2026
+## Vorrangiger Next-Session-Handoff — 14.09.2026
+
+Dieser Block ersetzt ältere aktuelle Statusangaben darunter.
+
+- Branch/Remote: `docs/openspec-planning-2026-09-11` auf `38cd932`, mit Remote synchron. `origin/main` ist `05e0bdd`; lokales `main` liegt vier Commits zurück. Der Arbeitsbaum enthält nur lokale, noch nicht committed/pushte Kontext-/Terminologieänderungen.
+- Aktiv bleiben `harden-deployment-gateway` (**2/4**) und `complete-thesis-documentation` (**0/6**). Zusätzlich sind fünf reine Planungschanges mit vollständigen Proposal-/Design-/Spec-/Task-Artefakten angelegt: `add-business-tax-identifiers` (0/7), `decouple-partner-number-from-login` (0/5), `add-company-internal-partner-note` (0/4), `add-partner-trade-proof` (0/6) und `add-unique-bmd-article-number` (0/6). Keine Produktimplementierung daraus erfolgt; Gesamtplan: `Specification/WORK_PLAN_2026-09-14.md`.
+- **Next-Session-Reihenfolge:** (1) öffentliche VM auf den aktuellsten lokalen Stand bringen und Live-Deployment verifizieren; (2) anschließend einen autorisierten Security-/Deployment-Subagenten mit den nötigen VM-, Git- und Securityrechten die vollständigen VM-Nachweise erledigen lassen; (3) danach Stammdaten-/BMD-Aufgaben mit höherem Modell, hohem Reasoning, OpenSpec und Caveman gründlich planen; (4) konkrete Clockify-Einträge mit Datum, Uhrzeit und Beschreibung erstellen.
+- Für Deployment und VM-Nachweise gilt die ausdrückliche Nutzerfreigabe für die nächste Session. Keine Secrets ausgeben, keine Datenvolumes löschen oder zurücksetzen; Änderungen und Belege sanitisiert dokumentieren.
+- Der VM-/Security-Subagent muss mindestens diese Nachweise erledigen: root-eigener Gateway und korrekte Dateirechte; `visudo`-Prüfung; eingeschränkter Deploy-Account und Read-only-Repository-Key; Host-Key-Pinning; kein allgemeines sudo, kein Docker-Zugriff und kein Lesen von `.env.prod`; negative SSH-Tests für beliebige Befehle, PTY, Forwarding, SCP/SFTP; sicherer Verify-/Upload-Ablauf; HTTPS/OIDC/Login/Bestellung; gekoppelter Rollback ohne PostgreSQL-/Keycloak-/Caddy-Schaden.
+- Fachliche Richtung bestätigt: BMD bleibt führendes System; PAPO übernimmt Partner-/Artikelnummern zunächst über Excel/CSV. Kein direkter Connector ohne konkretes BMD-Produkt, API-Vertrag, Zugang und Beispieldaten. Produktion enthält nur synthetische Demodaten.
+- Nächste Stammdaten-Schritte als Planungsauftrag: Partnernummer/UID-Steuerkennung (**ca. 0,5–2 Tage** abhängig von Migration/Login), Gewerbeschein minimal sicher (**ca. 1–2 Tage**), BMD-Artikelnummer mit Import, eindeutiger Unique-Regel, Duplikatprüfung und Tests (**ca. 1–2 Tage nach Beispieldaten**), insgesamt minimal **ca. 3–5 Entwicklertage plus Dokumentation**. Historie, Ablaufdatum, OCR, mehrere Dateien und BMD-Synchronisation ausdrücklich als zusätzliche Komplexität markieren.
+- UID/Steuerkennung: international verständliches, generisches Feldmodell prüfen; für Österreich verifizieren, ob UID oder eine andere Steuernummer fachlich maßgeblich ist. Pflichtfeld und länderspezifische Validierung planen, ohne Österreichs Regeln unbestätigt zu behaupten.
+- Internes Notizfeld: nur Company-sichtbar, Plaintext, maximal **4.000 Zeichen**; niemals über Partnerprofil, Import, Export oder Bestellungen ausliefern.
+- Gewerbenachweis: Partner lädt genau eine aktuelle, ersetzbare Datei hoch; Company prüft. PDF/JPG/PNG, maximal 10 MiB, privater Zugriff, Upload-/Ersetz-/Prüfstatus, keine Historie/OCR/Mehrfachdateien und keine automatische Aktivierung. Portalunternehmen speichert eigene GISA-/Registerkennung. Rechtliche Aufbewahrung vor Realbetrieb festlegen.
+- BMD-Artikelnummer: als eindeutig unique behandeln; nach Beispieldaten Unique-Validierung, Import-Duplikatbericht und – falls im vereinfachten Prozess sinnvoll – Exportregel planen. Der aktuelle Code hat noch kein BMD-Nummernfeld; nicht als erledigt darstellen.
+- Clockify: über angemeldeten Zen-Browser im Workspace `DA` tatsächlich befüllen. Rückwirkende Zeiten dürfen geschätzt/ergänzt werden; Einträge brauchen Datum, Start-/Endzeit, Dauer und Beschreibung und werden als **retrospektiv geschätzt** gekennzeichnet. Sie sind keine technischen Nachweise. Nicht erneut verschieben.
+- Alle älteren Abschnitte dieses Dokuments sind historische Arbeitsprotokolle. Bei abweichenden Zahlen oder Statusangaben gilt dieser Block plus `openspec list --json` und die aktuellen `tasks.md`.
+
+## Aktueller Orchester-Handoff — 14.09.2026
+
+### Historischer Auftrag — Tobias-5.9 und Abschluss
+
+**Addon:** Nach dem Ergebnis der 5.9-Prüfung soll der neue Agent dem Gateway-Security-Agenten nur dann einen konkreten Folgeprompt schicken, wenn dessen unabhängige Prüfung noch benötigt wird; fehlen Tobias-Nachweise, soll er stattdessen den exakten Blocker dokumentieren. Zusätzlich ist der bestehende Dirty Worktree als eigener Aufräumtask zu bereinigen (ohne neuen OpenSpec-Change): Dateien einzeln zuordnen, gewünschte Arbeit sauber committen, unnötige Artefakte nur nach Prüfung entfernen und den Status nachvollziehbar clean machen. Für diese Arbeiten sind Push, Pull, Merge, Deployment, VM-Zugriff und Commits mit sauberen Commitmessages ausdrücklich freigegeben; Secrets, Datenvolumes und unklare Fremdänderungen bleiben geschützt.
+
+- Chris muss aktuell nichts weiter tun, außer diesen Fortsetzungsauftrag zu bestätigen. Der nächste Agent soll zuerst prüfen, ob Tobias Task 5.9 bereits mit belastbaren VM-, Deploy-Key-, Host-Key-, Eigentümer-, sudoers- und Remote-Negativnachweisen belegt hat.
+- Der Agent darf die ausdrücklich freigegebenen VM-, Git-Pull/Push/Merge- und Deployment-Rechte nutzen und soll selbst bewerten, ob er 5.9 sicher übernehmen kann. Keine Annahme von Nachweisen: fehlende oder unsichere Belege konkret benennen und vor riskanten Secret-/Produktionsschritten stoppen.
+- Wenn 5.9 belegbar ausführbar ist, soll der Agent die Arbeit selbst erledigen und passende Subagents für unabhängige finale Remote-Security-, Browser-, Live- und gekoppelten Rollbacktests einsetzen. Ergebnisse, Revisionen und Grenzen sanitisiert dokumentieren.
+- Danach soll die Präsentation finalisiert werden: Lehreranforderungen aus den neuesten Besprechungsprotokollen prüfen, OpenSpec-Archive der letzten Changes gegen Screenshots/Flows abgleichen und überall die fachliche Terminologie **Artikel** verwenden.
+- Clockify nicht pauschal auf den 14.09. bündeln: Vor einer Eintragung die letzten Besprechungsprotokolle und die archivierten Changes prüfen, Tätigkeiten realistisch über die belegten Arbeitstage verteilen, vorhandene leere Blöcke mit passenden Beschreibungen versehen und neue Zwischen-/Abschlussblöcke nur bei nachvollziehbarer Zuordnung ergänzen. Keine Tätigkeiten, Zeiten oder Dauer erfinden.
+
+- `origin/main` `05e0bdd` wurde kontrolliert integriert; Tobias' CI/CD- und Demo-Seeding-Archive bleiben erhalten. Konflikte wurden ohne Verlust der lokalen Kategorie-Migration gelöst.
+- Der archivierte Basis-Change wird durch `harden-deployment-gateway` (**2/4**) ergänzt: lokale Gateway-Umsetzung/Harness fertig, VM-Installation und Remote-Negativ-/Livechecks bei Tobias offen.
+- `SEED_DEMO_DATA` bleibt standardmäßig `false`; Produktion mit Bestellung `#51` wurde nicht verändert und das Flag nicht aktiviert. `CategoryMigrationService` läuft unabhängig vom Seed weiter.
+- Nachweise der Integration: Seeder-Fokus 1/1, vollständige Tests 100/100, Package 100/100 erfolgreich. Kein Deployment oder Volume-Eingriff.
+
+- P0-Recovery laut Betriebsnachweis erfolgreich: Dumps, Passwortangleichung, Services, OIDC/API-401, Logins und Bestellung #51 bis `FULFILLED`.
+- `integrate-category-management-into-article-management` 4/4 geprüft und archiviert unter `openspec/changes/archive/2026-09-14-integrate-category-management-into-article-management`.
+- Aktiv: `harden-deployment-gateway` 2/4 und `complete-thesis-documentation` 0/6.
+- Reihenfolge: Tobias' Gateway-Nachweise, finale Security-/Live-Reviews, dann Thesis-Doku/Präsentation. Präsentation konsequent „Artikel“.
+- Clockify nur anhand nachvollziehbarer Tätigkeiten beschreiben.
+
+## Maßgeblicher Planungsnachtrag — 13.09.2026
+
+Git-Fetch ausgeführt: Branch `docs/openspec-planning-2026-09-11` und sein Remote stehen beide auf `d85e92f`; `origin/main` ist `fea0e5b`, der Branch liegt fünf Commits voraus. Kein Pull nötig, kein Commit/Push/Merge ausgeführt. Vorhandener Dirty Worktree und vier untracked Playwright-Bilder bleiben erhalten.
+
+`build-partnerportal-mvp` ist nun **53/53 und technisch abgeschlossen**, aber nicht archiviert. 8.3/8.4 wurden ohne Lieferbehauptung in den eigenständigen Dokumentationschange `complete-thesis-documentation` (0/6) übertragen; FD.4 ist für den aktuellen Screenstand abgeschlossen. Künftiger visueller Polish gehört in den jeweiligen UI-Change.
+
+Neu und apply-ready geplant: `complete-thesis-documentation` für UI/UX-, Technik- und vollständige FR-01–FR-25/B-01–B-08-Traceability-Dokumentation; `integrate-category-management-into-article-management` (0/4) für eine einfache Company-Navigation „Artikelverwaltung“, Kategorien als bestehende Unterseite und unveränderte Partnernavigation „Artikel“.
+
+CI/CD steht bei **34/45**. Belegt: GHCR privat, Branch Protection mit `Test backend`, DNS `paportal.at` auf `178.104.109.45`, HTTPS/Let's Encrypt und Root-200. Screenshot zeigt Julian weiterhin mit geerbtem Write-Zugriff; entfernen oder aktuelle Autorisierung dokumentieren. P0-Ursache belegt: persistentes PostgreSQL-Rollenpasswort stimmt nicht mit VM-lokalem `.env.prod` überein; Keycloak und Backend scheitern mit `FATAL: password authentication failed for user "partnerportal"`. Recovery nie durch Volume-Löschung: DB-Zugriff prüfen, beide DBs lokal dumpen, Rollenpasswort geheim angleichen, Keycloak/Backend neu starten, dann OIDC/API/Login/Bestellung prüfen. Gateway aus `48ad4d8` gezielt auf aktuellen Frontend-Releasepfad portieren; nicht blind cherry-picken.
+
+Empfohlene Reihenfolge: P0-Recovery und Live-Nachweise; Dokumentationschange; Artikelverwaltungs-UX; eingeschränkter Deploy-Gateway; lokaler Cron-/Backupnachweis. Offsite bleibt post-MVP.
+
+## Maßgeblicher Abschlussnachtrag — 12.09.2026
+
+`define-mvp-traceability-format` (**3/3**) ist geprüft und unter `openspec/changes/archive/2026-09-12-define-mvp-traceability-format` archiviert. Es handelt sich um reine Dokumentation: 33 eindeutige Matrixzeilen, Quellen-/Link-/Strukturcheck, Strict-Validate, Diff-Check und Reviews ohne Findings.
+
+`manage-article-categories` (**6/6**) ist geprüft und unter `openspec/changes/archive/2026-09-12-manage-article-categories` archiviert. Java 21: fokussiert 27/27, vollständig 100/100, Package 100/100; `node --check` für die geänderten Kategorie-Seiten, Strict-Validate und Diff-Check erfolgreich. Playwright belegte Company-CRUD, Sonderzeichen-Escaping, Deaktivierung/Reaktivierung, die markierte Bestandsoption `(deaktiviert)` im Artikel-Edit, Desktop/Mobile und Partnerisolation. Qualitäts-, Funktions-, Test-, Sinnhaftigkeits-, Daten- und Securityreview ohne Findings.
+
+`openspec list --json` enthält nur noch `build-partnerportal-mvp` (50/53) und `ci-cd-deployment-with-gh-actions` (30/41). Beide wurden nicht implementiert. `build-partnerportal-mvp` ist für den technischen Kern weitgehend umgesetzt, aber als Gesamtchange noch nicht abschließbar: offen sind 8.3 (Tobias: UI/UX-Dokumentation), 8.4 (Chris+Tobias: FSD→Implementierung→Tests und Deferred-Liste) und FD.4 (Tobias: visueller Polish für später ergänzte Screens). Dafür ist keine neue technische Terra-Planung erkennbar, aber Tobias-/gemeinsame Eingaben fehlen.
+
+`ci-cd-deployment-with-gh-actions` bleibt laut `review.md` **BLOCKIERT** und nicht Terra-ready. Offen sind 3.5/3.6 (GHCR privat, Branch Protection), 6.1–6.4 (datierter DNS-, HTTPS-, Caddy-, Keycloak-/OIDC-/API-/Login-/Bestellnachweis), 7.5/7.6a (VM-Cron und lokaler Backupzyklus) sowie die ausdrücklich post-MVP verschobenen 7.2/7.3/7.6b (Offsite-Provider, rclone, Offsite-Nachweis). Zusätzlich fehlen aktuelle Ursachenklärung/Nachweise zu P0-Ausfall, Frontend-Archiv-/Index-/Recoverypfad und den PR-#5-Zugriffsgrenzen. Keine Infrastruktur-, VM-, Secret-, SSH-, Backup- oder Deploymentaktion ableiten.
+
+`python3 tools/ai_evidence_log.py sync` und der Abschluss-`enrich` wurden mit den tatsächlich ausgeführten Checks synchronisiert. Kein Commit, Push, Merge oder Deployment.
+
+## Maßgeblicher Abschlussnachtrag — define-mvp-traceability-format, 12.09.2026
+
+`define-mvp-traceability-format` ist **3/3 Tasks fertig**, aber gemäß aktuellem Auftrag **nicht archiviert**. `docs/REQUIREMENTS_TRACEABILITY.md` enthält die acht vorgesehenen Spalten, Legende und genau 33 eindeutige Zeilen (FR-01 bis FR-25, B-01 bis B-08), mit aufgelösten relativen Quellenlinks und ausdrücklich offenen Code-/Testzuordnungen. `docs/DOCUMENTATION_TODO.md` verweist darauf, benennt Chris/Tobias/gemeinsame Abnahme und lässt MVP 8.3/8.4/FD.4 offen.
+
+Nachweise: Quellen-/ID-/Link-/Tabellenstrukturabgleich, `openspec validate define-mvp-traceability-format --strict` und `git diff --check` erfolgreich. Funktions-/Evidenz-/Securityreview ohne Findings; keine Backendtests nötig, da es sich um reine Dokumentation handelt. Keine privaten Belege, Produktdatenänderungen oder externe Zugriffe.
+
+**Nächster Schritt:** Kein weiterer nicht blockierter Change ist gemäß aktuellem Auftrag freizugeben; `manage-article-categories` und `define-mvp-traceability-format` bleiben fertig, aber unarchiviert. CI/CD und `build-partnerportal-mvp` sowie die ausdrücklich ausgeschlossenen Themen nicht spekulativ beginnen. Bei Fortsetzung zuerst Worktree/OpenSpec prüfen und nur bei neuer Freigabe einen Change nach dem vorgeschriebenen Ablauf starten.
+
+## Maßgeblicher Abschlussnachtrag — manage-article-categories, 12.09.2026
+
+`manage-article-categories` ist **6/6 Tasks fertig**, aber gemäß aktuellem Auftrag **nicht archiviert**. Umgesetzt sind additive Kategorie-Entity/Migration, Company-CRUD mit Rollen/Locks, Product-FK/Legacy-Synchronisierung, Importbegrenzung auf bekannte aktive Kategorien und die Company-Kategorienseite mit Artikel-Select. Der stale-Entity-Fehler im Edit-Select wurde durch Browserprüfung gefunden und korrigiert; bestehende inaktive Zuordnungen erscheinen als `(deaktiviert)`.
+
+Nachweise: fokussiert **27/27**, vollständige `./mvnw test`-Suite **79/79**, `./mvnw package` erfolgreich, `openspec validate manage-article-categories --strict`, JavaScript-Syntaxchecks und `git diff --check` erfolgreich. Browser 1440/390 belegte CRUD/Filter, Sonderzeichen-Escaping, GET-Fehler/Retry, Tastatur-/Mobilelayout, inaktive Bestandsoption und Partnerisolation; `/api/partner/products` lud keinen globalen Kategorienendpunkt. `partnerportal-quality`, Funktions-/Test-/Sinnhaftigkeits- sowie Daten-/Securityreview ohne Findings. Der synthetische Rollbacktest erzeugte erwartete Datenbank-Warnlogs, bestand aber und hinterließ keinen Artikel.
+
+**Nächster Change:** `define-mvp-traceability-format` einzeln beginnen; davor die vorgeschriebenen Status-/Apply-Schritte ausführen. Keine Archivierung, kein Commit/Push/Merge/Deployment. Die vorhandenen Änderungen, Archive und Playwright-Screenshots bewahren.
+
+## Maßgeblicher Auto-Compact-Handoff — Arbeitsstopp 12.09.2026
+
+Dieser Block hat Vorrang vor allen älteren Angaben darunter und beschreibt den exakten Fortsetzungspunkt nach dem unterbrochenen Apply-Lauf.
+
+**Arbeitsbaum:** Branch `docs/openspec-planning-2026-09-11`, dirty und vollständig zu bewahren. Kein Fetch/Pull, Commit, Push, Merge, Deployment, VM-, Secret-, SSH-, Backup- oder GitHub-Secrets-Zugriff. Die untracked Playwright-Bilder `output/playwright/show-partner-company-name-desktop.png` und `output/playwright/show-partner-company-name-mobile.png` nicht löschen oder überschreiben. Die vier Changes `search-order-customers`, `clarify-order-customer-context`, `show-partner-company-name` und `use-huemer-demo-partner` sind echt fertig und archiviert; nicht erneut bearbeiten.
+
+**Aktiver Change:** `manage-article-categories`, OpenSpec-Status **3/6**. Tasks 1.1, 1.2 und 2.1 sind abgehakt. Die fokussierten Läufe für Datenbasis/Migration/Seed und Kategorien-/Enablement-/Produktpfade waren erfolgreich; die letzte Import-Erweiterung ist angewendet, aber nach dem Auto-Compact noch nicht erneut getestet. Task 2.2, 3.1 und 4.1 sind offen. Nicht archivieren.
+
+**Exakter nächster Schritt:** Zuerst den letzten Diff in `ImportDefinition.java`, `ImportService.java` und `ProductImportDefinition.java` prüfen. Anschließend Task 2.2 strikt umsetzen: fokussierte `ProductImportResourceTest`-Fälle für bekannte/optionale, unbekannte und inaktive Kategorien, gemischte Dateien, Preview→Rename/Deactivate, Parallelcommit und Rollback; keine neue Kategorie und keine Änderung der Namens-Deduplizierung. Vor dem Abhaken Lock-/Refresh-Verhalten und Row-Report wirklich ausführen. Danach 3.1, anschließend 4.1.
+
+**Wichtiger offener Technikpunkt:** `CategoryService.lockCategories`/manuelle Product-Create-/Update-Pfade müssen nach dem Kategorie-Lock den aktuellen Entity-Zustand refreshen und Aktivstatus/Legacyname nochmals prüfen, damit Rename/Deactivate zwischen Vorauflösung und Lock nicht durch stale Persistence-Context übergangen wird. Erst gezielt korrigieren, dann Race-/Securitytests wiederholen. LEFT JOIN FETCH für optionale Kategorien und Partner-Enablement sind bereits eingebaut und müssen mitgeprüft werden.
+
+**Vorhandene Manage-Category-Umsetzung:** `Category` mit optionalem `Product.articleCategory`-FK, normalisiertem eindeutigen Namen und Legacy-Synchronisierung; Company-CRUD ohne DELETE und mit expliziter Companyrolle; additive ORM-Migration nach Seed; Product-DTO/Request-Kompatibilität; Enablement-LEFT-JOIN-FETCH; Import-Prepare/Prepared-Validation. Backendtests bislang in fokussierten Läufen: Datenbasis 13/13, Migration/Seed 5/5, CategoryResource/Enablement/Product 17/17. Nach dem Import-Patch fehlt der fokussierte Importlauf sowie der abschließende Full-/Package-Lauf.
+
+**Review-/Scopegrenzen:** Nach jedem Task fokussiert testen; Checkbox nur bei erfüllten Akzeptanz-, Daten-/Security-, Test- und DoD-Nachweisen. Nach dem Change Strict-Validate, Full-Test/Package, Browser 1440/390, `partnerportal-quality`, Funktions-/Test-/Sinnhaftigkeitsreview und wegen Daten/Rollen/Input Securityreview. KI-Evidence nur mit tatsächlich ausgeführten Checks synchronisieren. CI/CD und MVP bleiben ohne neue Entscheidung/Nachweise außen vor; keine Mandantenfähigkeit, Subdomains, öffentlicher Partnershop, direkte BMD-Schnittstelle, Fachbereiche, Produktgruppen, Paketlogik oder KI.
+
+## Maßgeblicher Handoff — Arbeitsstand 12.09.2026
+
+Dieser Abschnitt hat Vorrang vor allen älteren Fortsetzungsangaben in dieser Datei.
+
+**Branch/Arbeitsbaum:** `docs/openspec-planning-2026-09-11`, uncommittet. Kein Commit, Push, Merge oder Deployment ausgeführt. `search-order-customers`, `clarify-order-customer-context`, `show-partner-company-name` und `use-huemer-demo-partner` wurden nach Abschlussprüfung als `openspec/changes/archive/2026-09-12-search-order-customers`, `openspec/changes/archive/2026-09-12-clarify-order-customer-context`, `openspec/changes/archive/2026-09-12-show-partner-company-name` beziehungsweise `openspec/changes/archive/2026-09-12-use-huemer-demo-partner` archiviert. Vorhandene Änderungen wurden bewahrt. Zusätzlich liegen zwei untracked lokale Browserbelege vor: `output/playwright/show-partner-company-name-desktop.png` und `output/playwright/show-partner-company-name-mobile.png`; nicht löschen oder ungeprüft committen.
+
+**Tatsächlicher Stand:**
+
+- `show-partner-company-name`: **3/3 Tasks fertig und archiviert** unter `openspec/changes/archive/2026-09-12-show-partner-company-name`. Portal- und Dashboardlabel nutzen den eigenen Profilnamen mit neutralem Retry; Rendergeneration, Logout-/Disconnected-Guards und Sitzungswechsel verhindern stale Namen. Browser 1440/390 belegte echten Huemer-Namen, Fehler-/Retrypfad, verzögerte Antworten nach Navigation/Abmeldung, Sitzungsrotation, langen Mobilnamen und Profilnavigation. `node --check`, `./mvnw package` (79/79), Strict-Validate und Diff-Check sowie `partnerportal-quality`, Funktions-/Sinnhaftigkeits-/Securityreview und unabhängiger Abschlussreview waren ohne Blocker.
+- `use-huemer-demo-partner`: **2/2 Tasks fertig und archiviert** unter `openspec/changes/archive/2026-09-12-use-huemer-demo-partner`. Der bestehende `PARTNER-DEMO`-Seed verwendet `Huemer GmbH`; Partnernummer, Beziehungen und Seed-Gating blieben erhalten. `PartnerResourceTest` fokussiert 12/12, vollständige Suite und Package 79/79, Strict-Validate und Diff-Check sowie lokaler Browsernachweis, Projekt-, Funktions-/Sinnhaftigkeits- und Securityreview waren ohne Blocker.
+- `search-order-customers`: **3/3 Tasks fertig und archiviert** unter `openspec/changes/archive/2026-09-12-search-order-customers`. Der Partner-Wizard nutzt lokale Suche über geladene eigene Kunden, native Auswahl, explizite Neuanlage, lokalen Entwurf und ein gültiges Weiter-/Checkpoint-Gate; die lokale Kunden-ID-Mitgliedschaft wird beim Weiter zusätzlich geprüft. Browser 1440/390 belegte >20/0 Treffer, Umlaute, Tastaturauswahl, Filter-/Kundenwechsel, Warenkorb-/Payload-Erhalt, Draftfortsetzung, Abbruch sowie Partner-/Company-Regression mit Mehrartikeln und Fehler-/Erfolgspfaden. Order-POSTs für die Erfolgspfade waren browserseitig gemockt; keine echten Testbestellungen wurden erzeugt. `node --check`, `./mvnw package` (79/79), `openspec validate search-order-customers --strict` und `git diff --check` erfolgreich. `partnerportal-quality`, lokaler Funktions-/Sinnhaftigkeits- und Securityreview sowie unabhängiger Abschlussreview ohne Blocker.
+- `clarify-order-customer-context`: **3/3 Tasks fertig und archiviert** unter `openspec/changes/archive/2026-09-12-clarify-order-customer-context`. Kundenüberschriften, exakter Prüfhint, Katalog-vor-Bestellpanel, responsive DOM-Reihenfolge und unveränderter Mock-Order-Vertrag sind belegt; Browser 1440/390 einschließlich Mengen-/Summen-, Erfolg-/Reset- und Safe-Text-Fällen, Java-21-Package 79/79, Strict-Validate, Diff-Check, `partnerportal-quality`, Funktions-/Sinnhaftigkeits-/Securityreview und unabhängiger Abschlussreview waren ohne Blocker.
+
+**Nächste Session:** Erst `git status --short --branch` und die vier Handoff-Dateien lesen. `search-order-customers`, `clarify-order-customer-context`, `show-partner-company-name` und `use-huemer-demo-partner` nicht erneut umsetzen; alle vier sind archiviert. Danach den nächsten nicht blockierten genehmigten Change `manage-article-categories` mit eigenem Status-/Apply-Aufruf und nur dessen Context-Files taskweise fortsetzen. `ci-cd-deployment-with-gh-actions` und `build-partnerportal-mvp` bleiben ohne neue Entscheidung/Nachweise außerhalb des Arbeitsplans. Kein Fetch/Pull bei schmutzigem Arbeitsbaum und keine OpenSpec-Archivierung ohne ausdrücklichen Auftrag.
+
+**Nachweisgrenze:** `python3 tools/ai_evidence_log.py sync` und `enrich` wurden in diesem Arbeitsblock ausgeführt. Browser-Erfolgspfade nutzten ausschließlich temporäre Playwright-Routen; keine echten Order-POSTs wurden dadurch persistiert. Keine weiteren Nachweise behaupten.
+
+## Maßgeblicher Handoff — 11.09.2026
+
+Diese Fortschreibung ersetzt widersprechende Status-/Blockerangaben weiter unten; ältere Abschnitte bleiben historische Herleitung. Kanonisches Ergebnis: [Planungsreview 11.09.2026](../openspec/PLANNING_REVIEW_2026-09-11.md).
+
+## Aktueller Fortsetzungspunkt — 11.09.2026
+
+`add-standalone-customer-creation` ist mit **6/6 Tasks fertig**, unter `openspec/changes/archive/2026-09-11-add-standalone-customer-creation` archiviert und nicht committed. Die Partnerübersicht erstellt Endkunden lokal im nativen Dialog über den vorhandenen partner-scoped Endpunkt; Pflichtdaten, Pending-Sperre, konservativer unklarer Speicherstatus, GET-only-Refresh und Wiederverwendung im Bestellwizard sind umgesetzt. Partnerisolation, Rollen, Inaktivstatus und Adressvalidierung sind in `KundeResourceTest` belegt.
+
+Belegt: fokussiert **9/9**, vollständiges `./mvnw test` und `./mvnw package` jeweils **79/79, 0 Fehler**; Strict-Validate und Diff-Check grün. Browser 1440/390 deckte Anlage mit leeren optionalen Kontakten, Filterreset, Sonderzeichen als Text, Pending-/Fehler-/Refreshpfade, Wizard-Wiederverwendung sowie anonyme/falsche Rollenrouten ab. Projekt-, Funktions- und Securityreview ohne Blocker. Nur erwarteter `favicon.ico`-404 des temporären Static-Servers. Nächster Change: `show-partner-company-name`.
+
+`align-visible-article-terminology` ist mit **2/2 Tasks** fertig und unter `openspec/changes/archive/2026-09-11-align-visible-article-terminology` archiviert. Der bestehende Frontenddiff blieb erhalten; sichtbare Navigation, Listen, Formulare, Bestellschritte und Backendfehler verwenden „Artikel“ beziehungsweise „Artikelkategorie“. Technische Keys, URLs, `productId` und Importaliasnamen einschließlich `produktname` blieben unverändert; keine sichtbare zusätzliche Artikel-ID wurde ergänzt.
+
+Belegt: Java 21, Fokuslauf `./mvnw test -Dtest=EnablementResourceTest,ProductResourceTest,OrderResourceTest` — **26/26**; vollständiges `./mvnw test` und `./mvnw package` — jeweils **77/77, 0 Fehler**; `openspec validate align-visible-article-terminology --strict` und `git diff --check` erfolgreich. Browserprüfung lief bei 1440/390 für Company-/Partner-Artikel, Import und Bestellwizard einschließlich lokaler Fehlerpfade. Projekt-, Funktions- und Securityreview ohne Blocker. Einziger Browserkonsolenbefund: erwarteter `favicon.ico`-404 des temporären Python-Static-Servers.
+
+`fix-partner-create-commission-default` ist ebenfalls mit **2/2 Tasks** fertig und unter `openspec/changes/archive/2026-09-11-fix-partner-create-commission-default` archiviert. Nur die manuelle Formularvorauswahl in `openCreate()` startet bei 5 %; API, Import, Datenmodell, bestehende Partner und Provisionen blieben unverändert. Browserprüfung 1440/390 belegt 5-%-POST, Abbruchreset, 10-%-Bearbeiten sowie gespeicherte individuelle 7,5 %; `./mvnw package` bestand mit 77/77, Strict-Validate und Diff-Check sind grün. Projekt- und Korrektheitsreview ohne Findings.
+
+Nach der Archivierung und dem selektiven Commit beginnt als Nächstes `show-partner-company-name`. Kein Fetch/Pull bei Dirty Worktree, kein Commit/Push/Merge/Deployment und keine VM-/Secret-/SSH-/Backup-Zugriffe. Fremde Frontend- und Präsentationsänderungen bewahren.
+
+Die drei Changes `align-visible-article-terminology`, `fix-partner-create-commission-default` und `add-standalone-customer-creation` sind implementiert, getestet und archiviert. Danach bleibt `show-partner-company-name` der nächste aktive Change. Fremde uncommittete Produkt- und Präsentationsänderungen wurden bewahrt.
+
+**Umsetzungsstand 11.09.2026:** Der lokale Keycloak-Dev-Service-Blocker für `align-visible-article-terminology` ist gelöst. Docker Desktop präsentierte Hostzugriffe mit einer öffentlichen Quell-IP; Testprofil-Hostname, dynamischer Backchannel, Issuer und Timeout wurden passend gesetzt. Der Change ist nun 2/2 fertig, strict validiert, vollständig getestet und unter `openspec/changes/archive/2026-09-11-align-visible-article-terminology` archiviert; nicht committed.
+
+Neueste Primärquelle ist `Documentation/Besprechungsprotokolle/Besprechungsprotokoll_10.9.md`; auch die Originale 25.08./31.08. wurden vollständig abgeglichen. Die Partnerfirma kommt vorerst aus `Partner.name`; Huemer GmbH ist synthetisch. Kategorienverwaltung ist ausdrücklich bestätigt und nicht mehr pauschal durch BMD blockiert. Kundensuche, ausdrücklicher Neuanlagebutton, Kundenüberschriften und Katalog links sind geplant. Kundenbearbeitung braucht zuerst entschiedene Altbestands-Snapshots. Keycloak-sub als Ziel bestätigt; Kontomapping und Betriebsprozess fehlen. Bestandsnummern erhalten.
+
+Stand: elf aktive Changes; abschließende READY-/Entscheidungsübersicht und exakte Prüfungen im verlinkten Report. Nicht erneut alte Roadmap-Aussagen („unabhängige Kundenverwaltung erledigt“, „Kategorieverwaltung unbestätigt“) übernehmen. Vor Apply tatsächlichen aktuellen Workspace und Report lesen.
+
+Branch dieses Planungsblocks: `docs/openspec-planning-2026-09-11`, Ausgangsrevision `fea0e5b`. Bereits unsauberer Worktree vollständig erhalten, kein Fetch/Pull, kein Commit/Push/Merge. Frontendreparatur lokal vorhanden; Produktivzustand nicht geprüft. Keine VM-/SSH-/Secret-/Backup-/Realmzugriffe.
+
+Nächster Schritt: nach dem Commit `show-partner-company-name` taskweise nach dem neuen Start-Prompt in `Specification/NEXT_SESSION_PLAN.md` umsetzen. Die drei archivierten Changes nicht erneut implementieren. Snapshot-, Login-, Nummern-, Upload-, BMD- und Betriebsblocker nicht durch Annahmen schließen. Visuelles Design/Präsentation bei Tobias belassen; 8.4 bleibt gemeinsam offen.
+
+### Verbindliches Apply-Protokoll
+
+- READY-Reihenfolge: `align-visible-article-terminology`, `fix-partner-create-commission-default`, `add-standalone-customer-creation`, `show-partner-company-name`, `use-huemer-demo-partner`, `search-order-customers`, `clarify-order-customer-context`, `manage-article-categories`, `define-mvp-traceability-format`; niemals mehrere gleichzeitig.
+- Je Change: `openspec status --change <name> --json`, dann `openspec instructions apply --change <name> --json`; ausschließlich dessen Context-Files lesen, Tasks streng nacheinander umsetzen und Checkboxen sofort nach erfüllter Task setzen.
+- Pro Task fokussiert testen. Nach einem Change strikt validieren, passende Backendtests/Package oder Desktop-/Mobile-Browserprüfung ausführen sowie `partnerportal-quality` und Funktions-/Test-/Sinnhaftigkeitsreview durchführen; bei Auth, Daten, Rollen oder Eingaben zusätzlich Securityreview. Findings beheben und erneut prüfen.
+- Nicht einplanen: Mandantenfähigkeit, Subdomains, öffentlicher Partnershop, direkte BMD-Schnittstelle, Fachbereiche, Produktgruppen, Paketlogik, KI-Feature. Bei Stopbedingung nicht raten: exakten Blocker im Change dokumentieren und pausieren.
+- Nicht archivieren oder committen. Zum Handoff nur tatsächlichen Stand in Continuation Prompt, Next Session Plan, Restarbeitsplan und Planning-Report nachziehen; keine Prüfungen erfinden. Nur Vorschläge mit exakten `git add`-Pfaden und Push-Befehl ausgeben, nichts davon ausführen.
+
+**Dokumentstand:** 11.09.2026
 
 **Zweck:** vollständiger operativer Handoff für eine neue Claude-/Codex-Session
 
 **Repository:** `/Users/mitgl/Desktop/Schule/4CHITM/Diplomarbeit/diplomarbeit-papo`
 
 Diese Datei ist so geschrieben, dass ein neues Modell nach vollständigem Lesen das Projekt, den implementierten Stand, die fachlichen Grenzen und die nächste Reihenfolge versteht. Flüchtige Angaben zu Git, Tests, Infrastruktur und OpenSpec müssen trotzdem vor jeder Arbeit neu verifiziert werden.
+
+**Aktueller Planungshandoff:** Für die nächste Astra-Planungssitzung zusätzlich `Specification/NEXT_SESSION_PLAN.md` und `docs/AI_WORKFLOW_EFFICIENCY.md` lesen. Der Handoff verlangt OpenSpec-Planung und Reviews, keine Implementierung oder Infrastrukturarbeit.
+
+## Fortsetzungspunkt nach Astra-Planung — 10.09.2026
+
+Nicht von vorn beginnen. Die Planungssitzung hat den Endkundenentwurf korrigiert und zwei kleine Changes vollständig erstellt. Kanonischer Ergebnisreport: `openspec/PLANNING_REVIEW_2026-09-10.md`.
+
+- `add-standalone-customer-creation` 0/6: **READY für Terra medium**. Bestehende API, partnerseitige Eigentümerauflösung und Formularhilfen; kein Realm-/Schemaumbau. Filter/Pagination, Pending, Tastatur, unklarer Speicherstatus und GET-only Retry sind spezifiziert.
+- `fix-partner-create-commission-default` 0/2: **READY für Terra medium**. Nur manuelle 5-%-Vorauswahl; keine API-/Import-/Bestandsänderung.
+- `define-mvp-traceability-format` 0/3: **READY für Terra medium**. Liefert später 33 Quellenzeilen und Evidenzformat; MVP-8.4 bleibt offen.
+- `build-partnerportal-mvp` 50/53: **BLOCKIERT für Abschluss** durch Tobias 8.3/FD.4 und gemeinsame 8.4-Ausfüllung. Aufgaben 10.1–10.5 wurden nur formal richtig nummeriert.
+- `ci-cd-deployment-with-gh-actions` 30/41: **BLOCKIERT**. P0-Ausfall, Frontendpfad und geschlossener PR #5 bleiben getrennt; aktuelle Tobias-Diagnose und datierte Betriebs-/Securitynachweise fehlen.
+
+Alle fünf Changes bestanden am 10.09.2026 `openspec validate <change> --strict`; `git diff --check` war sauber. Unabhängige Security-/Funktionsreviews des Endkundenplans wurden eingearbeitet. Die beiden kleinen Folgechanges wurden gegen dieselben vorab unabhängig geprüften Scope-/Securityentscheidungen und abschließend lokal reviewt. Keine Produkt-, Backend-, Browser-, Infrastruktur- oder externe Prüfung wurde ausgeführt.
+
+### Pflichtstart der nächsten Session
+
+1. Workspace und Branch prüfen; uncommittete Arbeit vollständig bewahren.
+2. Nur nach sicherem Sichern/sauberem Arbeitsbaum `git fetch --prune` und `git pull --ff-only`; bei Divergenz oder Konflikt stoppen und konkreten Blocker melden. Nicht automatisch stashen.
+3. Per Dateiliste das neueste Besprechungsprotokoll bestimmen, vollständig lesen und gegen den Stand 10.09 analysieren. Ein neueres Protokoll überschreibt ältere Planung, bedeutet aber nicht automatisch implementierten Code.
+4. `AGENTS.md`, diesen Handoff, `NEXT_SESSION_PLAN.md`, `RESTARBEITSPLAN`, FSD, Roadmap, Backlog, kanonische Specs und alle aktiven OpenSpec-Artefakte nur gezielt nach Revision/Betroffenheit lesen. Keine unnötigen Wiederholungsreads.
+5. Zuerst die drei READY-Changes auf Drift durch Git-/Besprechungsänderungen prüfen. Neue bestätigte Anforderungen sofort als getrennte kleine OpenSpec-Proposals planen; betroffene vorhandene Proposals korrigieren oder blockieren.
+6. Danach restliche Chris-Kandidaten vollständig durchplanen oder mit exakter fehlender Entscheidung blockieren. Abschlussziel und wortgetreuer `/goal` stehen oben in `NEXT_SESSION_PLAN.md`.
+
+Workspace beim letzten Check: Branch `main`, Tracking `origin/main`, zahlreiche vorhandene/uncommittete Benutzer- und Planänderungen. Kein Pull ausgeführt, weil der Arbeitsbaum nicht sauber war. Remote-Stand daher in der nächsten Session neu und sicher prüfen.
 
 ````text
 Du setzt die Arbeit am PAPO-Partnerportal fort. Lies diesen Continuation Prompt vollständig, bevor du Änderungen vorschlägst oder ausführst. Übernimm keine alten Erinnerungen ungeprüft.
@@ -25,7 +202,8 @@ Lies und analysiere in einer frischen Session mindestens diese Dateien, bevor du
 8. `Specification/ROADMAP_2026-08-25.md` — gespeicherter Zukunftsplan, aktualisiert durch die Entscheidungen vom 31.08.2026.
 9. `Specification/IMPLEMENTATION_PLAN.md` — ursprüngliche Arbeitspakete und Risiken.
 10. `docs/CONVENTIONS.md`, `docs/SETUP.md`, `docs/DATA_MODEL.md` — Code-, Runtime- und Datenmodellregeln.
-11. `openspec list --json`, danach Proposal/Design/Specs/Tasks jedes für die Aufgabe relevanten Changes.
+11. `docs/AI_WORKFLOW_EFFICIENCY.md` und bei Planung `Specification/NEXT_SESSION_PLAN.md`.
+12. `openspec list --json`, danach Proposal/Design/Specs/Tasks jedes für die Aufgabe relevanten Changes.
 
 Nur bei Arbeit am späteren Gesamtprodukt zusätzlich `Specification/functional_specification_document_full_vision.md` lesen. Dieses ältere Visionsdokument darf neuere Besprechungen oder die Roadmap nicht überstimmen.
 
@@ -170,7 +348,7 @@ Aus der Firmenmail und Besprechung vom 31.08. folgt:
 - Kategorie kann später kaufmännische Provisions-/Rabattregeln beeinflussen; solche Regeln sind jetzt nicht beauftragt.
 - Fachbereich ist eine spätere Grundlage für Schulungs-/Einschulungsberechtigungen.
 - Produktgruppe A/B/C/D ist ein separates späteres Merkmal für PP-/Margenlogik.
-- Artikelpakete/Stücklisten und eine übergeordnete Produktebene für Varianten sind spätere Möglichkeiten.
+- Artikelpakete/Stücklisten und eine übergeordnete Artikelebene für Varianten sind spätere Möglichkeiten.
 
 Der Betreuer bewertete den Gesamtumfang der ersten Firmenmail als zu groß. Eine vereinfachte Folgemail ist angekündigt. Vorher keinen Sammelchange für Artikelnummer, Kategorie, Fachbereich, Produktgruppe, Pakete und Provisionslogik anlegen. Die frühere Mail ist Architektur-/Zukunftskontext, keine vollständige aktuelle Anforderung.
 
@@ -284,7 +462,7 @@ Zuletzt verifizierter Snapshot (02.09.2026):
 
 Taskzahlen sind Snapshotwerte und mit `openspec list --json` zu verifizieren.
 
-## Rang 1 — `build-partnerportal-mvp` (50/53)
+## Rang 1 — `build-partnerportal-mvp` (50/53, bestätigt am 10.09.2026)
 
 Offen:
 
@@ -297,7 +475,11 @@ Dev-Services-Testpfad ist in `docs/SETUP.md` dokumentiert und am 02.09.2026 mit
 77/77 erfolgreichen Tests sowie erfolgreichem Paketbuild erneut bestätigt.
 Erst nach den drei echten offenen Aufgaben archivieren.
 
-## Rang 2 — `ci-cd-deployment-with-gh-actions` (25/41)
+## Rang 1a — `add-standalone-customer-creation` (0/5, geplant am 10.09.2026)
+
+Dieser uncommittete Entwurf untersucht eine Code-/Roadmap-Lücke: Die Partnerseite „Meine Endkunden" zeigt bisher nur eine Liste, obwohl API und Bestellwizard Endkunden anlegen können. Die nächste Astra-Session muss Proposal, Design, Delta-Spec, Tasks und Sicherheitsannahmen unabhängig prüfen; erst danach ist eine Terra-Freigabe möglich.
+
+## Rang 2 — `ci-cd-deployment-with-gh-actions` (30/41, bestätigt am 10.09.2026)
 
 Noch nicht implementierungsbereit: Der Change enthält ältere Oracle-/ARM-Annahmen
 und muss vor weiterer Umsetzung als Hetzner-x86_64-Plan überarbeitet und erneut
@@ -376,7 +558,7 @@ Erst spätere Produktstufen:
 - externer Endkunden-Partnershop;
 - Fachbereichs-/Schulungsberechtigungen;
 - Produktgruppen-/PP-/Margenlogik;
-- Artikelpakete/Stücklisten und Varianten-Produktebene;
+- Artikelpakete/Stücklisten und Varianten-Artikelebene;
 - erweiterte Trendanalysen;
 - KI-Funktion nur mit messbarem fachlichem Nutzen.
 

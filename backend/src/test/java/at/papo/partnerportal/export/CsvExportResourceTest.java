@@ -49,7 +49,7 @@ class CsvExportResourceTest {
         String mullerLine = lines.stream().filter(line -> line.contains("Müller")).findFirst()
                 .orElseThrow(() -> new AssertionError("erwartete Umlaut-Zeile (Müller) nicht in Export gefunden"));
         // German-locale Excel: decimal comma, dd.MM.yyyy - not the raw dot-decimal/ISO form.
-        assertEquals("\"" + today + "\";\"Elektro Huber GmbH\";\"Müller\";\"89,90\";\"10,00\";\"8,99\";\"Eingereicht\"",
+        assertEquals("\"" + today + "\";\"Huemer GmbH\";\"Müller\";\"89,90\";\"10,00\";\"8,99\";\"Eingereicht\"",
                 mullerLine);
     }
 

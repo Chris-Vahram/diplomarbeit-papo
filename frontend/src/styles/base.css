@@ -14,6 +14,7 @@
   src: url('/vendor/fonts/plus-jakarta-sans-cyrillic-ext.woff2') format('woff2');
   unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
 }
+
 @font-face {
   font-family: 'Plus Jakarta Sans';
   font-style: normal;
@@ -318,6 +319,18 @@ body {
   letter-spacing: var(--letter-spacing-wider);
   text-transform: uppercase;
   color: var(--text-brand);
+}
+
+.portal-label-retry {
+  display: block;
+  margin-top: var(--spacing-1);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .app-sidebar__nav {
@@ -2037,6 +2050,38 @@ table button[data-edit-id] {
   gap: var(--spacing-3);
 }
 
+.customer-create-dialog {
+  width: min(42rem, calc(100vw - 2rem));
+  border: 0;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-6);
+  color: var(--text-primary);
+  background: var(--surface-primary);
+}
+
+.customer-create-dialog::backdrop {
+  background: rgb(0 0 0 / 45%);
+}
+
+.customer-create-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-4);
+}
+
+.customer-create-dialog__header button {
+  border: 0;
+  background: none;
+  color: var(--text-secondary);
+  font-size: var(--font-size-xl);
+  line-height: 1;
+}
+
+.customer-create-status {
+  margin-bottom: var(--spacing-4);
+}
+
 .entity-form {
   display: flex;
   flex-direction: column;
@@ -2461,7 +2506,7 @@ legend {
 }
 
 /* Horizontally-scrolling single row rather than a wrapping grid: with the
-   "Übersicht"/cart-preview panel now owning its own column (produkte-step-layout
+   "Übersicht"/cart-preview panel now owning its own column (article-step-layout
    below), a wrapping multi-row grid would fight that column for height. A
    fixed card width (.product-card) lets the row scroll instead. */
 .catalog__grid {
@@ -2508,7 +2553,7 @@ legend {
 
 /* A fixed height (not aspect-ratio, which made this 13rem tall at the card's
    own 13rem width) - a tall thumbnail is what forced the whole row (and thus
-   produkte-step-layout's overflow:hidden fallback) to clip the add-to-cart
+   article-step-layout's overflow:hidden fallback) to clip the add-to-cart
    button. A shorter, width-independent thumb keeps a full card comfortably
    inside the calculated row height instead of relying on clipping at all. */
 .product-card__thumb {
@@ -2961,7 +3006,7 @@ legend {
   margin-top: var(--spacing-6);
 }
 
-/* "Produkte wählen" step: cart preview (left, fixed width) + catalog (right,
+/* "Artikel wählen" step: catalog (left, fixed width) + cart preview (right,
    remaining width). minmax(0, 1fr) is required, not just 1fr - it's what lets
    .catalog__grid's overflow-x:auto actually clip/scroll instead of the grid
    track growing to fit its content and blowing out the column.
@@ -2984,7 +3029,7 @@ legend {
    with the cart, and "Gesamtwert" never scrolls out of view. */
 .cart--preview {
   /* Overrides .cart's position:sticky - height already matches the catalog
-     column exactly (see produkte-step-layout above), so there's no extra
+     column exactly (see article-step-layout above), so there's no extra
      scroll room within the row for "stick while scrolling" to make sense. */
   position: static;
   display: flex;
@@ -2997,13 +3042,13 @@ legend {
      (too-small) requested height instead of what actually got rendered, and
      the mismatch reads as the box overflowing past its own bottom edge into
      whatever sits below it. min-height:0 removes that floor so shrinking the
-     row (produkte-step-layout's calc() above) actually shrinks this box too. */
+     row (article-step-layout's calc() above) actually shrinks this box too. */
   min-height: 0;
   overflow: hidden;
 }
 
 /* Same min-height:0 reasoning as .cart--preview - without it, a full card row
-   forces produkte-step-layout's row back up to its own natural height on a
+   forces article-step-layout's row back up to its own natural height on a
    short viewport regardless of the calc() above, which is what desynced
    .cart--preview's height:100% from the row's actual rendered size. overflow:
    hidden is the fallback for the (much rarer) case where even one card row
@@ -3038,7 +3083,7 @@ legend {
 }
 
 /* "Übersicht" step: Endkunde details (left) + cart summary (right), side by
-   side - align-items: start (not stretch, unlike produkte-step-layout above)
+   side - align-items: start (not stretch, unlike article-step-layout above)
    since there's no shared reference height to match here; each box just sizes
    itself, and .cart--summary below caps/scrolls independently so a long cart
    doesn't grow the page instead of the box. */
@@ -3052,7 +3097,7 @@ legend {
 .cart--summary {
   display: flex;
   flex-direction: column;
-  /* Same reasoning as .produkte-step-layout above, chrome total ≈ 27.5rem here
+  /* Same reasoning as .article-step-layout above, chrome total ≈ 27.5rem here
      (this step's two-line description is a bit taller). */
   max-height: min(24rem, calc(100vh - 27.5rem));
 }

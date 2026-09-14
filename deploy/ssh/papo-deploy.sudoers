@@ -1,0 +1,2 @@
+Defaults:papo-deploy env_keep += "SSH_ORIGINAL_COMMAND"
+papo-deploy ALL=(root) NOPASSWD: /usr/local/libexec/papo-deploy-gateway ""

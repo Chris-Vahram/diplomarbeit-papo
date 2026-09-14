@@ -18,7 +18,7 @@ public class EnablementService {
         Set<Long> enabledProductIds = ProductEnablement.<ProductEnablement>list("partner", partner).stream()
                 .map(e -> e.product.id)
                 .collect(java.util.stream.Collectors.toSet());
-        return Product.<Product>listAll().stream()
+        return Product.<Product>find("select p from Product p left join fetch p.articleCategory order by p.id").list().stream()
                 .map(product -> EnablementDto.from(product, enabledProductIds.contains(product.id)))
                 .toList();
     }
@@ -44,7 +44,9 @@ public class EnablementService {
     }
 
     public List<ProductDto> listEnabledProducts(Partner partner) {
-        return ProductEnablement.<ProductEnablement>list("partner", partner).stream()
+        return ProductEnablement.<ProductEnablement>find(
+                "select e from ProductEnablement e join fetch e.product p left join fetch p.articleCategory "
+                        + "where e.partner = ?1 order by p.id", partner).list().stream()
                 .map(e -> ProductDto.from(e.product))
                 .toList();
     }
@@ -68,7 +70,7 @@ public class EnablementService {
     private Product findProductOrThrow(Long productId) {
         Product product = Product.findById(productId);
         if (product == null) {
-            throw new ApiException(404, "Produkt nicht gefunden.");
+            throw new ApiException(404, "Artikel nicht gefunden.");
         }
         return product;
     }

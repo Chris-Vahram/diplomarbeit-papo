@@ -69,7 +69,8 @@ class EnablementResourceTest {
         given().auth().oauth2(token)
                 .when().get("/api/partner/products")
                 .then().statusCode(200)
-                .body("size()", is(3));
+                .body("size()", is(3))
+                .body("find { it.name == 'Bohrmaschine Profi 750W' }.category", is("Werkzeug"));
     }
 
     // product-enablement spec, "No enabled products handling": the endpoint the

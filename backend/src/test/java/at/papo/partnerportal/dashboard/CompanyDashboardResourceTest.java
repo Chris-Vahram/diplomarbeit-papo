@@ -37,7 +37,7 @@ class CompanyDashboardResourceTest {
         BigDecimal commissionBefore = before.getObject("totalCommission", BigDecimal.class);
         long fulfilledCountBefore = before.getLong("fulfilledOrderCount");
         BigDecimal partnerRevenueBefore = before.getObject(
-                "settlement.find { it.partnerName == 'Elektro Huber GmbH' }.revenue", BigDecimal.class);
+                "settlement.find { it.partnerName == 'Huemer GmbH' }.revenue", BigDecimal.class);
 
         int orderId = given().auth().oauth2(partnerToken).contentType("application/json")
                 .body("{\"newKunde\":{\"lastName\":\"Firmendashboardtest\",\"address\":{\"street\":\"Teststr.\",\"houseNumber\":\"11\",\"postalCode\":\"4020\",\"city\":\"Linz\",\"country\":\"Österreich\"}},"
@@ -61,7 +61,7 @@ class CompanyDashboardResourceTest {
                 .body("totalRevenue", is(revenueBefore.add(new BigDecimal("12.30")).floatValue()))
                 .body("totalCommission", is(commissionBefore.add(new BigDecimal("1.23")).floatValue()))
                 .body("fulfilledOrderCount", is((int) fulfilledCountBefore + 1))
-                .body("settlement.find { it.partnerName == 'Elektro Huber GmbH' }.revenue",
+                .body("settlement.find { it.partnerName == 'Huemer GmbH' }.revenue",
                         is(partnerRevenueBefore.add(new BigDecimal("12.30")).floatValue()))
                 .body("settlement.find { it.partnerName == 'Sanitär Bauer KG' }.fulfilledOrderCount", is(0))
                 .body("settlement.find { it.partnerName == 'Sanitär Bauer KG' }.revenue", is(0))

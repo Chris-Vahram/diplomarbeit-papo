@@ -1,8 +1,10 @@
 # Documentation TODO
 
-Stand: 2026-07-07
+Stand: 2026-09-14
 
-Der MVP ist technisch vorzeigbar. Offen ist vor allem die Diplomarbeits- und UI/UX-Dokumentation.
+Der technische MVP ist abgeschlossen. Offene Diplomarbeits- und UI/UX-Dokumentation wird unabhängig im OpenSpec-Change `complete-thesis-documentation` bearbeitet und blockiert den technischen MVP nicht.
+
+Visueller Polish ist für den aktuellen Screenstand abgeschlossen. Neue oder wesentlich geänderte Screens erhalten Desktop-/Mobile-Polish und passende Belege in ihrem jeweiligen UI-Change.
 
 ## Tobias: UI/UX-Dokumentation
 
@@ -12,12 +14,12 @@ Tobias dokumentiert, wie das Frontend aufgebaut, gestaltet und bedienbar ist.
 
 - Screenshots der wichtigsten Screens:
   - Login
-  - Company: Dashboard, Produkte, Partner, Bestellungen, Datenimport
-  - Partner: Dashboard, Produkte, Meine Bestellungen, Neue Bestellung, Profil
+  - Company: Dashboard, Artikel, Partner, Bestellungen, Datenimport
+  - Partner: Dashboard, Artikel, Meine Bestellungen, Neue Bestellung, Profil
 - User-Flows:
-  - Firma verwaltet Produkte und Partner
-  - Firma schaltet Produkte fuer Partner frei
-  - Partner sieht freigeschaltete Produkte
+  - Firma verwaltet Artikel und Partner
+  - Firma schaltet Artikel fuer Partner frei
+  - Partner sieht freigeschaltete Artikel
   - Partner erstellt eine Bestellung fuer einen Kunden
   - Firma bearbeitet den Bestellstatus
 - Design-System:
@@ -32,8 +34,8 @@ Tobias dokumentiert, wie das Frontend aufgebaut, gestaltet und bedienbar ist.
   - getrennte Company- und Partnerbereiche
   - klare Navigation
   - deutsche UI-Texte
-  - Such-/Pagination-Tabellen fuer viele Produkte/Partner
-  - Produktbilder zur besseren Erkennbarkeit
+  - Such-/Pagination-Tabellen fuer viele Artikel/Partner
+  - Artikelbilder zur besseren Erkennbarkeit
 
 ## Chris: Technische Diplomarbeits-Dokumentation
 
@@ -49,27 +51,33 @@ Chris dokumentiert, was technisch umgesetzt wurde, warum es so umgesetzt wurde u
 - Datenmodell:
   - auf `docs/DATA_MODEL.md` aufbauen
   - wichtige Entscheidungen erklaeren: Unit-Price-Snapshot, kein CommissionLevel, Partner/Kunde-Scoping
-- Requirements-Mapping:
-  - Tabelle mit `Anforderung | Umsetzung | Code/Modul | Test/Nachweis | Status`
+  - Requirements-Mapping:
+  - zentrale Matrix in [`docs/REQUIREMENTS_TRACEABILITY.md`](REQUIREMENTS_TRACEABILITY.md) mit Quelle, Verhalten/Abgrenzung, Code, Test/Beleg, Implementierungs- und Prüfstatus sowie Zuständigkeit/Blocker
+  - Chris pflegt die technische Zuordnung und ausführbaren Nachweise; Tobias ergänzt UI-/UX-Belege; die spätere fachliche Endabnahme erfolgt gemeinsam
 - Sicherheits- und Rollenmodell:
   - Company vs Partner
   - serverseitige Rollenpruefung
   - Partner sieht nur eigene Daten
 - Testkapitel:
-  - Backend-Test-Suite: 77/77 Tests grün (0 Fehler, 0 Fehlschläge, 0 übersprungen)
+  - Backend-Test-Suite: 100/100 Tests grün (0 Fehler, 0 Fehlschläge, 0 übersprungen)
   - Browserchecks/Demo-Flow
-  - relevante Edge Cases: falsche Rolle, inaktiver Partner, nicht freigeschaltete Produkte, ungueltige Imports, XSS bei Bild-URLs
+  - relevante Edge Cases: falsche Rolle, inaktiver Partner, nicht freigeschaltete Artikel, ungueltige Imports, XSS bei Bild-URLs
 - Deferred Scope:
   - B-01 bis B-08 aus `Specification/phase2_backlog.md`
   - klar schreiben: nicht vergessen, sondern bewusst aus dem MVP geschnitten
+
+### Offene Abnahme- und Dokumentationspunkte
+
+- Die Traceability-Matrix ist das gemeinsame Arbeitsformat; offene Zuordnungen bleiben ausdrücklich offen.
+- Die MVP-Punkte 8.3, 8.4 und FD.4 bleiben bis zu einer separaten fachlichen Prüfung offen.
 
 ### Beispiel fuer Requirements-Mapping
 
 | Anforderung | Umsetzung | Code/Modul | Test/Nachweis | Status |
 |---|---|---|---|---|
 | Partnerverwaltung | CRUD fuer Partner inkl. Provision und Aktivstatus | `partner` Package | `PartnerResourceTest` | umgesetzt |
-| Produktverwaltung | CRUD fuer Produkte inkl. Kategorie/Bild | `product` Package, Produktseiten | `ProductResourceTest`, Browsercheck | umgesetzt |
-| Produktfreischaltung | Partner sieht/bestellt nur freigeschaltete Produkte | `enablement` Package | `EnablementResourceTest` | umgesetzt |
+| Artikelverwaltung | CRUD fuer Artikel inkl. Kategorie/Bild | `product` Package, Artikelseiten | `ProductResourceTest`, Browsercheck | umgesetzt |
+| Artikelfreischaltung | Partner sieht/bestellt nur freigeschaltete Artikel | `enablement` Package | `EnablementResourceTest` | umgesetzt |
 | Bestellung | Partner erstellt Bestellung fuer Kunde mit mehreren Artikeln | `order` Package | `OrderResourceTest` | umgesetzt |
 | Provision | Provision wird pro Bestellung gespeichert | `commission` Package | Assertions in `OrderResourceTest` | umgesetzt |
 | Import | Excel/CSV Import mit Mapping und Validierung | `importer` Package | Import-Tests | umgesetzt |
@@ -107,8 +115,8 @@ Damit passt sie zu beidem:
 
 ### Finalisierung MVP
 
-Finalisierung MVP: Produktbilder-Feature abgeschlossen, Browser-/Security-Checks durchgefuehrt, OpenSpec archiviert, Remote-Stand gemerged und finalen MVP-Stand gepusht.
+Finalisierung MVP: Artikelbilder-Feature abgeschlossen, Browser-/Security-Checks durchgefuehrt, OpenSpec archiviert, Remote-Stand gemerged und finalen MVP-Stand gepusht.
 
 ### Groesserer Implementierungsblock
 
-MVP-Implementierung Partnerportal: Partner-/Produktverwaltung, Rollen und Zugriffsschutz, Produktfreischaltung, Kunden- und Bestellprozess, Provisionen, Dashboards, Import/Export, Tests und Demo-Verifikation umgesetzt.
+MVP-Implementierung Partnerportal: Partner-/Artikelverwaltung, Rollen und Zugriffsschutz, Artikelfreischaltung, Kunden- und Bestellprozess, Provisionen, Dashboards, Import/Export, Tests und Demo-Verifikation umgesetzt.

@@ -8,11 +8,14 @@ class CompanyProductListPage extends HTMLElement {
     this.classList.add("area--company");
     this.innerHTML = `
       <div class="list-header">
-        <h1>Produkte</h1>
-        <button type="button" class="button-primary" id="new-product-btn">Neues Produkt</button>
+        <h1>Artikelverwaltung</h1>
+        <div class="list-header__actions">
+          <a class="button-secondary" href="#/company/categories">Kategorien verwalten</a>
+          <button type="button" class="button-primary" id="new-product-btn">Neuer Artikel</button>
+        </div>
       </div>
       <data-table id="product-table"></data-table>
-      <modal-dialog id="product-modal" title="Neues Produkt">
+      <modal-dialog id="product-modal" title="Neuer Artikel">
         <form id="product-form" class="entity-form entity-form--grid">
           <input type="hidden" name="id" />
           <form-field label="Name" name="name" required></form-field>
@@ -20,7 +23,9 @@ class CompanyProductListPage extends HTMLElement {
           <form-field class="form-field--wide" label="Beschreibung" name="description">
             <textarea name="description"></textarea>
           </form-field>
-          <form-field label="Kategorie" name="category"></form-field>
+          <form-field label="Artikelkategorie" name="categoryId">
+            <select name="categoryId"><option value="">Keine Artikelkategorie</option></select>
+          </form-field>
           <image-chooser name="imageUrl" class="form-field--wide"></image-chooser>
           <label class="checkbox-field">
             <input type="checkbox" name="available" checked />
@@ -38,11 +43,11 @@ class CompanyProductListPage extends HTMLElement {
       { key: "imageUrl", label: "Bild", image: true },
       { key: "name", label: "Name" },
       { key: "priceLabel", label: "Preis (€)" },
-      { key: "category", label: "Kategorie" },
+      { key: "category", label: "Artikelkategorie" },
       { key: "availableLabel", label: "Verfügbar" },
       { key: "actions", label: "", html: true },
     ];
-    this.table.emptyMessage = "Noch keine Produkte angelegt.";
+    this.table.emptyMessage = "Noch keine Artikel angelegt.";
     this.table.searchKeys = ["name"];
     this.table.pageSize = 20;
 
@@ -62,10 +67,13 @@ class CompanyProductListPage extends HTMLElement {
 
   async load() {
     try {
-      this.products = await apiFetch("/company/products");
+      [this.products, this.categories] = await Promise.all([
+        apiFetch("/company/products"),
+        apiFetch("/company/categories"),
+      ]);
       const categories = [...new Set(this.products.map((p) => p.category).filter(Boolean))].sort();
       this.table.filters = [
-        { key: "category", type: "select", label: "Kategorie", options: categories.map((c) => ({ value: c, label: c })) },
+        { key: "category", type: "select", label: "Artikelkategorie", options: categories.map((c) => ({ value: c, label: c })) },
         {
           key: "availableLabel",
           type: "select",
@@ -76,6 +84,7 @@ class CompanyProductListPage extends HTMLElement {
           ],
         },
       ];
+      this.renderCategoryOptions();
       const rows = this.products.map((p) => ({
         imageUrl: p.imageUrl ?? "",
         name: p.name,
@@ -93,8 +102,9 @@ class CompanyProductListPage extends HTMLElement {
   openCreate() {
     this.form.reset();
     this.form.elements.id.value = "";
+    this.renderCategoryOptions();
     this.imageChooser.reset();
-    this.modal.setAttribute("title", "Neues Produkt");
+    this.modal.setAttribute("title", "Neuer Artikel");
     this.modal.open();
   }
 
@@ -105,10 +115,10 @@ class CompanyProductListPage extends HTMLElement {
     this.form.elements.name.value = product.name;
     this.form.elements.price.value = product.price;
     this.form.elements.description.value = product.description ?? "";
-    this.form.elements.category.value = product.category ?? "";
+    this.renderCategoryOptions(product.categoryId ?? "");
     this.imageChooser.value = product.imageUrl ?? "";
     this.form.elements.available.checked = product.available;
-    this.modal.setAttribute("title", "Produkt bearbeiten");
+    this.modal.setAttribute("title", "Artikel bearbeiten");
     this.modal.open();
   }
 
@@ -120,7 +130,7 @@ class CompanyProductListPage extends HTMLElement {
       name: data.get("name"),
       price: Number(data.get("price")),
       description: data.get("description") || null,
-      category: data.get("category") || null,
+      categoryId: data.get("categoryId") ? Number(data.get("categoryId")) : null,
       imageUrl: data.get("imageUrl") || null,
       available: this.form.elements.available.checked,
     };
@@ -128,16 +138,30 @@ class CompanyProductListPage extends HTMLElement {
     try {
       if (id) {
         await apiFetch(`/company/products/${id}`, { method: "PUT", body: JSON.stringify(payload) });
-        showToast("Produkt aktualisiert.", "success");
+        showToast("Artikel aktualisiert.", "success");
       } else {
         await apiFetch("/company/products", { method: "POST", body: JSON.stringify(payload) });
-        showToast("Produkt angelegt.", "success");
+        showToast("Artikel angelegt.", "success");
       }
       this.modal.close();
       this.load();
     } catch (error) {
       showToast(error.message, "error");
     }
+  }
+
+  renderCategoryOptions(selectedId = this.form.elements.categoryId.value) {
+    const select = this.form.elements.categoryId;
+    select.innerHTML = `<option value="">Keine Artikelkategorie</option>`;
+    for (const category of this.categories ?? []) {
+      if (category.active || String(category.id) === String(selectedId)) {
+        const option = document.createElement("option");
+        option.value = category.id;
+        option.textContent = `${category.name}${category.active ? "" : " (deaktiviert)"}`;
+        select.appendChild(option);
+      }
+    }
+    select.value = selectedId;
   }
 }
 

@@ -91,13 +91,13 @@ public class OrderService {
         for (OrderItemRequest itemRequest : request.items()) {
             Product product = Product.findById(itemRequest.productId());
             if (product == null) {
-                throw new ApiException(404, "Produkt nicht gefunden.");
+                throw new ApiException(404, "Artikel nicht gefunden.");
             }
             if (!enablementService.isEnabledForPartner(partner, product.id)) {
-                throw new ApiException(400, "Produkt \"" + product.name + "\" ist für Sie nicht freigeschaltet.");
+                throw new ApiException(400, "Artikel \"" + product.name + "\" ist für Sie nicht freigeschaltet.");
             }
             if (!product.available) {
-                throw new ApiException(400, "Produkt \"" + product.name + "\" ist derzeit nicht verfügbar.");
+                throw new ApiException(400, "Artikel \"" + product.name + "\" ist derzeit nicht verfügbar.");
             }
 
             OrderItem item = new OrderItem();

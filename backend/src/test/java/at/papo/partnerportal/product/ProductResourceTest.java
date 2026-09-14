@@ -8,6 +8,8 @@ import jakarta.inject.Inject;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 @QuarkusTest
 class ProductResourceTest {
@@ -88,5 +90,89 @@ class ProductResourceTest {
                 .when().put("/api/company/products/" + id)
                 .then().statusCode(200)
                 .body("imageUrl", org.hamcrest.Matchers.is("https://example.at/bild.jpg"));
+    }
+
+    @Test
+    void companyAssignsProductCategoryByIdAndReturnsCurrentName() {
+        String token = tokens.tokenFor("company-demo", "company-demo");
+        int categoryId = createCategory(token, "ID Kategorie");
+
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"name\":\"ID Kategorieartikel\",\"price\":7.50,\"categoryId\":" + categoryId + "}")
+                .when().post("/api/company/products")
+                .then().statusCode(200)
+                .body("categoryId", is(categoryId))
+                .body("category", is("ID Kategorie"));
+    }
+
+    @Test
+    void legacyCategoryNameResolvesWithoutCreatingCategory() {
+        String token = tokens.tokenFor("company-demo", "company-demo");
+        int categoryId = createCategory(token, "Legacy Kategorie");
+
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"name\":\"Legacy Kategorieartikel\",\"price\":8.50,\"category\":\" legacy kategorie \"}")
+                .when().post("/api/company/products")
+                .then().statusCode(200)
+                .body("categoryId", is(categoryId))
+                .body("category", is("Legacy Kategorie"));
+    }
+
+    @Test
+    void unknownOrConflictingCategoryInputLeavesProductUnchanged() {
+        String token = tokens.tokenFor("company-demo", "company-demo");
+        int productId = given().auth().oauth2(token).contentType("application/json")
+                .body("{\"name\":\"Kategoriefehlerartikel\",\"price\":11.00}")
+                .when().post("/api/company/products")
+                .then().statusCode(200)
+                .extract().path("id");
+
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"name\":\"Kategoriefehlerartikel geändert\",\"price\":12.00,\"categoryId\":999999}")
+                .when().put("/api/company/products/" + productId)
+                .then().statusCode(400);
+
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"name\":\"Kategoriefehlerartikel geändert\",\"price\":12.00,\"category\":\"Unbekannte Kategorie\"}")
+                .when().put("/api/company/products/" + productId)
+                .then().statusCode(400);
+
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"name\":\"Kategoriefehlerartikel geändert\",\"price\":12.00,\"categoryId\":1,\"category\":\"Werkzeug\"}")
+                .when().put("/api/company/products/" + productId)
+                .then().statusCode(400);
+
+        given().auth().oauth2(token)
+                .when().get("/api/company/products/" + productId)
+                .then().statusCode(200)
+                .body("name", is("Kategoriefehlerartikel"))
+                .body("categoryId", nullValue())
+                .body("category", nullValue());
+    }
+
+    @Test
+    void categoryCanBeClearedByOmittingBothInputs() {
+        String token = tokens.tokenFor("company-demo", "company-demo");
+        int categoryId = createCategory(token, "Löschbare Zuordnung");
+        int productId = given().auth().oauth2(token).contentType("application/json")
+                .body("{\"name\":\"Zuordnungartikel\",\"price\":13.00,\"categoryId\":" + categoryId + "}")
+                .when().post("/api/company/products")
+                .then().statusCode(200)
+                .extract().path("id");
+
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"name\":\"Zuordnungartikel\",\"price\":14.00}")
+                .when().put("/api/company/products/" + productId)
+                .then().statusCode(200)
+                .body("categoryId", nullValue())
+                .body("category", nullValue());
+    }
+
+    private int createCategory(String token, String name) {
+        return given().auth().oauth2(token).contentType("application/json")
+                .body("{\"name\":\"" + name + "\"}")
+                .when().post("/api/company/categories")
+                .then().statusCode(200)
+                .extract().path("id");
     }
 }
