@@ -9,7 +9,7 @@ externen SSH-Negativmatrix ohne lokalen Deploy-Key.
 
 ## Neuer Next-Session-Plan — Besprechungsprotokoll 14.9
 
-Das neue Protokoll `Documentation/Besprechungsprotokolle/Besprechungsprotokoll_14.9.md` ist gelesen. Die nächste Session priorisiert die Präsentation: `presentation/mvp-deck/index.html` sprachlich anpassen, digitale Souveränität mit 2–3 Folien erklären, GitHub-Stars und zwei echte Screenshots ergänzen, Clockify-Gesamtzeit darstellen und ein kurzes Probe-Gallopp-Drehbuch erstellen. Danach Desktop/Mobile und Offline-Assets prüfen und über PR mergen.
+Das neue Protokoll `Documentation/Besprechungsprotokolle/Besprechungsprotokoll_14.9.md` ist gelesen. Die Präsentation ist als 22-Folien-Deck umgesetzt, geprüft und gemergt; Clockify weist für Chris + Tobias im Workspace „DA“ vom 01.03.–30.09.2026 exakt 151:41:38 aus.
 
 Der Company-Notiz-Change ist archiviert und nicht erneut zu starten. Der nächste technische Andockpunkt nach der Präsentation bleibt `harden-deployment-gateway` 3/4 mit fehlender externer SSH-Negativmatrix; BMD-Nummern bleiben bis Beispieldaten/Vertrag begrenzt.
 
@@ -203,8 +203,8 @@ Keine Backend-/Browser-/Produkt-/Datenbanktests ausgeführt: diese Sitzung setzt
 `python3 tools/ai_evidence_log.py sync` nicht ausgeführt: das Skript liest standardmäßig externe Sessionarchive und schreibt ins private Roharchiv (tools/ai_evidence_log.py:21–23,194–217). Diese Zugriffe sind im engen Auftrag nicht freigegeben. Auch keine fingierte Enrichment-Zeile; dieser Repo-Report hält Zweck, Ergebnis und echte Prüfungen fest.
 # Fortschreibung — 14.09.2026 Präsentation
 
-Die Präsentation wurde auf 22 Folien fertiggestellt vorbereitet. Sie verwendet „Artikel“, erklärt
-Rollen und Bereitstellung verständlich für die Unternehmenszielgruppe und enthält GitHub-Stars,
-digitale Souveränität, zwei zusätzliche echte Screenshots, eine Clockify-Übersicht für Chris und
-Tobias sowie ein Demo-Drehbuch. Die fehlende Clockify-Istsumme bleibt als technischer Zugriffspunkt
-dokumentiert; der Zielwert „ca. 400 h“ wird nicht als Ist-Zeit ausgegeben.
+Die Präsentation wurde auf 22 Folien fertiggestellt. Sie verwendet „Artikel“, erklärt Rollen und
+Bereitstellung verständlich für die Unternehmenszielgruppe und enthält GitHub-Stars, digitale
+Souveränität, zwei zusätzliche echte Screenshots, eine Clockify-Übersicht für Chris und Tobias
+sowie ein Demo-Drehbuch. Clockify weist im Workspace „DA“ mit Teamfilter Chris + Tobias für
+01.03.–30.09.2026 exakt 151:41:38 Ist-Zeit aus; „ca. 400 h“ bleibt ein getrennter Zielwert.

@@ -4,11 +4,12 @@
 
 `complete-thesis-documentation` steht bei **3/6**. Die technische Dokumentation, die
 Traceability-Matrix und die UI/UX-Dokumentation sind erstellt; Tobias’ Prüfung der UI-/Screenshot-
-Belege bleibt offen.
+Belege bleibt offen. Die Präsentation ist auf 22 Folien fertiggestellt; Clockify weist für Chris +
+Tobias im Workspace „DA“ (01.03.–30.09.2026) exakt 151:41:38 Ist-Zeit aus.
 
 ## Neuer verbindlicher Next Step — Präsentation / Protokoll 14.9
 
-Das neue Protokoll `Documentation/Besprechungsprotokolle/Besprechungsprotokoll_14.9.md` ist vollständig gelesen und eingecheckt. Vor weiteren technischen OpenSpec-Changes wird die Präsentation in `presentation/mvp-deck/` überarbeitet: Formulierungen und Struktur, digitale Souveränität, GitHub-Stars, zwei zusätzliche Screenshots, Clockify-Gesamtübersicht und kurzes Demo-Drehbuch. Danach Browser-/Offline-/Lesbarkeitsprüfung und PR-Merge.
+Das neue Protokoll `Documentation/Besprechungsprotokolle/Besprechungsprotokoll_14.9.md` ist vollständig gelesen und eingecheckt. Die Präsentation in `presentation/mvp-deck/` ist mit Formulierungs-/Strukturkorrekturen, digitaler Souveränität, GitHub-Stars, zwei zusätzlichen Screenshots, Clockify-Gesamtübersicht und Demo-Drehbuch fertiggestellt, geprüft und gemergt.
 
 Archiviert und abgeschlossen: `add-company-internal-partner-note` unter `openspec/changes/archive/2026-09-14-add-company-internal-partner-note`; Haupt-Spec synchronisiert. Offen danach: Gateway 3/4 mit SSH-Negativmatrix, Thesis-Dokumentation und die vier Stammdaten-/BMD-Changes.
 
@@ -298,5 +299,5 @@ Nächste Astra-Session setzt beim obigen Stand fort. Vor Bewertung neuen Git-Sta
 Die Präsentation ist nach dem Protokoll 14.9 auf 22 Folien erweitert und für eine nichttechnische
 Firmenzielgruppe formuliert. Enthalten sind die fachlichen Sprachkorrekturen, GitHub-Stars,
 digitale Souveränität, zusätzliche echte Screenshots, die Clockify-Übersicht für Chris und Tobias
-und das Demo-Drehbuch. Die Ist-Summe aus Clockify konnte im angemeldeten Zen-Browser nicht verifiziert
-werden; der dokumentierte Zielwert „ca. 400 h“ bleibt entsprechend gekennzeichnet.
+und das Demo-Drehbuch. Clockify weist im Workspace „DA“ mit Teamfilter Chris + Tobias für
+01.03.–30.09.2026 exakt 151:41:38 Ist-Zeit aus; „ca. 400 h“ bleibt ein getrennter Zielwert.
