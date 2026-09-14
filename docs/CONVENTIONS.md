@@ -32,7 +32,7 @@ Every resource method annotated `@RolesAllowed("company")` or `@RolesAllowed("pa
 - **Money** (product price, unit-price snapshot, order value, commission basis/value, `commissionPercent`): `java.math.BigDecimal`, mapped to `numeric` — never `double`/`float`.
 - **`Order` entity maps to table `orders`** via `@Table(name = "orders")` — `ORDER` is a reserved SQL word in PostgreSQL and breaks schema generation otherwise.
 - Timestamps: `java.time` types (`LocalDate`/`Instant`), never `java.util.Date`.
-- Schema: Hibernate auto-generation (no Flyway). dev/test = `drop-and-create` + programmatic seed (`at.papo.partnerportal.seed.DemoDataSeeder`, gated to dev/test via `LaunchMode`); prod/demo = `update`, no auto-seed (demo data must survive restarts).
+- Schema: Hibernate auto-generation (no Flyway). dev/test = `drop-and-create` + programmatic seed (`at.papo.partnerportal.seed.DemoDataSeeder`, unconditional under dev/test `LaunchMode`); prod/demo = `update`, no auto-seed by default — opt-in only via `SEED_DEMO_DATA` (`papo.seed-demo-data`), see `docs/DEPLOYMENT.md`.
 
 ## Frontend (native Web Components)
 

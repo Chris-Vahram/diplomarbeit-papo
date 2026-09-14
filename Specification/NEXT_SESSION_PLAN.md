@@ -2,15 +2,12 @@
 
 ## Aktueller Startpunkt — 13.09.2026
 
-Fortschreibung 14.09.2026: Gateway 5.8 ist lokal umgesetzt; CI/CD **35/45**. Geprüft mit `sh -n`, isoliertem Harness 18/18, Strict-Validate und `git diff --check`. 5.9 wartet auf Tobias' sanitisierten VM-, Key-, Host-Key-, Eigentümer-, sudoers- und Remote-Negativnachweis. `HEAD d85e92f` und `origin/main 05e0bdd` divergieren 5/4; Merge-Simulation zeigt Konflikte in `DemoDataSeeder.java` sowie beim remote archivierten/lokal aktiven CI/CD-Change. Kein Pull/Merge/Push.
+Fortschreibung nach Integration 14.09.2026: `origin/main` `05e0bdd` ist kontrolliert übernommen. Der Basis-CI/CD-Change bleibt wie von Tobias geliefert archiviert; offene Gateway-Arbeit liegt in `harden-deployment-gateway` (**2/4**). Demo-Seeding ist übernommen, standardmäßig aus und mit der lokalen Kategorie-Migration kombiniert. Fokus 1/1, Suite 100/100 und Package 100/100 erfolgreich. Nächster Schritt: Tobias' VM-/Key-/sudoers-/Remote-Nachweise für Tasks 2.1/2.2; erst danach Aktivierung und finale Livechecks.
 
-- Git: `d85e92f`, Remote-Branch synchron, fünf Commits vor `origin/main`; Dirty Worktree bewahren.
 - MVP: `build-partnerportal-mvp` **53/53**, technisch abgeschlossen, nicht archiviert.
 - Apply-ready: `complete-thesis-documentation` **0/6** und `integrate-category-management-into-article-management` **0/4**.
-- CI/CD: **34/45**. P0 durch DB-Passwortdrift geklärt; Recovery mit Dump vor Rollenpasswort-Angleichung. Danach OIDC/API/Login/Bestellung.
 - GitHub belegt: GHCR privat, `main` geschützt. Julian besitzt laut Screenshot noch Write-Zugriff; klären.
-- Gateway `48ad4d8` nur selektiv auf aktuellen `frontend-live`-Stand portieren.
-- Reihenfolge: P0-Recovery, Dokumentation, Artikelverwaltungs-UX, Gateway-Hardening, Cron/Backup. Kein Volume löschen, keine Secrets ausgeben.
+- Reihenfolge: Gateway-Remote-Nachweise, Security-/Livechecks, Cron/Backup, danach Dokumentation und Präsentation. Kein Volume löschen, keine Secrets ausgeben.
 
 ## Tatsächlicher Abschlussstand — 12.09.2026
 

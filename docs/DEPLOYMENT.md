@@ -47,6 +47,7 @@ kein zusätzliches Secret nötig.
 | `KC_ADMIN_PASSWORD` | Keycloak-Admin-Passwort |
 | `DOMAIN` | Produktionsdomain — steuert `KC_HOSTNAME`, Caddy-TLS, Keycloak `redirectUris`/`webOrigins` (siehe `deploy/keycloak/render-and-start.sh`) |
 | `IMAGE_TAG` | Welches Image-Tag `docker-compose.prod.yml` zieht (normal `latest`, siehe Rollback) |
+| `SEED_DEMO_DATA` | Opt-in: Demo-Daten auf einer leeren DB seeden (siehe Abschnitt "Demo-Daten (`SEED_DEMO_DATA`)"); Default `false`, nie im Image |
 
 Das GHCR-Package ist **privat**; die VM authentifiziert sich einmalig per
 `docker login ghcr.io` mit einem VM-lokalen, read-only PAT (nicht in GitHub Secrets, nicht
@@ -99,6 +100,31 @@ offen):
 Offsite-Kopie (S3-kompatibler Object-Storage-Bucket via `rclone`) ist bewusst auf
 "vor echtem Produktivbetrieb" verschoben (siehe design.md Decision 7) — lokale Backups
 grenzen das Risiko während der Evaluationsphase (Kunde/Betreuer) ausreichend ein.
+
+## Demo-Daten (`SEED_DEMO_DATA`)
+
+Der `%prod`-Profil-Container läuft standardmäßig als `LaunchMode.NORMAL` und seedet nie
+Demo-Daten — die Kunden-Realm-Logins (`company-demo`/`partner-demo`, siehe Keycloak-
+Realm-Template) treffen sonst auf eine leere Datenbank.
+
+Setzt `SEED_DEMO_DATA=true` in der VM-lokalen `.env.prod` (nie im Image, nie als
+Default), läuft beim nächsten Start derselbe Seed wie in `%dev`/`%test`
+(`DemoDataSeeder`): Partner, Artikel, Artikel-Freischaltungen und ~5 Monate
+Bestellhistorie (für Dashboards/Provisionsansicht). `docker compose -f
+docker-compose.prod.yml --env-file .env.prod up -d` nach dem Setzen genügt, kein
+Neu-Build nötig.
+
+Der bestehende Schutz (`Partner.count() > 0`) gilt unverändert: Sobald irgendein
+Partner existiert (geseedet oder aus echtem Import), seedet ein Neustart/Redeploy mit
+`SEED_DEMO_DATA=true` nicht erneut — keine Duplikate.
+
+**Vor echtem Kunden-Onboarding (reale Partner/Artikel):** `SEED_DEMO_DATA` in
+`.env.prod` wieder auf `false` setzen (oder die Zeile entfernen) **und** die geseedeten
+Zeilen entfernen — da `%prod` `update` als Schema-Strategie nutzt (kein automatischer
+Reset), bleiben sie sonst neben echten Daten stehen. Ohne dedizierte "Clear"-Funktion
+manuell per `docker compose -f docker-compose.prod.yml down -v` (löscht das komplette
+Postgres-Volume, danach frisch seeden lassen oder `SEED_DEMO_DATA=false` lassen) oder
+gezielte `DELETE`-Statements.
 
 ## CORS
 

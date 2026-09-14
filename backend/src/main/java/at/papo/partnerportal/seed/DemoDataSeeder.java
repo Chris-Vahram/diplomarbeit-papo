@@ -20,16 +20,20 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-// Dev/test only (never in the packaged demo run — LaunchMode.NORMAL), matching
-// the drop-and-create schema strategy for those profiles (docs/CONVENTIONS.md,
-// docs/SETUP.md). Not a raw import.sql: Hibernate's default pooled sequence
-// optimizer (block size 50) would collide hand-picked seed ids with the first
-// id the app allocates at runtime, so seed rows are persisted through Panache
+// Dev/test always seed (LaunchMode DEVELOPMENT/TEST), matching the drop-and-create
+// schema strategy for those profiles (docs/CONVENTIONS.md, docs/SETUP.md). Under
+// LaunchMode.NORMAL (packaged/deployed runs, e.g. the VM) seeding only happens when
+// explicitly opted into via papo.seed-demo-data=true (SEED_DEMO_DATA env var, VM-local
+// .env.prod only - see docs/DEPLOYMENT.md); it must be turned off again before real
+// customer partners/articles are onboarded. Not a raw import.sql: Hibernate's default
+// pooled sequence optimizer (block size 50) would collide hand-picked seed ids with the
+// first id the app allocates at runtime, so seed rows are persisted through Panache
 // like any other entity and let Hibernate assign ids itself.
 @ApplicationScoped
 public class DemoDataSeeder {
@@ -43,16 +47,20 @@ public class DemoDataSeeder {
     @Inject
     CategoryMigrationService categoryMigrationService;
 
+    @ConfigProperty(name = "papo.seed-demo-data", defaultValue = "false")
+    boolean seedDemoData;
+
     @Transactional
     void onStart(@Observes StartupEvent event) {
-        if (shouldSeed(LaunchMode.current(), Partner.count())) {
+        LaunchMode launchMode = LaunchMode.current();
+        if (shouldSeed(launchMode, Partner.count(), seedDemoData)) {
             seedPartners();
             seedProducts();
             seedProductImages();
             seedEnablements();
-            // Demo orders only in dev/demo — tests assume a clean order baseline
-            // (specific partners with zero orders), so don't seed them under %test.
-            if (LaunchMode.current() == LaunchMode.DEVELOPMENT) {
+            // Tests assume a clean order baseline, so seed orders only in dev or
+            // in the explicit NORMAL+flag demo path.
+            if (launchMode == LaunchMode.DEVELOPMENT || launchMode == LaunchMode.NORMAL) {
                 seedOrders();
             }
         }
@@ -60,7 +68,11 @@ public class DemoDataSeeder {
     }
 
     static boolean shouldSeed(LaunchMode launchMode, long partnerCount) {
-        return launchMode != LaunchMode.NORMAL && partnerCount == 0;
+        return shouldSeed(launchMode, partnerCount, false);
+    }
+
+    static boolean shouldSeed(LaunchMode launchMode, long partnerCount, boolean seedDemoData) {
+        return partnerCount == 0 && (launchMode != LaunchMode.NORMAL || seedDemoData);
     }
 
     private void seedPartners() {

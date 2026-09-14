@@ -2,7 +2,7 @@
 
 ## Aktueller Orchesterstatus — 14.09.2026
 
-Kategorie-Navigation ist geprüft und archiviert. P0-Recovery ist laut Live-Bericht erfolgreich. Gateway 5.8 ist lokal implementiert und geprüft; CI/CD 35/45, 5.9 wartet auf Tobias' Remote-Nachweise. Lokaler Branch bleibt dirty auf `d85e92f`; `origin/main` `05e0bdd` divergiert 5/4 und ist wegen DemoSeeder-/CI-CD-OpenSpec-Konflikten nicht blind mergebar. Präsentation nutzt „Artikel“. Clockify-Zeit niemals erfinden.
+Kategorie-Navigation ist geprüft und archiviert. `origin/main` `05e0bdd` ist kontrolliert integriert; Tobias' Basis-CI/CD-Change bleibt archiviert. Gateway-Härtung wird separat in `harden-deployment-gateway` 2/4 fortgeführt und wartet auf Tobias' VM-Nachweise. Demo-Seeding ist standardmäßig aus und erhält die Kategorie-Migration; Integrationstests und Package 100/100 grün. Präsentation nutzt „Artikel“. Clockify-Zeit niemals erfinden.
 
 ## Project owner
 This project belongs to **Chris**.

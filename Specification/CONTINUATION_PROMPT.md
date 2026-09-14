@@ -2,15 +2,16 @@
 
 ## Aktueller Orchester-Handoff — 14.09.2026
 
-- Branch `docs/openspec-planning-2026-09-11`, HEAD `d85e92f`, Dirty Worktree. `git fetch origin` erledigt; kein Pull/Merge/Push.
-- `origin/main` `05e0bdd` enthält neue Tobi-Commits, diver­giert aber und setzt teils „Produkte“. Kein blinder Pull; selektiv prüfen.
+- `origin/main` `05e0bdd` wurde kontrolliert integriert; Tobias' CI/CD- und Demo-Seeding-Archive bleiben erhalten. Konflikte wurden ohne Verlust der lokalen Kategorie-Migration gelöst.
+- Der archivierte Basis-Change wird durch `harden-deployment-gateway` (**2/4**) ergänzt: lokale Gateway-Umsetzung/Harness fertig, VM-Installation und Remote-Negativ-/Livechecks bei Tobias offen.
+- `SEED_DEMO_DATA` bleibt standardmäßig `false`; Produktion mit Bestellung `#51` wurde nicht verändert und das Flag nicht aktiviert. `CategoryMigrationService` läuft unabhängig vom Seed weiter.
+- Nachweise der Integration: Seeder-Fokus 1/1, vollständige Tests 100/100, Package 100/100 erfolgreich. Kein Deployment oder Volume-Eingriff.
+
 - P0-Recovery laut Betriebsnachweis erfolgreich: Dumps, Passwortangleichung, Services, OIDC/API-401, Logins und Bestellung #51 bis `FULFILLED`.
 - `integrate-category-management-into-article-management` 4/4 geprüft und archiviert unter `openspec/changes/archive/2026-09-14-integrate-category-management-into-article-management`.
-- Aktiv: CI/CD 35/45 und `complete-thesis-documentation` 0/6. Gateway 5.8 lokal umgesetzt; 5.9 bleibt Tobias-/Remote-Nachweis-abhängig.
-- Gateway 5.8 ist lokal umgesetzt und geprüft; CI/CD steht nun bei **35/45**. `sh -n`, isolierter Harness 18/18, Strict-Validate und Diff-Check sind grün. 5.9 bleibt bis zu Tobias' VM-/Key-/Host-Key-/sudoers-Nachweisen blockiert.
-- Fetch 14.09: `HEAD d85e92f` gegen `origin/main 05e0bdd` divergiert 5/4. Merge-Simulation meldet Konflikte in `DemoDataSeeder.java` sowie im lokal aktiven/remote archivierten CI/CD-Change; kein Pull/Merge/Push.
-- Reihenfolge: Remote-Diff/CI-Auswirkung, Gateway, finale Security-/Live-Reviews, dann Thesis-Doku/Präsentation. Präsentation konsequent „Artikel“.
-- Clockify nur mit echten Nachweisen; keine erfundenen Stunden/Uhrzeiten.
+- Aktiv: `harden-deployment-gateway` 2/4 und `complete-thesis-documentation` 0/6.
+- Reihenfolge: Tobias' Gateway-Nachweise, finale Security-/Live-Reviews, dann Thesis-Doku/Präsentation. Präsentation konsequent „Artikel“.
+- Clockify nur anhand nachvollziehbarer Tätigkeiten beschreiben.
 
 ## Maßgeblicher Planungsnachtrag — 13.09.2026
 

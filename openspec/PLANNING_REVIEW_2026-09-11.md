@@ -2,12 +2,13 @@
 
 ## Orchester-Fortschreibung — 14.09.2026
 
+- `origin/main` `05e0bdd` kontrolliert integriert. Tobias' Basis-CI/CD- und Demo-Seeding-Archive bleiben erhalten; offene Gateway-Sicherheitsarbeit ist im aktiven `harden-deployment-gateway` (**2/4**) nachvollziehbar.
+- Seeder-Konflikt kombiniert: Opt-in-Normal-Seeding plus weiterhin unabhängige Kategorie-Migration. Flag nicht aktiviert, keine VM-/Produktionsdaten geändert.
+- Integration geprüft: Seeder 1/1, vollständige Suite 100/100 und Package 100/100 erfolgreich.
+
 - Kategorien-Change: **4/4, archiviert** am 14.09.
 - P0-Recovery laut Betriebsnachweis erfolgreich; CI-Nachweise/Tasks noch synchronisieren.
-- `origin/main` `05e0bdd` ist nicht merge-sicher: lokale Kategorie-Implementierung fehlt dort, Präsentation setzt teils „Produkte“. Kein blinder Pull.
-- Nächste Entscheidungen: Gateway selektiv portieren; Remote-Installation erst nach Tobias-Nachweisen; danach Security-/Live-Checks, Thesis-Doku, Präsentation.
-- Gateway 5.8 ist lokal selektiv portiert; CI/CD **35/45**. `sh -n`, Harness 18/18, Strict-Validate und Diff-Check erfolgreich. 5.9 bleibt Tobias-/Remote-blockiert.
-- Fetch: `HEAD d85e92f` vs. `origin/main 05e0bdd`, Divergenz 5/4. Konkrete Mergekonflikte: `DemoDataSeeder.java` und remote archivierter versus lokal aktiver CI/CD-Change. Kein Pull/Merge/Push.
+- Nächste Entscheidung: Remote-Installation erst nach Tobias-Nachweisen; danach Security-/Live-Checks, Thesis-Doku und Präsentation.
 
 ## Fortschreibung — 13.09.2026
 
