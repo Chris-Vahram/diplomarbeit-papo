@@ -7,6 +7,7 @@ import { escapeHtml } from "./html.js";
 const routes = {
   "/login": { tag: "login-page", role: null, title: "Anmeldung" },
   "/company/dashboard": { tag: "company-dashboard-page", role: "company", title: "Firmen-Dashboard" },
+  "/company/profile": { tag: "company-profile-page", role: "company", title: "Firmenprofil" },
   "/company/products": { tag: "company-product-list-page", role: "company", title: "Artikelverwaltung" },
   "/company/categories": { tag: "company-category-list-page", role: "company", title: "Artikelkategorien" },
   "/company/partners": { tag: "company-partner-list-page", role: "company", title: "Partnerverwaltung" },
@@ -22,6 +23,7 @@ const routes = {
 
 const NAV_ICONS = {
   "/company/dashboard": "layout-dashboard",
+  "/company/profile": "building-2",
   "/company/products": "package",
   "/company/categories": "tags",
   "/company/partners": "users",
@@ -134,6 +136,7 @@ function renderNav() {
   const links = session.isCompany
     ? [
         ["/company/dashboard", "Dashboard"],
+        ["/company/profile", "Firmenprofil"],
         ["/company/orders", "Bestellungen"],
         ["/company/partners", "Partnerverwaltung"],
         ["/company/products", "Artikelverwaltung"],
@@ -193,7 +196,7 @@ function renderNav() {
   });
   menu.querySelector('[data-action="profile"]').addEventListener("click", () => {
     closeProfileMenu();
-    location.hash = session.isCompany ? "#/company/dashboard" : "#/partner/profile";
+    location.hash = session.isCompany ? "#/company/profile" : "#/partner/profile";
   });
 
   window.lucide?.createIcons();
@@ -303,6 +306,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   await import("../components/index.js");
   import("../pages/login-page.js");
   import("../pages/company-dashboard-page.js");
+  import("../pages/company-profile-page.js");
   import("../pages/company-product-list-page.js");
   import("../pages/company-category-list-page.js");
   import("../pages/company-partner-list-page.js");

@@ -2,6 +2,7 @@ import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import { formatNumber } from "../lib/format.js";
 import { addressFieldsHtml, readAddress, fillAddress } from "../lib/address-fields.js";
+import { taxIdentifierFieldsHtml, readTaxIdentifier, fillTaxIdentifier } from "../lib/tax-identifier-fields.js";
 
 // Commission dropdown presets per FSD FR-19/partner-management spec: 5/10/15 or a custom value.
 const COMMISSION_PRESETS = ["5", "10", "15"];
@@ -24,6 +25,7 @@ class CompanyPartnerListPage extends HTMLElement {
           </p>
           <form-field label="Name" name="name" required></form-field>
           ${addressFieldsHtml("address")}
+          ${taxIdentifierFieldsHtml()}
           <form-field label="E-Mail" name="email" type="email"></form-field>
           <form-field label="Telefon" name="phone"></form-field>
           <form-field class="form-field--wide" label="Interne Notiz – nur für das Unternehmen" name="internalNote">
@@ -157,6 +159,7 @@ class CompanyPartnerListPage extends HTMLElement {
     this.form.elements.partnerNumber.value = partner.partnerNumber;
     this.form.elements.name.value = partner.name;
     fillAddress(this.form, "address", partner.address);
+    fillTaxIdentifier(this.form, partner.taxIdentifier);
     this.form.elements.email.value = partner.email ?? "";
     this.form.elements.phone.value = partner.phone ?? "";
     this.form.elements.internalNote.value = partner.internalNote ?? "";
@@ -213,6 +216,8 @@ class CompanyPartnerListPage extends HTMLElement {
 
   async handleSubmit(event) {
     event.preventDefault();
+    if (this.submitting) return;
+    this.submitting = true;
     const data = new FormData(this.form);
     const id = data.get("id");
     const preset = data.get("commissionPercentPreset");
@@ -222,6 +227,7 @@ class CompanyPartnerListPage extends HTMLElement {
       partnerNumber: data.get("partnerNumber"),
       name: data.get("name"),
       address: readAddress(this.form, "address"),
+      taxIdentifier: readTaxIdentifier(this.form),
       email: data.get("email") || null,
       phone: data.get("phone") || null,
       internalNote: data.get("internalNote"),
@@ -241,6 +247,8 @@ class CompanyPartnerListPage extends HTMLElement {
       this.load();
     } catch (error) {
       showToast(error.message, "error");
+    } finally {
+      this.submitting = false;
     }
   }
 }

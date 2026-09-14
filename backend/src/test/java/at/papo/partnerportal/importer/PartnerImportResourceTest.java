@@ -29,6 +29,8 @@ class PartnerImportResourceTest {
     // they check (address umlaut decoding is covered by commitDecodesIso88591FileWithUmlauts).
     private static final String ADDRESS_MAPPING = "\"street\":\"Strasse\",\"houseNumber\":\"Hausnummer\","
             + "\"postalCode\":\"PLZ\",\"city\":\"Ort\",\"country\":\"Land\"";
+    private static final String TAX_MAPPING = "\"taxCountry\":\"Steuerland\",\"taxIdentifierType\":\"Steuerart\","
+            + "\"taxIdentifierValue\":\"Steuernummer\"";
 
     @Test
     void previewSuggestsMappingFromKnownHeaderNames() {
@@ -55,13 +57,13 @@ class PartnerImportResourceTest {
     void commitAcceptsValidRowsRejectsInvalidAndDuplicateRows() {
         String token = tokens.tokenFor("company-demo", "company-demo");
         // Row 1: valid new partner. Row 2: missing name. Row 3: duplicate of seeded PARTNER-DEMO.
-        String csvText = "Nr,Name,Strasse,Hausnummer,PLZ,Ort,Land,Provision\n"
-                + "P-9002,Neupartner,Teststraße,1,4020,Linz,Österreich,8\n"
-                + ",Ohne Nummer,Teststraße,1,4020,Linz,Österreich,5\n"
-                + "PARTNER-DEMO,Duplikat,Teststraße,1,4020,Linz,Österreich,10\n";
+        String csvText = "Nr,Name,Strasse,Hausnummer,PLZ,Ort,Land,Steuerland,Steuerart,Steuernummer,Provision\n"
+                + "P-9002,Neupartner,Teststraße,1,4020,Linz,Österreich,AT,VAT_ID,ATU45678901,8\n"
+                + ",Ohne Nummer,Teststraße,1,4020,Linz,Österreich,AT,VAT_ID,ATU45678902,5\n"
+                + "PARTNER-DEMO,Duplikat,Teststraße,1,4020,Linz,Österreich,AT,VAT_ID,ATU45678903,10\n";
         byte[] csv = csvText.getBytes(StandardCharsets.UTF_8);
         String mapping = "{\"partnerNumber\":\"Nr\",\"name\":\"Name\"," + ADDRESS_MAPPING
-                + ",\"commissionPercent\":\"Provision\"}";
+                + "," + TAX_MAPPING + ",\"commissionPercent\":\"Provision\"}";
 
         given().auth().oauth2(token)
                 .multiPart("file", "partner.csv", csv, "text/csv")
@@ -75,7 +77,8 @@ class PartnerImportResourceTest {
         given().auth().oauth2(token)
                 .when().get("/api/company/partners")
                 .then().statusCode(200)
-                .body("find { it.partnerNumber == 'P-9002' }.name", is("Neupartner"));
+                .body("find { it.partnerNumber == 'P-9002' }.name", is("Neupartner"))
+                .body("find { it.partnerNumber == 'P-9002' }.taxIdentifier.value", is("ATU45678901"));
     }
 
     @Test
@@ -83,11 +86,11 @@ class PartnerImportResourceTest {
         String token = tokens.tokenFor("company-demo", "company-demo");
         // Seeded demo partner's canonical number is "PARTNER-DEMO" — mixed-case
         // "partner-demo" must still be caught as a duplicate after canonicalization.
-        String csvText = "Nr,Name,Strasse,Hausnummer,PLZ,Ort,Land,Provision\n"
-                + "partner-demo,Kleinschreibung,Teststraße,1,4020,Linz,Österreich,5\n";
+        String csvText = "Nr,Name,Strasse,Hausnummer,PLZ,Ort,Land,Steuerland,Steuerart,Steuernummer,Provision\n"
+                + "partner-demo,Kleinschreibung,Teststraße,1,4020,Linz,Österreich,AT,VAT_ID,ATU45678904,5\n";
         byte[] csv = csvText.getBytes(StandardCharsets.UTF_8);
         String mapping = "{\"partnerNumber\":\"Nr\",\"name\":\"Name\"," + ADDRESS_MAPPING
-                + ",\"commissionPercent\":\"Provision\"}";
+                + "," + TAX_MAPPING + ",\"commissionPercent\":\"Provision\"}";
 
         given().auth().oauth2(token)
                 .multiPart("file", "partner.csv", csv, "text/csv")
@@ -97,6 +100,27 @@ class PartnerImportResourceTest {
                 .body("acceptedCount", is(0))
                 .body("rejectedCount", is(1))
                 .body("rows[0].errors[0]", is("Existiert bereits."));
+    }
+
+    @Test
+    void commitRejectsInvalidAndPartialTaxIdentifiersPerRow() {
+        String token = tokens.tokenFor("company-demo", "company-demo");
+        String csvText = "Nr,Name,Strasse,Hausnummer,PLZ,Ort,Land,Steuerland,Steuerart,Steuernummer,Provision\n"
+                + "P-9010,Ungültig,Teststraße,1,4020,Linz,Österreich,AT,NATIONAL_TAX_ID,12345678,5\n"
+                + "P-9011,Unvollständig,Teststraße,1,4020,Linz,Österreich,AT,,ATU12345678,5\n";
+        String mapping = "{\"partnerNumber\":\"Nr\",\"name\":\"Name\",\"street\":\"Strasse\","
+                + "\"houseNumber\":\"Hausnummer\",\"postalCode\":\"PLZ\",\"city\":\"Ort\","
+                + "\"country\":\"Land\"," + TAX_MAPPING + ",\"commissionPercent\":\"Provision\"}";
+
+        given().auth().oauth2(token)
+                .multiPart("file", "partner.csv", csvText.getBytes(StandardCharsets.UTF_8), "text/csv")
+                .multiPart("mapping", mapping)
+                .when().post("/api/company/import/partners/commit")
+                .then().statusCode(200)
+                .body("acceptedCount", is(0))
+                .body("rejectedCount", is(2))
+                .body("rows[0].errors[0]", is("Eine österreichische Steuernummer muss genau neun Ziffern enthalten."))
+                .body("rows[1].errors[0]", is("Steueridentifikation muss vollständig angegeben werden."));
     }
 
     @Test
@@ -117,11 +141,11 @@ class PartnerImportResourceTest {
     void commitDecodesIso88591FileWithUmlauts() {
         String token = tokens.tokenFor("company-demo", "company-demo");
         // File encoded as ISO-8859-1 (German-locale Excel default), not UTF-8.
-        String csvText = "Nr,Name,Strasse,Hausnummer,PLZ,Ort,Land,Provision\n"
-                + "P-9004,Müller & Söhne,Teststraße,1,4020,Linz,Österreich,5\n";
+        String csvText = "Nr,Name,Strasse,Hausnummer,PLZ,Ort,Land,Steuerland,Steuerart,Steuernummer,Provision\n"
+                + "P-9004,Müller & Söhne,Teststraße,1,4020,Linz,Österreich,AT,VAT_ID,ATU45678905,5\n";
         byte[] csv = csvText.getBytes(StandardCharsets.ISO_8859_1);
         String mapping = "{\"partnerNumber\":\"Nr\",\"name\":\"Name\"," + ADDRESS_MAPPING
-                + ",\"commissionPercent\":\"Provision\"}";
+                + "," + TAX_MAPPING + ",\"commissionPercent\":\"Provision\"}";
 
         given().auth().oauth2(token)
                 .multiPart("file", "partner.csv", csv, "text/csv")

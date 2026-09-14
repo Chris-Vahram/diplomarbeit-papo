@@ -1,5 +1,6 @@
 package at.papo.partnerportal.partner;
 
+import at.papo.partnerportal.business.BusinessTaxIdentifierDto;
 import at.papo.partnerportal.common.AddressRequest;
 
 import java.math.BigDecimal;
@@ -13,11 +14,13 @@ public record CompanyPartnerDto(
         String phone,
         String internalNote,
         BigDecimal commissionPercent,
-        boolean active
+        boolean active,
+        BusinessTaxIdentifierDto taxIdentifier
 ) {
     public static CompanyPartnerDto from(Partner partner) {
         return new CompanyPartnerDto(partner.id, partner.partnerNumber, partner.name,
                 AddressRequest.from(partner.address), partner.email, partner.phone,
-                partner.internalNote, partner.commissionPercent, partner.active);
+                partner.internalNote, partner.commissionPercent, partner.active,
+                BusinessTaxIdentifierDto.from(partner.taxIdentifier));
     }
 }
