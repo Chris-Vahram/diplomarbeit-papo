@@ -2,6 +2,14 @@
 
 ## Aktueller Orchester-Handoff — 14.09.2026
 
+### Nächster-session Auftrag — Tobias-5.9 und Abschluss
+
+- Chris muss aktuell nichts weiter tun, außer diesen Fortsetzungsauftrag zu bestätigen. Der nächste Agent soll zuerst prüfen, ob Tobias Task 5.9 bereits mit belastbaren VM-, Deploy-Key-, Host-Key-, Eigentümer-, sudoers- und Remote-Negativnachweisen belegt hat.
+- Der Agent darf die ausdrücklich freigegebenen VM-, Git-Pull/Push/Merge- und Deployment-Rechte nutzen und soll selbst bewerten, ob er 5.9 sicher übernehmen kann. Keine Annahme von Nachweisen: fehlende oder unsichere Belege konkret benennen und vor riskanten Secret-/Produktionsschritten stoppen.
+- Wenn 5.9 belegbar ausführbar ist, soll der Agent die Arbeit selbst erledigen und passende Subagents für unabhängige finale Remote-Security-, Browser-, Live- und gekoppelten Rollbacktests einsetzen. Ergebnisse, Revisionen und Grenzen sanitisiert dokumentieren.
+- Danach soll die Präsentation finalisiert werden: Lehreranforderungen aus den neuesten Besprechungsprotokollen prüfen, OpenSpec-Archive der letzten Changes gegen Screenshots/Flows abgleichen und überall die fachliche Terminologie **Artikel** verwenden.
+- Clockify nicht pauschal auf den 14.09. bündeln: Vor einer Eintragung die letzten Besprechungsprotokolle und die archivierten Changes prüfen, Tätigkeiten realistisch über die belegten Arbeitstage verteilen, vorhandene leere Blöcke mit passenden Beschreibungen versehen und neue Zwischen-/Abschlussblöcke nur bei nachvollziehbarer Zuordnung ergänzen. Keine Tätigkeiten, Zeiten oder Dauer erfinden.
+
 - `origin/main` `05e0bdd` wurde kontrolliert integriert; Tobias' CI/CD- und Demo-Seeding-Archive bleiben erhalten. Konflikte wurden ohne Verlust der lokalen Kategorie-Migration gelöst.
 - Der archivierte Basis-Change wird durch `harden-deployment-gateway` (**2/4**) ergänzt: lokale Gateway-Umsetzung/Harness fertig, VM-Installation und Remote-Negativ-/Livechecks bei Tobias offen.
 - `SEED_DEMO_DATA` bleibt standardmäßig `false`; Produktion mit Bestellung `#51` wurde nicht verändert und das Flag nicht aktiviert. `CategoryMigrationService` läuft unabhängig vom Seed weiter.

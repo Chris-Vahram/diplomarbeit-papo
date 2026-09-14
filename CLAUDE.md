@@ -2,6 +2,8 @@
 
 ## Aktueller Orchesterstatus — 14.09.2026
 
+Nächste Session: 5.9 anhand echter VM-/Key-/Host-Key-/sudoers-/Remote-Nachweise prüfen. Der Agent hat ausdrückliche VM-, Git-Pull/Push/Merge- und Deployment-Freigabe und soll selbst entscheiden, ob er 5.9 übernehmen kann; bei ausreichender Evidenz Subagents für finale Remote-Security-, Browser-, Live- und Rollbacktests einsetzen. Danach Präsentation nach neuesten Lehrerprotokollen und OpenSpec-Archiven mit **Artikel**-Terminologie finalisieren. Clockify über belegte Tage verteilen und nicht erfinden.
+
 Kategorie-Navigation ist geprüft und archiviert. `origin/main` `05e0bdd` ist kontrolliert integriert; Tobias' Basis-CI/CD-Change bleibt archiviert. Gateway-Härtung wird separat in `harden-deployment-gateway` 2/4 fortgeführt und wartet auf Tobias' VM-Nachweise. Demo-Seeding ist standardmäßig aus und erhält die Kategorie-Migration; Integrationstests und Package 100/100 grün. Präsentation nutzt „Artikel“. Clockify-Zeit niemals erfinden.
 
 ## Project owner

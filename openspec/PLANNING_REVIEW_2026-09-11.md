@@ -2,6 +2,8 @@
 
 ## Orchester-Fortschreibung — 14.09.2026
 
+Nächster Abschlusslauf: 5.9 zuerst mit echten Tobias-Nachweisen auditieren. Bei ausreichender Freigabe darf der Agent VM-/Git-/Deploymentarbeit übernehmen und unabhängige Subagents für Remote-Security-, Browser-, Live- und Rollbacktests einsetzen. Danach Präsentation anhand der neuesten Lehreranforderungen und OpenSpec-Archive finalisieren; Clockify verteilt über belegte Arbeitstage aus Protokollen/Archiven ableiten, ohne erfundene Tätigkeiten oder Zeiten.
+
 - `origin/main` `05e0bdd` kontrolliert integriert. Tobias' Basis-CI/CD- und Demo-Seeding-Archive bleiben erhalten; offene Gateway-Sicherheitsarbeit ist im aktiven `harden-deployment-gateway` (**2/4**) nachvollziehbar.
 - Seeder-Konflikt kombiniert: Opt-in-Normal-Seeding plus weiterhin unabhängige Kategorie-Migration. Flag nicht aktiviert, keine VM-/Produktionsdaten geändert.
 - Integration geprüft: Seeder 1/1, vollständige Suite 100/100 und Package 100/100 erfolgreich.

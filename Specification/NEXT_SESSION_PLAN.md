@@ -2,6 +2,13 @@
 
 ## Aktueller Startpunkt — 13.09.2026
 
+### Verbindlicher nächster Arbeitsauftrag
+
+1. 5.9 zuerst anhand sanitiserter VM-/Key-/Host-Key-/sudoers-/Remote-Negativnachweise prüfen. Der Agent soll mit den freigegebenen VM-, Git-Pull/Push/Merge- und Deployment-Rechten selbst entscheiden, ob er 5.9 ausführen darf; fehlende Sicherheitsbelege bleiben ein Stop.
+2. Bei ausreichender Evidenz 5.9 selbst umsetzen und Subagents für unabhängige Remote-Security-, Browser-, Live- und gekoppelten Rollbacktests einsetzen. Keine Secrets ausgeben; laufende Daten/Volumes schützen.
+3. Danach finale Security-/OpenSpec-/Live-Abnahme und Präsentationsfinalisierung nach Lehreranforderungen und neuesten Protokollen. Präsentation: **Artikel**, nicht Produkte.
+4. Clockify über mehrere belegte Arbeitstage verteilen: letzte Protokolle und OpenSpec-Archive als Tätigkeitsquelle prüfen, leere Screenshot-Blöcke beschreiben, sinnvolle Zwischenblöcke ergänzen; nur realistisch belegbare Zeiten verwenden, Unsicherheiten offen markieren.
+
 Fortschreibung nach Integration 14.09.2026: `origin/main` `05e0bdd` ist kontrolliert übernommen. Der Basis-CI/CD-Change bleibt wie von Tobias geliefert archiviert; offene Gateway-Arbeit liegt in `harden-deployment-gateway` (**2/4**). Demo-Seeding ist übernommen, standardmäßig aus und mit der lokalen Kategorie-Migration kombiniert. Fokus 1/1, Suite 100/100 und Package 100/100 erfolgreich. Nächster Schritt: Tobias' VM-/Key-/sudoers-/Remote-Nachweise für Tasks 2.1/2.2; erst danach Aktivierung und finale Livechecks.
 
 - MVP: `build-partnerportal-mvp` **53/53**, technisch abgeschlossen, nicht archiviert.
