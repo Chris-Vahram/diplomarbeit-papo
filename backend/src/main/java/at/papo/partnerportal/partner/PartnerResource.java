@@ -29,13 +29,13 @@ public class PartnerResource {
     KundeService kundeService;
 
     @GET
-    public List<PartnerDto> list() {
+    public List<CompanyPartnerDto> list() {
         return partnerService.list();
     }
 
     @GET
     @Path("/{id}")
-    public PartnerDto get(@PathParam("id") Long id) {
+    public CompanyPartnerDto get(@PathParam("id") Long id) {
         return partnerService.get(id);
     }
 
@@ -48,13 +48,13 @@ public class PartnerResource {
     }
 
     @POST
-    public PartnerDto create(@Valid PartnerRequest request) {
+    public CompanyPartnerDto create(@Valid PartnerRequest request) {
         return partnerService.create(request);
     }
 
     @PUT
     @Path("/{id}")
-    public PartnerDto update(@PathParam("id") Long id, @Valid PartnerRequest request) {
+    public CompanyPartnerDto update(@PathParam("id") Long id, @Valid PartnerRequest request) {
         return partnerService.update(id, request);
     }
 }

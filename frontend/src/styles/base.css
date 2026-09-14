@@ -1855,6 +1855,8 @@ table button[data-edit-id]:hover {
 }
 
 .button-secondary {
+  display: inline-flex;
+  align-items: center;
   padding: var(--spacing-2) var(--spacing-4);
   border: 0.0625rem solid var(--border-strong);
   border-radius: var(--radius-md);
@@ -1864,6 +1866,7 @@ table button[data-edit-id]:hover {
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
+  text-decoration: none;
   transition: background var(--duration-fast) var(--ease-in-out), border-color var(--duration-fast) var(--ease-in-out);
 }
 
@@ -2051,7 +2054,11 @@ table button[data-edit-id] {
 }
 
 .customer-create-dialog {
+  box-sizing: border-box;
   width: min(42rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+  margin: auto;
   border: 0;
   border-radius: var(--radius-lg);
   padding: var(--spacing-6);
@@ -2067,7 +2074,15 @@ table button[data-edit-id] {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  grid-column: 1 / -1;
   margin-bottom: var(--spacing-4);
+}
+
+.customer-create-dialog__header h2 { margin: 0; }
+
+form-field {
+  display: block;
+  min-width: 0;
 }
 
 .customer-create-dialog__header button {

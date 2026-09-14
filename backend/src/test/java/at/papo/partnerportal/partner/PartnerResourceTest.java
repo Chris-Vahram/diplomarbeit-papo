@@ -8,7 +8,9 @@ import jakarta.inject.Inject;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 
 @QuarkusTest
 class PartnerResourceTest {
@@ -59,10 +61,11 @@ class PartnerResourceTest {
 
         given().auth().oauth2(token).contentType("application/json")
                 .body("{\"partnerNumber\":\"p-9104\",\"name\":\"Kleinschreibung\",\"address\":" + SAMPLE_ADDRESS_JSON
-                        + ",\"commissionPercent\":5}")
+                        + ",\"commissionPercent\":5,\"internalNote\":\"Erstnotiz\"}")
                 .when().post("/api/company/partners")
                 .then().statusCode(200)
-                .body("partnerNumber", is("P-9104"));
+                .body("partnerNumber", is("P-9104"))
+                .body("internalNote", is("Erstnotiz"));
 
         given().auth().oauth2(token).contentType("application/json")
                 .body("{\"partnerNumber\":\"P-9104\",\"name\":\"Zweiter Versuch\",\"address\":" + SAMPLE_ADDRESS_JSON
@@ -118,6 +121,53 @@ class PartnerResourceTest {
                 .then().statusCode(400);
     }
 
+    @Test
+    void companyInternalNoteIsBoundedAndPrivateFromPartner() {
+        String companyToken = tokens.tokenFor("company-demo", "company-demo");
+        long partnerId = partner1001Id();
+        String originalState = given().auth().oauth2(companyToken)
+                .when().get("/api/company/partners/" + partnerId)
+                .then().statusCode(200)
+                .extract().asString();
+        String note = ("ÄÖÜß\n").repeat(800);
+
+        try {
+            updatePartner(companyToken, partnerId, originalState, note)
+                    .body("internalNote", is(note));
+
+            updatePartner(companyToken, partnerId, originalState, note + "x")
+                    .statusCode(400);
+
+            given().auth().oauth2(companyToken)
+                    .when().get("/api/company/partners/" + partnerId)
+                    .then().statusCode(200)
+                    .body("internalNote", is(note));
+
+            String partnerToken = tokens.tokenFor("partner-demo", "partner-demo");
+            given().auth().oauth2(partnerToken)
+                    .when().get("/api/partner/profile")
+                    .then().statusCode(200)
+                    .body("$", not(hasKey("internalNote")));
+
+            given().auth().oauth2(partnerToken).contentType("application/json")
+                    .body(partnerContactBody(originalState, "Manipuliert"))
+                    .when().put("/api/partner/profile")
+                    .then().statusCode(200)
+                    .body("$", not(hasKey("internalNote")));
+
+            given().auth().oauth2(companyToken)
+                    .when().get("/api/company/partners/" + partnerId)
+                    .then().statusCode(200)
+                    .body("internalNote", is(note));
+
+            updatePartner(companyToken, partnerId, originalState, "")
+                    .body("internalNote", is((Object) null));
+        } finally {
+            updatePartner(companyToken, partnerId, originalState,
+                    io.restassured.path.json.JsonPath.from(originalState).getString("internalNote"));
+        }
+    }
+
     // Access-control edge case (auth-access-control spec, "Inactive partner
     // blocking"): deactivating via the same PUT the company UI uses must lock
     // the partner out of its own endpoints immediately - CurrentPartner.resolve()
@@ -162,10 +212,11 @@ class PartnerResourceTest {
         // or this restore-after-toggle helper silently wipes it.
         String body = String.format(
                 "{\"partnerNumber\":\"%s\",\"name\":\"%s\",\"address\":%s,\"email\":%s,\"phone\":%s,"
-                        + "\"commissionPercent\":%s,\"active\":%s}",
+                        + "\"commissionPercent\":%s,\"internalNote\":%s,\"active\":%s}",
                 current.getString("partnerNumber"), current.getString("name"),
                 addressJson, quoteOrNull(current.getString("email")),
-                quoteOrNull(current.getString("phone")), current.getString("commissionPercent"), active);
+                quoteOrNull(current.getString("phone")), current.getString("commissionPercent"),
+                quoteOrNull(current.getString("internalNote")), active);
 
         given().auth().oauth2(companyToken).contentType("application/json")
                 .body(body)
@@ -175,7 +226,42 @@ class PartnerResourceTest {
     }
 
     private String quoteOrNull(String value) {
-        return value == null ? "null" : "\"" + value + "\"";
+        return value == null ? "null" : "\"" + value.replace("\\", "\\\\")
+                .replace("\"", "\\\"").replace("\r", "\\r").replace("\n", "\\n") + "\"";
+    }
+
+    private io.restassured.response.ValidatableResponse updatePartner(String companyToken, long partnerId,
+            String currentStateJson, String internalNote) {
+        io.restassured.path.json.JsonPath current = io.restassured.path.json.JsonPath.from(currentStateJson);
+        String addressJson = String.format(
+                "{\"street\":\"%s\",\"houseNumber\":\"%s\",\"postalCode\":\"%s\",\"city\":\"%s\",\"country\":\"%s\"}",
+                current.getString("address.street"), current.getString("address.houseNumber"),
+                current.getString("address.postalCode"), current.getString("address.city"),
+                current.getString("address.country"));
+        String body = String.format(
+                "{\"partnerNumber\":\"%s\",\"name\":\"%s\",\"address\":%s,\"email\":%s,\"phone\":%s,"
+                        + "\"commissionPercent\":%s,\"internalNote\":%s,\"active\":%s}",
+                current.getString("partnerNumber"), current.getString("name"), addressJson,
+                quoteOrNull(current.getString("email")), quoteOrNull(current.getString("phone")),
+                current.getString("commissionPercent"), quoteOrNull(internalNote), current.getBoolean("active"));
+
+        return given().auth().oauth2(companyToken).contentType("application/json")
+                .body(body)
+                .when().put("/api/company/partners/" + partnerId)
+                .then();
+    }
+
+    private String partnerContactBody(String currentStateJson, String internalNote) {
+        io.restassured.path.json.JsonPath current = io.restassured.path.json.JsonPath.from(currentStateJson);
+        return String.format(
+                "{\"name\":\"%s\",\"address\":{\"street\":\"%s\",\"houseNumber\":\"%s\","
+                        + "\"postalCode\":\"%s\",\"city\":\"%s\",\"country\":\"%s\"},"
+                        + "\"email\":%s,\"phone\":%s,\"internalNote\":%s}",
+                current.getString("name"), current.getString("address.street"),
+                current.getString("address.houseNumber"), current.getString("address.postalCode"),
+                current.getString("address.city"), current.getString("address.country"),
+                quoteOrNull(current.getString("email")), quoteOrNull(current.getString("phone")),
+                quoteOrNull(internalNote));
     }
 
     // Keycloak's username claim comes back lowercase ("partner-demo"); the seeded partner's
@@ -227,10 +313,11 @@ class PartnerResourceTest {
                 current.getString("address.country"));
         String body = String.format(
                 "{\"partnerNumber\":\"%s\",\"name\":\"%s\",\"address\":%s,\"email\":%s,\"phone\":%s,"
-                        + "\"commissionPercent\":%s,\"active\":%s}",
+                        + "\"commissionPercent\":%s,\"internalNote\":%s,\"active\":%s}",
                 newPartnerNumber, current.getString("name"), addressJson,
                 quoteOrNull(current.getString("email")), quoteOrNull(current.getString("phone")),
-                current.getString("commissionPercent"), current.getBoolean("active"));
+                current.getString("commissionPercent"), quoteOrNull(current.getString("internalNote")),
+                current.getBoolean("active"));
 
         given().auth().oauth2(companyToken).contentType("application/json")
                 .body(body)

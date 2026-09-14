@@ -26,6 +26,9 @@ class CompanyPartnerListPage extends HTMLElement {
           ${addressFieldsHtml("address")}
           <form-field label="E-Mail" name="email" type="email"></form-field>
           <form-field label="Telefon" name="phone"></form-field>
+          <form-field class="form-field--wide" label="Interne Notiz – nur für das Unternehmen" name="internalNote">
+            <textarea name="internalNote" maxlength="4000" rows="5"></textarea>
+          </form-field>
           <form-field label="Provision" name="commissionPercentPreset">
             <select name="commissionPercentPreset">
               <option value="5">5%</option>
@@ -130,6 +133,8 @@ class CompanyPartnerListPage extends HTMLElement {
           <button type="button" class="row-actions__secondary" data-manage-id="${p.id}">Artikel</button>
         </div>`,
       }));
+      const requestedPartnerId = new URLSearchParams(location.hash.split("?")[1] ?? "").get("enablement");
+      if (requestedPartnerId) await this.openEnablement(requestedPartnerId);
     } catch (error) {
       showToast(error.message, "error");
     }
@@ -154,6 +159,7 @@ class CompanyPartnerListPage extends HTMLElement {
     fillAddress(this.form, "address", partner.address);
     this.form.elements.email.value = partner.email ?? "";
     this.form.elements.phone.value = partner.phone ?? "";
+    this.form.elements.internalNote.value = partner.internalNote ?? "";
     this.form.elements.active.checked = partner.active;
     this.partnerNumberHint.hidden = false;
 
@@ -218,6 +224,7 @@ class CompanyPartnerListPage extends HTMLElement {
       address: readAddress(this.form, "address"),
       email: data.get("email") || null,
       phone: data.get("phone") || null,
+      internalNote: data.get("internalNote") || null,
       commissionPercent,
       active: this.form.elements.active.checked,
     };

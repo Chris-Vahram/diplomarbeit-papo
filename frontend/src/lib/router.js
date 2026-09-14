@@ -63,7 +63,7 @@ document.addEventListener("keydown", (event) => {
 });
 
 function currentPath() {
-  return location.hash.replace(/^#/, "") || "/login";
+  return location.hash.replace(/^#/, "").split("?")[0] || "/login";
 }
 
 function resolveDefaultRoute() {

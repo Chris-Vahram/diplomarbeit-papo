@@ -192,7 +192,15 @@ class CompanyOrderListPage extends HTMLElement {
         .filter((p) => p.enabled)
         .map((p) => ({ id: p.productId, name: p.name, price: p.price, category: p.category, available: p.available }));
       if (products.length === 0) {
-        container.innerHTML = `<p>Für diesen Partner sind noch keine Artikel freigeschaltet.</p>`;
+        container.innerHTML = `
+          <p>Für diesen Partner sind noch keine Artikel freigeschaltet.</p>
+          <button type="button" class="button-secondary" data-manage-partner-id="${escapeHtml(String(partnerId))}">
+            Artikel für diesen Partner verwalten
+          </button>`;
+        container.querySelector("[data-manage-partner-id]").addEventListener("click", (event) => {
+          this.manualOrderModal.close();
+          location.hash = `#/company/partners?enablement=${encodeURIComponent(event.currentTarget.dataset.managePartnerId)}`;
+        });
         return;
       }
       const partner = this.manualOrderPartners.find((p) => String(p.id) === String(partnerId));
