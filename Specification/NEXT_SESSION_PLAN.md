@@ -1,5 +1,13 @@
 # PAPO-Planungs- und Umsetzungshandoff – 13.09.2026
 
+## Vorrangiger nächster-session Start — 14.09.2026
+
+- Branch `docs/openspec-planning-2026-09-11`, Remote/HEAD `f26c425`, Arbeitsbaum sauber; kein Cleanup nötig.
+- `harden-deployment-gateway` **2/4**. Tasks 2.1/2.2 nur mit Tobias-Nachweisen für VM, Keys, sudoers, Host-Key, Remote-Negativtests, Liveflows und Rollback. Ohne Nachweise: **BLOCKIERT**, keine VM-/SSH-/Secret-/Volume-Aktion.
+- Lokal belegt: Gateway-Harness 18/18, Backend 100/100, Package, JS-Syntax, OpenSpec 2/2, Präsentation 15 Folien, Diff-Check.
+- Präsentation final abgeglichen; `complete-thesis-documentation` bleibt 0/6. Ohne Gateway-Evidenz Dokumentation priorisieren.
+- Clockify nur aus Protokollen, Archiven und echten Checks ableiten.
+
 ## Aktueller Startpunkt — 13.09.2026
 
 ### Verbindlicher nächster Arbeitsauftrag

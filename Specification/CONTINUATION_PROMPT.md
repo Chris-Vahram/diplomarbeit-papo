@@ -1,5 +1,16 @@
 # Continuation Prompt — PAPO Partnerportal
 
+## Vorrangiger Abschluss-Handoff — 14.09.2026
+
+Dieser Block ersetzt ältere aktuelle Statusangaben darunter.
+
+- Branch/Remote: `docs/openspec-planning-2026-09-11`, synchron auf `f26c425`; Arbeitsbaum sauber, kein weiterer Push nötig.
+- `harden-deployment-gateway`: **2/4**. Lokales Gateway/Harness fertig; Tasks 2.1/2.2 blockiert wegen fehlender Tobias-Nachweise zu VM, Root-Eigentum/Modi/`visudo`, Deploy-/Read-only-Keys, Host-Key-Pinning, Sudo-/Docker-/`.env`-Abgrenzung, Remote-Negativtests, side-effect-freier Verify/Upload, HTTPS/OIDC/API/Login/Bestellung und gekoppeltem Rollback.
+- Lokal belegt: Harness **18/18**, Backend **100/100**, Package, JS-Syntaxchecks, OpenSpec-Strict **2/2**, Präsentation **15 Folien** mit echtem Screenshot, `git diff --check`. Einziger Browser-Konsolenfehler: erwartetes `/favicon.ico`-404.
+- Keine VM-, SSH-, Secret- oder Datenvolumenaktion. Keine Remote-Live-/Rollback-Evidenz behaupten.
+- Präsentation und Terminologie **Artikel** aktualisiert und committed. `complete-thesis-documentation` bleibt **0/6**.
+- Nächste Session: zuerst neue sanitiserte Tobias-Nachweise prüfen. Fehlen sie, Gateway blockiert lassen; danach nur bei Freigabe Dokumentation fortsetzen. Clockify nur evidenzbasiert.
+
 ## Aktueller Orchester-Handoff — 14.09.2026
 
 ### Nächster-session Auftrag — Tobias-5.9 und Abschluss

@@ -1,5 +1,13 @@
 # CLAUDE.md – Partnerportal (Diplomarbeit)
 
+### Vorrangiger Orchesterstand — 14.09.2026
+
+- Branch `docs/openspec-planning-2026-09-11` ist mit Remote synchron: `f26c425 chore: finalize gateway audit and thesis handoff`; Arbeitsbaum sauber.
+- `harden-deployment-gateway` **2/4**: lokale Umsetzung/Harness fertig, VM-Installation sowie Remote-/Live-/Rollbacknachweise fehlen. Ohne sanitiserte Tobias-Belege keine Infrastrukturaktion.
+- Belegt: Gateway 18/18, Backend 100/100, Package, JS-Syntaxchecks, OpenSpec Strict 2/2, Präsentation 15 Folien, Diff-Check. Keine VM-, SSH-, Secret- oder Volumenaktion.
+- Präsentation nutzt **Artikel** und ist committed; `complete-thesis-documentation` bleibt **0/6**.
+- Nächste Session: Tobias-Evidenz prüfen; bei Fehlen Blocker dokumentieren, dann Dokumentation fortsetzen. Clockify nur evidenzbasiert.
+
 ## Aktueller Orchesterstatus — 14.09.2026
 
 Nächster Agent: Nach 5.9-Befund Gateway-Security-Agent nur bei echtem zusätzlichem Prüfbedarf mit konkretem Folgeprompt beauftragen; sonst Blocker dokumentieren. Dirty Worktree anschließend ohne OpenSpec-Change einzeln bereinigen und sauber committen. Push/Pull/Merge/Deployment/VM und saubere Commitmessages sind ausdrücklich freigegeben; Secrets/Volumes schützen.

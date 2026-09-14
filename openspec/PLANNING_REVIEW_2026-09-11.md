@@ -1,5 +1,12 @@
 # OpenSpec-Planungsreview — 11.09.2026
 
+## Abschlussaudit — 14.09.2026
+
+- Branch/Remote sauber synchron auf `f26c425`; kein weiterer Push nötig.
+- `harden-deployment-gateway` **2/4**: lokale Umsetzung und Harness 18/18 belegt. Tasks 2.1/2.2 bleiben wegen fehlender Tobias-Nachweise zu VM, Keys, sudoers, Host-Key, Remote-Negativtests, side-effect-freiem Verify/Upload, HTTPS/OIDC/API/Login/Bestellung und Rollback blockiert.
+- Verifiziert: Backend 100/100, Package, JS-Syntaxchecks, OpenSpec Strict 2/2, `git diff --check`, Präsentation 15 Folien mit echtem Screenshot. Keine VM-, SSH-, Secret- oder Datenvolumenaktion.
+- Präsentation auf **Artikel** aktualisiert. `complete-thesis-documentation` bleibt 0/6; nächste Entscheidung hängt von Tobias-Evidenz ab.
+
 ## Orchester-Fortschreibung — 14.09.2026
 
 Nächster Abschlusslauf: 5.9 zuerst mit echten Tobias-Nachweisen auditieren. Bei ausreichender Freigabe darf der Agent VM-/Git-/Deploymentarbeit übernehmen und unabhängige Subagents für Remote-Security-, Browser-, Live- und Rollbacktests einsetzen. Danach Präsentation anhand der neuesten Lehreranforderungen und OpenSpec-Archive finalisieren; Clockify verteilt über belegte Arbeitstage aus Protokollen/Archiven ableiten, ohne erfundene Tätigkeiten oder Zeiten.

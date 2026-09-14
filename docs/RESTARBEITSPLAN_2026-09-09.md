@@ -1,5 +1,11 @@
 # PAPO Restarbeitsplan – 09.09.2026
 
+## Vorrangiger Abschlussstand — 14.09.2026
+
+Branch `docs/openspec-planning-2026-09-11` ist auf `f26c425` mit Remote synchron; Arbeitsbaum sauber. Gateway lokal geprüft (Harness 18/18), aber `harden-deployment-gateway` bleibt bei **2/4**, weil Tobias-Nachweise für VM, Keys, sudoers, Host-Key, Remote-Negativtests, Liveflows und Rollback fehlen. Keine VM-, SSH-, Secret- oder Datenvolumenaktion.
+
+Backend 100/100, Package, JS-Syntaxchecks, OpenSpec 2/2, Diff-Check und Präsentation mit 15 Folien/Screenshot sind belegt. Präsentation nutzt **Artikel**. `complete-thesis-documentation` bleibt 0/6. Nächste Session: Evidenz prüfen; ohne neue Nachweise Gateway blockiert lassen und Dokumentation priorisieren. Clockify nur evidenzbasiert.
+
 ## Orchester-Fortschreibung — 14.09.2026
 
 Kategorie-Navigation umgesetzt, geprüft und archiviert. P0-Recovery live belegt. `origin/main` enthält neue Tobi-Commits, aber widersprechende Artikel-/Präsentationsstände; selektive Prüfung statt Pull/Merge. Rest: CI/CD-Gateway/Nachweise, danach Thesis-Doku/Präsentation. Clockify nur real belegbar.
