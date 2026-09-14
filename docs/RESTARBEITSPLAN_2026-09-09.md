@@ -1,5 +1,11 @@
 # PAPO Restarbeitsplan – 09.09.2026
 
+## Aktueller Abschlussstand — 14.09.2026
+
+`add-company-internal-partner-note` ist **4/4 fertig**. Ausgelassene Notizfelder erhalten die bestehende Notiz, explizites `null`/Leertext leert sie; die Company-only-Grenze ist getestet. Nachweise: 13/13 fokussiert, 101/101 vollständig, Package, JS-Syntax, Strict-Validate, Diff-Check, Browser Desktop/Mobile sowie Qualitäts-/Java-/Securityreview.
+
+**Nächste Session:** PR/CI/live-Rollout verifizieren, dann VM-Task 2.2 mit autorisiertem Key für die externe SSH-Negativmatrix fortsetzen. Die vier übrigen OpenSpec-Changes bleiben offen; BMD-Nummern nur bis zum dokumentierten Beispieldaten-Gate und ohne direkte BMD-API.
+
 ## Fortschreibung — 14.09.2026
 
 **Nächster Andockpunkt:** PR #17 nach CI mergen, danach `add-company-internal-partner-note` mit den zwei Review-Findings und Browserabnahme fertigstellen. Der funktionale Stand aus PR #16 (`486ca54`, `main` `35d8a0ab63b4`) ist erfolgreich auf der öffentlichen VM deployed.

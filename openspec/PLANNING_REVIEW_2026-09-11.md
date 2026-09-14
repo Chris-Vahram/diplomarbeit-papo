@@ -1,5 +1,11 @@
 # OpenSpec-Planungsreview — 11.09.2026
 
+## Aktueller Abschlussnachtrag — 14.09.2026
+
+`add-company-internal-partner-note` ist **4/4 erledigt**. Die finale Request-Semantik bewahrt Notizen bei ausgelassenem Feld und löscht bei explizitem `null`, Leertext oder leerem Formular. Die Antwortgrenzen bleiben Company-only; relevante Partner-, Order-, Dashboard-, Produkt- und Exportpfade sind negativ geprüft. Backend 13/13 fokussiert und 101/101 vollständig, Package, JS-Syntax, Strict-Validate, Diff-Check, Browser Desktop/Mobile sowie PAPO-/Java-/Securityreview sind grün.
+
+**Nächster Andockpunkt:** PR/CI/live verifizieren und anschließend VM-Security Task 2.2 mit autorisiertem Deploy-Key um die externe SSH-Negativmatrix ergänzen. Danach einzeln mit den vier freigegebenen Stammdaten-/BMD-Changes fortfahren; BMD-Nummern bleiben bis Beispieldaten/Vertrag begrenzt.
+
 ## Tatsächliche Fortschreibung — 14.09.2026
 
 PR #16 mit `add-company-internal-partner-note` und den drei UI-Korrekturen ist nach `main` gemergt und über CI/CD-Lauf `34853223915` deployed. Der Change bleibt formal offen (0/4): zwei Review-Findings, Browserabnahme und vollständige Antwortgrenzen fehlen. PR #17 (`ae749ea`) dokumentiert den KI-Nachweis und wartet auf CI.

@@ -65,8 +65,12 @@ public class PartnerService {
         partner.email = request.email();
         partner.phone = request.phone();
         partner.commissionPercent = request.commissionPercent();
-        partner.internalNote = request.internalNote() == null || request.internalNote().isBlank()
-                ? null : request.internalNote();
+        // Keep older full-update clients from deleting a note they do not know about.
+        // The current company form sends an empty string explicitly when the user clears it.
+        if (request.internalNoteProvided()) {
+            partner.internalNote = request.internalNote() == null || request.internalNote().isBlank()
+                    ? null : request.internalNote();
+        }
         partner.active = request.active() == null || request.active();
     }
 
