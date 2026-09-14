@@ -1,5 +1,29 @@
 # Continuation Prompt — PAPO Partnerportal
 
+## Aktueller Orchester-Handoff — 14.09.2026
+
+- Branch `docs/openspec-planning-2026-09-11`, HEAD `d85e92f`, Dirty Worktree. `git fetch origin` erledigt; kein Pull/Merge/Push.
+- `origin/main` `05e0bdd` enthält neue Tobi-Commits, diver­giert aber und setzt teils „Produkte“. Kein blinder Pull; selektiv prüfen.
+- P0-Recovery laut Betriebsnachweis erfolgreich: Dumps, Passwortangleichung, Services, OIDC/API-401, Logins und Bestellung #51 bis `FULFILLED`.
+- `integrate-category-management-into-article-management` 4/4 geprüft und archiviert unter `openspec/changes/archive/2026-09-14-integrate-category-management-into-article-management`.
+- Aktiv: CI/CD 35/45 und `complete-thesis-documentation` 0/6. Gateway 5.8 lokal umgesetzt; 5.9 bleibt Tobias-/Remote-Nachweis-abhängig.
+- Gateway 5.8 ist lokal umgesetzt und geprüft; CI/CD steht nun bei **35/45**. `sh -n`, isolierter Harness 18/18, Strict-Validate und Diff-Check sind grün. 5.9 bleibt bis zu Tobias' VM-/Key-/Host-Key-/sudoers-Nachweisen blockiert.
+- Fetch 14.09: `HEAD d85e92f` gegen `origin/main 05e0bdd` divergiert 5/4. Merge-Simulation meldet Konflikte in `DemoDataSeeder.java` sowie im lokal aktiven/remote archivierten CI/CD-Change; kein Pull/Merge/Push.
+- Reihenfolge: Remote-Diff/CI-Auswirkung, Gateway, finale Security-/Live-Reviews, dann Thesis-Doku/Präsentation. Präsentation konsequent „Artikel“.
+- Clockify nur mit echten Nachweisen; keine erfundenen Stunden/Uhrzeiten.
+
+## Maßgeblicher Planungsnachtrag — 13.09.2026
+
+Git-Fetch ausgeführt: Branch `docs/openspec-planning-2026-09-11` und sein Remote stehen beide auf `d85e92f`; `origin/main` ist `fea0e5b`, der Branch liegt fünf Commits voraus. Kein Pull nötig, kein Commit/Push/Merge ausgeführt. Vorhandener Dirty Worktree und vier untracked Playwright-Bilder bleiben erhalten.
+
+`build-partnerportal-mvp` ist nun **53/53 und technisch abgeschlossen**, aber nicht archiviert. 8.3/8.4 wurden ohne Lieferbehauptung in den eigenständigen Dokumentationschange `complete-thesis-documentation` (0/6) übertragen; FD.4 ist für den aktuellen Screenstand abgeschlossen. Künftiger visueller Polish gehört in den jeweiligen UI-Change.
+
+Neu und apply-ready geplant: `complete-thesis-documentation` für UI/UX-, Technik- und vollständige FR-01–FR-25/B-01–B-08-Traceability-Dokumentation; `integrate-category-management-into-article-management` (0/4) für eine einfache Company-Navigation „Artikelverwaltung“, Kategorien als bestehende Unterseite und unveränderte Partnernavigation „Artikel“.
+
+CI/CD steht bei **34/45**. Belegt: GHCR privat, Branch Protection mit `Test backend`, DNS `paportal.at` auf `178.104.109.45`, HTTPS/Let's Encrypt und Root-200. Screenshot zeigt Julian weiterhin mit geerbtem Write-Zugriff; entfernen oder aktuelle Autorisierung dokumentieren. P0-Ursache belegt: persistentes PostgreSQL-Rollenpasswort stimmt nicht mit VM-lokalem `.env.prod` überein; Keycloak und Backend scheitern mit `FATAL: password authentication failed for user "partnerportal"`. Recovery nie durch Volume-Löschung: DB-Zugriff prüfen, beide DBs lokal dumpen, Rollenpasswort geheim angleichen, Keycloak/Backend neu starten, dann OIDC/API/Login/Bestellung prüfen. Gateway aus `48ad4d8` gezielt auf aktuellen Frontend-Releasepfad portieren; nicht blind cherry-picken.
+
+Empfohlene Reihenfolge: P0-Recovery und Live-Nachweise; Dokumentationschange; Artikelverwaltungs-UX; eingeschränkter Deploy-Gateway; lokaler Cron-/Backupnachweis. Offsite bleibt post-MVP.
+
 ## Maßgeblicher Abschlussnachtrag — 12.09.2026
 
 `define-mvp-traceability-format` (**3/3**) ist geprüft und unter `openspec/changes/archive/2026-09-12-define-mvp-traceability-format` archiviert. Es handelt sich um reine Dokumentation: 33 eindeutige Matrixzeilen, Quellen-/Link-/Strukturcheck, Strict-Validate, Diff-Check und Reviews ohne Findings.

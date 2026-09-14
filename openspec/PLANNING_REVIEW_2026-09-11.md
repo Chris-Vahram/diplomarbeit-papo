@@ -1,5 +1,25 @@
 # OpenSpec-Planungsreview — 11.09.2026
 
+## Orchester-Fortschreibung — 14.09.2026
+
+- Kategorien-Change: **4/4, archiviert** am 14.09.
+- P0-Recovery laut Betriebsnachweis erfolgreich; CI-Nachweise/Tasks noch synchronisieren.
+- `origin/main` `05e0bdd` ist nicht merge-sicher: lokale Kategorie-Implementierung fehlt dort, Präsentation setzt teils „Produkte“. Kein blinder Pull.
+- Nächste Entscheidungen: Gateway selektiv portieren; Remote-Installation erst nach Tobias-Nachweisen; danach Security-/Live-Checks, Thesis-Doku, Präsentation.
+- Gateway 5.8 ist lokal selektiv portiert; CI/CD **35/45**. `sh -n`, Harness 18/18, Strict-Validate und Diff-Check erfolgreich. 5.9 bleibt Tobias-/Remote-blockiert.
+- Fetch: `HEAD d85e92f` vs. `origin/main 05e0bdd`, Divergenz 5/4. Konkrete Mergekonflikte: `DemoDataSeeder.java` und remote archivierter versus lokal aktiver CI/CD-Change. Kein Pull/Merge/Push.
+
+## Fortschreibung — 13.09.2026
+
+| Change | Stand / Entscheidung |
+|---|---|
+| `build-partnerportal-mvp` | **53/53, technisch abgeschlossen**, nicht archiviert. Allgemeine Doku ausgelagert; FD.4 aktueller Stand fertig. |
+| `complete-thesis-documentation` | **0/6, READY.** Allgemeine UI/UX-, Technik- und Traceability-Dokumentation; keine Produktänderung. |
+| `integrate-category-management-into-article-management` | **0/4, READY.** Company-„Artikelverwaltung“, Kategorien über bestehende Unterseite, Partner bleibt „Artikel“. |
+| `ci-cd-deployment-with-gh-actions` | **34/45, teilweise READY.** P0-Ursache bekannt; Recovery benötigt DB-Dumps und geheime Passwortangleichung. Gateway/Liveflows/Cron bleiben offen. |
+
+Aktuelle Belege: GHCR privat; `main` mit PR-, Up-to-date- und `Test backend`-Pflicht ohne Bypass; DNS auf `178.104.109.45`; Root über gültiges Let's-Encrypt-HTTPS 200. Julian hat laut Screenshot noch geerbten Write-Zugriff und muss entfernt oder neu autorisiert werden. PostgreSQL ist gesund; Keycloak/Backend scheitern ausschließlich an `FATAL: password authentication failed for user "partnerportal"`. Frontend-404 gilt als behoben. Gateway aus `48ad4d8` bleibt verwertbare Quelle, muss aber auf `1513f9a`-Releasepfad angepasst werden.
+
 ## Abschlussstand nach Review und Archivierung — 12.09.2026
 
 `define-mvp-traceability-format` ist **3/3 fertig und archiviert** unter `openspec/changes/archive/2026-09-12-define-mvp-traceability-format`. `manage-article-categories` ist **6/6 fertig und archiviert** unter `openspec/changes/archive/2026-09-12-manage-article-categories`. Die dokumentierten Nachweise und Reviews sind auf den echten Stand nachgezogen; die aktive OpenSpec-Liste enthält nur noch die beiden folgenden Changes.

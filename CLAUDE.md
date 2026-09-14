@@ -1,5 +1,9 @@
 # CLAUDE.md – Partnerportal (Diplomarbeit)
 
+## Aktueller Orchesterstatus — 14.09.2026
+
+Kategorie-Navigation ist geprüft und archiviert. P0-Recovery ist laut Live-Bericht erfolgreich. Gateway 5.8 ist lokal implementiert und geprüft; CI/CD 35/45, 5.9 wartet auf Tobias' Remote-Nachweise. Lokaler Branch bleibt dirty auf `d85e92f`; `origin/main` `05e0bdd` divergiert 5/4 und ist wegen DemoSeeder-/CI-CD-OpenSpec-Konflikten nicht blind mergebar. Präsentation nutzt „Artikel“. Clockify-Zeit niemals erfinden.
+
 ## Project owner
 This project belongs to **Chris**.
 
@@ -18,7 +22,10 @@ Web-based, extensible **B2B partner-ordering platform** for partner-driven sales
 
 **Hard rule:** meetings override the FSD when they conflict (newer = authoritative). The FSD may lag behind the meetings of 25.08/31.08 until an explicit documentation sync; use the continuation prompt and roadmap for that delta. Do not reintroduce v1 assumptions (external shop as current stage, one-product orders, 3-person team).
 
-## Current status (2026-09-11; verify volatile claims)
+## Current status (2026-09-13; verify volatile claims)
+- `build-partnerportal-mvp` is 53/53 and technically complete; general thesis/UI documentation is independently tracked by `complete-thesis-documentation`.
+- `integrate-category-management-into-article-management` is planned to group company categories under “Artikelverwaltung” without backend changes.
+- CI/CD P0 cause is PostgreSQL password drift between the persistent role and VM-local `.env.prod`; preserve the volume, dump both databases before aligning the role password. DNS/HTTPS/GHCR privacy/branch protection are evidenced; OIDC/API/login/order checks remain.
 - The 10.09 meeting decisions and the reviewed implementation-ready OpenSpec changes are summarized in `openspec/PLANNING_REVIEW_2026-09-11.md`. This report supersedes older candidate/READY tables where they conflict.
 - MVP implementation and the meeting-driven July feature wave are merged to `main`. Audit Fix Batches A and B are implemented, regression-reviewed and `Verified` (UX-001..004, TECH-001).
 - Batch B is archived and synced to the main specs in the current local-history commit `94050cb`. The verified backend suite contains 77 tests (0 failures/errors/skips).

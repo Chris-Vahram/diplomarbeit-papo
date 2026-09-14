@@ -18,9 +18,10 @@ Produktionstopologie, CI/CD-Pipeline und Rollback-Prozedur. Setup/Dev-Umgebung s
 2. **`build-and-push`** (nur bei Push nach `main`, nach erfolgreichem `test`) — baut das
    Backend-Image (`Dockerfile.jvm`, `linux/amd64`) und pusht es nach GHCR, getaggt
    `latest` und `<git-sha>`.
-3. **`deploy`** (nach erfolgreichem `build-and-push`) — verbindet sich per SSH mit der VM
-   und führt dort `docker compose pull && docker compose up -d` aus. Nur der `backend`-
-   Container wird dabei ersetzt; Postgres und Keycloak laufen unverändert weiter.
+3. **`deploy`** (nach erfolgreichem `build-and-push`) — sendet ein kanonisches Frontend-
+   Archiv an den Forced-Command-Gateway und ruft `upload`, `verify`, `activate` für den
+   exakten `main`-SHA auf. Der Gateway ersetzt nur `backend`, hängt danach
+   `frontend-live/current` atomar um und lässt Postgres, Keycloak und Caddy unverändert.
 
 Ein fehlgeschlagener Test-Job verhindert Build und Deploy vollständig.
 
@@ -63,6 +64,12 @@ bindet `frontend-live/` (nicht die einzelne Release) - der Symlink wird pro Depl
 umgehängt, ohne dass der Caddy-Container neu erstellt werden muss. Ältere Reste aus dem
 früheren Verzeichnis-Swap-Schema (`frontend/`, `frontend-old/`, `frontend-new/`) können von
 Hand entfernt werden, sobald der erste Deploy mit diesem Schema durchgelaufen ist.
+
+Der eingeschränkte SSH-Account `papo-deploy` erhält keine Shell und keine Docker-Gruppe.
+Sein erzwungener Befehl ruft ausschließlich das root-owned
+`/usr/local/libexec/papo-deploy-gateway` über die enge Regel aus
+`deploy/ssh/papo-deploy.sudoers` auf. Installation und Remote-Negativtests sind Task 5.9
+und dürfen erst nach Tobias' VM-, Key-, Host-Key- und sudoers-Nachweisen erfolgen.
 
 ## Rollback (manuell)
 

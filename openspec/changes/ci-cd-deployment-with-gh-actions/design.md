@@ -1,6 +1,6 @@
 ## Context
 
-> Current gate, 10.09.2026: **BLOCKIERT**. Historical decisions/phases remain below; `review.md` records unresolved evidence and overrides old readiness claims. No VM, SSH, secret, backup or deployment operation is authorized by this planning review.
+> Current gate, 13.09.2026: P0 root cause confirmed as PostgreSQL password drift after the persistent volume was initialized. Recovery preserves the volume, creates local dumps first, rotates only the existing role password to the current VM-local value, then verifies OIDC/API/login/order behavior. DNS/HTTPS/GHCR/branch protection are evidenced. The forced-command gateway from `48ad4d8` is a source, not a cherry-pick: it must retain the current `frontend-live/releases/<sha>/current` deployment model.
 
 The Partnerportal currently only exists as a local dev environment: `docker compose up` starts Postgres + Keycloak, `mvnw quarkus:dev` runs the backend against them, and the frontend is served by any static file server (`python3 -m http.server`). There is no build artifact, no image registry, no deployment target, and no automation. This design covers everything needed to get from "push to `main`" to "running, HTTPS-reachable instance" on a single VPS: `papo-server-01` (`papo@178.104.109.45`), 4 vCPU, 7.6 GB RAM, `x86_64`, Ubuntu 26.04 LTS, Docker 29.6.1 + Docker Compose v5.3.1 already installed.
 
@@ -74,6 +74,9 @@ Set generous per-service memory limits for every container (Quarkus, Postgres, K
 ### 11. Firewall / ports (resolved 2026-08-23)
 `ufw` is inactive on `papo-server-01`, so ports 80/443 are open locally — sufficient for MVP, no action needed now. Two deferred, explicitly-noted caveats (not required before this change ships): (a) a provider-level/upstream firewall may still exist independent of `ufw` — the real test is reachability from outside once Caddy is actually listening on 80/443, verify then, not before; (b) before any production use beyond the thesis evaluation, enable `ufw` and allow only `22/80/443` — currently deferred alongside the offsite backup (Decision 7), tracked as the same class of "before production use" to-do.
 
+### 12. Forced-command release gateway (implemented locally 14.09.2026)
+The workflow uses pinned third-party Actions plus native `ssh`. A root-owned forced-command gateway accepts only `upload`, `verify` and `activate` with one lowercase 40-hex SHA. It fetches `origin/main` with a read-only repository key, byte-compares the upload with a server-generated canonical frontend archive, rejects non-blob tree entries, extracts directly to `frontend-live/releases/<sha>/`, requires a regular `index.html`, deploys only the backend with `IMAGE_TAG=<sha>`, and atomically changes `frontend-live/current` after Compose succeeds. PostgreSQL, Keycloak and Caddy are not recreated. The latest five frontend releases are retained; rollback stays manual and coupled across backend SHA and frontend symlink.
+
 ## Risks / Trade-offs
 
 - **[Risk] JVM Quarkus RAM footprint under real load is higher than estimated, crowding Keycloak/Postgres on the 7.6 GB box (tighter than the 12 GB originally planned for).** → Mitigation: `mem_limit` per service (Decision 10) so one process can't starve the others; native-image (Decision 2) remains a documented fallback if real-load footprint exceeds the estimate.
@@ -88,7 +91,7 @@ Set generous per-service memory limits for every container (Quarkus, Postgres, K
 2. Stand up the full stack locally via Docker Compose (Quarkus container included) to validate the Dockerfile and env-var wiring before anything touches GitHub Actions or the VM.
 3. Add the `test` → `build-and-push` workflow (Decisions 8, 9, 6) — independently testable via a throwaway public/private GHCR package, no VM required.
 4. Author `docker-compose.prod.yml` + Caddy config (Decisions 1, 3, 4) — testable locally by running it against `localhost` before pointing it at a real domain.
-5. Add the `deploy` job (SSH via `appleboy/ssh-action`) — VM already exists (`papo-server-01`); gate its rollout on Tobias entering the deploy secrets (tasks.md §5.2-5.4).
+5. Add the deploy job through the forced-command gateway; install its account, keys, root-owned script and sudoers boundary only after Tobias provides task-5.9 evidence.
 6. Add the local `pg_dump` backup cron (Decision 7, local half) — independent of the VM's deploy job, can be scheduled directly on the VM at any point once the VM is reachable. Offsite sync is deferred post-MVP, not part of this migration.
 
 Historical migration outline only: the claim that no deployment exists is superseded by the local workflow and 09.09 handoff. Current running revision and data state were not checked. Recovery and service-recreation guarantees need Tobias's evidence; the commands above are not authorized actions for this session.

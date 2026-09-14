@@ -22,8 +22,9 @@
 - [x] 3.2 Add a `build-and-push` job (`needs: test`, `if: github.ref == 'refs/heads/main'`) using `docker/setup-buildx-action` + `docker/build-push-action` targeting `linux/amd64` (VM is x86_64, matches GH runners — no cross-arch build needed)
 - [x] 3.3 Configure the job to push to `ghcr.io/<owner>/<repo>-backend` tagged `latest` and `${{ github.sha }}` — image name is `ghcr.io/chris-vahram/diplomarbeit-papo-backend` (owner/repo lowercased, GHCR requirement)
 - [x] 3.4 Grant the workflow `packages: write` permission
-- [ ] 3.5 Set the resulting GHCR package to private once first published
-- [ ] 3.6 Enable branch protection on `main` (require the `test` job to pass before merge)
+- [x] 3.5 Set the resulting GHCR package to private once first published — screenshot supplied 2026-09-13 shows “This package is currently private”
+- [x] 3.6 Enable branch protection on `main` (require the `test` job to pass before merge) — screenshot supplied 2026-09-13 shows PR requirement, required `Test backend`, up-to-date branches and no bypass
+- [ ] 3.7 Remove former team member Julian's inherited repository/package write access, or record an explicit current authorization decision; verify GitHub collaborators and inherited package access no longer exceed the Chris/Tobias team
 
 ## 4. Frontend + reverse proxy config
 
@@ -42,12 +43,15 @@
 - [x] 5.5 Add a `deploy` job (`needs: build-and-push`) to the workflow using `appleboy/ssh-action`, running `docker compose pull && docker compose up -d` in the production compose directory on the VM — targets `~/papo-deploy` on the VM (see task 5.6, done) as `username: papo` (VM account per proposal.md), `VM_HOST`/`VM_SSH_KEY` secrets. **Job re-enabled** (`if: false` swapped back to the branch/ref condition) now that 5.3, 5.4, and 5.6 are all done — also wired in `fingerprint: ${{ vars.VM_HOST_FINGERPRINT }}` for SSH host-key pinning (value was already set as a repo variable, just not connected to the workflow before).
 - [x] 5.6 Copy `docker-compose.prod.yml` + Caddyfile + Postgres init script to the VM (one-time manual step or a `scp` step in the deploy job)
 - [x] 5.7 Run the pipeline end-to-end against the real VM; verify only the Quarkus container restarts and Postgres/Keycloak data persists across the deploy — done (PR #6). Hit one issue on the first real run: the VM presents RSA/ECDSA/Ed25519 host keys, and `appleboy/ssh-action` negotiates by `golang.org/x/crypto/ssh`'s default order (ECDSA before Ed25519), so it checked the fingerprint against the ECDSA key while `VM_HOST_FINGERPRINT` was still the Ed25519 one — fixed by updating the stored variable to the ECDSA fingerprint (confirmed via `ssh-keyscan`). Pipeline now runs clean end-to-end.
+- [x] 5.8 Port the forced-command deploy gateway from historical commit `48ad4d8` onto the current pipeline without reverting the newer `frontend-live/releases/<sha>/current` layout; pin third-party Actions and keep deploy archive/revision validation. — implemented locally 14.09.2026; `sh -n` for gateway/harness and isolated harness **18/18** passed. No VM/SSH/secret action.
+- [ ] 5.9 Install the reconciled gateway, restricted deploy user/key and least-privilege sudoers entry on the VM; run its local harness plus negative remote-command tests and verify the key cannot obtain a shell or run arbitrary commands.
 
 ## 6. HTTPS + domain (domain name confirmed; current operating evidence pending — Tobias)
 
-- [ ] 6.1 (Tobias) Domain name `paportal.at` confirmed by meeting 25.08.2026; obtain dated evidence of its actual DNS target. Original task combined procurement and DNS, so name confirmation alone does not complete it.
+- [x] 6.1 (Tobias) Domain name `paportal.at` and dated DNS target confirmed — public check 2026-09-13 resolved A record to `178.104.109.45`
+- [ ] 6.1a Restore production DB access without deleting/reinitializing the persistent volume: verify local DB access, create local dumps of both databases, align PostgreSQL role `partnerportal` password with current VM-local `.env.prod` without printing it, restart Keycloak/backend, then verify both remain up and authentication failures stop.
 - [ ] 6.2 Set `KC_HOSTNAME`, `redirectUris`, and `webOrigins` together as one work package (design.md Decision 4) — do not scaffold any of the three against a placeholder domain beforehand
-- [ ] 6.3 Verify Caddy successfully provisions a Let's Encrypt certificate and the site is reachable over HTTPS; also confirms whether an upstream/provider firewall blocks 80/443 beyond the local `ufw` check already done (5.1)
+- [x] 6.3 Verify Caddy successfully provisions a Let's Encrypt certificate and the site is reachable over HTTPS — public check 2026-09-13 returned 200 for `/`, DNS target `178.104.109.45`, valid Let's Encrypt certificate; 80/443 externally reachable
 - [ ] 6.4 Verify Keycloak login flow works end-to-end through the `/auth` path behind the proxy (no redirect loops, correct issuer URL in tokens)
 
 ## 7. Backups — local now, offsite deferred (design.md Decision 7, resolved 2026-08-23)
@@ -74,3 +78,10 @@
 - 5.7: historical successful Action does not prove current HTTP/OIDC/login/order behavior. The contrary 404/502 report is also historical, not a new live check.
 - PR #5: closed/conflicted status comes only from the Restarbeitsplan. Its mentioned tasks 5.11/5.12 do not exist in this task list and must not be treated as current task IDs.
 - P0 outage, frontend archive/path/swap and PR-#5 gateway boundary remain three separate evidence requests in review.md. No repair tasks are added before diagnosis.
+
+## Incident evidence — 13.09.2026
+
+- Frontend archive/path incident is resolved externally: `/` returns 200 through HTTPS using the current release layout.
+- P0 root cause is now established: PostgreSQL is healthy, but both Keycloak and backend fail with `FATAL: password authentication failed for user "partnerportal"`. Existing volume retained its initialized role password while VM-local `.env.prod` supplies a different value; changing `POSTGRES_PASSWORD` does not rotate an existing PostgreSQL role.
+- Caddy, Keycloak and backend share `papo-prod_default`; network separation is not the root cause. Caddy's 502 responses follow from unavailable upstream processes.
+- Recovery must preserve the database volume and take local dumps before rotating the role password. No `down -v`, volume deletion, database reinitialization or secret output is permitted.

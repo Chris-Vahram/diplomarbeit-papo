@@ -1,4 +1,16 @@
-# PAPO-Planungs- und Umsetzungshandoff – 12.09.2026
+# PAPO-Planungs- und Umsetzungshandoff – 13.09.2026
+
+## Aktueller Startpunkt — 13.09.2026
+
+Fortschreibung 14.09.2026: Gateway 5.8 ist lokal umgesetzt; CI/CD **35/45**. Geprüft mit `sh -n`, isoliertem Harness 18/18, Strict-Validate und `git diff --check`. 5.9 wartet auf Tobias' sanitisierten VM-, Key-, Host-Key-, Eigentümer-, sudoers- und Remote-Negativnachweis. `HEAD d85e92f` und `origin/main 05e0bdd` divergieren 5/4; Merge-Simulation zeigt Konflikte in `DemoDataSeeder.java` sowie beim remote archivierten/lokal aktiven CI/CD-Change. Kein Pull/Merge/Push.
+
+- Git: `d85e92f`, Remote-Branch synchron, fünf Commits vor `origin/main`; Dirty Worktree bewahren.
+- MVP: `build-partnerportal-mvp` **53/53**, technisch abgeschlossen, nicht archiviert.
+- Apply-ready: `complete-thesis-documentation` **0/6** und `integrate-category-management-into-article-management` **0/4**.
+- CI/CD: **34/45**. P0 durch DB-Passwortdrift geklärt; Recovery mit Dump vor Rollenpasswort-Angleichung. Danach OIDC/API/Login/Bestellung.
+- GitHub belegt: GHCR privat, `main` geschützt. Julian besitzt laut Screenshot noch Write-Zugriff; klären.
+- Gateway `48ad4d8` nur selektiv auf aktuellen `frontend-live`-Stand portieren.
+- Reihenfolge: P0-Recovery, Dokumentation, Artikelverwaltungs-UX, Gateway-Hardening, Cron/Backup. Kein Volume löschen, keine Secrets ausgeben.
 
 ## Tatsächlicher Abschlussstand — 12.09.2026
 
@@ -224,3 +236,11 @@ Zum Schluss: jeden Change mit openspec validate prüfen; unabhängigen Security-
 - Roadmap nennt unabhängige Endkundenverwaltung erledigt; aktuelle Listen-Seite besitzt keinen Erstellen-Dialog. Code schlägt hier Dokumentationsbehauptung.
 - Der 5-%-Standard ist im aktuellen Formular nicht umgesetzt: `openCreate()` setzt 10 %.
 - `add-standalone-customer-creation` ist ein uncommitteter Vorentwurf. Erst Astra-Review entscheidet READY oder BLOCKIERT.
+# Nächster Orchester-Start — 14.09.2026
+
+1. Handoff und Gateway-Reviewer-Antwort lesen; `git status --short --branch`, `git fetch origin`, HEAD gegen `origin/main` vergleichen.
+2. Nicht automatisch pullen/mergen. Konflikte und Remote-Änderungen (Demo-Seeding, Archive, Präsentation, CI/CD) bewerten; bei Unsicherheit selektiv portieren.
+3. CI/CD-Tasks mit P0-Live-Nachweisen synchronisieren. Gateway 5.8 lokal, 5.9 erst nach Tobias-VM-Belegen.
+4. Finaler Security-/Quality-/Browser-/OpenSpec-Check.
+5. `complete-thesis-documentation` und Präsentation: „Artikel“ primär; Lehreranforderungen einarbeiten.
+6. Clockify nur evidenzbasiert ergänzen; Dauer/Uhrzeit aus Logs oder Nutzerangabe.

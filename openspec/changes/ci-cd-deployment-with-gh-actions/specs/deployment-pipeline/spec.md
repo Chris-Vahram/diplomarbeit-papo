@@ -1,6 +1,6 @@
 ## ADDED Requirements
 
-> Review gate 10.09.2026: this historical delta is **BLOCKIERT**, not an executable Terra plan. The desired service continuity and failure safety below are unverified acceptance goals, not guarantees supplied by Compose. Required evidence is listed in `../../review.md`.
+> Review gate 13.09.2026: DNS, HTTPS, private GHCR and protected `main` are evidenced. Production remains unavailable behind Caddy because persistent PostgreSQL credentials differ from VM-local configuration. Recovery and restricted deploy-gateway work remain pending; required evidence is listed in `../../review.md`.
 
 ### Requirement: Automated build on push to main
 The system SHALL automatically run the backend test suite on every push to `main` and on every pull request, using a GitHub Actions workflow.
@@ -39,21 +39,25 @@ The system SHALL build a Quarkus JVM-mode container image targeting `linux/amd64
 - **THEN** it SHALL be built for the `linux/amd64` platform to match the deployment VM's architecture (VM is `x86_64`, same as GitHub-hosted runners — no cross-arch build needed)
 
 ### Requirement: Automated deployment via SSH
-The system SHALL deploy the newly built image to the production VM through an explicitly authorized deployment path. Keeping the deploy key in a GitHub Actions secret SHALL NOT be described as proof of temporary access or command restrictions. The actual access boundary remains a blocking decision/evidence item in the review; no replacement deployment mechanism is approved here.
+The system SHALL deploy through a forced-command SSH gateway that accepts only `upload`, `verify` and `activate` for one lowercase 40-hex SHA matching server-fetched `origin/main`. The uploaded frontend archive SHALL byte-match the server-generated canonical archive and contain only regular Git blobs.
 
 #### Scenario: Deploy job runs after successful build
 - **WHEN** the build-and-push job completes successfully for a push to `main`
 - **THEN** the deploy job connects to the production VM via SSH using a GitHub Actions secret for the deploy key
-- **AND** runs `docker compose pull` followed by `docker compose up -d` in the production compose directory
+- **AND** uploads, verifies and activates the exact commit through the gateway
 
 #### Scenario: Only the Quarkus service is recreated
-- **WHEN** `docker compose pull && docker compose up -d` runs on the VM
+- **WHEN** the gateway activates a verified release
 - **THEN** only the Quarkus container is replaced with the new image
+- **AND** `IMAGE_TAG` equals the verified commit SHA
+- **AND** the frontend is extracted directly to `frontend-live/releases/<sha>/` and `current` is switched atomically
 - **AND** the Postgres and Keycloak containers continue running without interruption or data loss
+- **AND** Caddy is not recreated for a normal release
 
 #### Scenario: Deploy job fails without breaking existing deployment
 - **WHEN** the SSH connection or the deploy commands fail
 - **THEN** the previously running containers SHALL remain unaffected (no partial state that removes a working deployment)
+- **AND** `frontend-live/current` SHALL keep its previous target
 
 ### Requirement: No secrets committed to the repository
 The system SHALL keep all deployment credentials (database password, Keycloak admin credentials, deploy SSH key, VM public IP) out of the repository, sourced exclusively from GitHub Actions secrets or VM-local configuration not checked into version control.
