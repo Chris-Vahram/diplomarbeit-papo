@@ -4,6 +4,10 @@ Stand: 2026-09-14
 
 Der technische MVP ist abgeschlossen. Offene Diplomarbeits- und UI/UX-Dokumentation wird unabhängig im OpenSpec-Change `complete-thesis-documentation` bearbeitet und blockiert den technischen MVP nicht.
 
+Aktueller Stand 14.09.2026: `TECHNICAL_DOCUMENTATION.md`, `REQUIREMENTS_TRACEABILITY.md` und
+`UI_UX_DOCUMENTATION.md` sind erstellt. OpenSpec steht bei 3/6; Tobias’ Prüfung der UI-/Screenshot-
+Belege sowie gemeinsame Endabnahme und Abschlussvalidierung bleiben offen.
+
 Visueller Polish ist für den aktuellen Screenstand abgeschlossen. Neue oder wesentlich geänderte Screens erhalten Desktop-/Mobile-Polish und passende Belege in ihrem jeweiligen UI-Change.
 
 ## Tobias: UI/UX-Dokumentation

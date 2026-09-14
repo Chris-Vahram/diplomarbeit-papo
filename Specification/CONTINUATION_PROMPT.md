@@ -7,6 +7,7 @@
 - Clockify: „ca. 400 h“ ist ausdrücklich nur der dokumentierte Zielwert für das Zweierteam, nicht die ausgelesene Ist-Summe. Der angemeldete Zen-Browser stellte den Workspace-Inhalt in dieser Sitzung nicht bereit; keine Zahl wurde erfunden.
 - Layout-/Assetprüfung: Desktop- und Mobile-Rendering, Folienhöhe, lokale Bilder und Links sind nach der letzten Änderung erneut zu prüfen. Danach Kontextdateien/KI-Nachweis aktualisieren und committen.
 - Nach dem Präsentationscommit: `harden-deployment-gateway` mit `openspec-apply-change` fortsetzen; externe SSH-Negativmatrix nur mit autorisiertem Deploy-Key, danach die weiteren aktiven Changes einzeln.
+- OpenSpec-Fortschreibung: `complete-thesis-documentation` steht bei **3/6**. `docs/TECHNICAL_DOCUMENTATION.md`, `docs/REQUIREMENTS_TRACEABILITY.md` und `docs/UI_UX_DOCUMENTATION.md` sind erstellt/geprüft; 2.2 wartet auf Tobias’ menschliche UI-/Screenshot-Abnahme. Nicht als erledigt markieren.
 
 ## Verbindlicher Next-Session-Handoff — 14.09.2026, Protokoll 14.9 gelesen
 
