@@ -1,5 +1,11 @@
 # OpenSpec-Planungsreview — 11.09.2026
 
+## Tatsächliche Fortschreibung — 14.09.2026
+
+PR #16 mit `add-company-internal-partner-note` und den drei UI-Korrekturen ist nach `main` gemergt und über CI/CD-Lauf `34853223915` deployed. Der Change bleibt formal offen (0/4): zwei Review-Findings, Browserabnahme und vollständige Antwortgrenzen fehlen. PR #17 (`ae749ea`) dokumentiert den KI-Nachweis und wartet auf CI.
+
+Erledigt: Gateway-Streamingbug, Push/Merge/Deployment, Live-HTTPS/API-Smoke, Clockify und VM-Security-Task 2.1. Teilweise: VM-Security-Task 2.2 sowie Live-/Rollback-Abnahme. Offen: externe SSH-Negativmatrix, formaler Company-Notizabschluss und vier weitere Stammdaten-/BMD-Changes. BMD-Nummern bleiben bis Beispieldaten/Vertrag gestoppt; keine direkte BMD-API.
+
 ## Next-Session-Audit — 14.09.2026
 
 - Branch/Remote sauber synchron auf `38cd932`; lokaler Wortlaut-/Deck-Fix ist danach noch nicht committed oder gepusht. `origin/main` ist `05e0bdd`; lokales `main` liegt vier Commits zurück.

@@ -1,5 +1,12 @@
 # PAPO-Planungs- und Umsetzungshandoff – 13.09.2026
 
+## Vorrangiger Andockpunkt — 14.09.2026, nach PR #16 / Deployment
+
+- PR #16 (`486ca54`) ist gemergt; `origin/main`/Live stehen auf `35d8a0ab63b4`. PR #17 (`ae749ea`, KI-Nachweis) ist offen und wartet auf CI.
+- `add-company-internal-partner-note` ist funktional deployed, formal aber **0/4 Tasks**: zwei Review-Findings, Browserabnahme und vollständige Antwortgrenzen fehlen.
+- Erst PR #17 CI/merge abschließen; danach OpenSpec-Status/Apply lesen und den Change gezielt fertigstellen. Keine Archivierung vor erfüllter DoD.
+- Danach VM-Task-2.2-Negativmatrix mit autorisiertem Key nachholen und erst dann die vier übrigen OpenSpec-Changes einzeln beginnen.
+
 ## Vorrangiger nächster-session Start — nach dem Handoff vom 14.09.2026
 
 - Branch `docs/openspec-planning-2026-09-11`, HEAD/Remote `38cd932`; vor dem aktuellen lokalen Fix war der Arbeitsbaum sauber. `origin/main` ist `05e0bdd`; lokales `main` liegt vier Commits zurück.

@@ -1,5 +1,11 @@
 # PAPO Restarbeitsplan – 09.09.2026
 
+## Fortschreibung — 14.09.2026
+
+**Nächster Andockpunkt:** PR #17 nach CI mergen, danach `add-company-internal-partner-note` mit den zwei Review-Findings und Browserabnahme fertigstellen. Der funktionale Stand aus PR #16 (`486ca54`, `main` `35d8a0ab63b4`) ist erfolgreich auf der öffentlichen VM deployed.
+
+Status: Gateway-Bug erledigt; VM-Task 2.1 erledigt; VM-Task 2.2 teilweise wegen fehlender autorisierter SSH-Negativtests; Live-Smoke/gekoppelter Rollback teilweise belegt; Clockify erledigt; Company-Notiz implementiert, aber formal offen; vier weitere OpenSpec-Changes noch nicht implementiert. BMD-Partner-/Artikelnummern bleiben bis zum Beispieldaten-Gate.
+
 ## Vorrangiger Next-Session-Stand — 14.09.2026
 
 Branch `docs/openspec-planning-2026-09-11` ist auf `38cd932` mit Remote synchron; vor dem aktuellen lokalen Fix war der Arbeitsbaum sauber. Gateway lokal geprüft (Harness 18/18), aber `harden-deployment-gateway` bleibt bei **2/4**, weil VM-, Key-, sudoers-, Host-Key-, Remote-Negativtest- und Rollbacknachweise fehlen. Keine VM-, SSH-, Secret- oder Datenvolumenaktion.
