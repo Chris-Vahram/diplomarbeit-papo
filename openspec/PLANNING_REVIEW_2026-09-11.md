@@ -194,3 +194,10 @@ Abschließender Artefaktlauf am 11.09.2026: `openspec validate --changes --stric
 Keine Backend-/Browser-/Produkt-/Datenbanktests ausgeführt: diese Sitzung setzt ausschließlich Planung um. Vorhandene Produkt-/Präsentationsdiffs werden vor/nach verglichen.
 
 `python3 tools/ai_evidence_log.py sync` nicht ausgeführt: das Skript liest standardmäßig externe Sessionarchive und schreibt ins private Roharchiv (tools/ai_evidence_log.py:21–23,194–217). Diese Zugriffe sind im engen Auftrag nicht freigegeben. Auch keine fingierte Enrichment-Zeile; dieser Repo-Report hält Zweck, Ergebnis und echte Prüfungen fest.
+# Fortschreibung — 14.09.2026 Präsentation
+
+Die Präsentation wurde auf 22 Folien fertiggestellt vorbereitet. Sie verwendet „Artikel“, erklärt
+Rollen und Bereitstellung verständlich für die Unternehmenszielgruppe und enthält GitHub-Stars,
+digitale Souveränität, zwei zusätzliche echte Screenshots, eine Clockify-Übersicht für Chris und
+Tobias sowie ein Demo-Drehbuch. Die fehlende Clockify-Istsumme bleibt als technischer Zugriffspunkt
+dokumentiert; der Zielwert „ca. 400 h“ wird nicht als Ist-Zeit ausgegeben.

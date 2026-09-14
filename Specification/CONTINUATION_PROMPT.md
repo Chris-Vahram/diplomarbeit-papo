@@ -1,5 +1,13 @@
 # Continuation Prompt — PAPO Partnerportal
 
+## Aktueller Abschlussnachtrag — Präsentation 14.09.2026
+
+- `presentation/mvp-deck/index.html` umfasst jetzt 22 Folien. Die Texte sind auf eine nichttechnische Unternehmenszielgruppe ausgerichtet; technische Gateway-/Live-Nachweise und ein Hinweis auf fehlende Firmendaten stehen nicht mehr im Deck.
+- Ergänzt: GitHub-Star-Momentaufnahme vom 14.09.2026, drei sachliche Folien zu digitaler Souveränität, zwei echte Browser-Screenshot-Folien, Clockify-Übersicht für Chris und Tobias sowie `presentation/demo-drehbuch.md`.
+- Clockify: „ca. 400 h“ ist ausdrücklich nur der dokumentierte Zielwert für das Zweierteam, nicht die ausgelesene Ist-Summe. Der angemeldete Zen-Browser stellte den Workspace-Inhalt in dieser Sitzung nicht bereit; keine Zahl wurde erfunden.
+- Layout-/Assetprüfung: Desktop- und Mobile-Rendering, Folienhöhe, lokale Bilder und Links sind nach der letzten Änderung erneut zu prüfen. Danach Kontextdateien/KI-Nachweis aktualisieren und committen.
+- Nach dem Präsentationscommit: `harden-deployment-gateway` mit `openspec-apply-change` fortsetzen; externe SSH-Negativmatrix nur mit autorisiertem Deploy-Key, danach die weiteren aktiven Changes einzeln.
+
 ## Verbindlicher Next-Session-Handoff — 14.09.2026, Protokoll 14.9 gelesen
 
 - Das neue Protokoll `Documentation/Besprechungsprotokolle/Besprechungsprotokoll_14.9.md` ist vollständig gelesen und mitgepusht. Der fertige Change `add-company-internal-partner-note` ist archiviert unter `openspec/changes/archive/2026-09-14-add-company-internal-partner-note`; die Delta-Spec ist in `openspec/specs/partner-management/spec.md` synchronisiert.
