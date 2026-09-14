@@ -1,5 +1,16 @@
 # Continuation Prompt — PAPO Partnerportal
 
+## Vorrangiger Next-Session-Handoff — 14.09.2026, nach PR #16 / Live-Deployment
+
+Dieser Block ersetzt alle älteren aktuellen Statusangaben darunter.
+
+- Git: PR #16 mit Funktionscommit `486ca54` ist nach `main` gemergt; `origin/main` steht auf `35d8a0ab63b4`. Nachweis-Commit `ae749ea` ist gepusht; PR #17 ist noch offen und wartet auf CI. Arbeitsbaum nach dem Commit sauber.
+- Live: CI/CD-Lauf `34853223915` vollständig erfolgreich; `https://paportal.at/` liefert 200, unauthentifizierte Company-API 401. Notizfeld und Artikel-Freischaltungslink sind öffentlich ausgeliefert.
+- **Nächster Andockpunkt:** PR #17 CI/merge abschließen, danach `git fetch --prune`, Status/Log und `openspec list --json` prüfen. Dann ausschließlich `add-company-internal-partner-note` formal fertigstellen; nicht mit dem nächsten Change beginnen.
+- `add-company-internal-partner-note`: Code deployed, formal **0/4 Checkboxen**. Offen: Legacy-Company-PUT ohne `internalNote` darf keine Notiz löschen; negative Assertions für Partner-/Order-/Dashboard-/Produkt-/CSV-Antworten; Desktop-/Mobile-Browserabnahme; Reviews/Strict-Validate und Tasks/Archivabschluss.
+- Bereits belegt: fokussiert 13/13, vollständig 101/101, Package, JS-Syntax, Strict-Validate und Diff-Check. Securityreview clean; Javareview mit den zwei obigen should-fix-Hinweisen.
+- Gesamtauftrag: Gateway-Bug erledigt; VM-Deployment erledigt; VM-Security 2.1 erledigt und 2.2 teilweise (externe SSH-Negativmatrix wegen fehlendem autorisiertem lokalem Deploy-Key offen); Clockify erledigt; vier weitere Stammdaten-/BMD-Changes nicht implementiert. BMD-Nummern bleiben bis Beispieldaten/Vertrag offen.
+
 ## Vorrangiger Next-Session-Handoff — 14.09.2026
 
 Dieser Block ersetzt ältere aktuelle Statusangaben darunter.
