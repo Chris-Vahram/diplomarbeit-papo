@@ -2,10 +2,11 @@
 
 ## Fortschreibung — Apply `add-business-tax-identifiers`, 14.09.2026
 
-Der Change ist mit 7/7 Tasks umgesetzt: `CompanyProfile`-Singleton, gemeinsame
+Der Change ist mit 7/7 Tasks umgesetzt und über PR #25 (Merge-Commit
+`b49ab7279ab023ee1a76b30eab202c6dde779f26`) nach `main` gemergt: `CompanyProfile`-Singleton, gemeinsame
 Steuer-ID-Validierung, Partner-/Company-REST, CSV/XLSX-Import, native Firmenformulare,
 synthetische Seeds sowie BMF-/Datenmodell-/Setup-Dokumentation. Full-Test, Package,
-JS-Syntax, Strict-Validate und Diffcheck sind grün. PR/Merge fehlen noch. Danach bleibt
+JS-Syntax, Strict-Validate, Diffcheck und CI `34897649649` sind grün. Danach bleibt
 `harden-deployment-gateway` 3/4 wegen der autorisierten externen SSH-Negativmatrix offen.
 
 ## Fortschreibung — 14.09.2026

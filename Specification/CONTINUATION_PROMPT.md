@@ -3,14 +3,15 @@
 ## Aktueller Apply-Stand — `add-business-tax-identifiers`, 14.09.2026
 
 Der nächste geplante OpenSpec-Change wurde auf Branch `codex/add-business-tax-identifiers`
-implementiert. Die 7 Tasks sind erledigt: gemeinsamer Validator für ISO-Land/Art/Wert,
+implementiert und über PR #25 mit Merge-Commit `b49ab7279ab023ee1a76b30eab202c6dde779f26`
+nach `main` gemergt. Die 7 Tasks sind erledigt: gemeinsamer Validator für ISO-Land/Art/Wert,
 AT-UID bzw. neunstellige nationale Steuernummer, synthetisches `CompanyProfile`-Singleton,
 Company-only-REST, Partnerverwaltung, CSV/XLSX-Import, native Firmenformulare und Doku.
 Partner-Self-Service liefert und ändert keine Steuerkennung. Tests, Package, JS-Syntax,
-Strict-Validate und Diffprüfung sind grün; der Change ist noch nicht committed/merged.
-Offen für den nächsten Lauf: PR erstellen/CI abwarten/mergen und danach den Gateway-Blocker
-3/4 mit autorisiertem Deploy-Key weiterführen. BMD-Nummern bleiben bis Beispieldaten/Vertrag
-gesperrt; keine direkte BMD-API.
+Strict-Validate und Diffprüfung sind grün. CI Run `34897649649` (`Test backend`) ist grün;
+Image-Build und VM-Deployment waren bei diesem Daten-/Schema-Change übersprungen. Als
+nächstes den Gateway-Blocker 3/4 mit autorisiertem Deploy-Key weiterführen. BMD-Nummern
+bleiben bis Beispieldaten/Vertrag gesperrt; keine direkte BMD-API.
 
 ## Aktueller Abschlussnachtrag — Präsentation 14.09.2026
 

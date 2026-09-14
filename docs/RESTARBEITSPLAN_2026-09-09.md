@@ -2,10 +2,11 @@
 
 ## Fortschreibung — Apply `add-business-tax-identifiers`, 14.09.2026
 
-Der Change ist auf einem eigenen Branch umgesetzt und mit 7/7 Tasks abgeschlossen.
+Der Change ist auf einem eigenen Branch umgesetzt, mit 7/7 Tasks abgeschlossen und über PR #25
+(`b49ab7279ab023ee1a76b30eab202c6dde779f26`) nach `main` gemergt.
 Er ergänzt die gemeinsame, syntax-only Steuer-ID für Firmenprofil und Partner, Company-only
 Verwaltung, Importvalidierung, synthetische Demodaten, UI und Doku. `./mvnw test`, Package,
-JS-Syntax, Strict-Validate und Diffcheck sind erfolgreich. Als nächstes PR/CI/Merge; der
+JS-Syntax, Strict-Validate, Diffcheck und CI `34897649649` sind erfolgreich. Als nächstes
 Gateway-Change bleibt wegen fehlendem autorisiertem Deploy-Key offen.
 
 ## Fortschreibung — OpenSpec Apply 14.09.2026
