@@ -1,5 +1,11 @@
 # PAPO-Planungs- und Umsetzungshandoff – 13.09.2026
 
+## Fortschreibung — OpenSpec Apply 14.09.2026
+
+`complete-thesis-documentation` steht bei **3/6**: technische Dokumentation, Traceability-
+Matrix und UI/UX-Dokumentation sind erstellt; Task 2.2 wartet auf Tobias’ Sichtprüfung. Der
+Gateway-Change bleibt bei 3/4 wegen der externen SSH-Negativmatrix ohne lokalen Deploy-Key.
+
 ## Verbindlicher Startpunkt nächste Session — Protokoll 14.9 / Präsentation
 
 Das vollständige neue Protokoll liegt unter `Documentation/Besprechungsprotokolle/Besprechungsprotokoll_14.9.md` und ist zuerst zu lesen. Der nächste Arbeitsblock betrifft die Präsentation, nicht den nächsten Produkt-OpenSpec-Change. Fertiger Company-Notiz-Change: archiviert und in die Haupt-Spec synchronisiert.

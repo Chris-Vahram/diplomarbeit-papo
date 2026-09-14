@@ -1,5 +1,12 @@
 # OpenSpec-Planungsreview — 11.09.2026
 
+## Fortschreibung — 14.09.2026
+
+Der OpenSpec-Apply für `complete-thesis-documentation` steht bei **3/6**. Technische
+Dokumentation, Traceability-Matrix und UI/UX-Dokumentation sind erstellt; Tobias’ UI-/Screenshot-
+Abnahme ist der nächste offene Schritt. `harden-deployment-gateway` bleibt bei 3/4 wegen der
+externen SSH-Negativmatrix ohne lokalen Deploy-Key.
+
 ## Neuer Next-Session-Plan — Besprechungsprotokoll 14.9
 
 Das neue Protokoll `Documentation/Besprechungsprotokolle/Besprechungsprotokoll_14.9.md` ist gelesen. Die nächste Session priorisiert die Präsentation: `presentation/mvp-deck/index.html` sprachlich anpassen, digitale Souveränität mit 2–3 Folien erklären, GitHub-Stars und zwei echte Screenshots ergänzen, Clockify-Gesamtzeit darstellen und ein kurzes Probe-Gallopp-Drehbuch erstellen. Danach Desktop/Mobile und Offline-Assets prüfen und über PR mergen.

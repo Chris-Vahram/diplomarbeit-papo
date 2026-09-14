@@ -1,5 +1,11 @@
 # PAPO Restarbeitsplan – 09.09.2026
 
+## Fortschreibung — OpenSpec Apply 14.09.2026
+
+`complete-thesis-documentation` steht bei **3/6**. Die technische Dokumentation, die
+Traceability-Matrix und die UI/UX-Dokumentation sind erstellt; Tobias’ Prüfung der UI-/Screenshot-
+Belege bleibt offen.
+
 ## Neuer verbindlicher Next Step — Präsentation / Protokoll 14.9
 
 Das neue Protokoll `Documentation/Besprechungsprotokolle/Besprechungsprotokoll_14.9.md` ist vollständig gelesen und eingecheckt. Vor weiteren technischen OpenSpec-Changes wird die Präsentation in `presentation/mvp-deck/` überarbeitet: Formulierungen und Struktur, digitale Souveränität, GitHub-Stars, zwei zusätzliche Screenshots, Clockify-Gesamtübersicht und kurzes Demo-Drehbuch. Danach Browser-/Offline-/Lesbarkeitsprüfung und PR-Merge.
