@@ -1,5 +1,13 @@
 # PAPO Restarbeitsplan – 09.09.2026
 
+## Fortschreibung — Apply `add-business-tax-identifiers`, 14.09.2026
+
+Der Change ist auf einem eigenen Branch umgesetzt und mit 7/7 Tasks abgeschlossen.
+Er ergänzt die gemeinsame, syntax-only Steuer-ID für Firmenprofil und Partner, Company-only
+Verwaltung, Importvalidierung, synthetische Demodaten, UI und Doku. `./mvnw test`, Package,
+JS-Syntax, Strict-Validate und Diffcheck sind erfolgreich. Als nächstes PR/CI/Merge; der
+Gateway-Change bleibt wegen fehlendem autorisiertem Deploy-Key offen.
+
 ## Fortschreibung — OpenSpec Apply 14.09.2026
 
 `complete-thesis-documentation` steht bei **3/6**. Die technische Dokumentation, die

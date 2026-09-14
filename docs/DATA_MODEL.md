@@ -21,6 +21,15 @@ erDiagram
     ORDER ||--|| COMMISSION_RECORD : "erzeugt"
     PARTNER ||--o{ COMMISSION_RECORD : "erhält"
 
+    COMPANY_PROFILE {
+        Long id PK
+        String singletonKey UK "CURRENT; genau ein aktives Portalprofil"
+        String businessName
+        String taxCountry "ISO-3166-1 Alpha-2"
+        BusinessTaxIdentifierType taxIdentifierType "VAT_ID oder NATIONAL_TAX_ID"
+        String taxIdentifierValue "normalisiert, max. 64 Zeichen"
+    }
+
     PARTNER {
         Long id PK
         String partnerNumber UK "kanonisch Großschreibung, z.B. PARTNER-DEMO; = Keycloak-Login"
@@ -28,6 +37,9 @@ erDiagram
         String address
         String email
         String phone
+        String taxCountry "ISO-3166-1 Alpha-2"
+        BusinessTaxIdentifierType taxIdentifierType "VAT_ID oder NATIONAL_TAX_ID"
+        String taxIdentifierValue "normalisiert, max. 64 Zeichen"
         String internalNote "nullable, max. 4.000 Zeichen, nur Company-DTO"
         BigDecimal commissionPercent "5.2, Preset 5/10/15 + individuell"
         boolean active "DB-Flag, nicht mit Keycloak synced"
@@ -126,7 +138,16 @@ Firma wird im Bearbeiten-Formular entsprechend gewarnt.
 `internalNote` ist eine optionale Plain-Text-Notiz mit maximal 4.000 Zeichen,
 die ausschließlich in Company-Partnerantworten enthalten ist. Partner-
 Self-Service, Importe, Exporte, Bestellungen und Provisionsantworten erhalten
-dieses Feld nicht.
+dieses Feld nicht. Die Firma verwaltet außerdem genau eine syntaktisch geprüfte
+Steueridentifikation aus Land, Art (`VAT_ID` oder `NATIONAL_TAX_ID`) und Wert;
+Details und Grenzen stehen in [`docs/TAX_IDENTIFIERS.md`](TAX_IDENTIFIERS.md).
+
+### CompanyProfile
+Das `CompanyProfile` ist ein Singleton für die aktuell einzige Portal-Firma.
+`singletonKey=CURRENT` verhindert eine zweite aktive Profilzeile; es gibt keine
+Mandanten-, Subdomain- oder Routing-Beziehung. Firmenrollen lesen und ändern
+Firmenname und Steueridentifikation über `/api/company/profile`. Partnerrollen
+erhalten keinen Zugriff. Demo-Werte sind synthetisch.
 
 ### Product
 Zentral von der Firma verwaltete Artikel. `available` steuert Bestellbarkeit

@@ -1,5 +1,6 @@
 package at.papo.partnerportal.partner;
 
+import at.papo.partnerportal.business.BusinessTaxIdentifierRequest;
 import at.papo.partnerportal.common.AddressRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
@@ -26,6 +27,8 @@ public class PartnerRequest {
     @DecimalMin(value = "0.0", message = "Provision darf nicht negativ sein.")
     @DecimalMax(value = "100.0", message = "Provision darf 100% nicht überschreiten.")
     private BigDecimal commissionPercent;
+    @Valid
+    private BusinessTaxIdentifierRequest taxIdentifier;
     @Size(max = 4000, message = "Interne Notiz darf höchstens 4.000 Zeichen enthalten.")
     private String internalNote;
     private Boolean active;
@@ -56,6 +59,10 @@ public class PartnerRequest {
 
     public BigDecimal commissionPercent() {
         return commissionPercent;
+    }
+
+    public BusinessTaxIdentifierRequest taxIdentifier() {
+        return taxIdentifier;
     }
 
     public String internalNote() {
@@ -92,6 +99,10 @@ public class PartnerRequest {
 
     public void setCommissionPercent(BigDecimal commissionPercent) {
         this.commissionPercent = commissionPercent;
+    }
+
+    public void setTaxIdentifier(BusinessTaxIdentifierRequest taxIdentifier) {
+        this.taxIdentifier = taxIdentifier;
     }
 
     public void setInternalNote(String internalNote) {

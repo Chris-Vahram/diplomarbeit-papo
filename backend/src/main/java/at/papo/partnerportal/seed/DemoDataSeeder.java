@@ -2,6 +2,9 @@ package at.papo.partnerportal.seed;
 
 import at.papo.partnerportal.category.CategoryMigrationService;
 import at.papo.partnerportal.commission.CommissionService;
+import at.papo.partnerportal.business.BusinessTaxIdentifier;
+import at.papo.partnerportal.business.BusinessTaxIdentifierType;
+import at.papo.partnerportal.business.CompanyProfile;
 import at.papo.partnerportal.common.Address;
 import at.papo.partnerportal.customer.Kunde;
 import at.papo.partnerportal.enablement.ProductEnablement;
@@ -54,6 +57,7 @@ public class DemoDataSeeder {
     void onStart(@Observes StartupEvent event) {
         LaunchMode launchMode = LaunchMode.current();
         if (shouldSeed(launchMode, Partner.count(), seedDemoData)) {
+            seedCompanyProfile();
             seedPartners();
             seedProducts();
             seedProductImages();
@@ -79,13 +83,28 @@ public class DemoDataSeeder {
         // Canonical (upper-case) partner number == the Keycloak demo user "partner-demo"
         // (resolve() upper-cases the login claim), so login -> dashboard works out of the box.
         persistPartner("PARTNER-DEMO", "Huemer GmbH", address("Hauptstraße", "12", "4020", "Linz"),
-                "partner-demo@example.at", "+43 660 1234567", "10.00", true);
+                "partner-demo@example.at", "+43 660 1234567", "10.00", true, "ATU12345678");
         // No linked Keycloak user yet — demonstrates the manual-provisioning gap (design.md).
         persistPartner("P-1002", "Sanitär Bauer KG", address("Ringstraße", "5", "8010", "Graz"),
-                "office@sanitaer-bauer.example.at", "+43 664 2345678", "5.00", true);
+                "office@sanitaer-bauer.example.at", "+43 664 2345678", "5.00", true, "ATU23456789");
         // Inactive — for FR-23 inactive-partner testing (Phase 2).
         persistPartner("P-1003", "Baumarkt Weber e.U.", address("Industriezeile", "3", "6020", "Innsbruck"),
-                "info@weber-baumarkt.example.at", "+43 512 3456789", "15.00", false);
+                "info@weber-baumarkt.example.at", "+43 512 3456789", "15.00", false, "ATU34567890");
+    }
+
+    private void seedCompanyProfile() {
+        if (!shouldSeedCompanyProfile(CompanyProfile.count())) {
+            return;
+        }
+        CompanyProfile profile = new CompanyProfile();
+        profile.singletonKey = CompanyProfile.CURRENT_KEY;
+        profile.businessName = "Huemer GmbH";
+        profile.taxIdentifier = new BusinessTaxIdentifier("AT", BusinessTaxIdentifierType.VAT_ID, "ATU87654321");
+        profile.persist();
+    }
+
+    static boolean shouldSeedCompanyProfile(long profileCount) {
+        return profileCount == 0;
     }
 
     // Every seed address is in Austria; the country part is fixed here.
@@ -94,11 +113,12 @@ public class DemoDataSeeder {
     }
 
     private void persistPartner(String partnerNumber, String name, Address address, String email,
-            String phone, String commissionPercent, boolean active) {
+            String phone, String commissionPercent, boolean active, String taxIdentifierValue) {
         Partner partner = new Partner();
         partner.partnerNumber = partnerNumber;
         partner.name = name;
         partner.address = address;
+        partner.taxIdentifier = new BusinessTaxIdentifier("AT", BusinessTaxIdentifierType.VAT_ID, taxIdentifierValue);
         partner.email = email;
         partner.phone = phone;
         partner.commissionPercent = new BigDecimal(commissionPercent);

@@ -17,5 +17,7 @@ class DemoDataSeederTest {
         assertFalse(DemoDataSeeder.shouldSeed(LaunchMode.TEST, 1));
         assertTrue(DemoDataSeeder.shouldSeed(LaunchMode.DEVELOPMENT, 0));
         assertTrue(DemoDataSeeder.shouldSeed(LaunchMode.TEST, 0));
+        assertTrue(DemoDataSeeder.shouldSeedCompanyProfile(0));
+        assertFalse(DemoDataSeeder.shouldSeedCompanyProfile(1));
     }
 }

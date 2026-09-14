@@ -1,5 +1,6 @@
 package at.papo.partnerportal.partner;
 
+import at.papo.partnerportal.business.BusinessTaxIdentifier;
 import at.papo.partnerportal.common.Address;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Column;
@@ -19,6 +20,9 @@ public class Partner extends PanacheEntity {
 
     @Embedded
     public Address address;
+
+    @Embedded
+    public BusinessTaxIdentifier taxIdentifier;
 
     public String email;
 

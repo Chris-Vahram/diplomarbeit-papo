@@ -1,5 +1,17 @@
 # Continuation Prompt — PAPO Partnerportal
 
+## Aktueller Apply-Stand — `add-business-tax-identifiers`, 14.09.2026
+
+Der nächste geplante OpenSpec-Change wurde auf Branch `codex/add-business-tax-identifiers`
+implementiert. Die 7 Tasks sind erledigt: gemeinsamer Validator für ISO-Land/Art/Wert,
+AT-UID bzw. neunstellige nationale Steuernummer, synthetisches `CompanyProfile`-Singleton,
+Company-only-REST, Partnerverwaltung, CSV/XLSX-Import, native Firmenformulare und Doku.
+Partner-Self-Service liefert und ändert keine Steuerkennung. Tests, Package, JS-Syntax,
+Strict-Validate und Diffprüfung sind grün; der Change ist noch nicht committed/merged.
+Offen für den nächsten Lauf: PR erstellen/CI abwarten/mergen und danach den Gateway-Blocker
+3/4 mit autorisiertem Deploy-Key weiterführen. BMD-Nummern bleiben bis Beispieldaten/Vertrag
+gesperrt; keine direkte BMD-API.
+
 ## Aktueller Abschlussnachtrag — Präsentation 14.09.2026
 
 - `presentation/mvp-deck/index.html` umfasst jetzt 22 Folien. Die Texte sind auf eine nichttechnische Unternehmenszielgruppe ausgerichtet; technische Gateway-/Live-Nachweise und ein Hinweis auf fehlende Firmendaten stehen nicht mehr im Deck.

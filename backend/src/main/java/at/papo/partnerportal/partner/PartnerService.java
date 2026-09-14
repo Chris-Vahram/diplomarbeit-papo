@@ -1,7 +1,9 @@
 package at.papo.partnerportal.partner;
 
+import at.papo.partnerportal.business.BusinessTaxIdentifierValidator;
 import at.papo.partnerportal.common.ApiException;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
@@ -9,6 +11,9 @@ import java.util.Locale;
 
 @ApplicationScoped
 public class PartnerService {
+
+    @Inject
+    BusinessTaxIdentifierValidator taxIdentifierValidator;
 
     public List<CompanyPartnerDto> list() {
         return Partner.<Partner>listAll().stream().map(CompanyPartnerDto::from).toList();
@@ -65,6 +70,7 @@ public class PartnerService {
         partner.email = request.email();
         partner.phone = request.phone();
         partner.commissionPercent = request.commissionPercent();
+        partner.taxIdentifier = taxIdentifierValidator.normalize(request.taxIdentifier());
         // Keep older full-update clients from deleting a note they do not know about.
         // The current company form sends an empty string explicitly when the user clears it.
         if (request.internalNoteProvided()) {

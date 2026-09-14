@@ -376,6 +376,7 @@ class OrderResourceTest {
         updateBody.put("email", current.getString("email"));
         updateBody.put("phone", current.getString("phone"));
         updateBody.put("commissionPercent", current.getDouble("commissionPercent"));
+        updateBody.put("taxIdentifier", current.getMap("taxIdentifier"));
 
         updateBody.put("active", false);
         given().auth().oauth2(companyToken).contentType("application/json")

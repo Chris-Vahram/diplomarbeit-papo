@@ -7,6 +7,7 @@ One package per capability under `at.papo.partnerportal`, each layered `resource
 
 ```
 at.papo.partnerportal.partner        # Partner CRUD, commissionPercent, active flag
+at.papo.partnerportal.business       # CompanyProfile and shared business-tax validation
 at.papo.partnerportal.product        # Product CRUD, availability
 at.papo.partnerportal.enablement     # ProductEnablement (partner x product)
 at.papo.partnerportal.customer       # Kunde
@@ -30,6 +31,9 @@ Every resource method annotated `@RolesAllowed("company")` or `@RolesAllowed("pa
 
 ### Data conventions
 - **Money** (product price, unit-price snapshot, order value, commission basis/value, `commissionPercent`): `java.math.BigDecimal`, mapped to `numeric` — never `double`/`float`.
+- **Business tax identity**: country is ISO-3166-1 alpha-2; type is `VAT_ID` or
+  `NATIONAL_TAX_ID`; values are normalized (trim + uppercase) and syntactically
+  validated by the shared business validator. No register/VIES confirmation.
 - **`Order` entity maps to table `orders`** via `@Table(name = "orders")` — `ORDER` is a reserved SQL word in PostgreSQL and breaks schema generation otherwise.
 - Timestamps: `java.time` types (`LocalDate`/`Instant`), never `java.util.Date`.
 - Schema: Hibernate auto-generation (no Flyway). dev/test = `drop-and-create` + programmatic seed (`at.papo.partnerportal.seed.DemoDataSeeder`, unconditional under dev/test `LaunchMode`); prod/demo = `update`, no auto-seed by default — opt-in only via `SEED_DEMO_DATA` (`papo.seed-demo-data`), see `docs/DEPLOYMENT.md`.

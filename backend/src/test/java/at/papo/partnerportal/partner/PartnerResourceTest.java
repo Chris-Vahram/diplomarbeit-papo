@@ -18,6 +18,7 @@ class PartnerResourceTest {
 
     private static final String SAMPLE_ADDRESS_JSON = "{\"street\":\"Teststraße\",\"houseNumber\":\"1\","
             + "\"postalCode\":\"4020\",\"city\":\"Linz\",\"country\":\"Österreich\"}";
+    private static final String SAMPLE_TAX_JSON = "{\"country\":\"AT\",\"type\":\"VAT_ID\",\"value\":\"ATU12345678\"}";
 
     @Inject
     KeycloakTestTokens tokens;
@@ -38,7 +39,7 @@ class PartnerResourceTest {
 
         given().auth().oauth2(token).contentType("application/json")
                 .body("{\"partnerNumber\":\"PARTNER-DEMO\",\"name\":\"Duplikat\",\"address\":" + SAMPLE_ADDRESS_JSON
-                        + ",\"commissionPercent\":5}")
+                        + ",\"commissionPercent\":5,\"taxIdentifier\":" + SAMPLE_TAX_JSON + "}")
                 .when().post("/api/company/partners")
                 .then().statusCode(409);
     }
@@ -49,7 +50,7 @@ class PartnerResourceTest {
 
         given().auth().oauth2(token).contentType("application/json")
                 .body("{\"partnerNumber\":\"partner-demo\",\"name\":\"Duplikat Kleinschreibung\",\"address\":"
-                        + SAMPLE_ADDRESS_JSON + ",\"commissionPercent\":5}")
+                        + SAMPLE_ADDRESS_JSON + ",\"commissionPercent\":5,\"taxIdentifier\":" + SAMPLE_TAX_JSON + "}")
                 .when().post("/api/company/partners")
                 .then().statusCode(409);
     }
@@ -62,7 +63,7 @@ class PartnerResourceTest {
 
         given().auth().oauth2(token).contentType("application/json")
                 .body("{\"partnerNumber\":\"p-9104\",\"name\":\"Kleinschreibung\",\"address\":" + SAMPLE_ADDRESS_JSON
-                        + ",\"commissionPercent\":5,\"internalNote\":\"Erstnotiz\"}")
+                        + ",\"commissionPercent\":5,\"taxIdentifier\":" + SAMPLE_TAX_JSON + ",\"internalNote\":\"Erstnotiz\"}")
                 .when().post("/api/company/partners")
                 .then().statusCode(200)
                 .body("partnerNumber", is("P-9104"))
@@ -70,7 +71,7 @@ class PartnerResourceTest {
 
         given().auth().oauth2(token).contentType("application/json")
                 .body("{\"partnerNumber\":\"P-9104\",\"name\":\"Zweiter Versuch\",\"address\":" + SAMPLE_ADDRESS_JSON
-                        + ",\"commissionPercent\":5}")
+                        + ",\"commissionPercent\":5,\"taxIdentifier\":" + SAMPLE_TAX_JSON + "}")
                 .when().post("/api/company/partners")
                 .then().statusCode(409);
     }
@@ -84,13 +85,13 @@ class PartnerResourceTest {
 
         given().auth().oauth2(token).contentType("application/json")
                 .body("{\"partnerNumber\":\"P-9105\",\"name\":\"Original\",\"address\":" + SAMPLE_ADDRESS_JSON
-                        + ",\"commissionPercent\":5}")
+                        + ",\"commissionPercent\":5,\"taxIdentifier\":" + SAMPLE_TAX_JSON + "}")
                 .when().post("/api/company/partners")
                 .then().statusCode(200);
 
         given().auth().oauth2(token).contentType("application/json")
                 .body("{\"partnerNumber\":\"  P-9105  \",\"name\":\"Duplikat mit Leerzeichen\",\"address\":"
-                        + SAMPLE_ADDRESS_JSON + ",\"commissionPercent\":5}")
+                        + SAMPLE_ADDRESS_JSON + ",\"commissionPercent\":5,\"taxIdentifier\":" + SAMPLE_TAX_JSON + "}")
                 .when().post("/api/company/partners")
                 .then().statusCode(409)
                 .body("message", is("Partnernummer bereits vergeben."));
@@ -170,7 +171,8 @@ class PartnerResourceTest {
             given().auth().oauth2(companyToken)
                     .when().get("/api/company/partners/" + partnerId)
                     .then().statusCode(200)
-                    .body("internalNote", is(note));
+                    .body("internalNote", is(note))
+                    .body("taxIdentifier.value", is("ATU12345678"));
 
             assertResponseDoesNotExposeInternalNote(companyToken, "/api/company/orders");
             assertResponseDoesNotExposeInternalNote(companyToken, "/api/company/orders/export");
@@ -234,7 +236,7 @@ class PartnerResourceTest {
         // or this restore-after-toggle helper silently wipes it.
         String body = String.format(
                 "{\"partnerNumber\":\"%s\",\"name\":\"%s\",\"address\":%s,\"email\":%s,\"phone\":%s,"
-                        + "\"commissionPercent\":%s,\"internalNote\":%s,\"active\":%s}",
+                        + "\"commissionPercent\":%s,\"taxIdentifier\":" + SAMPLE_TAX_JSON + ",\"internalNote\":%s,\"active\":%s}",
                 current.getString("partnerNumber"), current.getString("name"),
                 addressJson, quoteOrNull(current.getString("email")),
                 quoteOrNull(current.getString("phone")), current.getString("commissionPercent"),
@@ -262,7 +264,7 @@ class PartnerResourceTest {
                 current.getString("address.country"));
         String body = String.format(
                 "{\"partnerNumber\":\"%s\",\"name\":\"%s\",\"address\":%s,\"email\":%s,\"phone\":%s,"
-                        + "\"commissionPercent\":%s,\"internalNote\":%s,\"active\":%s}",
+                        + "\"commissionPercent\":%s,\"taxIdentifier\":" + SAMPLE_TAX_JSON + ",\"internalNote\":%s,\"active\":%s}",
                 current.getString("partnerNumber"), current.getString("name"), addressJson,
                 quoteOrNull(current.getString("email")), quoteOrNull(current.getString("phone")),
                 current.getString("commissionPercent"), quoteOrNull(internalNote), current.getBoolean("active"));
@@ -282,7 +284,7 @@ class PartnerResourceTest {
                 current.getString("address.country"));
         return String.format(
                 "{\"partnerNumber\":\"%s\",\"name\":\"%s\",\"address\":%s,\"email\":%s,\"phone\":%s,"
-                        + "\"commissionPercent\":%s,\"active\":%s}",
+                        + "\"commissionPercent\":%s,\"taxIdentifier\":" + SAMPLE_TAX_JSON + ",\"active\":%s}",
                 current.getString("partnerNumber"), current.getString("name"), addressJson,
                 quoteOrNull(current.getString("email")), quoteOrNull(current.getString("phone")),
                 current.getString("commissionPercent"), current.getBoolean("active"));
@@ -301,7 +303,8 @@ class PartnerResourceTest {
         return String.format(
                 "{\"name\":\"%s\",\"address\":{\"street\":\"%s\",\"houseNumber\":\"%s\","
                         + "\"postalCode\":\"%s\",\"city\":\"%s\",\"country\":\"%s\"},"
-                        + "\"email\":%s,\"phone\":%s,\"internalNote\":%s}",
+                        + "\"email\":%s,\"phone\":%s,\"internalNote\":%s,"
+                        + "\"taxIdentifier\":{\"country\":\"AT\",\"type\":\"VAT_ID\",\"value\":\"ATU00000000\"}}",
                 current.getString("name"), current.getString("address.street"),
                 current.getString("address.houseNumber"), current.getString("address.postalCode"),
                 current.getString("address.city"), current.getString("address.country"),
@@ -358,7 +361,7 @@ class PartnerResourceTest {
                 current.getString("address.country"));
         String body = String.format(
                 "{\"partnerNumber\":\"%s\",\"name\":\"%s\",\"address\":%s,\"email\":%s,\"phone\":%s,"
-                        + "\"commissionPercent\":%s,\"internalNote\":%s,\"active\":%s}",
+                        + "\"commissionPercent\":%s,\"taxIdentifier\":" + SAMPLE_TAX_JSON + ",\"internalNote\":%s,\"active\":%s}",
                 newPartnerNumber, current.getString("name"), addressJson,
                 quoteOrNull(current.getString("email")), quoteOrNull(current.getString("phone")),
                 current.getString("commissionPercent"), quoteOrNull(current.getString("internalNote")),
