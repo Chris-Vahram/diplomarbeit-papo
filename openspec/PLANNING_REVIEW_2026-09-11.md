@@ -2,7 +2,8 @@
 
 ## Aktueller Abschlussnachtrag — 14.09.2026
 
-`add-company-internal-partner-note` ist **4/4 erledigt**. Die finale Request-Semantik bewahrt Notizen bei ausgelassenem Feld und löscht bei explizitem `null`, Leertext oder leerem Formular. Die Antwortgrenzen bleiben Company-only; relevante Partner-, Order-, Dashboard-, Produkt- und Exportpfade sind negativ geprüft. Backend 13/13 fokussiert und 101/101 vollständig, Package, JS-Syntax, Strict-Validate, Diff-Check, Browser Desktop/Mobile sowie PAPO-/Java-/Securityreview sind grün.
+`add-company-internal-partner-note` ist **4/4 erledigt** und über PR #18 (`e061ab8c1e3cc41cae57b7fbe17a8f9e65664b5d`) gemergt. Die finale Request-Semantik bewahrt Notizen bei ausgelassenem Feld und löscht bei explizitem `null`, Leertext oder leerem Formular. Die Antwortgrenzen bleiben Company-only; relevante Partner-, Order-, Dashboard-, Produkt- und Exportpfade sind negativ geprüft. Backend 13/13 fokussiert und 101/101 vollständig, Package, JS-Syntax, Strict-Validate, Diff-Check, Browser Desktop/Mobile sowie PAPO-/Java-/Securityreview sind grün.
+- CI/CD `34857012639` ist mit Test, Image-Build und VM-Deployment erfolgreich; Live-Smoke: Root 200, unauthentifizierte Company-API 401.
 
 **Nächster Andockpunkt:** PR/CI/live verifizieren und anschließend VM-Security Task 2.2 mit autorisiertem Deploy-Key um die externe SSH-Negativmatrix ergänzen. Danach einzeln mit den vier freigegebenen Stammdaten-/BMD-Changes fortfahren; BMD-Nummern bleiben bis Beispieldaten/Vertrag begrenzt.
 

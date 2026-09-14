@@ -2,9 +2,10 @@
 
 ## Authoritative update — 14.09.2026, company internal partner note completed
 
-- `add-company-internal-partner-note` is now **4/4 tasks complete** on branch `codex/add-company-internal-partner-note`. Omitted `internalNote` preserves an existing value; explicit `null`, blank text and an empty form value clear it. Company and partner response DTOs remain separated.
+- `add-company-internal-partner-note` is now **4/4 tasks complete** and merged via PR #18 (`e061ab8c1e3cc41cae57b7fbe17a8f9e65664b5d`). Omitted `internalNote` preserves an existing value; explicit `null`, blank text and an empty form value clear it. Company and partner response DTOs remain separated.
 - Evidence: focused `PartnerResourceTest` 13/13, full backend suite 101/101, package, JavaScript syntax, strict OpenSpec validation, diff check, desktop/mobile browser checks, `partnerportal-quality`, and clean Java/security reviews. The latest reviewer follow-up explicitly covers omitted versus explicit `null`.
-- **Next-session anchor:** after the PR/CI/live rollout, do not reopen this change. Continue with the missing VM-Security Task 2.2 external SSH negative matrix (arbitrary commands, PTY, forwarding, SCP/SFTP) only when the authorized deploy key is available; then select the next approved OpenSpec change.
+- Live: CI/CD run `34857012639` passed Test backend, GHCR build/push and VM deployment; `https://paportal.at/` returned 200 and unauthenticated Company API returned 401.
+- **Next-session anchor:** do not reopen this change. Continue with the missing VM-Security Task 2.2 external SSH negative matrix (arbitrary commands, PTY, forwarding, SCP/SFTP) only when the authorized deploy key is available; then select the next approved OpenSpec change.
 - Still open overall: VM Task 2.2 external SSH matrix and any final coupled rollback evidence; the four remaining Stammdaten/BMD changes. BMD article/partner numbers remain gated by documented sample data and a concrete contract; no direct BMD API.
 
 ## Vorrangiger Next-Session-Handoff — 14.09.2026, nach PR #16 / Live-Deployment
