@@ -2,9 +2,9 @@
 
 ## Aktueller Abschlussstand — 14.09.2026
 
-`add-company-internal-partner-note` ist **4/4 fertig**. Ausgelassene Notizfelder erhalten die bestehende Notiz, explizites `null`/Leertext leert sie; die Company-only-Grenze ist getestet. Nachweise: 13/13 fokussiert, 101/101 vollständig, Package, JS-Syntax, Strict-Validate, Diff-Check, Browser Desktop/Mobile sowie Qualitäts-/Java-/Securityreview.
+`add-company-internal-partner-note` ist **4/4 fertig** und über PR #18 (`e061ab8c1e3cc41cae57b7fbe17a8f9e65664b5d`) gemergt. Ausgelassene Notizfelder erhalten die bestehende Notiz, explizites `null`/Leertext leert sie; die Company-only-Grenze ist getestet. Nachweise: 13/13 fokussiert, 101/101 vollständig, Package, JS-Syntax, Strict-Validate, Diff-Check, Browser Desktop/Mobile sowie Qualitäts-/Java-/Securityreview.
 
-**Nächste Session:** PR/CI/live-Rollout verifizieren, dann VM-Task 2.2 mit autorisiertem Key für die externe SSH-Negativmatrix fortsetzen. Die vier übrigen OpenSpec-Changes bleiben offen; BMD-Nummern nur bis zum dokumentierten Beispieldaten-Gate und ohne direkte BMD-API.
+CI/CD `34857012639` mit VM-Deployment und Live-Smoke ist erfolgreich: Root 200, unauthentifizierte Company-API 401. **Nächste Session:** VM-Task 2.2 mit autorisiertem Key für die externe SSH-Negativmatrix fortsetzen. Die vier übrigen OpenSpec-Changes bleiben offen; BMD-Nummern nur bis zum dokumentierten Beispieldaten-Gate und ohne direkte BMD-API.
 
 ## Fortschreibung — 14.09.2026
 
