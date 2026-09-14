@@ -2,11 +2,12 @@
 
 ## Fortschreibung — Apply `add-business-tax-identifiers`, 14.09.2026
 
-Der Change ist auf `codex/add-business-tax-identifiers` umgesetzt und in `tasks.md` mit
+Der Change ist auf `codex/add-business-tax-identifiers` umgesetzt, über PR #25 nach `main`
+gemergt (Merge-Commit `b49ab7279ab023ee1a76b30eab202c6dde779f26`) und in `tasks.md` mit
 7/7 abgehakt. Enthalten sind `CompanyProfile`, gemeinsame Steuer-ID-Validierung,
 Company-/Partner-REST, CSV/XLSX-Validierung, Firmen-/Partnerformular und Quellen-/Datenmodelldoku.
 `./mvnw test`, `./mvnw package`, `node --check`, `openspec validate --strict` und Diffcheck
-sind grün. Noch nicht gemergt. Nach PR/CI/Merge bleibt als technischer Andockpunkt
+sind grün. Nach PR/CI/Merge bleibt als technischer Andockpunkt
 `harden-deployment-gateway` 3/4; die externe SSH-Negativmatrix benötigt weiterhin den
 autorisierten Deploy-Key.
 
