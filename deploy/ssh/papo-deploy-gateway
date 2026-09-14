@@ -88,7 +88,7 @@ upload() {
     incoming=$(mktemp "$INCOMING_DIR/.upload.XXXXXX") || fail
     cleanup_file=$incoming
     chmod 600 "$incoming"
-    dd bs=26214401 count=1 of="$incoming" 2>/dev/null || fail
+    head -c "$((MAX_ARCHIVE_BYTES + 1))" > "$incoming" || fail
     [ "$(wc -c < "$incoming" | tr -d ' ')" -le "$MAX_ARCHIVE_BYTES" ] || fail
     cmp -s "$incoming" "$canonical" || fail
     mv -f -- "$incoming" "$PENDING_ARCHIVE"

@@ -50,7 +50,7 @@ cd backend
 Der `%dev`-Modus verbindet sich mit den Compose-Containern (Keycloak :8081, Postgres :5432).
 **Wichtig:** `docker compose up` muss vorher laufen — Dev Services werden im Dev-Modus
 bewusst NICHT genutzt, damit Frontend und Backend denselben Keycloak (gleicher Token-Issuer)
-verwenden. Schema: `drop-and-create` bei jedem Start; Demodaten (Partner, Produkte) werden
+verwenden. Schema: `drop-and-create` bei jedem Start; Demodaten (Partner, Artikel) werden
 danach programmatisch von `DemoDataSeeder` eingespielt (Dev-Daten sind Wegwerf-Daten).
 
 ## 3. Frontend starten

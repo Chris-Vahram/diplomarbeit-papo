@@ -1,14 +1,16 @@
 # PAPO Restarbeitsplan – 09.09.2026
 
-## Vorrangiger Abschlussstand — 14.09.2026
+## Vorrangiger Next-Session-Stand — 14.09.2026
 
-Branch `docs/openspec-planning-2026-09-11` ist auf `f26c425` mit Remote synchron; Arbeitsbaum sauber. Gateway lokal geprüft (Harness 18/18), aber `harden-deployment-gateway` bleibt bei **2/4**, weil Tobias-Nachweise für VM, Keys, sudoers, Host-Key, Remote-Negativtests, Liveflows und Rollback fehlen. Keine VM-, SSH-, Secret- oder Datenvolumenaktion.
+Branch `docs/openspec-planning-2026-09-11` ist auf `38cd932` mit Remote synchron; vor dem aktuellen lokalen Fix war der Arbeitsbaum sauber. Gateway lokal geprüft (Harness 18/18), aber `harden-deployment-gateway` bleibt bei **2/4**, weil VM-, Key-, sudoers-, Host-Key-, Remote-Negativtest- und Rollbacknachweise fehlen. Keine VM-, SSH-, Secret- oder Datenvolumenaktion.
 
-Backend 100/100, Package, JS-Syntaxchecks, OpenSpec 2/2, Diff-Check und Präsentation mit 15 Folien/Screenshot sind belegt. Präsentation nutzt **Artikel**. `complete-thesis-documentation` bleibt 0/6. Nächste Session: Evidenz prüfen; ohne neue Nachweise Gateway blockiert lassen und Dokumentation priorisieren. Clockify nur evidenzbasiert.
+Backend 100/100, Package, JS-Syntaxchecks, OpenSpec 2/2, Diff-Check und Präsentation mit 15 Folien sind belegt. Public-Live-Test erfolgreich: Partner-Login, Endkunde, zwei Artikel, Bestellung #52 über 218,90 € und Company-Statusänderung auf `Geprüft`. Next session zuerst Deployment auf den aktuellen lokalen Stand, dann delegierte VM-Security-Nachweise. Clockify als retrospektiv geschätzte Datum-/Uhrzeit-/Beschreibungseinträge vorbereiten und deutlich als Schätzung markieren.
 
 ## Orchester-Fortschreibung — 14.09.2026
 
-Kategorie-Navigation umgesetzt, geprüft und archiviert. P0-Recovery live belegt. `origin/main` enthält neue Tobi-Commits, aber widersprechende Artikel-/Präsentationsstände; selektive Prüfung statt Pull/Merge. Rest: CI/CD-Gateway/Nachweise, danach Thesis-Doku/Präsentation. Clockify nur real belegbar.
+Kategorie-Navigation umgesetzt, geprüft und archiviert. `origin/main` und die aktiven Branches wurden geprüft; der aktuelle Arbeitsbranch braucht keinen Pull. Rest: Gateway-Nachweise, Thesis-Doku, BMD-geführte Partnerstammdaten, generische Steuerkennung, Company-Notiz, Gewerbeschein und eindeutige BMD-Artikelnummer/Import-/Exportregel. Diese Punkte in der nächsten Session mit höherem Modell, OpenSpec und Caveman planen; noch nichts implementieren. Clockify-Einträge diesmal konkret ausgeben.
+
+Die älteren Abschnitte darunter sind historische Arbeitsstände; bei Widerspruch gilt dieser Block, `openspec list --json` und die aktuellen `tasks.md`.
 
 ## Fortschreibung — 13.09.2026
 

@@ -1,20 +1,20 @@
 # CLAUDE.md – Partnerportal (Diplomarbeit)
 
-### Vorrangiger Orchesterstand — 14.09.2026
+### Vorrangiger Next-Session-Orchesterstand — 14.09.2026
 
-- Branch `docs/openspec-planning-2026-09-11` ist mit Remote synchron: `f26c425 chore: finalize gateway audit and thesis handoff`; Arbeitsbaum sauber.
-- `harden-deployment-gateway` **2/4**: lokale Umsetzung/Harness fertig, VM-Installation sowie Remote-/Live-/Rollbacknachweise fehlen. Ohne sanitiserte Tobias-Belege keine Infrastrukturaktion.
+- Branch `docs/openspec-planning-2026-09-11` ist mit Remote synchron: `38cd932 docs: record context handoff evidence`; vor dem aktuellen lokalen Fix war der Arbeitsbaum sauber.
+- `harden-deployment-gateway` **2/4**: lokale Umsetzung/Harness fertig; vor VM-Aktivierung ist der neu entdeckte fragmentierte-SSH-Uploadfehler im Gateway samt Regressionstest zu beheben. Danach Deployment und autorisierte Remote-/Live-/Rollbacknachweise.
 - Belegt: Gateway 18/18, Backend 100/100, Package, JS-Syntaxchecks, OpenSpec Strict 2/2, Präsentation 15 Folien, Diff-Check. Keine VM-, SSH-, Secret- oder Volumenaktion.
-- Präsentation nutzt **Artikel** und ist committed; `complete-thesis-documentation` bleibt **0/6**.
-- Nächste Session: Tobias-Evidenz prüfen; bei Fehlen Blocker dokumentieren, dann Dokumentation fortsetzen. Clockify nur evidenzbasiert.
+- Präsentation nutzt im Quelltext **Artikel**; Folie 8/13 und technische Altbegriffe werden aktuell lokal korrigiert, noch ohne Commit/Push. `complete-thesis-documentation` bleibt **0/6**.
+- Fünf Stammdaten-/BMD-Changes sind vollständig geplant, aber nicht implementiert; Plan und Reihenfolge: `Specification/WORK_PLAN_2026-09-14.md`. Clockify im Zen-Browser, Workspace `DA`, mit konkret datierten retrospektiv geschätzten Einträgen tatsächlich befüllen.
 
 ## Aktueller Orchesterstatus — 14.09.2026
 
-Nächster Agent: Nach 5.9-Befund Gateway-Security-Agent nur bei echtem zusätzlichem Prüfbedarf mit konkretem Folgeprompt beauftragen; sonst Blocker dokumentieren. Dirty Worktree anschließend ohne OpenSpec-Change einzeln bereinigen und sauber committen. Push/Pull/Merge/Deployment/VM und saubere Commitmessages sind ausdrücklich freigegeben; Secrets/Volumes schützen.
+Nächster Agent: öffentliche VM zuerst auf den aktuellen lokalen Stand bringen. Danach den autorisierten Gateway-Security-Agenten/Subagenten mit VM-, Git- und Securityrechten beauftragen und die vollständigen Nachweise erledigen. Erst anschließend Stammdaten-/BMD-Planung und Clockify-Einträge bearbeiten. Push/Pull/Merge/Deployment/VM sind für diesen Auftrag freigegeben; Secrets/Volumes schützen.
 
-Nächste Session: 5.9 anhand echter VM-/Key-/Host-Key-/sudoers-/Remote-Nachweise prüfen. Der Agent hat ausdrückliche VM-, Git-Pull/Push/Merge- und Deployment-Freigabe und soll selbst entscheiden, ob er 5.9 übernehmen kann; bei ausreichender Evidenz Subagents für finale Remote-Security-, Browser-, Live- und Rollbacktests einsetzen. Danach Präsentation nach neuesten Lehrerprotokollen und OpenSpec-Archiven mit **Artikel**-Terminologie finalisieren. Clockify über belegte Tage verteilen und nicht erfinden.
+Nächste Session: 5.9 durch den autorisierten Subagenten mit echten VM-/Key-/Host-Key-/sudoers-/Remote-Nachweisen erledigen. Danach Stammdaten/BMD mit höherem Modell, hohem Reasoning, OpenSpec und Caveman planen. Clockify als retrospektiv geschätzte, konkrete Datum-/Uhrzeit-/Beschreibungseinträge erstellen und als Schätzung markieren.
 
-Kategorie-Navigation ist geprüft und archiviert. `origin/main` `05e0bdd` ist kontrolliert integriert; Tobias' Basis-CI/CD-Change bleibt archiviert. Gateway-Härtung wird separat in `harden-deployment-gateway` 2/4 fortgeführt und wartet auf Tobias' VM-Nachweise. Demo-Seeding ist standardmäßig aus und erhält die Kategorie-Migration; Integrationstests und Package 100/100 grün. Präsentation nutzt „Artikel“. Clockify-Zeit niemals erfinden.
+Kategorie-Navigation ist geprüft und archiviert. `origin/main` `05e0bdd` ist kontrolliert integriert; Tobias' Basis-CI/CD-Change bleibt archiviert. Gateway-Härtung wird separat in `harden-deployment-gateway` 2/4 fortgeführt. Demo-Seeding ist standardmäßig aus und erhält die Kategorie-Migration; Integrationstests und Package 100/100 grün. Präsentation nutzt „Artikel“. Clockify-Einträge dürfen retrospektiv geschätzt werden, müssen aber als Schätzung markiert werden und sind keine technische Evidenz.
 
 ## Project owner
 This project belongs to **Chris**.
@@ -34,14 +34,14 @@ Web-based, extensible **B2B partner-ordering platform** for partner-driven sales
 
 **Hard rule:** meetings override the FSD when they conflict (newer = authoritative). The FSD may lag behind the meetings of 25.08/31.08 until an explicit documentation sync; use the continuation prompt and roadmap for that delta. Do not reintroduce v1 assumptions (external shop as current stage, one-product orders, 3-person team).
 
-## Current status (2026-09-13; verify volatile claims)
-- `build-partnerportal-mvp` is 53/53 and technically complete; general thesis/UI documentation is independently tracked by `complete-thesis-documentation`.
-- `integrate-category-management-into-article-management` is planned to group company categories under “Artikelverwaltung” without backend changes.
-- CI/CD P0 cause is PostgreSQL password drift between the persistent role and VM-local `.env.prod`; preserve the volume, dump both databases before aligning the role password. DNS/HTTPS/GHCR privacy/branch protection are evidenced; OIDC/API/login/order checks remain.
-- The 10.09 meeting decisions and the reviewed implementation-ready OpenSpec changes are summarized in `openspec/PLANNING_REVIEW_2026-09-11.md`. This report supersedes older candidate/READY tables where they conflict.
-- MVP implementation and the meeting-driven July feature wave are merged to `main`. Audit Fix Batches A and B are implemented, regression-reviewed and `Verified` (UX-001..004, TECH-001).
-- Batch B is archived and synced to the main specs in the current local-history commit `94050cb`. The verified backend suite contains 77 tests (0 failures/errors/skips).
-- `build-partnerportal-mvp` is at 50/53 tasks. Only UI/UX documentation (8.3), thesis traceability (8.4) and final visual polish (FD.4) remain.
+## Current status (2026-09-14; verify volatile claims)
+- Active OpenSpec: `harden-deployment-gateway` 2/4 and `complete-thesis-documentation` 0/6. The technical MVP is 53/53 and archived; completed feature changes are under `openspec/changes/archive/`.
+- Branch `docs/openspec-planning-2026-09-11` and its remote are at `38cd932`; `origin/main` is `05e0bdd`, while local `main` is four commits behind. No pull/merge is needed for the current branch.
+- Verified locally: Gateway Harness 18/18, backend/package 100/100, JS syntax, strict validation 2/2 and presentation 15 slides. Public live flow succeeded on 14.09.: partner login → existing end customer → two articles → order #52 for 218.90 € → company status `Eingereicht` to `Geprüft`.
+- Gateway remote evidence remains open. “Tobias evidence” means sanitized VM/key/sudoers/host-key/negative-SSH/live/rollback proof; Chris can produce it himself if he has the same authorized VM and key access. GitHub commits alone do not prove VM installation or runtime state.
+- Partner master data (partner number, UID/tax identifier, internal company note, trade certificate) and BMD article number/import rules remain thesis scope but require the listed domain decisions before implementation. Direct BMD integration is not approved.
+- The public VM still renders old “Produkte” labels; local source corrections are pending deployment and are not yet claimed as live.
+- This section supersedes older dated status blocks in this file; those blocks remain as history.
 - Meetings on 25.08 and 31.08 established PAPO as a company-independent, extensible product. Domain `paportal.at` is assigned. The current demo uses one company, but this is an implementation stage rather than the thesis product boundary.
 - Multi-company tenancy and `firma-x.paportal.at` are the correct architecture once a second company is onboarded. They are explicitly not the next change; their thesis delivery date/scope remains open.
 - The current stage uses one shared organizational login per partner company. Personal partner-employee accounts are not required.
@@ -66,7 +66,7 @@ Also in the current stage: central partner + article management by the company, 
 - The current research question was confirmed by the supervisor. It frames the internal ordering MVP as the first step of an extensible portal; the external partner shop remains Phase 2.
 - In user-facing UI and thesis language use **Artikel**, not alternating Product/Artikel terminology. Internal code/entity/API names such as `Product` may remain until a real technical reason requires renaming.
 - BMD is the leading article-master system. PAPO uses import data and does not own a competing master record. A direct BMD interface remains unapproved/out of scope.
-- The unique visible business identifier is the BMD article number. The existing database id remains technical; no extra visible article id is required. `Preislistenbereich` is explicitly omitted.
+- Target decision: the unique visible business identifier should be the BMD article number; the existing database id remains technical and no second visible ID is required. In the current code snapshot, `Product` has no BMD-number field yet and import dedupe still uses the article name, so implementation waits for the simplified company mail/sample export. `Preislistenbereich` remains omitted.
 - Category remains relevant. Fachbereich, product group A/B/C/D, bundles/BOMs, training permissions, and PP/margin-based commission rules are future directions, not current requirements; wait for the simplified company follow-up.
 
 The future target in `Specification/ROADMAP_2026-08-25.md` changes partner identifiers only through separate approved changes: generated partner numbers become company-local business identifiers and imported existing numbers become external references. One shared partner-company access is confirmed for the current stage. Do not implement tenant/auth restructuring now; revisit it when onboarding a second company or when its thesis deadline is explicitly set.
@@ -96,6 +96,7 @@ B-01 external end-customer shop (CUT) · B-02 shop design customization (CUT) ·
 ## Still open (ask, don't assume)
 - Simplified company follow-up defining the minimal article fields; do not implement the over-complete earlier mail as one change.
 - Import file column sets for partner/article files and BMD export rules — waiting on sample data (blocks final import finalization only).
+- Partner master-data rules — still need the decisions recorded in the current handoff: generated vs existing partner number, UID/tax identifier fields and validation, internal company note visibility/length, and trade-certificate upload/retention.
 - Dormancy threshold is currently 60 days; confirm it with the client at the next meeting.
 - Production domain is `paportal.at`; final Hetzner DNS, certificate and deployment details remain open. Wildcard subdomains are future tenant work, not an immediate deployment blocker.
 - Exact thesis deadline/scope for multi-company tenancy; do not start it merely because it is the target architecture.

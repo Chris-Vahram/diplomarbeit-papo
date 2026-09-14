@@ -1,11 +1,16 @@
 # OpenSpec-Planungsreview — 11.09.2026
 
-## Abschlussaudit — 14.09.2026
+## Next-Session-Audit — 14.09.2026
 
-- Branch/Remote sauber synchron auf `f26c425`; kein weiterer Push nötig.
-- `harden-deployment-gateway` **2/4**: lokale Umsetzung und Harness 18/18 belegt. Tasks 2.1/2.2 bleiben wegen fehlender Tobias-Nachweise zu VM, Keys, sudoers, Host-Key, Remote-Negativtests, side-effect-freiem Verify/Upload, HTTPS/OIDC/API/Login/Bestellung und Rollback blockiert.
+- Branch/Remote sauber synchron auf `38cd932`; lokaler Wortlaut-/Deck-Fix ist danach noch nicht committed oder gepusht. `origin/main` ist `05e0bdd`; lokales `main` liegt vier Commits zurück.
+- `harden-deployment-gateway` **2/4**: lokale Umsetzung und Harness 18/18 belegt. Next session zuerst Live-Deployment auf den aktuellen lokalen Stand; anschließend autorisierter VM-/Git-/Security-Subagent für Tasks 2.1/2.2.
 - Verifiziert: Backend 100/100, Package, JS-Syntaxchecks, OpenSpec Strict 2/2, `git diff --check`, Präsentation 15 Folien mit echtem Screenshot. Keine VM-, SSH-, Secret- oder Datenvolumenaktion.
-- Präsentation auf **Artikel** aktualisiert. `complete-thesis-documentation` bleibt 0/6; nächste Entscheidung hängt von Tobias-Evidenz ab.
+- Präsentationsquelle ist auf **Artikel** vereinheitlicht; Folie 8/13 und technische Kommentare/Dokumentation wurden lokal korrigiert. `complete-thesis-documentation` bleibt 0/6.
+- Public-Live-Test am 14.09. erfolgreich: Partner-Login → Endkunde → zwei Artikel → Bestellung #52 (218,90 €) → Company-Status `Geprüft`. Die Live-VM zeigt trotzdem noch alte „Produkte“-Labels, weil kein Deployment ausgeführt wurde.
+- Wirklich offen sind: VM-Deployment/Nachweise, Thesis-Doku, BMD-geführte Partnerstammdaten, generische UID-/Steuerkennung, Company-Notiz, Gewerbeschein und eindeutige BMD-Artikelnummer mit Import-/Exportregel. Diese Punkte sollen in der nächsten Session mit höherem Modell, OpenSpec und Caveman geplant werden; noch keine Implementierung.
+- Clockify ist als eigener nächster Arbeitspunkt verpflichtend: retrospektiv geschätzte, klar markierte Einträge mit Datum, Uhrzeit und Beschreibung erstellen.
+
+Alle Abschnitte mit älterem Datum darunter sind historische Reviews und nicht der aktuelle Aufgabenstand.
 
 ## Orchester-Fortschreibung — 14.09.2026
 

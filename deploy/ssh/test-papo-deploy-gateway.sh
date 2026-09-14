@@ -36,6 +36,7 @@ pass=0 failures=0
 ok() { pass=$((pass + 1)); }
 bad() { printf 'FEHLER: %s\n' "$1" >&2; failures=$((failures + 1)); }
 run_ok() { label=$1 command=$2 input=${3-}; if [ -n "$input" ]; then SSH_ORIGINAL_COMMAND="$command" "$GATEWAY" < "$input" >/dev/null 2>&1 && ok || bad "$label"; else SSH_ORIGINAL_COMMAND="$command" "$GATEWAY" >/dev/null 2>&1 && ok || bad "$label"; fi; }
+run_fragmented_ok() { label=$1 command=$2 input=$3; split -b 4096 "$input" "$TEST_ROOT/chunk."; if (for chunk in "$TEST_ROOT"/chunk.*; do cat "$chunk"; sleep 0.001; done) | SSH_ORIGINAL_COMMAND="$command" "$GATEWAY" >/dev/null 2>&1; then ok; else bad "$label"; fi; }
 run_fail() { label=$1 command=$2 input=${3-}; before=$(wc -l < "$LOG" | tr -d ' '); if [ -n "$input" ]; then SSH_ORIGINAL_COMMAND="$command" "$GATEWAY" < "$input" >/dev/null 2>&1 && bad "$label" || ok; else SSH_ORIGINAL_COMMAND="$command" "$GATEWAY" >/dev/null 2>&1 && bad "$label" || ok; fi; [ "$before" = "$(wc -l < "$LOG" | tr -d ' ')" ] || bad "$label führte Docker aus"; }
 archive_for() { git -C "$SOURCE" archive --format=tar --output="$2" "$1" -- frontend; }
 publish() { printf '%s\n' "$1" >> "$SOURCE/frontend/index.html"; git -C "$SOURCE" add frontend; git -C "$SOURCE" commit -qm "$1"; git -C "$SOURCE" push -q origin main; }
@@ -51,6 +52,7 @@ dd if=/dev/zero of="$TEST_ROOT/large.tar" bs=1048576 count=25 2>/dev/null; print
 run_fail 'übergroßes Archiv' "upload $sha" "$TEST_ROOT/large.tar"
 PAPO_TEST_LOCK_FAIL=1; export PAPO_TEST_LOCK_FAIL; run_fail 'Lock' "upload $sha" "$archive"; unset PAPO_TEST_LOCK_FAIL
 run_ok 'Upload' "upload $sha" "$archive"
+run_fragmented_ok 'fragmentierter Upload' "upload $sha" "$archive"
 before_release=$(find "$DEPLOY/frontend-live/releases" -mindepth 1 | wc -l); before_docker=$(wc -l < "$LOG")
 run_ok 'Verify' "verify $sha"
 [ "$before_release" = "$(find "$DEPLOY/frontend-live/releases" -mindepth 1 | wc -l)" ] || bad 'Verify erzeugte Release'

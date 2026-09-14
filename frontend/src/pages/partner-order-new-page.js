@@ -133,7 +133,7 @@ class PartnerOrderNewPage extends HTMLElement {
 
   // Whether `step`'s own data is still valid right now — not just "was this step
   // reached before". A step reached earlier can become invalid later (e.g. the
-  // partner goes back to "Produkte wählen" and removes every item from the
+  // partner goes back to "Artikel wählen" and removes every item from the
   // cart) - its checkpoint must stop showing as completed once that happens.
   isStepDataValid(step) {
     switch (step) {
@@ -213,7 +213,7 @@ class PartnerOrderNewPage extends HTMLElement {
   }
 
   // The step before `step` in the actual (per-partner) flow — skips "neuerKunde"
-  // when it was never used, so "Vorheriger Schritt" from "produkte" never lands
+  // when it was never used, so "Vorheriger Schritt" from "Artikel wählen" never lands
   // on a step the partner didn't go through.
   prevStepFor(step) {
     let prevIndex = STEPS.indexOf(step) - 1;
@@ -421,7 +421,7 @@ class PartnerOrderNewPage extends HTMLElement {
     });
   }
 
-  // ---- Step: Produkte wählen ----
+  // ---- Step: Artikel wählen ----
 
   produkteStepHtml() {
     const kundeName = escapeHtml(this.kundeDisplayName());

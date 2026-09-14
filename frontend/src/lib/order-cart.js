@@ -72,7 +72,7 @@ function categoryOptionsHtml(products) {
   return categories.map((c) => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
 }
 
-// "Produkte wählen" wizard step: catalog toolbar + grid only, no cart panel
+// "Artikel wählen" wizard step: catalog toolbar + grid only, no cart panel
 // (the cart is the next step's content — partner-order-wizard design.md decision #2).
 export function catalogStepHtml(products) {
   return `
@@ -123,7 +123,7 @@ function cartTotalsHtml(cart, commissionPercent) {
 }
 
 // Cart lines + totals, editable (quantity/remove) via wireCartStep - the
-// "Produkte wählen" step's own live preview while browsing/adding. Empty state
+// "Artikel wählen" step's own live preview while browsing/adding. Empty state
 // has no submit button (an empty cart cannot be submitted, spec requirement).
 export function cartStepHtml(cart, commissionPercent, { showSubmit = true } = {}) {
   if (cart.length === 0) {
@@ -148,7 +148,7 @@ function cartSummaryLineHtml({ product, quantity }) {
 
 // Read-only cart review for the "Übersicht" step, plus the submit button - no
 // quantity/remove controls here (per the wizard spec, "Übersicht" only reviews
-// and submits; changing the order means going back to "Produkte wählen" via
+// and submits; changing the order means going back to "Artikel wählen" via
 // the checkpoint bar, not editing in place).
 export function cartSummaryHtml(cart, commissionPercent, { showSubmit = true } = {}) {
   if (cart.length === 0) {
@@ -160,7 +160,7 @@ export function cartSummaryHtml(cart, commissionPercent, { showSubmit = true } =
     ${showSubmit ? `<button type="button" id="cart-submit-btn" class="cart__submit-btn button-primary">Bestellung aufgeben</button>` : ""}`;
 }
 
-// Wires catalog search/filter/add-to-cart for the "Produkte wählen" step. `cart`
+// Wires catalog search/filter/add-to-cart for the "Artikel wählen" step. `cart`
 // is the wizard's own state array (partner-order-new-page.js), mutated in place
 // here so it stays the single source of truth across step navigation; `onCartChange`
 // lets the page refresh its own cart-preview panel and Weiter-button.
@@ -228,7 +228,7 @@ export function wireCartSummaryThumbs(root) {
   );
 }
 
-// Wires cart quantity/remove interactions - shared by the "Produkte wählen"
+// Wires cart quantity/remove interactions - shared by the "Artikel wählen"
 // step's editable preview and the "Übersicht" step (see cartStepHtml). `cart` is
 // the wizard's own state array, mutated in place; `onCartChange` lets the page
 // know (e.g. to refresh a "Weiter" button's disabled state elsewhere).

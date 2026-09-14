@@ -1,6 +1,6 @@
 // <metric-card label="Provision" value="1.234 €" icon="percent" tone="positive"
 //   value-tone="brand" trend="up" trend-label="+12,4% ggü. Vorperiode"
-//   sparkline="40,65,30,90,55,70" ring="68" ring-caption="27 von 40 Produkten"></metric-card>
+//   sparkline="40,65,30,90,55,70" ring="68" ring-caption="27 von 40 Artikeln"></metric-card>
 //
 // icon: optional Lucide icon name — shown as a large, near-invisible watermark
 //   in the card's corner.

@@ -1,19 +1,26 @@
 # Continuation Prompt — PAPO Partnerportal
 
-## Vorrangiger Abschluss-Handoff — 14.09.2026
+## Vorrangiger Next-Session-Handoff — 14.09.2026
 
 Dieser Block ersetzt ältere aktuelle Statusangaben darunter.
 
-- Branch/Remote: `docs/openspec-planning-2026-09-11`, synchron auf `f26c425`; Arbeitsbaum sauber, kein weiterer Push nötig.
-- `harden-deployment-gateway`: **2/4**. Lokales Gateway/Harness fertig; Tasks 2.1/2.2 blockiert wegen fehlender Tobias-Nachweise zu VM, Root-Eigentum/Modi/`visudo`, Deploy-/Read-only-Keys, Host-Key-Pinning, Sudo-/Docker-/`.env`-Abgrenzung, Remote-Negativtests, side-effect-freier Verify/Upload, HTTPS/OIDC/API/Login/Bestellung und gekoppeltem Rollback.
-- Lokal belegt: Harness **18/18**, Backend **100/100**, Package, JS-Syntaxchecks, OpenSpec-Strict **2/2**, Präsentation **15 Folien** mit echtem Screenshot, `git diff --check`. Einziger Browser-Konsolenfehler: erwartetes `/favicon.ico`-404.
-- Keine VM-, SSH-, Secret- oder Datenvolumenaktion. Keine Remote-Live-/Rollback-Evidenz behaupten.
-- Präsentation und Terminologie **Artikel** aktualisiert und committed. `complete-thesis-documentation` bleibt **0/6**.
-- Nächste Session: zuerst neue sanitiserte Tobias-Nachweise prüfen. Fehlen sie, Gateway blockiert lassen; danach nur bei Freigabe Dokumentation fortsetzen. Clockify nur evidenzbasiert.
+- Branch/Remote: `docs/openspec-planning-2026-09-11` auf `38cd932`, mit Remote synchron. `origin/main` ist `05e0bdd`; lokales `main` liegt vier Commits zurück. Der Arbeitsbaum enthält nur lokale, noch nicht committed/pushte Kontext-/Terminologieänderungen.
+- Aktiv bleiben `harden-deployment-gateway` (**2/4**) und `complete-thesis-documentation` (**0/6**). Zusätzlich sind fünf reine Planungschanges mit vollständigen Proposal-/Design-/Spec-/Task-Artefakten angelegt: `add-business-tax-identifiers` (0/7), `decouple-partner-number-from-login` (0/5), `add-company-internal-partner-note` (0/4), `add-partner-trade-proof` (0/6) und `add-unique-bmd-article-number` (0/6). Keine Produktimplementierung daraus erfolgt; Gesamtplan: `Specification/WORK_PLAN_2026-09-14.md`.
+- **Next-Session-Reihenfolge:** (1) öffentliche VM auf den aktuellsten lokalen Stand bringen und Live-Deployment verifizieren; (2) anschließend einen autorisierten Security-/Deployment-Subagenten mit den nötigen VM-, Git- und Securityrechten die vollständigen VM-Nachweise erledigen lassen; (3) danach Stammdaten-/BMD-Aufgaben mit höherem Modell, hohem Reasoning, OpenSpec und Caveman gründlich planen; (4) konkrete Clockify-Einträge mit Datum, Uhrzeit und Beschreibung erstellen.
+- Für Deployment und VM-Nachweise gilt die ausdrückliche Nutzerfreigabe für die nächste Session. Keine Secrets ausgeben, keine Datenvolumes löschen oder zurücksetzen; Änderungen und Belege sanitisiert dokumentieren.
+- Der VM-/Security-Subagent muss mindestens diese Nachweise erledigen: root-eigener Gateway und korrekte Dateirechte; `visudo`-Prüfung; eingeschränkter Deploy-Account und Read-only-Repository-Key; Host-Key-Pinning; kein allgemeines sudo, kein Docker-Zugriff und kein Lesen von `.env.prod`; negative SSH-Tests für beliebige Befehle, PTY, Forwarding, SCP/SFTP; sicherer Verify-/Upload-Ablauf; HTTPS/OIDC/Login/Bestellung; gekoppelter Rollback ohne PostgreSQL-/Keycloak-/Caddy-Schaden.
+- Fachliche Richtung bestätigt: BMD bleibt führendes System; PAPO übernimmt Partner-/Artikelnummern zunächst über Excel/CSV. Kein direkter Connector ohne konkretes BMD-Produkt, API-Vertrag, Zugang und Beispieldaten. Produktion enthält nur synthetische Demodaten.
+- Nächste Stammdaten-Schritte als Planungsauftrag: Partnernummer/UID-Steuerkennung (**ca. 0,5–2 Tage** abhängig von Migration/Login), Gewerbeschein minimal sicher (**ca. 1–2 Tage**), BMD-Artikelnummer mit Import, eindeutiger Unique-Regel, Duplikatprüfung und Tests (**ca. 1–2 Tage nach Beispieldaten**), insgesamt minimal **ca. 3–5 Entwicklertage plus Dokumentation**. Historie, Ablaufdatum, OCR, mehrere Dateien und BMD-Synchronisation ausdrücklich als zusätzliche Komplexität markieren.
+- UID/Steuerkennung: international verständliches, generisches Feldmodell prüfen; für Österreich verifizieren, ob UID oder eine andere Steuernummer fachlich maßgeblich ist. Pflichtfeld und länderspezifische Validierung planen, ohne Österreichs Regeln unbestätigt zu behaupten.
+- Internes Notizfeld: nur Company-sichtbar, Plaintext, maximal **4.000 Zeichen**; niemals über Partnerprofil, Import, Export oder Bestellungen ausliefern.
+- Gewerbenachweis: Partner lädt genau eine aktuelle, ersetzbare Datei hoch; Company prüft. PDF/JPG/PNG, maximal 10 MiB, privater Zugriff, Upload-/Ersetz-/Prüfstatus, keine Historie/OCR/Mehrfachdateien und keine automatische Aktivierung. Portalunternehmen speichert eigene GISA-/Registerkennung. Rechtliche Aufbewahrung vor Realbetrieb festlegen.
+- BMD-Artikelnummer: als eindeutig unique behandeln; nach Beispieldaten Unique-Validierung, Import-Duplikatbericht und – falls im vereinfachten Prozess sinnvoll – Exportregel planen. Der aktuelle Code hat noch kein BMD-Nummernfeld; nicht als erledigt darstellen.
+- Clockify: über angemeldeten Zen-Browser im Workspace `DA` tatsächlich befüllen. Rückwirkende Zeiten dürfen geschätzt/ergänzt werden; Einträge brauchen Datum, Start-/Endzeit, Dauer und Beschreibung und werden als **retrospektiv geschätzt** gekennzeichnet. Sie sind keine technischen Nachweise. Nicht erneut verschieben.
+- Alle älteren Abschnitte dieses Dokuments sind historische Arbeitsprotokolle. Bei abweichenden Zahlen oder Statusangaben gilt dieser Block plus `openspec list --json` und die aktuellen `tasks.md`.
 
 ## Aktueller Orchester-Handoff — 14.09.2026
 
-### Nächster-session Auftrag — Tobias-5.9 und Abschluss
+### Historischer Auftrag — Tobias-5.9 und Abschluss
 
 **Addon:** Nach dem Ergebnis der 5.9-Prüfung soll der neue Agent dem Gateway-Security-Agenten nur dann einen konkreten Folgeprompt schicken, wenn dessen unabhängige Prüfung noch benötigt wird; fehlen Tobias-Nachweise, soll er stattdessen den exakten Blocker dokumentieren. Zusätzlich ist der bestehende Dirty Worktree als eigener Aufräumtask zu bereinigen (ohne neuen OpenSpec-Change): Dateien einzeln zuordnen, gewünschte Arbeit sauber committen, unnötige Artefakte nur nach Prüfung entfernen und den Status nachvollziehbar clean machen. Für diese Arbeiten sind Push, Pull, Merge, Deployment, VM-Zugriff und Commits mit sauberen Commitmessages ausdrücklich freigegeben; Secrets, Datenvolumes und unklare Fremdänderungen bleiben geschützt.
 
@@ -341,7 +348,7 @@ Aus der Firmenmail und Besprechung vom 31.08. folgt:
 - Kategorie kann später kaufmännische Provisions-/Rabattregeln beeinflussen; solche Regeln sind jetzt nicht beauftragt.
 - Fachbereich ist eine spätere Grundlage für Schulungs-/Einschulungsberechtigungen.
 - Produktgruppe A/B/C/D ist ein separates späteres Merkmal für PP-/Margenlogik.
-- Artikelpakete/Stücklisten und eine übergeordnete Produktebene für Varianten sind spätere Möglichkeiten.
+- Artikelpakete/Stücklisten und eine übergeordnete Artikelebene für Varianten sind spätere Möglichkeiten.
 
 Der Betreuer bewertete den Gesamtumfang der ersten Firmenmail als zu groß. Eine vereinfachte Folgemail ist angekündigt. Vorher keinen Sammelchange für Artikelnummer, Kategorie, Fachbereich, Produktgruppe, Pakete und Provisionslogik anlegen. Die frühere Mail ist Architektur-/Zukunftskontext, keine vollständige aktuelle Anforderung.
 
@@ -551,7 +558,7 @@ Erst spätere Produktstufen:
 - externer Endkunden-Partnershop;
 - Fachbereichs-/Schulungsberechtigungen;
 - Produktgruppen-/PP-/Margenlogik;
-- Artikelpakete/Stücklisten und Varianten-Produktebene;
+- Artikelpakete/Stücklisten und Varianten-Artikelebene;
 - erweiterte Trendanalysen;
 - KI-Funktion nur mit messbarem fachlichem Nutzen.
 

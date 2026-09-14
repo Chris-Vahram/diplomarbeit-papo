@@ -1,7 +1,7 @@
 ## 1. Local gateway implementation — essential
 
 - [x] 1.1 Implement the forced-command gateway, least-privilege sudoers rule and native-SSH workflow while preserving `frontend-live/releases/<sha>/current`; verify workflow YAML and shell syntax.
-- [x] 1.2 Add and run an isolated harness covering command/SHA/archive/lock validation, verify-only behavior, exact release layout, backend-only Compose and failure-safe `current`; 18/18 checks passed locally on 14.09.2026.
+- [x] 1.2 Add and run an isolated harness covering command/SHA/archive/lock validation, verify-only behavior, exact release layout, backend-only Compose and failure-safe `current`; 19/19 checks passed locally on 14.09.2026, including fragmented-stream upload regression.
 
 ## 2. VM installation and evidence — essential, Tobias
 

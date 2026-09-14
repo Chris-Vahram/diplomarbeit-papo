@@ -43,6 +43,9 @@
 
 | AUSSTEHEND-01a09db0 | 2026-09-14 | Chris | Codex | Kontext-Handoff für nächste Session aktualisieren | lokale Sitzung `01a09db0-547d-70a3-80c3-279b68f996e0` | `EXAKT` | CONTINUATION_PROMPT, NEXT_SESSION_PLAN, CLAUDE, PLANNING_REVIEW und RESTARBEITSPLAN auf Commit eacb8cd, sauberen Worktree und den belegten Gateway-Blocker synchronisiert.; Prüfungen: git diff --check; openspec validate --changes --strict --json --no-interactive: 2/2 gültig |
 
+
+| AUSSTEHEND-01a09f17 | 2026-09-14 | Chris | Codex | Next-Session-Handoff mit Deployment-, VM-Security-, BMD-Stammdaten- und Clockify-Auftrag aktualisieren | lokale Sitzung `01a09f17-f9eb-79a2-b1a7-d5250bcd1508` | `EXAKT` | Nur Context-/Handoff-Dateien aktualisiert; verbindliche Reihenfolge, Nutzerentscheidungen, Subagent-Nachweise, Aufwandsschätzungen und retrospektiv geschätzte Clockify-Einträge für die nächste Session dokumentiert; keine Implementierung, kein Deployment; Prüfungen: git diff --check |
+
 | AUSSTEHEND-01a06809 | 2026-09-03 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a06809-6bda-70c3-922a-59e5eeeeff28` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a0676e | 2026-09-03 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a0676e-bfa1-7241-89c0-43de935e78ee` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a06ab1 | 2026-09-04 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a06ab1-5040-7761-b84f-b202b6db6cc8` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
@@ -55,6 +58,7 @@
 | AUSSTEHEND-01a09bbc | 2026-09-13 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a09bbc-835b-7082-8168-80fdd72001dc` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a0991c | 2026-09-13 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a0991c-8bfe-7740-acde-03ac93efb975` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a09bc1 | 2026-09-13 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a09bc1-6421-7b03-81c3-88f51bff5430` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-01a09f85 | 2026-09-14 | Chris | Codex | BMD-, Steuerkennungs-, Notiz- und Gewerbenachweis-Changes mit OpenSpec durchplanen | lokale Sitzung `01a09f85-3301-7780-8e60-436a08e81900` | `EXAKT` | Fünf vollständige Proposal-, Design-, Spec- und Taskpakete sowie ein neuer Work Plan erstellt; keine Produktimplementierung; Prüfungen: Alle fünf Changes mit openspec validate --strict sowie git diff --check erfolgreich geprüft |
 | AUSSTEHEND-01a09d84 | 2026-09-14 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a09d84-f0df-7e52-9508-b2c829f98aa2` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-019f72d2 | 2026-07-18 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f72d2-d09e-7382-ad24-52f329a30e94` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-019f75a8 | 2026-07-18 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f75a8-0fb0-7721-9c66-e0a221a69661` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |

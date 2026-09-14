@@ -1,12 +1,34 @@
 # PAPO-Planungs- und Umsetzungshandoff – 13.09.2026
 
-## Vorrangiger nächster-session Start — 14.09.2026
+## Vorrangiger nächster-session Start — nach dem Handoff vom 14.09.2026
 
-- Branch `docs/openspec-planning-2026-09-11`, Remote/HEAD `f26c425`, Arbeitsbaum sauber; kein Cleanup nötig.
-- `harden-deployment-gateway` **2/4**. Tasks 2.1/2.2 nur mit Tobias-Nachweisen für VM, Keys, sudoers, Host-Key, Remote-Negativtests, Liveflows und Rollback. Ohne Nachweise: **BLOCKIERT**, keine VM-/SSH-/Secret-/Volume-Aktion.
+- Branch `docs/openspec-planning-2026-09-11`, HEAD/Remote `38cd932`; vor dem aktuellen lokalen Fix war der Arbeitsbaum sauber. `origin/main` ist `05e0bdd`; lokales `main` liegt vier Commits zurück.
+- `harden-deployment-gateway` **2/4**. Zuerst die öffentliche VM auf den aktuellsten lokalen Stand deployen. Danach einen autorisierten Security-/Deployment-Subagenten mit VM-, Git- und Securityrechten die Tasks 2.1/2.2 vollständig erledigen lassen.
 - Lokal belegt: Gateway-Harness 18/18, Backend 100/100, Package, JS-Syntax, OpenSpec 2/2, Präsentation 15 Folien, Diff-Check.
-- Präsentation final abgeglichen; `complete-thesis-documentation` bleibt 0/6. Ohne Gateway-Evidenz Dokumentation priorisieren.
-- Clockify nur aus Protokollen, Archiven und echten Checks ableiten.
+- Public-Live-Test am 14.09. war erfolgreich: Partner-Login, Endkunde, zwei Artikel, Bestellung #52 über 218,90 €, Company-Status auf `Geprüft`; der Live-Quellstand muss trotzdem zuerst aktualisiert werden.
+- `complete-thesis-documentation` bleibt 0/6. Fünf zusätzliche Planungschanges sind 4/4 artefaktvollständig; noch keine Produktimplementierung. Reihenfolge, Abhängigkeiten und Stopbedingungen stehen in `Specification/WORK_PLAN_2026-09-14.md`.
+- Clockify über den angemeldeten Zen-Browser im Workspace `DA` tatsächlich erfassen: Datum, Start-/Endzeit, Dauer und Beschreibung. Zeiten dürfen retrospektiv geschätzt/ergänzt werden, müssen als Schätzung markiert werden und dürfen nicht als technische Evidenz dienen.
+
+### Aktueller Aufgabenfilter
+
+- Erledigt/archiviert nicht erneut beginnen: technischer MVP (53/53) sowie die archivierten Changes in `openspec/changes/archive/`.
+- Wirklich offen: `complete-thesis-documentation` 0/6, Gateway-Nachweise 2.1/2.2, Partnerstammdaten/Gewerbeschein, BMD-Artikelnummer/Importregel und die Lehrerabnahme.
+- Next-session Planungsblock mit höherem Modell, hohem Reasoning, OpenSpec und Caveman: BMD-Partnernummer übernehmen statt PAPO-Auto-Nummer; generische internationale Steuerkennung mit österreichischer Pflicht-/Formatprüfung; Company-only-Notizfeld mit Prüfwert 2.000 Zeichen; Gewerbeschein als sicherer aktueller Nachweis mit rechtlicher Prüfung; eindeutige BMD-Artikelnummer mit Import-/Export-/Duplikatregel.
+- Aufwand als Planungsrahmen speichern: Partnernummer/Steuerkennung 0,5–2 Tage, Gewerbeschein 1–2 Tage, BMD-Artikelnummer 1–2 Tage nach Beispieldaten, zusammen minimal 3–5 Entwicklertage plus Dokumentation. Historie, Ablaufdatum, OCR, mehrere Dateien und direkte BMD-Synchronisation separat ausweisen.
+
+### Verbindlicher Copy-paste-Auftrag für die nächste Session
+
+```text
+Arbeite mit einem höheren Modell und hohem/xhigh Reasoning. Nutze OpenSpec und Caveman für die Planung. Implementiere und plane in dieser Session zuerst nichts außer dem ausdrücklich nötigen Live-Deployment und den VM-Nachweisen:
+
+1. Bringe paportal.at auf den aktuellsten lokalen Stand. Prüfe danach den Live-Flow erneut.
+2. Beauftrage einen autorisierten Security-/Deployment-Subagenten mit den nötigen VM-, Git- und Securityrechten. Erledige mit ihm vollständig: root-eigener Gateway und Dateirechte; visudo; eingeschränkter Deploy-Account und Read-only-Repository-Key; Host-Key-Pinning; kein allgemeines sudo, Docker-Zugriff oder Lesen von .env.prod; negative SSH-Tests für beliebige Befehle, PTY, Forwarding, SCP/SFTP; side-effect-freier Verify-/Upload-Ablauf; HTTPS/OIDC/Login/Bestellung; gekoppelter Rollback ohne PostgreSQL-/Keycloak-/Caddy-Schaden. Belege alles sanitisiert und setze den Gateway-Blocker erst nach echten Nachweisen auf erledigt.
+3. Danach mit OpenSpec/Caveman die weiteren Changes planen, noch nicht implementieren: BMD-geführte Partnernummer statt PAPO-Auto-Nummer; generische internationale UID-/Steuerkennung mit verifizierter österreichischer Pflicht-/Formatlogik; Company-only-Notizfeld, Prüfwert 2.000 Zeichen; Gewerbeschein als sicherer aktueller Nachweis mit Vorschlag zu Dateiarten, ca. 10 MB, Zugriff, Ersetzdatum, optionalem Ablaufdatum und rechtlicher Prüfung; eindeutige BMD-Artikelnummer mit Import-, Unique-, Duplikat- und sinnvoller Exportregel. Direkte BMD-Schnittstelle nur planen, wenn die neue Anforderung das ausdrücklich meint; nicht stillschweigend bauen.
+4. Clockify diesmal konkret erledigen: rückwirkend geschätzte Einträge mit Datum, Uhrzeit und Beschreibung erstellen/erfassen. Jede Zeit als Schätzung markieren; Clockify-Einträge sind keine technischen Nachweise. Nicht erneut verschieben.
+5. Keine Secrets ausgeben, keine Volumes löschen/zurücksetzen, keine fertige Implementierung behaupten. Danach Context-/Handoff-Dateien mit echten Ergebnissen aktualisieren.
+```
+
+Die älteren Abschnitte darunter sind historische Sitzungsnotizen und gelten nicht als aktueller Status.
 
 ## Aktueller Startpunkt — 13.09.2026
 
@@ -16,7 +38,7 @@ Addon: Je nach 5.9-Befund entweder einen konkreten Folgeprompt an den Gateway-Se
 
 1. 5.9 zuerst anhand sanitiserter VM-/Key-/Host-Key-/sudoers-/Remote-Negativnachweise prüfen. Der Agent soll mit den freigegebenen VM-, Git-Pull/Push/Merge- und Deployment-Rechten selbst entscheiden, ob er 5.9 ausführen darf; fehlende Sicherheitsbelege bleiben ein Stop.
 2. Bei ausreichender Evidenz 5.9 selbst umsetzen und Subagents für unabhängige Remote-Security-, Browser-, Live- und gekoppelten Rollbacktests einsetzen. Keine Secrets ausgeben; laufende Daten/Volumes schützen.
-3. Danach finale Security-/OpenSpec-/Live-Abnahme und Präsentationsfinalisierung nach Lehreranforderungen und neuesten Protokollen. Präsentation: **Artikel**, nicht Produkte.
+3. Danach finale Security-/OpenSpec-/Live-Abnahme und Präsentationsfinalisierung nach Lehreranforderungen und neuesten Protokollen. Präsentation: durchgehend **Artikel**.
 4. Clockify über mehrere belegte Arbeitstage verteilen: letzte Protokolle und OpenSpec-Archive als Tätigkeitsquelle prüfen, leere Screenshot-Blöcke beschreiben, sinnvolle Zwischenblöcke ergänzen; nur realistisch belegbare Zeiten verwenden, Unsicherheiten offen markieren.
 
 Fortschreibung nach Integration 14.09.2026: `origin/main` `05e0bdd` ist kontrolliert übernommen. Der Basis-CI/CD-Change bleibt wie von Tobias geliefert archiviert; offene Gateway-Arbeit liegt in `harden-deployment-gateway` (**2/4**). Demo-Seeding ist übernommen, standardmäßig aus und mit der lokalen Kategorie-Migration kombiniert. Fokus 1/1, Suite 100/100 und Package 100/100 erfolgreich. Nächster Schritt: Tobias' VM-/Key-/sudoers-/Remote-Nachweise für Tasks 2.1/2.2; erst danach Aktivierung und finale Livechecks.
