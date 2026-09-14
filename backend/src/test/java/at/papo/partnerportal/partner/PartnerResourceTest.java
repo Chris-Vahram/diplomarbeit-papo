@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import jakarta.inject.Inject;
 
 import static io.restassured.RestAssured.given;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
@@ -143,6 +144,17 @@ class PartnerResourceTest {
                     .then().statusCode(200)
                     .body("internalNote", is(note));
 
+            given().auth().oauth2(companyToken).contentType("application/json")
+                    .body(legacyPartnerUpdateBody(originalState))
+                    .when().put("/api/company/partners/" + partnerId)
+                    .then().statusCode(200)
+                    .body("internalNote", is(note));
+
+            updatePartner(companyToken, partnerId, originalState, null)
+                    .body("internalNote", is((Object) null));
+            updatePartner(companyToken, partnerId, originalState, note)
+                    .body("internalNote", is(note));
+
             String partnerToken = tokens.tokenFor("partner-demo", "partner-demo");
             given().auth().oauth2(partnerToken)
                     .when().get("/api/partner/profile")
@@ -160,11 +172,21 @@ class PartnerResourceTest {
                     .then().statusCode(200)
                     .body("internalNote", is(note));
 
+            assertResponseDoesNotExposeInternalNote(companyToken, "/api/company/orders");
+            assertResponseDoesNotExposeInternalNote(companyToken, "/api/company/orders/export");
+            assertResponseDoesNotExposeInternalNote(companyToken, "/api/company/commissions/export");
+            assertResponseDoesNotExposeInternalNote(companyToken, "/api/company/dashboard");
+            assertResponseDoesNotExposeInternalNote(companyToken, "/api/company/products");
+            assertResponseDoesNotExposeInternalNote(partnerToken, "/api/partner/profile");
+            assertResponseDoesNotExposeInternalNote(partnerToken, "/api/partner/products");
+            assertResponseDoesNotExposeInternalNote(partnerToken, "/api/partner/orders");
+            assertResponseDoesNotExposeInternalNote(partnerToken, "/api/partner/dashboard");
+
             updatePartner(companyToken, partnerId, originalState, "")
                     .body("internalNote", is((Object) null));
         } finally {
-            updatePartner(companyToken, partnerId, originalState,
-                    io.restassured.path.json.JsonPath.from(originalState).getString("internalNote"));
+            String originalNote = io.restassured.path.json.JsonPath.from(originalState).getString("internalNote");
+            updatePartner(companyToken, partnerId, originalState, originalNote == null ? "" : originalNote);
         }
     }
 
@@ -249,6 +271,29 @@ class PartnerResourceTest {
                 .body(body)
                 .when().put("/api/company/partners/" + partnerId)
                 .then();
+    }
+
+    private String legacyPartnerUpdateBody(String currentStateJson) {
+        io.restassured.path.json.JsonPath current = io.restassured.path.json.JsonPath.from(currentStateJson);
+        String addressJson = String.format(
+                "{\"street\":\"%s\",\"houseNumber\":\"%s\",\"postalCode\":\"%s\",\"city\":\"%s\",\"country\":\"%s\"}",
+                current.getString("address.street"), current.getString("address.houseNumber"),
+                current.getString("address.postalCode"), current.getString("address.city"),
+                current.getString("address.country"));
+        return String.format(
+                "{\"partnerNumber\":\"%s\",\"name\":\"%s\",\"address\":%s,\"email\":%s,\"phone\":%s,"
+                        + "\"commissionPercent\":%s,\"active\":%s}",
+                current.getString("partnerNumber"), current.getString("name"), addressJson,
+                quoteOrNull(current.getString("email")), quoteOrNull(current.getString("phone")),
+                current.getString("commissionPercent"), current.getBoolean("active"));
+    }
+
+    private void assertResponseDoesNotExposeInternalNote(String token, String path) {
+        String response = given().auth().oauth2(token)
+                .when().get(path)
+                .then().statusCode(200)
+                .extract().asString();
+        assertFalse(response.contains("internalNote"), path + " darf internalNote nicht enthalten");
     }
 
     private String partnerContactBody(String currentStateJson, String internalNote) {

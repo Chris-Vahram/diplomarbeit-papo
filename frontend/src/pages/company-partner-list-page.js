@@ -224,7 +224,7 @@ class CompanyPartnerListPage extends HTMLElement {
       address: readAddress(this.form, "address"),
       email: data.get("email") || null,
       phone: data.get("phone") || null,
-      internalNote: data.get("internalNote") || null,
+      internalNote: data.get("internalNote"),
       commissionPercent,
       active: this.form.elements.active.checked,
     };

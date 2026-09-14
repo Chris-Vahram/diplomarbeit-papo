@@ -1,5 +1,12 @@
 # PAPO-Planungs- und Umsetzungshandoff – 13.09.2026
 
+## Aktueller Andockpunkt — 14.09.2026, nach Abschluss des Company-Notiz-Changes
+
+- `add-company-internal-partner-note` ist **4/4 erledigt**. Der Request unterscheidet jetzt ausgelassene Notizfelder von explizitem `null`: Auslassen bewahrt die bestehende Notiz, `null`/leer löscht. Die Notiz bleibt Company-only und maximal 4.000 Zeichen.
+- Geprüft: `PartnerResourceTest` 13/13, Suite 101/101, Package, JS-Syntax, Strict-Validate, Diff-Check, Browser Desktop/Mobile sowie PAPO-Qualitäts-, Java- und Securityreview.
+- **Nächster Session-Start:** PR/CI/live-Rollout dieses letzten Fixes verifizieren; danach die fehlende VM-Security-Task-2.2-SSH-Negativmatrix mit autorisiertem Deploy-Key nachholen. Erst dann den nächsten Change starten.
+- Offene Produktarbeit: `add-business-tax-identifiers`, `decouple-partner-number-from-login`, `add-partner-trade-proof`, `add-unique-bmd-article-number`. BMD-Nummern nur bis Beispieldaten-Gate, keine direkte BMD-API ohne Vertrag.
+
 ## Vorrangiger Andockpunkt — 14.09.2026, nach PR #16 / Deployment
 
 - PR #16 (`486ca54`) ist gemergt; `origin/main`/Live stehen auf `35d8a0ab63b4`. PR #17 (`ae749ea`, KI-Nachweis) ist offen und wartet auf CI.

@@ -12,16 +12,94 @@ import java.math.BigDecimal;
 
 // Company-side create/edit — full record incl. commissionPercent and active
 // (never exposed on the partner self-edit path, see PartnerContactRequest / FR-08).
-public record PartnerRequest(
-        @NotBlank(message = "Partnernummer ist erforderlich.") String partnerNumber,
-        @NotBlank(message = "Name ist erforderlich.") String name,
-        @NotNull(message = "Adresse ist erforderlich.") @Valid AddressRequest address,
-        String email,
-        String phone,
-        @NotNull(message = "Provision ist erforderlich.")
-        @DecimalMin(value = "0.0", message = "Provision darf nicht negativ sein.")
-        @DecimalMax(value = "100.0", message = "Provision darf 100% nicht überschreiten.") BigDecimal commissionPercent,
-        @Size(max = 4000, message = "Interne Notiz darf höchstens 4.000 Zeichen enthalten.") String internalNote,
-        Boolean active
-) {
+public class PartnerRequest {
+    @NotBlank(message = "Partnernummer ist erforderlich.")
+    private String partnerNumber;
+    @NotBlank(message = "Name ist erforderlich.")
+    private String name;
+    @NotNull(message = "Adresse ist erforderlich.")
+    @Valid
+    private AddressRequest address;
+    private String email;
+    private String phone;
+    @NotNull(message = "Provision ist erforderlich.")
+    @DecimalMin(value = "0.0", message = "Provision darf nicht negativ sein.")
+    @DecimalMax(value = "100.0", message = "Provision darf 100% nicht überschreiten.")
+    private BigDecimal commissionPercent;
+    @Size(max = 4000, message = "Interne Notiz darf höchstens 4.000 Zeichen enthalten.")
+    private String internalNote;
+    private Boolean active;
+    private boolean internalNoteProvided;
+
+    public PartnerRequest() {
+    }
+
+    public String partnerNumber() {
+        return partnerNumber;
+    }
+
+    public String name() {
+        return name;
+    }
+
+    public AddressRequest address() {
+        return address;
+    }
+
+    public String email() {
+        return email;
+    }
+
+    public String phone() {
+        return phone;
+    }
+
+    public BigDecimal commissionPercent() {
+        return commissionPercent;
+    }
+
+    public String internalNote() {
+        return internalNote;
+    }
+
+    public boolean internalNoteProvided() {
+        return internalNoteProvided;
+    }
+
+    public Boolean active() {
+        return active;
+    }
+
+    public void setPartnerNumber(String partnerNumber) {
+        this.partnerNumber = partnerNumber;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAddress(AddressRequest address) {
+        this.address = address;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void setCommissionPercent(BigDecimal commissionPercent) {
+        this.commissionPercent = commissionPercent;
+    }
+
+    public void setInternalNote(String internalNote) {
+        this.internalNoteProvided = true;
+        this.internalNote = internalNote;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
 }
