@@ -2,7 +2,7 @@ import { apiFetch } from "../lib/api.js";
 import { ensureValidSession, getSession } from "../lib/auth.js";
 import { showToast } from "../components/toast-notice.js";
 import { formatEuro, formatNumber, formatDate } from "../lib/format.js";
-import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue, previousPeriod, trendInfo, toLocalIsoDate } from "../lib/dashboard-data.js";
+import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue, previousPeriod, trendInfo, trailingWindowTrend, toLocalIsoDate } from "../lib/dashboard-data.js";
 import { escapeHtml } from "../lib/html.js";
 
 const eur = new Intl.NumberFormat("de-AT", { style: "currency", currency: "EUR" });
@@ -234,12 +234,13 @@ class PartnerDashboardPage extends HTMLElement {
     } else {
       // No explicit range: headline totals are the backend's true all-time values
       // (BigDecimal-exact, no client-side recompute) - charts show all orders.
-      // No "previous period" concept without an explicit range, so no trend arrows.
+      // Trend arrows use a fixed trailing-30-days-vs-prior-30-days comparison,
+      // decoupled from the all-time headline totals.
       inRange = this.orders;
       revenue = this.base.totalRevenue;
       commission = this.base.totalCommission;
       count = this.base.fulfilledOrderCount;
-      revenueTrend = commissionTrend = countTrend = null;
+      ({ revenueTrend, commissionTrend, countTrend } = trailingWindowTrend(this.orders));
     }
     const trendAttrs = (t) => (t ? `trend="${t.trend}" trend-label="${t.label}"` : "");
 

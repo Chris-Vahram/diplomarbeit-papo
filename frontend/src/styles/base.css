@@ -3006,6 +3006,59 @@ legend {
   margin-top: var(--spacing-6);
 }
 
+/* "Endkunde wählen" step: click-to-select list of own Endkunden, filtered by
+   the search field above it. Scrolls internally so a long customer list
+   doesn't push the step's action buttons off-screen. */
+.kunde-list-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  margin-top: var(--spacing-3);
+}
+
+.kunde-list-field__label {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  color: var(--color-neutral-700);
+}
+
+.kunde-list {
+  list-style: none;
+  margin: 0;
+  padding: var(--spacing-1);
+  max-height: 16rem;
+  overflow-y: auto;
+  border: 0.0625rem solid var(--border-strong);
+  border-radius: var(--radius-md);
+}
+
+.kunde-list__row {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--spacing-2) var(--spacing-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-in-out);
+}
+
+.kunde-list__row:hover { background: var(--color-neutral-100); }
+
+.kunde-list__row:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus-ring);
+}
+
+.kunde-list__row.is-selected {
+  background: var(--color-primary-50);
+  color: var(--color-primary-700);
+  font-weight: var(--font-weight-semibold);
+}
+
 /* "Artikel wählen" step: catalog (left, fixed width) + cart preview (right,
    remaining width). minmax(0, 1fr) is required, not just 1fr - it's what lets
    .catalog__grid's overflow-x:auto actually clip/scroll instead of the grid
@@ -3020,7 +3073,7 @@ legend {
    matter what changes the catalog's height later. */
 .produkte-step-layout {
   display: grid;
-  grid-template-columns: 21rem minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) 20rem;
   gap: var(--spacing-5);
 }
 
