@@ -287,3 +287,10 @@ Nächste Astra-Session setzt beim obigen Stand fort. Vor Bewertung neuen Git-Sta
 ## Einschätzung
 
 **Zu viel – nur diese P0-Punkte** vor dem unmittelbar nächsten Termin. Danach P1.1 und P1.2.
+# Fortschreibung — 14.09.2026
+
+Die Präsentation ist nach dem Protokoll 14.9 auf 22 Folien erweitert und für eine nichttechnische
+Firmenzielgruppe formuliert. Enthalten sind die fachlichen Sprachkorrekturen, GitHub-Stars,
+digitale Souveränität, zusätzliche echte Screenshots, die Clockify-Übersicht für Chris und Tobias
+und das Demo-Drehbuch. Die Ist-Summe aus Clockify konnte im angemeldeten Zen-Browser nicht verifiziert
+werden; der dokumentierte Zielwert „ca. 400 h“ bleibt entsprechend gekennzeichnet.

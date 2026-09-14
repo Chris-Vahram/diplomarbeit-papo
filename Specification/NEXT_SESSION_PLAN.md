@@ -321,3 +321,14 @@ Zum Schluss: jeden Change mit openspec validate prüfen; unabhängigen Security-
 4. Finaler Security-/Quality-/Browser-/OpenSpec-Check.
 5. `complete-thesis-documentation` und Präsentation: „Artikel“ primär; Lehreranforderungen einarbeiten.
 6. Clockify nur evidenzbasiert ergänzen; Dauer/Uhrzeit aus Logs oder Nutzerangabe.
+# Aktueller Abschlussnachtrag — 14.09.2026
+
+Die Präsentation wurde auf 22 verständliche Folien nach Protokoll 14.9 erweitert: Sprachkorrekturen,
+GitHub-Stars, digitale Souveränität, zwei zusätzliche echte Screenshots, Clockify für Chris und
+Tobias sowie Demo-Drehbuch. Hosting ist als verständlicher Bereitstellungsablauf formuliert;
+technische offene Nachweise und fehlende Firmendaten gehören nicht in die Firmenpräsentation.
+Die Ist-Gesamtsumme von Clockify konnte im angemeldeten Zen-Browser nicht ausgelesen werden und
+bleibt daher offen; „ca. 400 h“ ist als Zielwert gekennzeichnet.
+
+Nach Abschlussprüfung und Commit der Präsentation zuerst `harden-deployment-gateway` per
+`openspec-apply-change` aufnehmen, danach die verbleibenden Changes strikt einzeln bearbeiten.

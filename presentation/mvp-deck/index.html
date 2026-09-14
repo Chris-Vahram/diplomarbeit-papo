@@ -15,32 +15,32 @@
       <section class="dark">
         <p class="eyebrow">HTL Diplomarbeit · Informatik / IT Medientechnik</p>
         <h1>Partnerportal</h1>
-        <p class="lead">Ein internes B2B-Bestellportal für partnerbasierte Vertriebsmodelle. Kette: Unternehmen → Partner → Endkunde.</p>
+        <p class="lead">PaPo ist ein B2B-Bestellportal für partnerbasierte Vertriebsmodelle<br>Struktur: Unternehmen → Partner → Endkunde.</p>
         <p class="meta">
           <strong>Chris Vahram</strong> &amp; <strong>Tobias Huemer</strong>
           <span class="sep">·</span> 2026
         </p>
       </section>
 
-      <!-- 2. Akteure & Kette -->
+      <!-- 2. Akteure & Struktur -->
       <section>
-        <p class="eyebrow">Akteure &amp; Kette</p>
+        <p class="eyebrow">Akteure &amp; Struktur</p>
         <h2>Unternehmen → Partner → Endkunde</h2>
 
-        <div class="chain">
+        <div class="structure">
           <span class="node hot">Unternehmen</span>
           <span class="arrow">→</span>
           <span class="node">Partner</span>
           <span class="arrow">→</span>
           <span class="node">Endkunde</span>
         </div>
-        <p class="chain-note">1 Unternehmen : n Partner · 1 Partner : n Endkunden – keine 1:1-Beziehung</p>
+        <p class="structure-note">1 Unternehmen : n Partner · 1 Partner : n Endkunden – klare Struktur</p>
 
         <div class="actors">
           <div class="actor hot">
             <h3>Unternehmen</h3>
             <ul>
-              <li>Verwaltet Partner &amp; Artikel zentral</li>
+              <li>Verwaltet Partner &amp; Artikel</li>
               <li>Importiert Excel/CSV-Daten</li>
               <li>Schaltet Artikel pro Partner frei</li>
               <li>Sieht alle Bestellungen, setzt Status</li>
@@ -50,24 +50,21 @@
           <div class="actor">
             <h3>Partner</h3>
             <ul>
-              <li>Wickelt Bestellungen für Endkunden ab</li>
+              <li>Führt Bestellungen für Endkunden durch</li>
               <li>Sieht nur freigeschaltete Artikel</li>
-              <li>Artikel werden individuell pro Partner freigeschaltet</li>
+              <li>Legt Endkunden an und verwaltet sie</li>
               <li>Dashboard: Überblick über Bestellungen &amp; Provisionen</li>
-              <li>Wählt oder erstellt Endkunden für Bestellungen</li>
               <li>Ein gemeinsamer organisatorischer Zugang je Partnerfirma</li>
-              <li>Perspektivisch: eigene Partnershop-Homepage <em>(außerhalb MVP)</em></li>
             </ul>
           </div>
           <div class="flow">→</div>
           <div class="actor quiet">
             <h3>Endkunde</h3>
             <ul>
-              <li>Kann nicht direkt bestellen</li>
-              <li>Wird vom Partner angelegt</li>
-              <li>Bestellung wird vom Partner für ihn getätigt</li>
-              <li>Erhält die Ware</li>
-              <li>Erhält Bestätigung</li>
+              <li>Wird vom Partner angelegt und verwaltet</li>
+              <li>Die Bestellung führt der Partner für ihn durch</li>
+              <li>Bezahlt dem Unternehmen</li>
+              <li>Erhält Ware und Bestätigung</li>
             </ul>
           </div>
         </div>
@@ -84,7 +81,7 @@
             <h4>Bisher</h4>
             <ul>
               <li>Bestellungen per E-Mail oder Telefon</li>
-              <li>Keine zentrale Übersicht</li>
+              <li>Informationen liegen verteilt vor</li>
               <li>Zuordnung &amp; Provision manuell</li>
             </ul>
           </div>
@@ -104,27 +101,27 @@
       <!-- 4. Problem -->
       <section>
         <p class="eyebrow">Ausgangslage</p>
-        <h2>Bestellungen laufen heute manuell</h2>
-        <p class="lead">Heute gibt es kein zentrales System für Partner- und Artikeldaten – jede Bestellung bedeutet Handarbeit.</p>
+        <h2>Bestellungen laufen derzeit manuell</h2>
+        <p class="lead">Derzeit gibt es kein gemeinsames System für Partner- und Artikeldaten – jede Bestellung braucht Abstimmung und Übertragung.</p>
 
         <div class="stats">
-          <div class="stat"><div class="num">B2B</div><div class="lbl">internes Portal</div></div>
+          <div class="stat"><div class="num">B2B</div><div class="lbl">B2B-Portal</div></div>
           <div class="stat"><div class="num">1</div><div class="lbl">Demo-Unternehmen</div></div>
           <div class="stat"><div class="num">n</div><div class="lbl">Partnerfirmen</div></div>
           <div class="stat"><div class="num">n</div><div class="lbl">Artikel</div></div>
         </div>
 
         <ul class="plain">
-          <li><strong>Keine zentrale Verwaltung</strong> von Partner- und Artikeldaten</li>
-          <li><strong>Keine kontrollierte Sichtbarkeit</strong> – welcher Partner welche Artikel bestellen darf</li>
-          <li><strong>Keine automatische Zuordnung</strong> von Bestellung zu Partner und Provision</li>
+          <li><strong>Partner- und Artikeldaten</strong> liegen getrennt vor</li>
+          <li><strong>Artikel-Freigaben</strong> brauchen manuelle Pflege</li>
+          <li><strong>Bestellung und Provision</strong> werden manuell zugeordnet</li>
         </ul>
       </section>
 
-      <!-- 5. Kernablauf -->
+      <!-- 5. Use Case -->
       <section>
         <p class="eyebrow">Use Case</p>
-        <h2>Kernablauf: Partner bestellt für Endkunde</h2>
+        <h2>Partner bestellt für Endkunde</h2>
 
         <ol class="steps">
           <li>Partner meldet sich an<small>Login über Keycloak, Rolle „partner“</small></li>
@@ -206,7 +203,96 @@
         </table>
       </section>
 
-      <!-- 8. Architektur -->
+      <!-- 8. GitHub-Stars -->
+      <section>
+        <p class="eyebrow">Technologie · GitHub</p>
+        <h2>Offene Komponenten, aktuell verifiziert</h2>
+        <p class="lead">GitHub-Stars am 14.09.2026. Die Werte sind Momentaufnahmen der jeweiligen Repositories.</p>
+
+        <table class="stars">
+          <thead>
+            <tr><th>Baustein</th><th>Repository</th><th>Stars</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Quarkus</td><td><a href="https://github.com/quarkusio/quarkus">quarkusio/quarkus</a></td><td>15.884</td></tr>
+            <tr><td>Keycloak</td><td><a href="https://github.com/keycloak/keycloak">keycloak/keycloak</a></td><td>36.764</td></tr>
+            <tr><td>PostgreSQL</td><td><a href="https://github.com/postgres/postgres">postgres/postgres</a></td><td>22.104</td></tr>
+            <tr><td>Caddy</td><td><a href="https://github.com/caddyserver/caddy">caddyserver/caddy</a></td><td>75.732</td></tr>
+            <tr><td>Apache POI</td><td><a href="https://github.com/apache/poi">apache/poi</a></td><td>2.270</td></tr>
+            <tr><td>opencsv</td><td><a href="https://github.com/cygri/opencsv">cygri/opencsv</a></td><td>14</td></tr>
+            <tr><td>reveal.js</td><td><a href="https://github.com/hakimel/reveal.js">hakimel/reveal.js</a></td><td>72.292</td></tr>
+          </tbody>
+        </table>
+        <p class="source-note">Quelle: GitHub-Repositorydaten, abgerufen am 14.09.2026. Native HTML/CSS/JavaScript haben kein eigenes Repository im Stack.</p>
+      </section>
+
+      <!-- 9. Digitale Souveränität: Begriff -->
+      <section>
+        <p class="eyebrow">Digitale Souveränität</p>
+        <h2>PaPo auf Basis digitaler Souveränität</h2>
+        <p class="lead">Wir behalten die Kontrolle über Quellcode, Daten und den Betrieb der Anwendung.</p>
+
+        <div class="sovereignty-layout">
+          <div>
+            <h3>Für dieses Projekt heißt das</h3>
+            <ul class="plain sovereignty-list">
+              <li><strong>Verstehen:</strong> Der Stack bleibt nachvollziehbar und dokumentiert.</li>
+              <li><strong>Betreiben:</strong> Die Anwendung läuft in einer eigenen Betriebsumgebung.</li>
+              <li><strong>Wechseln:</strong> Offene Komponenten und Standard-Schnittstellen halten Alternativen möglich.</li>
+            </ul>
+          </div>
+          <div class="quote-box">
+            <strong>Konkreter Anspruch</strong>
+            <p>Eine Plattform, deren zentrale Funktionen wir selbst erklären, prüfen und betreiben können.</p>
+          </div>
+        </div>
+        <p class="source-note">Einordnung aus dem dokumentierten PAPO-Stack und der Deployment-Architektur.</p>
+      </section>
+
+      <!-- 10. Digitale Souveränität: Umsetzung -->
+      <section>
+        <p class="eyebrow">Digitale Souveränität</p>
+        <h2>Im MVP konkret umgesetzt</h2>
+
+        <div class="sovereignty-columns">
+          <div>
+            <h3>Software</h3>
+            <ul class="plain sovereignty-list">
+              <li>Statisches Frontend mit nativen Web Components, ohne CDN-Laufzeit.</li>
+              <li>Quarkus REST, OIDC und JDBC als klar getrennte Schnittstellen.</li>
+              <li>PostgreSQL und Keycloak als selbst betriebene Open-Source-Komponenten.</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Betrieb</h3>
+            <ul class="plain sovereignty-list">
+              <li>Caddy übernimmt TLS und Pfadrouting auf der VM.</li>
+              <li>BMD bleibt führendes System; PAPO übernimmt Excel/CSV-Daten.</li>
+              <li>Die Datenhaltung bleibt vom öffentlichen Frontend getrennt.</li>
+            </ul>
+          </div>
+        </div>
+        <p class="source-note">Grundlage: `docs/DEPLOYMENT.md`, `docs/SETUP.md` und der festgelegte Technologie-Stack.</p>
+      </section>
+
+      <!-- 11. Digitale Souveränität: Grenzen -->
+      <section>
+        <p class="eyebrow">Digitale Souveränität</p>
+        <h2>Souveränität braucht klare Grenzen</h2>
+        <p class="lead">Der MVP reduziert Abhängigkeiten, beseitigt sie aber nicht vollständig.</p>
+
+        <table class="scope-table">
+          <thead><tr><th>Abhängigkeit</th><th>Bewusster Umgang</th></tr></thead>
+          <tbody>
+            <tr><td>GitHub Actions und GHCR</td><td>Build und Registry bleiben externe Dienste; die Laufzeit liegt auf der eigenen VM.</td></tr>
+            <tr><td>Open-Source-Betrieb</td><td>Updates, Backups und Zugriffsrechte bleiben Verantwortung des Betreibers.</td></tr>
+            <tr><td>BMD</td><td>BMD bleibt führend; der aktuelle Austausch läuft über Excel/CSV, ohne direkte Schnittstelle.</td></tr>
+          </tbody>
+        </table>
+        <p class="source-note">Keine Marketingaussage: Die Folie beschreibt den aktuellen MVP-Umfang und seine offenen Betriebsaufgaben.</p>
+      </section>
+
+      <!-- 12. Architektur -->
       <section>
         <p class="eyebrow">Architektur</p>
         <h2>Wie die Komponenten zusammenarbeiten</h2>
@@ -252,7 +338,7 @@
         </div>
       </section>
 
-      <!-- 9. Bildschirmaufnahmen -->
+      <!-- 13. Bildschirmaufnahmen -->
       <section>
         <p class="eyebrow">Beispiel aus der Oberfläche</p>
         <h2>Artikelverwaltung mit Artikelkategorien</h2>
@@ -270,14 +356,66 @@
         </div>
       </section>
 
-      <!-- 10. Live-Demo (Übergang) -->
+      <!-- 14. Bildschirmaufnahme: Partner-Dashboard -->
+      <section>
+        <p class="eyebrow">Browsernachweis</p>
+        <h2>Dashboard der Partnerfirma</h2>
+        <div class="focus-evidence">
+          <figure class="focus-shot">
+            <img src="../../output/playwright/show-partner-company-name-desktop.png" alt="Dashboard der Partnerfirma mit sichtbarem Firmennamen und Artikelbereich">
+          </figure>
+          <div class="evidence-copy">
+            <h3>Firmenbezug sichtbar</h3>
+            <p>Das Dashboard zeigt die Partnerfirma im Seitentitel und im Portalbereich. Artikel und Bestellungen bleiben im Kontext der eigenen Firma.</p>
+            <p class="source-note">Echte Browseraufnahme aus `output/playwright/show-partner-company-name-desktop.png`.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 15. Bildschirmaufnahme: Artikelkategorien -->
+      <section>
+        <p class="eyebrow">Browsernachweis</p>
+        <h2>Artikelkategorien verwalten</h2>
+        <div class="focus-evidence">
+          <figure class="focus-shot">
+            <img src="../../output/playwright/article-categories-desktop.png" alt="Company-Seite zur Verwaltung von Artikelkategorien mit Suche und Statusfilter">
+          </figure>
+          <div class="evidence-copy">
+            <h3>Verwaltung im Company-Bereich</h3>
+            <p>Die Company kann Artikelkategorien suchen, nach Status filtern und bestehende Einträge bearbeiten.</p>
+            <p class="source-note">Echte Browseraufnahme in 1440 × 900 aus `output/playwright/article-categories-desktop.png`.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 16. Clockify -->
+      <section>
+        <p class="eyebrow">Arbeitsaufwand</p>
+        <h2>Clockify-Gesamtübersicht</h2>
+        <p class="lead">Workspace „DA“ · Erfasst für: Chris &amp; Tobias</p>
+
+        <div class="time-summary">
+          <div class="time-total">
+            <span class="num">ca. 400 h</span>
+            <span class="lbl">dokumentiertes Ziel für das Zweierteam</span>
+          </div>
+          <div class="time-detail">
+            <p><strong>Erfasst werden:</strong> Implementierung, Tests, Planung, Dokumentation, Besprechungen, Deployment und Präsentation.</p>
+            <p><strong>Transparenz:</strong> Retrospektive Einträge werden in Clockify ausdrücklich als geschätzt gekennzeichnet.</p>
+            <p class="pending-note">Die aktuelle Ist-Gesamtsumme aus Workspace „DA“ konnte in dieser Sitzung im angemeldeten Zen-Browser nicht ausgelesen werden und ist daher nicht als Zahl ergänzt.</p>
+          </div>
+        </div>
+        <p class="source-note">Der Wert „ca. 400 h“ ist der dokumentierte Zielwert aus dem Besprechungsprotokoll 31.08.2026, keine Ist-Zeit.</p>
+      </section>
+
+      <!-- 17. Live-Demo (Übergang) -->
       <section class="dark">
         <p class="eyebrow">Ab hier live</p>
         <h1>Live-Demo</h1>
         <p class="lead">Partner-Login → Bestellung aufgeben → Status durch das Unternehmen ändern.</p>
       </section>
 
-      <!-- 11. Out of scope / Phase-2-Backlog -->
+      <!-- 18. Out of scope / Phase-2-Backlog -->
       <section>
         <p class="eyebrow">Bewusst nicht gebaut</p>
         <h2>Out of Scope / Phase-2-Backlog</h2>
@@ -293,14 +431,14 @@
         </ul>
       </section>
 
-      <!-- 12. Phase 2 – Zwischentitel -->
+      <!-- 19. Phase 2 – Zwischentitel -->
       <section class="dark">
         <p class="eyebrow">Phase 2</p>
         <h1>Seit dem Termin am 10.07.</h1>
         <p class="lead">Was seither umgesetzt wurde – und was noch aussteht.</p>
       </section>
 
-      <!-- 13. Feedback umgesetzt -->
+      <!-- 20. Feedback umgesetzt -->
       <section>
         <p class="eyebrow">Feedback umgesetzt</p>
         <h2>Umgesetzte UX- und MVP-Wünsche</h2>
@@ -315,27 +453,26 @@
         </ul>
       </section>
 
-      <!-- 14. Hosting -->
+      <!-- 21. Hosting -->
       <section>
         <p class="eyebrow">Hosting</p>
-        <h2>Deployment: Gateway- und Live-Nachweis offen</h2>
-        <p class="lead">Domain <code>paportal.at</code>, HTTPS, privates GHCR und geschützter Main-Branch sind belegt. Die VM-Installation des eingeschränkten Gateways und der Live-Nachweis folgen.</p>
+        <h2>Wie PaPo bereitgestellt wird</h2>
+        <p class="lead">PaPo ist online unter <code>paportal.at</code> erreichbar. Änderungen werden geprüft, verpackt und anschließend bereitgestellt.</p>
         <ul class="plain">
-          <li><strong>Tests &amp; Build</strong> laufen automatisch bei jedem Push<small>GitHub Actions, Backend-Testsuite grün</small></li>
-          <li><strong>Docker-Image</strong> wird automatisch gebaut und ins Registry gepusht<small>GHCR, bei jedem Merge nach main</small></li>
-          <li><strong>Gateway</strong> ist lokal implementiert und mit 18 Harness-Prüfungen belegt<small>VM-Installation, Remote-Negativtests, Live-Flows und gekoppelter Rollback bleiben offen</small></li>
+          <li><strong>Automatische Prüfungen</strong> laufen bei Änderungen<small>Backend-Tests und Build prüfen den aktuellen Stand.</small></li>
+          <li><strong>Eindeutige Versionen</strong> machen Änderungen nachvollziehbar<small>Eine bereitgestellte Version kann eindeutig zugeordnet werden.</small></li>
+          <li><strong>Geschützter Zugang</strong> trennt die Rollen<small>Unternehmen und Partner sehen jeweils die passenden Bereiche.</small></li>
         </ul>
       </section>
 
-      <!-- 15. Ausblick -->
+      <!-- 22. Ausblick -->
       <section class="dark">
         <p class="eyebrow">Ausblick</p>
         <h2>Nächste Schritte</h2>
         <ul class="plain" style="max-width: 30em;">
-          <li><strong>Nach VM-Nachweisen:</strong> Gateway aktivieren und HTTPS/OIDC/API/Login/Bestellung live prüfen</li>
-          <li><strong>Sobald Firmendaten da:</strong> Import-Spaltenmapping finalisieren</li>
+          <li><strong>Import:</strong> Spaltenmapping und Stammdatenregeln weiter präzisieren</li>
           <li>Mobile Feinschliff fortsetzen</li>
-          <li>Weitere Härtung: Sicherheit, Effizienz, Bedienbarkeit</li>
+          <li>Weitere Verbesserungen bei Sicherheit, Effizienz und Bedienbarkeit</li>
           <li>Diplomarbeits-Dokumentation fertigstellen</li>
         </ul>
       </section>

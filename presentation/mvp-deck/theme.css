@@ -153,9 +153,9 @@ section.dark .meta .sep { color: #4b5c7c; }
 section.dark ul.plain li { color: #b9c7dd; }
 section.dark ul.plain li strong { color: #ffffff; }
 
-/* --- Kette Unternehmen -> Partner -> Endkunde --------------------------- */
+/* --- Struktur Unternehmen -> Partner -> Endkunde ------------------------ */
 
-.chain {
+.structure {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -164,7 +164,7 @@ section.dark ul.plain li strong { color: #ffffff; }
   margin: 34px 0 44px 0;
 }
 
-.chain .node {
+.structure .node {
   border: 1.5px solid var(--blue);
   color: var(--blue-tint);
   border-radius: 8px;
@@ -172,27 +172,27 @@ section.dark ul.plain li strong { color: #ffffff; }
   background: rgba(59, 130, 246, 0.14);
 }
 
-.chain .node.hot {
+.structure .node.hot {
   border-color: var(--accent-tint);
   color: var(--accent-tint);
   background: rgba(194, 65, 12, 0.18);
 }
 
-.chain .arrow { color: #6f83a6; font-size: 26px; }
+.structure .arrow { color: #6f83a6; font-size: 26px; }
 
-/* helle Variante der Kette */
-section:not(.dark) .chain .node {
+/* helle Variante der Struktur */
+section:not(.dark) .structure .node {
   color: var(--blue-deep);
   background: var(--blue-tint);
 }
 
-section:not(.dark) .chain .node.hot {
+section:not(.dark) .structure .node.hot {
   color: var(--accent);
   border-color: var(--accent);
   background: var(--accent-tint);
 }
 
-.chain-note {
+.structure-note {
   font-family: var(--font-mono);
   font-size: 15px;
   color: var(--ink-faint);
@@ -461,6 +461,10 @@ ul.plain li small {
   font-size: 30px;
 }
 
+.actors .actor { padding: 16px 18px; }
+.actors .actor h3 { font-size: 21px; }
+.actors .actor li { font-size: 16px; line-height: 1.25; margin-bottom: 7px; }
+
 /* --- Prozess-Schritte --------------------------------------------------- */
 
 ol.steps {
@@ -563,6 +567,181 @@ table.stack td.v small {
   color: var(--ink-faint);
   margin-top: 3px;
 }
+
+/* --- GitHub-Stars ------------------------------------------------------- */
+
+table.stars,
+table.scope-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+table.stars th,
+table.stars td,
+table.scope-table th,
+table.scope-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: baseline;
+}
+
+table.stars th,
+table.scope-table th {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+table.stars td,
+table.scope-table td {
+  font-size: 20px;
+  color: var(--ink);
+}
+
+table.stars td:last-child {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--blue-mid);
+  text-align: right;
+  white-space: nowrap;
+}
+
+table.stars a { color: var(--blue-mid); }
+
+.source-note {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink-faint);
+  margin: 16px 0 0 0;
+}
+
+/* --- Digitale Souveränität --------------------------------------------- */
+
+.sovereignty-layout,
+.sovereignty-columns {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 44px;
+  align-items: start;
+  margin-top: 28px;
+}
+
+.sovereignty-columns { grid-template-columns: 1fr 1fr; }
+
+.sovereignty-list { margin-top: 18px !important; }
+.sovereignty-list li { font-size: 22px; margin-bottom: 14px; }
+.sovereignty-list li small { font-size: 16px; }
+
+.quote-box {
+  background: var(--accent-tint);
+  border-left: 5px solid var(--accent);
+  border-radius: 8px;
+  padding: 24px 28px;
+  color: var(--ink);
+  font-size: 23px;
+  line-height: 1.35;
+}
+
+.quote-box strong {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.quote-box p { margin: 0; }
+
+table.scope-table td:first-child {
+  width: 30%;
+  font-weight: 700;
+  color: var(--blue-deep);
+}
+
+/* --- Einzelne Screenshot-Nachweise ------------------------------------ */
+
+.focus-evidence {
+  display: grid;
+  grid-template-columns: minmax(0, 2.15fr) minmax(230px, 0.85fr);
+  gap: 28px;
+  align-items: start;
+  margin-top: 24px;
+}
+
+.focus-shot {
+  margin: 0;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 8px 22px rgba(22, 35, 58, 0.08);
+}
+
+.focus-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 470px;
+  object-fit: contain;
+  object-position: top;
+}
+
+.evidence-copy { padding-top: 12px; }
+.evidence-copy h3 { font-size: 27px; margin-bottom: 14px; }
+.evidence-copy p { font-size: 22px; line-height: 1.4; color: var(--ink-soft); }
+
+/* --- Clockify ---------------------------------------------------------- */
+
+.time-summary {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 38px;
+  align-items: start;
+  margin-top: 34px;
+}
+
+.time-total {
+  border-top: 5px solid var(--accent);
+  padding-top: 18px;
+}
+
+.time-total .num {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 68px;
+  font-weight: 700;
+  color: var(--blue-deep);
+  line-height: 1.1;
+}
+
+.time-total .lbl {
+  display: block;
+  font-size: 22px;
+  color: var(--ink-soft);
+  margin-top: 8px;
+}
+
+.time-detail {
+  border-left: 1px solid var(--line);
+  padding-left: 28px;
+}
+
+.time-detail p {
+  font-size: 23px;
+  line-height: 1.4;
+  color: var(--ink-soft);
+  margin: 0 0 18px 0;
+}
+
+.time-detail strong { color: var(--ink); }
+.pending-note { color: var(--amber) !important; }
 
 /* --- Diagramm-Folie ----------------------------------------------------- */
 
