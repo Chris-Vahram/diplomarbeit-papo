@@ -5,8 +5,8 @@
 Das Deck umfasst jetzt 22 Folien und wurde nach dem Besprechungsprotokoll 14.9 überarbeitet:
 verständliche Akteurs- und Ablauftexte, GitHub-Stars, drei sachliche Folien zu digitaler
 Souveränität, zwei zusätzliche echte Browseraufnahmen, eine Clockify-Übersicht für Chris und
-Tobias sowie das [Demo-Drehbuch](demo-drehbuch.md). Die Clockify-Folie weist klar aus, dass
-„ca. 400 h“ ein dokumentierter Zielwert und keine ausgelesene Ist-Summe ist.
+Tobias sowie das [Demo-Drehbuch](demo-drehbuch.md). Die Clockify-Folie weist die im Workspace
+„DA“ ausgelesene Ist-Summe von 151:41:38 für Chris und Tobias aus.
 
 reveal.js-Deck für die Diplomarbeits-Präsentation (Thema: MVP, Use Cases, Tech-Stack).
 
@@ -30,5 +30,5 @@ externen Schriftarten oder CDN-Links, System-Font-Stack).
 
 Die Präsentation verwendet die fachliche Terminologie „Artikel“ und ist für die Abnahme nach
 dem Besprechungsprotokoll 14.9 vorbereitet. Produktive Deployment-/Live-Nachweise sind über
-CI/CD und Live-Smoke belegt; die Clockify-Istsumme muss noch direkt aus Workspace „DA“ übernommen
-werden, sobald der angemeldete Browserzugriff verfügbar ist.
+CI/CD und Live-Smoke belegt; die Clockify-Auswertung für Chris und Tobias stammt aus Workspace
+„DA“ und wurde am 14.09.2026 geprüft.

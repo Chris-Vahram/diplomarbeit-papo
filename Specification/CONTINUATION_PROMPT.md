@@ -4,15 +4,15 @@
 
 - `presentation/mvp-deck/index.html` umfasst jetzt 22 Folien. Die Texte sind auf eine nichttechnische Unternehmenszielgruppe ausgerichtet; technische Gateway-/Live-Nachweise und ein Hinweis auf fehlende Firmendaten stehen nicht mehr im Deck.
 - Ergänzt: GitHub-Star-Momentaufnahme vom 14.09.2026, drei sachliche Folien zu digitaler Souveränität, zwei echte Browser-Screenshot-Folien, Clockify-Übersicht für Chris und Tobias sowie `presentation/demo-drehbuch.md`.
-- Clockify: „ca. 400 h“ ist ausdrücklich nur der dokumentierte Zielwert für das Zweierteam, nicht die ausgelesene Ist-Summe. Der angemeldete Zen-Browser stellte den Workspace-Inhalt in dieser Sitzung nicht bereit; keine Zahl wurde erfunden.
-- Layout-/Assetprüfung: Desktop- und Mobile-Rendering, Folienhöhe, lokale Bilder und Links sind nach der letzten Änderung erneut zu prüfen. Danach Kontextdateien/KI-Nachweis aktualisieren und committen.
-- Nach dem Präsentationscommit: `harden-deployment-gateway` mit `openspec-apply-change` fortsetzen; externe SSH-Negativmatrix nur mit autorisiertem Deploy-Key, danach die weiteren aktiven Changes einzeln.
+- Clockify: Workspace „DA“, Report „Summary“, Teamfilter nur Chris + Tobias, 01.03.–30.09.2026: **151:41:38 Ist-Zeit** (im Deck gerundet 151 h 41 min). Retrospektive Einträge bleiben als geschätzt gekennzeichnet; der frühere Zielwert „ca. 400 h“ ist davon getrennt.
+- Layout-/Assetprüfung: Desktop- und Mobile-Rendering, Folienhöhe, lokale Bilder und Links sind geprüft; 22 Folien ohne Überlauf, lokale Assets geladen, `git diff --check` erfolgreich.
+- Nach dem Präsentationscommit: `harden-deployment-gateway` mit `openspec-apply-change` wurde fortgesetzt; Task 2.2 bleibt wegen fehlendem autorisiertem Deploy-Key offen. `complete-thesis-documentation` steht bei 3/6.
 - OpenSpec-Fortschreibung: `complete-thesis-documentation` steht bei **3/6**. `docs/TECHNICAL_DOCUMENTATION.md`, `docs/REQUIREMENTS_TRACEABILITY.md` und `docs/UI_UX_DOCUMENTATION.md` sind erstellt/geprüft; 2.2 wartet auf Tobias’ menschliche UI-/Screenshot-Abnahme. Nicht als erledigt markieren.
 
 ## Verbindlicher Next-Session-Handoff — 14.09.2026, Protokoll 14.9 gelesen
 
 - Das neue Protokoll `Documentation/Besprechungsprotokolle/Besprechungsprotokoll_14.9.md` ist vollständig gelesen und mitgepusht. Der fertige Change `add-company-internal-partner-note` ist archiviert unter `openspec/changes/archive/2026-09-14-add-company-internal-partner-note`; die Delta-Spec ist in `openspec/specs/partner-management/spec.md` synchronisiert.
-- **Nächster Hauptschritt:** Präsentation planen und direkt umsetzen. Quelle ist `presentation/mvp-deck/index.html` mit derzeit 15 Folien. Protokollanforderungen: präzisere Einstiegs-/Akteursformulierungen, „Struktur“ statt „Kette“, keine unnötig negativen Wörter, „derzeit“ statt „heute“, „Kernablauf:“ entfernen, GitHub-Stars ergänzen, 2–3 Folien zu digitaler Souveränität, zwei weitere Screenshot-Folien, Clockify-Gesamtüberblick sowie ein kurzes Demo-Drehbuch für den Probe-Gallopp.
+- **Präsentation abgeschlossen:** `presentation/mvp-deck/index.html` umfasst 22 Folien. Die Protokollanforderungen, GitHub-Stars, drei Souveränitätsfolien, zwei echte Screenshots, die Clockify-Auswertung für Chris + Tobias und das Demo-Drehbuch sind umgesetzt.
 - Die Präsentationssession soll zuerst nur Deck, Screenshots, Clockify-Auswertung und Demo-Drehbuch bearbeiten; keine neuen Produkt- oder BMD-Features hineininterpretieren. Danach Desktop/Mobile rendern und alle Folien, Links, Assets, Terminologie „Artikel“ und Offline-Fähigkeit prüfen.
 - Weiter offen nach der Präsentation: `harden-deployment-gateway` 3/4, insbesondere die externe SSH-Negativmatrix mit autorisiertem Deploy-Key; danach `complete-thesis-documentation` und die vier geplanten Stammdaten-/BMD-Changes einzeln. BMD-Nummern bleiben bis Beispieldaten/Vertrag begrenzt, keine direkte BMD-API.
 

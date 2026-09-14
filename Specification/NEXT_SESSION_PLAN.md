@@ -27,7 +27,7 @@ Arbeite zuerst ausschließlich an Planung und Umsetzung der Präsentation in pre
 7. Funktionsumfang nur prüfen, nicht unnötig verändern.
 8. Technologie-Stack: aktuelle GitHub-Stars verifizieren und ergänzen. Danach 2–3 gut lesbare Folien zur digitalen Souveränität ergänzen; mit einer sachlichen Formulierung wie „PaPo auf Basis digitaler Souveränität“ beginnen. Keine unbelegten Marketingbehauptungen.
 9. Zwei weitere Screenshot-Folien ergänzen. Nur echte, passende Screenshots verwenden; Bildquellen/Alttexte und Offline-Laden prüfen.
-10. Eine Clockify-Gesamtübersicht als Präsentationsfolie ergänzen. Zeiten aus dem angemeldeten Zen-Browser/Workspace DA und vorhandenen Nachweisen zusammentragen; nichts erfinden und Schätzungen klar als retrospektiv geschätzt kennzeichnen.
+10. Eine Clockify-Gesamtübersicht als Präsentationsfolie ergänzen. Zeiten aus dem angemeldeten Zen-Browser/Workspace DA und vorhandenen Nachweisen zusammentragen; nichts erfinden und Schätzungen klar als retrospektiv geschätzt kennzeichnen. **Erledigt:** Teamfilter Chris + Tobias, 01.03.–30.09.2026, 151:41:38 Ist-Zeit.
 11. Ein kurzes Demo-Drehbuch für den Probe-Gallopp schreiben: Artikel anlegen → ändern → löschen; Partner anlegen → ändern → löschen; Endkunde anlegen/verwalten; Bestellung für Endkunden simulieren; passende Status-/Rollenhinweise nennen. Als eigene gut auffindbare Markdown-Datei unter presentation/ ablegen.
 
 Vor dem Editieren einen kompakten Folienplan erstellen und dann direkt umsetzen. Keine Backend-/BMD-Features ergänzen. Danach mit Browserprüfung Desktop und Mobile rendern, 15+ Folien auf Überlauf/Lesbarkeit prüfen, alle Assets/Links und Offline-Fähigkeit prüfen, „Artikel“ konsequent verwenden und git diff --check ausführen. Geeignete Präsentations-/Dokumentationschecks ausführen und Ergebnisse exakt dokumentieren. Erst nach sauberem Review committen, pushen und über PR nach main mergen. Danach ist der nächste technische Andockpunkt harden-deployment-gateway 3/4 mit der externen SSH-Negativmatrix; die archivierte Company-Notiz nicht wieder öffnen.
@@ -333,8 +333,9 @@ Die Präsentation wurde auf 22 verständliche Folien nach Protokoll 14.9 erweite
 GitHub-Stars, digitale Souveränität, zwei zusätzliche echte Screenshots, Clockify für Chris und
 Tobias sowie Demo-Drehbuch. Hosting ist als verständlicher Bereitstellungsablauf formuliert;
 technische offene Nachweise und fehlende Firmendaten gehören nicht in die Firmenpräsentation.
-Die Ist-Gesamtsumme von Clockify konnte im angemeldeten Zen-Browser nicht ausgelesen werden und
-bleibt daher offen; „ca. 400 h“ ist als Zielwert gekennzeichnet.
+Die Ist-Gesamtsumme von Clockify wurde im angemeldeten Zen-Browser aus Workspace „DA“ ausgelesen:
+151:41:38 für Chris + Tobias im Zeitraum 01.03.–30.09.2026. „ca. 400 h“ bleibt als historischer
+Zielwert getrennt und ist nicht die Ist-Zeit.
 
 Nach Abschlussprüfung und Commit der Präsentation zuerst `harden-deployment-gateway` per
 `openspec-apply-change` aufnehmen, danach die verbleibenden Changes strikt einzeln bearbeiten.
