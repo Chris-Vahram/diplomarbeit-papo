@@ -2,6 +2,7 @@
 
 ## Purpose
 TBD - created by archiving change add-list-search-pagination. Update Purpose after archive.
+
 ## Requirements
 
 ### Requirement: Manual partner creation starts with five percent commission
@@ -22,6 +23,7 @@ The company-facing new-partner form SHALL preselect 5 percent commission every t
 #### Scenario: Cancelled form does not change defaults
 - **WHEN** the company changes the creation preset, cancels and opens another new-partner form
 - **THEN** no partner was created and the new form again starts at 5 percent
+
 ### Requirement: Partner list search, filter, and pagination
 The company partner list SHALL support searching by name, and pagination, to remain usable at the client's partner scale (~200 partners). Searching SHALL treat German special characters (ä/ö/ü/ß) correctly (case-insensitive match includes umlauts).
 
@@ -81,3 +83,29 @@ The system SHALL validate required partner fields before saving and prevent dupl
 #### Scenario: Duplicate identifier differing only by case
 - **WHEN** the company manually creates or updates a partner with an identifier that already exists under a different letter case (e.g. `"p-1001"` when `"P-1001"` exists)
 - **THEN** the system rejects the save as a duplicate, matching the case-insensitive check already applied on import
+
+### Requirement: Company manages partners
+The company SHALL be able to create, view, edit, and manage partner records centrally, including partner master data, a commission percentage (`Partner.commissionPercent`), and an active/inactive status (`Partner.active`).
+
+#### Scenario: Create partner
+- **WHEN** the company submits a new partner with valid master data and a commission percentage
+- **THEN** the system stores the partner and shows a success confirmation
+
+#### Scenario: Set commission percentage
+- **WHEN** the company selects a commission percentage from the dropdown (5/10/15) or enters a custom value
+- **THEN** the system saves it as `Partner.commissionPercent` and applies it to future commission calculations
+
+#### Scenario: Deactivate partner
+- **WHEN** the company sets `Partner.active` to false
+- **THEN** the partner can no longer log in or create orders (see auth-access-control)
+
+### Requirement: Partner limited self-edit
+A partner SHALL be able to edit limited own master data (e.g. contact data) but SHALL NOT change commission percentage, role, active status, or other central system data.
+
+#### Scenario: Partner edits contact data
+- **WHEN** a partner updates its own contact fields
+- **THEN** the system saves the change
+
+#### Scenario: Partner cannot change commission percentage
+- **WHEN** a partner attempts to change its commission percentage
+- **THEN** the system rejects the action (field not editable / unauthorized)

@@ -1,5 +1,15 @@
 # PAPO Restarbeitsplan – 09.09.2026
 
+## Orchester-Fortschreibung — 14.09.2026
+
+Kategorie-Navigation umgesetzt, geprüft und archiviert. P0-Recovery live belegt. `origin/main` enthält neue Tobi-Commits, aber widersprechende Artikel-/Präsentationsstände; selektive Prüfung statt Pull/Merge. Rest: CI/CD-Gateway/Nachweise, danach Thesis-Doku/Präsentation. Clockify nur real belegbar.
+
+## Fortschreibung — 13.09.2026
+
+`build-partnerportal-mvp` ist **53/53 technisch abgeschlossen**. Allgemeine Diplomarbeitsdokumentation läuft getrennt als `complete-thesis-documentation` (0/6); aktuelle FD.4-Abdeckung ist beendet, neue Screens tragen eigenen Polish. Kleine UI-Planung `integrate-category-management-into-article-management` (0/4) bündelt Kategorien unter Company-„Artikelverwaltung“ ohne Backendänderung.
+
+CI/CD ist **34/45**: GHCR privat, Branch Protection, DNS und HTTPS belegt. P0-Ursache: Passwortdrift zwischen persistentem PostgreSQL-User und `.env.prod`, dadurch Keycloak/Backend-Neustartschleifen und 502. Nächster Schritt: lokale Dumps, Passwort geheim angleichen, Services/Flows prüfen. Julian-Write-Zugriff klären; Gateway `48ad4d8` mit aktuellem Releasepfad versöhnen; Cron/lokalen Backupzyklus danach. Offsite bleibt post-MVP.
+
 ## Abschlussstand nach Review und Archivierung — 12.09.2026
 
 `define-mvp-traceability-format` (**3/3**) und `manage-article-categories` (**6/6**) sind vollständig geprüft und archiviert: `openspec/changes/archive/2026-09-12-define-mvp-traceability-format` bzw. `openspec/changes/archive/2026-09-12-manage-article-categories`. Für Kategorien sind 27 fokussierte Backendtests, 100 vollständige Tests, Package, JavaScript-Syntaxchecks, Playwright-Desktop-/Mobilefälle, Strict-Validate, Diff-Check und die Abschlussreviews ohne Findings belegt; für Traceability die Dokumentations-/Link-/Strukturprüfungen.

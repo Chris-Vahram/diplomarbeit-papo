@@ -1,8 +1,10 @@
 # Documentation TODO
 
-Stand: 2026-07-07
+Stand: 2026-09-13
 
-Der MVP ist technisch vorzeigbar. Offen ist vor allem die Diplomarbeits- und UI/UX-Dokumentation.
+Der technische MVP ist abgeschlossen. Offene Diplomarbeits- und UI/UX-Dokumentation wird unabhängig im OpenSpec-Change `complete-thesis-documentation` bearbeitet und blockiert den technischen MVP nicht.
+
+Visueller Polish ist für den aktuellen Screenstand abgeschlossen. Neue oder wesentlich geänderte Screens erhalten Desktop-/Mobile-Polish und passende Belege in ihrem jeweiligen UI-Change.
 
 ## Tobias: UI/UX-Dokumentation
 

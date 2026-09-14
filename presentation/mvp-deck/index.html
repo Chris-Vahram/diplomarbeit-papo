@@ -54,7 +54,8 @@
               <li>Sieht nur freigeschaltete Artikel</li>
               <li>Artikel werden individuell pro Partner freigeschaltet</li>
               <li>Dashboard: Überblick über Bestellungen &amp; Provisionen</li>
-              <li>Bearbeitet eigene Stammdaten &amp; die der zugeordneten Endkunden</li>
+              <li>Wählt oder erstellt Endkunden für Bestellungen</li>
+              <li>Ein gemeinsamer organisatorischer Zugang je Partnerfirma</li>
               <li>Perspektivisch: eigene Partnershop-Homepage <em>(außerhalb MVP)</em></li>
             </ul>
           </div>
@@ -107,15 +108,15 @@
         <p class="lead">Heute gibt es kein zentrales System für Partner- und Artikeldaten – jede Bestellung bedeutet Handarbeit.</p>
 
         <div class="stats">
-          <div class="stat"><div class="num">~200</div><div class="lbl">Partner</div></div>
-          <div class="stat"><div class="num">~800</div><div class="lbl">Artikel</div></div>
-          <div class="stat"><div class="num">10–15</div><div class="lbl">Bestellungen/Tag per E-Mail</div></div>
-          <div class="stat"><div class="num">3–4</div><div class="lbl">Bestellungen/Tag per Telefon</div></div>
+          <div class="stat"><div class="num">B2B</div><div class="lbl">internes Portal</div></div>
+          <div class="stat"><div class="num">1</div><div class="lbl">Demo-Unternehmen</div></div>
+          <div class="stat"><div class="num">n</div><div class="lbl">Partnerfirmen</div></div>
+          <div class="stat"><div class="num">n</div><div class="lbl">Artikel</div></div>
         </div>
 
         <ul class="plain">
           <li><strong>Keine zentrale Verwaltung</strong> von Partner- und Artikeldaten</li>
-          <li><strong>Keine kontrollierte Sichtbarkeit</strong> – welcher Partner welches Artikel bestellen darf</li>
+          <li><strong>Keine kontrollierte Sichtbarkeit</strong> – welcher Partner welche Artikel bestellen darf</li>
           <li><strong>Keine automatische Zuordnung</strong> von Bestellung zu Partner und Provision</li>
         </ul>
       </section>
@@ -155,7 +156,7 @@
           </div>
           <div class="card">
             <h3>Excel/CSV-Import</h3>
-            <p>Spalten-Mapping, Duplikaterkennung und Validierungsbericht für Partner- und Artikeldaten.</p>
+            <p>BMD bleibt führendes System; PAPO übernimmt Excel/CSV-Exporte mit Spalten-Mapping, Duplikaterkennung und Validierungsbericht.</p>
           </div>
           <div class="card">
             <h3>Artikelfreischaltung</h3>
@@ -251,14 +252,32 @@
         </div>
       </section>
 
-      <!-- 9. Live-Demo (Übergang) -->
+      <!-- 9. Bildschirmaufnahmen -->
+      <section>
+        <p class="eyebrow">Beispiel aus der Oberfläche</p>
+        <h2>Artikelverwaltung mit Artikelkategorien</h2>
+        <div class="shots">
+          <div class="shot">
+            <div class="shot-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="url">paportal.at/#/company/products</span></div>
+            <div class="shot-body"><img src="../../output/playwright/integrate-category-management-desktop.png" alt="Artikelverwaltung auf Desktop"></div>
+            <div class="shot-caption">Desktop · Company: Artikelverwaltung und Kategorien-Link</div>
+          </div>
+          <div class="shot">
+            <div class="shot-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="url">paportal.at/#/company/products</span></div>
+            <div class="shot-body"><img src="../../output/playwright/integrate-category-management-mobile.png" alt="Artikelverwaltung auf Mobilgerät"></div>
+            <div class="shot-caption">Mobil · responsive Anordnung der Artikelverwaltung</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10. Live-Demo (Übergang) -->
       <section class="dark">
         <p class="eyebrow">Ab hier live</p>
         <h1>Live-Demo</h1>
         <p class="lead">Partner-Login → Bestellung aufgeben → Status durch das Unternehmen ändern.</p>
       </section>
 
-      <!-- 10. Out of scope / Phase-2-Backlog -->
+      <!-- 11. Out of scope / Phase-2-Backlog -->
       <section>
         <p class="eyebrow">Bewusst nicht gebaut</p>
         <h2>Out of Scope / Phase-2-Backlog</h2>
@@ -274,14 +293,14 @@
         </ul>
       </section>
 
-      <!-- 11. Phase 2 – Zwischentitel -->
+      <!-- 12. Phase 2 – Zwischentitel -->
       <section class="dark">
         <p class="eyebrow">Phase 2</p>
         <h1>Seit dem Termin am 10.07.</h1>
         <p class="lead">Was seither umgesetzt wurde – und was noch aussteht.</p>
       </section>
 
-      <!-- 12. Feedback umgesetzt -->
+      <!-- 13. Feedback umgesetzt -->
       <section>
         <p class="eyebrow">Feedback umgesetzt</p>
         <h2>Alle konkreten Wünsche aus dem Meeting sind erledigt</h2>
@@ -292,28 +311,28 @@
           <li><span class="btag">UX</span> Partner sieht Endkunden ohne kürzliche Bestellung <span class="note done">erledigt</span></li>
           <li><span class="btag">Fix</span> Keycloak-Session hält länger, kein schnelles Auto-Logout mehr <span class="note done">erledigt</span></li>
           <li><span class="btag">Fix</span> Unklares Feld „Keycloak-Username“ entfernt, Login läuft über Partnernummer <span class="note done">erledigt</span></li>
-          <li><span class="btag">UX</span> Feinschliff mobile Ansicht <span class="note open">laufend</span></li>
+          <li><span class="btag">UX</span> Mobile Ansicht und neue Artikel-/Kategorienseiten geprüft <span class="note done">belegt</span></li>
         </ul>
       </section>
 
-      <!-- 13. Hosting -->
+      <!-- 14. Hosting -->
       <section>
         <p class="eyebrow">Hosting</p>
-        <h2>Deployment: bereit bis auf die Domain</h2>
-        <p class="lead">Firma stellt die Hetzner-VM, CI/CD läuft auf unserer Seite bereits vollständig.</p>
+        <h2>Deployment: Gateway- und Live-Nachweis offen</h2>
+        <p class="lead">Domain <code>paportal.at</code>, HTTPS, privates GHCR und geschützter Main-Branch sind belegt. Die VM-Installation des eingeschränkten Gateways und der Live-Nachweis folgen.</p>
         <ul class="plain">
           <li><strong>Tests &amp; Build</strong> laufen automatisch bei jedem Push<small>GitHub Actions, Backend-Testsuite grün</small></li>
           <li><strong>Docker-Image</strong> wird automatisch gebaut und ins Registry gepusht<small>GHCR, bei jedem Merge nach main</small></li>
-          <li><strong>Deploy-Schritt</strong> ist fertig implementiert, aber noch deaktiviert<small>fehlende Domain blockiert TLS-Zertifikat &amp; Keycloak-Hostname-Konfiguration</small></li>
+          <li><strong>Gateway</strong> ist lokal implementiert und mit 18 Harness-Prüfungen belegt<small>VM-Installation, Remote-Negativtests, Live-Flows und gekoppelter Rollback bleiben offen</small></li>
         </ul>
       </section>
 
-      <!-- 14. Ausblick -->
+      <!-- 15. Ausblick -->
       <section class="dark">
         <p class="eyebrow">Ausblick</p>
         <h2>Nächste Schritte</h2>
         <ul class="plain" style="max-width: 30em;">
-          <li><strong>Sobald Domain da:</strong> Deploy-Pipeline aktivieren, live gehen</li>
+          <li><strong>Nach VM-Nachweisen:</strong> Gateway aktivieren und HTTPS/OIDC/API/Login/Bestellung live prüfen</li>
           <li><strong>Sobald Firmendaten da:</strong> Import-Spaltenmapping finalisieren</li>
           <li>Mobile Feinschliff fortsetzen</li>
           <li>Weitere Härtung: Sicherheit, Effizienz, Bedienbarkeit</li>

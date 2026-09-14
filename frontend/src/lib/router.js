@@ -7,7 +7,7 @@ import { escapeHtml } from "./html.js";
 const routes = {
   "/login": { tag: "login-page", role: null, title: "Anmeldung" },
   "/company/dashboard": { tag: "company-dashboard-page", role: "company", title: "Firmen-Dashboard" },
-  "/company/products": { tag: "company-product-list-page", role: "company", title: "Artikel" },
+  "/company/products": { tag: "company-product-list-page", role: "company", title: "Artikelverwaltung" },
   "/company/categories": { tag: "company-category-list-page", role: "company", title: "Artikelkategorien" },
   "/company/partners": { tag: "company-partner-list-page", role: "company", title: "Partnerverwaltung" },
   "/company/orders": { tag: "company-order-list-page", role: "company", title: "Bestellungen" },
@@ -136,8 +136,7 @@ function renderNav() {
         ["/company/dashboard", "Dashboard"],
         ["/company/orders", "Bestellungen"],
         ["/company/partners", "Partnerverwaltung"],
-        ["/company/products", "Artikel"],
-        ["/company/categories", "Artikelkategorien"],
+        ["/company/products", "Artikelverwaltung"],
         ["/company/import", "Datenimport"],
       ]
     : [

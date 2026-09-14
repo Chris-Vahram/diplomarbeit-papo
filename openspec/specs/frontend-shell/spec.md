@@ -37,3 +37,16 @@ The partner portal SHALL show “Partnerportal der Firma <name>” in its left p
 #### Scenario: Name contains markup
 - **WHEN** the own profile name contains HTML-like text or German special characters
 - **THEN** the characters are displayed as text without execution or broken layout
+
+### Requirement: Company article navigation is grouped
+
+The company area SHALL expose one primary navigation entry named „Artikelverwaltung“. Article-category management SHALL NOT appear as a separate primary navigation entry. Partner navigation SHALL continue to use „Artikel“.
+
+#### Scenario: Company opens navigation
+- **WHEN** a company user views the sidebar
+- **THEN** one primary entry „Artikelverwaltung“ is shown
+- **AND** no separate primary entry „Artikelkategorien“ is shown
+
+#### Scenario: Partner opens navigation
+- **WHEN** a partner views the sidebar
+- **THEN** the existing entry remains named „Artikel“

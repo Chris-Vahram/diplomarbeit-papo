@@ -321,6 +321,18 @@ body {
   color: var(--text-brand);
 }
 
+.portal-label-retry {
+  display: block;
+  margin-top: var(--spacing-1);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .app-sidebar__nav {
   flex: 1;
   padding: var(--spacing-3);
@@ -2994,7 +3006,7 @@ legend {
   margin-top: var(--spacing-6);
 }
 
-/* "Produkte wählen" step: cart preview (left, fixed width) + catalog (right,
+/* "Produkte wählen" step: catalog (left, fixed width) + cart preview (right,
    remaining width). minmax(0, 1fr) is required, not just 1fr - it's what lets
    .catalog__grid's overflow-x:auto actually clip/scroll instead of the grid
    track growing to fit its content and blowing out the column.

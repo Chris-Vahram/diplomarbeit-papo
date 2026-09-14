@@ -7,7 +7,10 @@ class CompanyCategoryListPage extends HTMLElement {
     this.innerHTML = `
       <div class="list-header">
         <h1>Artikelkategorien</h1>
-        <button type="button" class="button-primary" id="new-category-btn">Neue Artikelkategorie</button>
+        <div class="list-header__actions">
+          <a class="button-secondary" href="#/company/products">Zur Artikelverwaltung</a>
+          <button type="button" class="button-primary" id="new-category-btn">Neue Artikelkategorie</button>
+        </div>
       </div>
       <p id="category-load-error" class="form-field__error" hidden>
         Kategorien konnten nicht geladen werden.

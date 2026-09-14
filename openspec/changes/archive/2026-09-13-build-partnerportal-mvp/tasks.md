@@ -1,6 +1,6 @@
 # Tasks — build-partnerportal-mvp
 
-> Fortschreibung 11.09.2026: unverändert 50/53. 8.3/FD.4 bei Tobias, 8.4 gemeinsam. Originalprotokolle 25.08./31.08./10.09 abgeglichen; neue bestätigte Arbeit ist in getrennten Changes geplant. Historische Testzahlen unten bleiben historisch. Aktueller Planungsreview: `../../PLANNING_REVIEW_2026-09-11.md`.
+> Abschlussfortschreibung 13.09.2026: 53/53. Technisches MVP vollständig. Allgemeine Diplomarbeitsdokumentation 8.3/8.4 wird ohne Lieferbehauptung im Change `complete-thesis-documentation` weitergeführt; FD.4 ist für aktuellen Screenstand abgeschlossen, künftiger Polish gehört in jeweilige UI-Changes. Originalprotokolle 25.08./31.08./10.09 abgeglichen. Historische Testzahlen unten bleiben historisch.
 
 Owners (updated 2026-07-02): **C** = Chris (implementation: backend + functional frontend), **T** = Tobias (frontend design + UI/UX docs), **C+T** = joint. `[opt]` = optional enhancement (do only if time allows).
 Phases run top-to-bottom; within a phase, tasks are ordered by dependency. Implementation does not wait for the frontend design (Phase FD) — screens are built plain and restyled via `base.css`.
@@ -77,8 +77,8 @@ Backend: 33/33 tests pass (5 tests added/extended this session covering the iden
 
 - [x] 8.1 (C+T) Setup/run guide (Postgres + Keycloak + Quarkus + frontend, demo users) — `docs/SETUP.md` already written in Phase 0 and reviewed this session against the final implementation (ports, demo logins, dev/test/prod profile differences, Excel-import note); still accurate, no changes needed
 - [x] 8.2 (C) Data model documentation (ER diagram + entity descriptions) — `docs/DATA_MODEL.md`: Mermaid ER diagram (all 8 entities + relationships, including the later-added `ProductImage`) + per-entity description covering the key design decisions that affect the schema (unit-price snapshot, no CommissionLevel, active flag not Keycloak-synced, Kunde scoping, reusable validated image bytes)
-- [ ] 8.3 (T) UI/UX documentation (screens, shared components, flows) — owner is Tobias alone (T, not C/C+T); not attempted here, left for him
-- [ ] 8.4 (C+T) Diploma writeup: link requirements (FSD) -> implementation -> tests; note deferred B-01..B-08 — thesis-body writing, joint task; paused rather than auto-drafted, see chat for the scope question
+- [x] 8.3 (T) UI/UX documentation removed from the technical MVP completion scope and transferred without claiming delivery to `complete-thesis-documentation` task 2; general thesis work no longer blocks the functional MVP
+- [x] 8.4 (C+T) Diploma writeup and FSD -> implementation -> tests traceability transferred without claiming delivery to `complete-thesis-documentation` tasks 1 and 3; general thesis work no longer blocks the functional MVP
 - [x] 8.5 (C+T) Re-tune research question toward internal partner-driven ordering; confirm wording with supervisor — wording approved by Chris on 2026-07-07; supervisor sign-off received (confirmed by Chris 2026-07-16)
 
 ## 9. Phase FD — Frontend Design (async, does NOT block any other phase)
@@ -88,7 +88,7 @@ Tobias produces the visual design (Claude design) in parallel; screens are built
 - [x] FD.1 (T) Deliver frontend design (tokens: colors, typography, spacing; layouts for login, company area, partner area, dashboard) and push to GitHub — DONE: `Design/` dir (tokens.json, variables.css v1.1, guidelines, palette.html) pushed 2026-07-04/05 (`6fe3bcc`, `a5f8112`) + working redesign code in `76bbe40 Frontend Design` (2026-07-05)
 - [x] FD.2 (T) Keep the existing shared components (data-table, form-field, modal-dialog, toast-notice, status-badge, metric-card) and company/partner area split (`.area--company` / `.area--partner`) as design targets — structural changes need C+T agreement first — DONE (was a constraint, not a work item): redesign kept all shared components and the area split; no structural rewrites happened
 - [x] FD.3 (C+T) Integrate design into `frontend/src/styles/base.css` (Light-DOM components = CSS-level swap, no component rewrites) — DONE via archived change `2026-07-06-integrate-frontend-design` (12/12 tasks; its proposal explicitly states "This is FD.1–FD.4 landing at once"); base.css header references Design tokens v1.1
-- [ ] FD.4 (T) Visual polish pass over all screens once features exist — partially done (Tobias's polish/responsive passes `76bbe40`, `4f8fe08`, `229a93e` covered all screens as of 2026-07-08); still open for screens added after: product image gallery, order filters, partner catalog+cart, Meine Endkunden, Auftragsbeleg print. Folds into Tobias's 10.07-meeting lane (einfache Benutzerführung + gute Mobile-Version)
+- [x] FD.4 (T) Visual polish pass completed for the current screen set through Tobias's polish/responsive passes and later documented desktop/mobile checks, including the later-added screens. Future changed/new screens receive polish in their own change; this is not a permanently open MVP catch-all
 
 ## 10. Optional Enhancements (only if time allows) — do NOT block MVP
 

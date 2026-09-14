@@ -8,8 +8,11 @@ class CompanyProductListPage extends HTMLElement {
     this.classList.add("area--company");
     this.innerHTML = `
       <div class="list-header">
-        <h1>Artikel</h1>
-        <button type="button" class="button-primary" id="new-product-btn">Neuer Artikel</button>
+        <h1>Artikelverwaltung</h1>
+        <div class="list-header__actions">
+          <a class="button-secondary" href="#/company/categories">Kategorien verwalten</a>
+          <button type="button" class="button-primary" id="new-product-btn">Neuer Artikel</button>
+        </div>
       </div>
       <data-table id="product-table"></data-table>
       <modal-dialog id="product-modal" title="Neuer Artikel">

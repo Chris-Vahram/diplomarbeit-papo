@@ -1,4 +1,5 @@
 import { apiFetch } from "../lib/api.js";
+import { ensureValidSession, getSession } from "../lib/auth.js";
 import { showToast } from "../components/toast-notice.js";
 import { formatEuro, formatNumber, formatDate } from "../lib/format.js";
 import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue, previousPeriod, trendInfo, toLocalIsoDate } from "../lib/dashboard-data.js";
@@ -64,7 +65,8 @@ class PartnerDashboardPage extends HTMLElement {
       <div class="dashboard-header">
         <div class="page-heading">
           <p class="page-heading__greeting">${greeting}</p>
-          <h1>Partner-Dashboard</h1>
+          <h1 id="dashboard-heading">Dashboard</h1>
+          <p id="profile-name-status" hidden></p>
         </div>
         <div class="dashboard-header__actions">
           <button type="button" class="button-primary" id="new-order-btn">Neue Bestellung</button>
@@ -114,6 +116,32 @@ class PartnerDashboardPage extends HTMLElement {
 
     this.wirePeriodPicker();
     this.load();
+    this.loadProfileName();
+  }
+
+  async loadProfileName() {
+    const session = await ensureValidSession();
+    if (!session?.isPartner || !this.isConnected) return;
+    const accessToken = session.accessToken;
+    const heading = this.querySelector("#dashboard-heading");
+    const status = this.querySelector("#profile-name-status");
+    try {
+      const profile = await apiFetch("/partner/profile");
+      const current = getSession();
+      if (!this.isConnected || !current?.isPartner || current.accessToken !== accessToken) return;
+      heading.textContent = `Dashboard der Firma ${profile.name}`;
+      status.hidden = true;
+    } catch {
+      const current = getSession();
+      if (!this.isConnected || !current?.isPartner || current.accessToken !== accessToken) return;
+      status.textContent = "Firmenname nicht verfügbar.";
+      status.hidden = false;
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.textContent = "Erneut laden";
+      retry.addEventListener("click", () => this.loadProfileName(), { once: true });
+      status.append(" ", retry);
+    }
   }
 
   wirePeriodPicker() {

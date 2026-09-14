@@ -259,7 +259,7 @@ class PartnerResourceTest {
                 .body("commissionPercent", is(10.0f));
 
         given().auth().oauth2(token).contentType("application/json")
-                .body("{\"name\":\"Elektro Huber GmbH\",\"address\":{\"street\":\"Neue Adresse\","
+                .body("{\"name\":\"Huemer GmbH\",\"address\":{\"street\":\"Neue Adresse\","
                         + "\"houseNumber\":\"1\",\"postalCode\":\"4020\",\"city\":\"Linz\",\"country\":\"Österreich\"},"
                         + "\"email\":\"partner-demo@example.at\",\"phone\":\"+43 660 1234567\"}")
                 .when().put("/api/partner/profile")
