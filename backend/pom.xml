@@ -119,6 +119,9 @@
                 <version>${compiler-plugin.version}</version>
                 <configuration>
                     <parameters>true</parameters>
+                    <testExcludes>
+                        <testExclude>**/* 2.java</testExclude>
+                    </testExcludes>
                 </configuration>
             </plugin>
             <plugin>

@@ -56,4 +56,34 @@ class CompanyProfileResourceTest {
         given().auth().oauth2(partnerToken).when().get("/api/partner/profile")
                 .then().statusCode(200).body("$", not(hasKey("taxIdentifier")));
     }
+
+    @Test
+    void businessNameRespectsDatabaseLengthWithoutChangingStoredProfile() {
+        String token = tokens.tokenFor("company-demo", "company-demo");
+        String accepted = "A".repeat(255);
+
+        try {
+            given().auth().oauth2(token).contentType("application/json")
+                    .body(profileJson(accepted))
+                    .when().put("/api/company/profile")
+                    .then().statusCode(200).body("businessName", is(accepted));
+
+            given().auth().oauth2(token).contentType("application/json")
+                    .body(profileJson("B".repeat(256)))
+                    .when().put("/api/company/profile")
+                    .then().statusCode(400);
+
+            given().auth().oauth2(token).when().get("/api/company/profile")
+                    .then().statusCode(200).body("businessName", is(accepted));
+        } finally {
+            given().auth().oauth2(token).contentType("application/json")
+                    .body(profileJson("Huemer GmbH"))
+                    .when().put("/api/company/profile").then().statusCode(200);
+        }
+    }
+
+    private String profileJson(String businessName) {
+        return "{\"businessName\":\"" + businessName + "\",\"taxIdentifier\":"
+                + "{\"country\":\"AT\",\"type\":\"VAT_ID\",\"value\":\"ATU87654321\"}}";
+    }
 }

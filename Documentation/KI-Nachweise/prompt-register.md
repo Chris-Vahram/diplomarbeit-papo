@@ -55,6 +55,11 @@
 | AUSSTEHEND-01a0a15e | 2026-09-14 | Chris | Codex | OpenSpec Apply add-business-tax-identifiers implementieren und technisch abschließen | lokale Sitzung `01a0a15e-c030-7c70-b8b9-b51ea07d0595` | `EXAKT` | CompanyProfile-Singleton, gemeinsame Steuer-ID-Validierung, Partner-REST/Import/UI und BMF-/Datenmodelldoku umgesetzt; Partner-Self-Service bleibt ohne Steuerkennung.; Prüfungen: BusinessTaxIdentifierValidatorTest und CompanyProfileResourceTest; ./mvnw test; ./mvnw package; node --check frontend/src; openspec validate add-business-tax-identifiers --strict; git diff --check; statischer Browser-Shellcheck mit Loginroute/Desktop-Mobile-Resize. |
 
 
+
+| AUSSTEHEND-01a0a41f | 2026-09-15 | Chris | Codex | PAPO-Context- und Planungsdokumente konsolidieren | lokale Sitzung `01a0a41f-8191-7e50-934e-5e18303f648a` | `EXAKT` | CONTINUATION_PROMPT als einzige operative Source of Truth gekürzt; vier redundante Planungsdateien entfernt; AGENTS und Präsentations-README synchronisiert; keine Produktdatei geändert; Prüfungen: git diff --check; git diff --name-status; git status --short --branch; openspec list --json |
+
+| AUSSTEHEND-01a0a51d | 2026-09-15 | Chris | Codex | Next-Session-Kontext für add-partner-trade-proof synchronisieren | lokale Sitzung `01a0a51d-60d0-7461-9df7-0f2f9404192b` | `EXAKT` | CONTINUATION_PROMPT.md und die aktuellen Statusblöcke in CLAUDE.md auf Branch, OpenSpec-Status, abgeschlossenen Tax-Rollout und Trade-Proof-Startreihenfolge aktualisiert.; Prüfungen: openspec status/instructions/list geprüft; git diff --check erfolgreich. |
+
 | AUSSTEHEND-01a06809 | 2026-09-03 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a06809-6bda-70c3-922a-59e5eeeeff28` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a0676e | 2026-09-03 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a0676e-bfa1-7241-89c0-43de935e78ee` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a06ab1 | 2026-09-04 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a06ab1-5040-7761-b84f-b202b6db6cc8` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
@@ -64,6 +69,7 @@
 | AUSSTEHEND-01a07969 | 2026-09-07 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a07969-fb4c-7442-b106-45b8188208b5` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a0863c | 2026-09-09 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a0863c-505a-7f30-b0f4-ac430c1866cb` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a05dcf | 2026-09-01 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a05dcf-2be8-7021-89cc-07ddb9a4aaca` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-01a0a229 | 2026-09-14 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a0a229-f40a-74e3-9d3a-c0e4e56885c5` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a09bbc | 2026-09-13 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a09bbc-835b-7082-8168-80fdd72001dc` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a0991c | 2026-09-13 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a0991c-8bfe-7740-acde-03ac93efb975` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a09bc1 | 2026-09-13 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a09bc1-6421-7b03-81c3-88f51bff5430` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
