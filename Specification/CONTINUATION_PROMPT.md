@@ -10,7 +10,7 @@ geordnet. Dieses Dokument bleibt der einzige operative Session-Handoff.
 > Lies `AGENTS.md`, `CLAUDE.md`, diese Datei, `PRODUCT_COMPLETION_PLAN.md`, die
 > Protokolle vom 31.08., 10.09. und 14.09. sowie `phase2_backlog.md`. Prüfe
 > `git status --short --branch`, `git log -5 --oneline --decorate`,
-> `openspec list --json` und PR #27. Arbeite an **einem** nächsten freigegebenen
+> `openspec list --json` und den letzten `main`-Deploy. Arbeite an **einem** nächsten freigegebenen
 > Produkt-Change mit OpenSpec; keine pauschale Umsetzung von Phase 2. Bewahre
 > Tobias-Dateien und fremde Änderungen. BMD-/Auszahlungsregeln nicht erfinden.
 
@@ -24,16 +24,16 @@ geordnet. Dieses Dokument bleibt der einzige operative Session-Handoff.
 - Trade Proof/Registerkennung samt OpenSpec-Archiv und dem Fix für inaktive
   Partner und Partner ohne Nachweis: Commit `7b2d4b7`; Thesis-/Plan-Sync
   `f373a0b`; lokales `main` konfliktfrei im Ergebnis integriert als
-  Merge-Commit `b05667c`. Alle drei sind auf
-  `codex/archive-business-tax-identifiers` gepusht. PR #27 existiert. Der
+  Merge-Commit `b05667c`. PR #27 ist in `main` gemergt (`5fff3b0`). Der
   Review fand und behob den `tradeProof:null`-Listenregressionsfall.
 - Backend `./mvnw test`: 128/128 grün vor dem letzten Regressionstest;
   `./mvnw package`: 129/129 grün und Build erfolgreich nach dem Fix.
   Ein paralleler Paketlauf scheiterte zwischenzeitlich nur an Test-Port 8081;
   der anschließende einzelne Lauf war erfolgreich. `git diff --check`,
   JavaScript-`node --check` und `openspec validate
-  complete-thesis-documentation --strict` bestanden. PR #27 Backend-CI bestand;
-  Deploy-Jobs wurden bei PR erwartungsgemäß übersprungen.
+  complete-thesis-documentation --strict` bestanden. PR #27 und sein erster
+  `main`-Workflow bestanden; der erste Deploy hatte trotz grünem Job einen
+  Backend-Startfehler (Details unten).
 - Thesis-Dokumentation und Matrix wurden gegen FSD, Phase 2, Code und Audit
   unabhängig überprüft und korrigiert. Insbesondere sind FR-03/04 laut geltender
   FSD erfüllt; die BMD-Artikelnummer ist eine separate spätere Erweiterung.
@@ -45,7 +45,9 @@ geordnet. Dieses Dokument bleibt der einzige operative Session-Handoff.
 - `harden-deployment-gateway` bleibt **3/4**. Einzig die externe SSH-Negativmatrix
   in Task 2.2 fehlt. GitHub-Secret `VM_SSH_KEY` ist vorhanden, aber dessen
   privater Wert ist nicht rücklesbar. VM-IP wurde von Chris bestätigt; autorisierte
-  Administration liegt bei Chris/Tobias. Private Schlüssel nie in Chat/Git.
+  Administration liegt bei Chris/Tobias. Admin-SSH als `papo@178.104.109.45`
+  wurde in dieser Session erfolgreich verwendet; das ist **nicht** automatisch
+  der separate `papo-deploy`-Schlüssel. Private Schlüssel nie in Chat/Git.
 - `decouple-partner-number-from-login` und `add-unique-bmd-article-number`
   stehen **0/6**. Die fachlichen BMD-Feldregeln/Beispiele fehlen. Für persönliche
   Konten ist jedoch die **Identitätsentkopplung** vorab nötig; den aktiven
@@ -79,13 +81,25 @@ keinen technischen BMD-Vertrag.
 
 ## Git/Deployment-Grenze
 
-Feature-Branch ist veröffentlicht, `main` wurde in dieser Session bisher **nicht**
-aktualisiert. PR #27 trägt jetzt den tatsächlichen Umfang im Titel/Text. Lokales
-`main` enthält den eigenen Archivierungscommit `39bad3f`; der Feature-Branch
-integriert ihn seit `b05667c`. Beim Merge blieben die kanonischen archivierten
-OpenSpec-Dateien und beide neueren Main-Spec-Ergänzungen erhalten; der resultierende
-Arbeitsbaum war identisch zum vorherigen Feature-Branch-Tree. PR-CI nach diesem
-letzten Push noch prüfen, bevor `main` aktualisiert wird.
+`main` enthält PR #27 (`5fff3b0`) und den Migrationsfix aus PR #28
+(`b5ab7fb`); lokaler `main` ist auf `origin/main` fast-forwarded. Archivdateien
+und neuere Spezifikationen aus dem früheren lokalen `main` blieben erhalten.
+Der erste Deploy von `5fff3b0` startete das Backend nicht: Die VM hatte den
+historischen Demo-Namen „Elektro Huber GmbH“, die Migration erkannte nur
+„Huemer GmbH“. Die VM wurde ohne Datenbank-/Volume-Löschung auf das vorige
+Image `e63a81d` zurückgestellt. Der enge Fix akzeptiert beide bekannten
+Demo-Namen, unbekannte Daten weiter nicht. Der Regressionstest reproduzierte
+den Fehler zuerst; danach `./mvnw test` und `./mvnw package` jeweils
+**130/130** grün, unabhängiger Java-Review ohne Blocker. `main`-Run
+`36115368910` bestand. Live nach Deploy von `b5ab7fb`: Backend `running`,
+RestartCount 0, Frontend-Link auf denselben SHA, 3/3 Partner mit Steuerkennung,
+1 Firmenprofil; Frontend HTTP 200, geschützte API ohne Login HTTP 401, OIDC
+HTTP 200. Noch keine angemeldete End-to-End-Browserabnahme.
+
+**Deploy-Risiko:** Der Gateway meldete beim ersten Versuch „Release aktiviert“,
+obwohl der Backend-Prozess danach abstürzte; GitHub Actions zeigte Erfolg.
+Post-Activation-Health-Check und automatischer Rollback sind ein separater,
+prioritärer Infrastruktur-Fix vor der nächsten größeren `main`-Änderung.
 
 Der bestehende Keycloak-Produktions-Template enthält **aktive Demo-Konten mit
 bekannten Passwörtern**. `SEED_DEMO_DATA=false` deaktiviert sie nicht; eine bereits
@@ -131,7 +145,7 @@ separat geplant werden; Tests/Git bleiben deterministische Evidenz.
 git status --short --branch
 git log -5 --oneline --decorate
 openspec list --json
-gh pr checks 27
+gh run view 36115368910 --json status,conclusion
 ```
 
 Bei Backendänderungen gemäß `AGENTS.md`:
