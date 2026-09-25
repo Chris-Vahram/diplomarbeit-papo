@@ -23,6 +23,9 @@ Erweiterung wird in kleinen OpenSpec-Changes spezifiziert und einzeln umgesetzt.
 - Chris und Tobias können die aktuelle VM administrieren. Der private Schlüssel für
   den eingeschränkten GitHub-Deploy-Zugang ist lokal noch nicht gefunden; das
   GitHub-Secret ist vorhanden, aber sein Wert ist nicht rücklesbar.
+- Chris bestätigt für die aktuelle VM ausschließlich Demo-Daten und aktive,
+  bekannte Demo-Logins. Sie ist keine sichere Umgebung für echte Kundendaten;
+  Demo-Logins vor echtem Onboarding deaktivieren und gesondert prüfen.
 
 ## Herbstferien-Ziel und Machbarkeit
 

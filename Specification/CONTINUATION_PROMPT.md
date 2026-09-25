@@ -22,7 +22,9 @@ geordnet. Dieses Dokument bleibt der einzige operative Session-Handoff.
   ebenfalls entfernt. Kanonische Dateien bleiben erhalten; gelöschte versionierte
   Kopien sind aus Git wiederherstellbar. Keine ` 2`-Datei blieb im Inventar.
 - Trade Proof/Registerkennung samt OpenSpec-Archiv und dem Fix für inaktive
-  Partner und Partner ohne Nachweis: Commit `7b2d4b7` auf
+  Partner und Partner ohne Nachweis: Commit `7b2d4b7`; Thesis-/Plan-Sync
+  `f373a0b`; lokales `main` konfliktfrei im Ergebnis integriert als
+  Merge-Commit `b05667c`. Alle drei sind auf
   `codex/archive-business-tax-identifiers` gepusht. PR #27 existiert. Der
   Review fand und behob den `tradeProof:null`-Listenregressionsfall.
 - Backend `./mvnw test`: 128/128 grün vor dem letzten Regressionstest;
@@ -78,22 +80,22 @@ keinen technischen BMD-Vertrag.
 ## Git/Deployment-Grenze
 
 Feature-Branch ist veröffentlicht, `main` wurde in dieser Session bisher **nicht**
-aktualisiert. Der bestehende PR #27 trägt noch den alten Tax-Archiv-Titel und muss
-vor Merge auf den tatsächlichen Inhalt aktualisiert werden. Lokales `main` enthält
-den eigenen Commit `39bad3f`; Feature-Branch enthält die alternative Archivierung
-`dd2be09`, den Tax-Härtungscommit `a9c36bd` und Trade Proof `7b2d4b7`.
-Vor `main`-Update diese Historien ohne Reset/Force-Push zusammenführen und den
-resultierenden Diff/CI prüfen.
+aktualisiert. PR #27 trägt jetzt den tatsächlichen Umfang im Titel/Text. Lokales
+`main` enthält den eigenen Archivierungscommit `39bad3f`; der Feature-Branch
+integriert ihn seit `b05667c`. Beim Merge blieben die kanonischen archivierten
+OpenSpec-Dateien und beide neueren Main-Spec-Ergänzungen erhalten; der resultierende
+Arbeitsbaum war identisch zum vorherigen Feature-Branch-Tree. PR-CI nach diesem
+letzten Push noch prüfen, bevor `main` aktualisiert wird.
 
 Der bestehende Keycloak-Produktions-Template enthält **aktive Demo-Konten mit
 bekannten Passwörtern**. `SEED_DEMO_DATA=false` deaktiviert sie nicht; eine bereits
 importierte Realm wird durch bloßes Code-Deployment nicht zuverlässig aktualisiert.
-Die öffentliche VM darf mit echten Firmen-/Kundendaten nicht als sicher gelten,
-solange diese Konten nicht geprüft/deaktiviert und reale Zugänge eingerichtet sind.
-Chris wurde gefragt, ob auf der VM nur Demo- oder bereits echte Daten liegen und
-ob Demo-Logins aktiv sind. Bis zur Antwort `main`-Merge/Deploy nicht als sicher
-freigeben. Bei bestehenden Company-Profilen bleibt die neue echte Registerkennung
-leer; ein Firmen-Admin muss sie vor Profiländerung mit echtem Wert ergänzen.
+Chris hat bestätigt: Auf der aktuellen VM liegen **nur Demo-Daten**, und die
+Demo-Logins sind aktiv. Damit ist der ausdrücklich freigegebene `main`-Deploy ein
+Demo-Deployment, **keine Freigabe für echte Firmen-/Kundendaten**. Vor echtem
+Onboarding Demo-Logins deaktivieren, echte Zugänge provisionieren, Staging trennen
+und erneut prüfen. Bei bestehenden Company-Profilen bleibt die neue echte
+Registerkennung leer; ein Firmen-Admin muss sie vor Profiländerung ergänzen.
 
 ## Altlasten außerhalb des nächsten Produkt-Agenten
 

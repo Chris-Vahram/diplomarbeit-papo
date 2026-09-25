@@ -3,9 +3,9 @@
 ### Vorrangiger Next-Session-Orchesterstand — 25.09.2026
 
 - Branch: `codex/archive-business-tax-identifiers`. Die 122 Suffix-` 2`-Duplikate wurden mit Chris' Freigabe geprüft und entfernt; kanonische Dateien bleiben erhalten.
-- Trade Proof/Registerkennung, Tax-Identifier-Archivierung und Review-Fixes sind als `7b2d4b7` auf dem Feature-Branch gepusht; PR #27 hat Backend-CI bestanden.
+- Trade Proof/Registerkennung und Review-Fixes (`7b2d4b7`), Thesis-/Plan-Sync (`f373a0b`) sowie die Integration des lokalen `main` (`b05667c`) sind auf dem Feature-Branch gepusht. PR #27 hatte vor dem letzten Merge-Push Backend-CI bestanden; erneute Prüfung steht aus.
 - Verifiziert: 129/129 Backend-Tests mit erfolgreichem Package, OpenSpec strict, JavaScript-Syntax und `git diff --check`. `main` wurde noch nicht aktualisiert; der bestehende Workflow würde produktiv deployen.
-- Chris möchte nun Phase 2 plus Mandantenfähigkeit/persönliche Konten für eine sicher deploybare Staging-Version verfolgen. BMD/B-07-Firmen-/Schulentscheidungen, echte Staging-Umgebung und Produktions-Demo-Login-Status sind noch offen.
+- Chris möchte nun Phase 2 plus Mandantenfähigkeit/persönliche Konten für eine sicher deploybare Staging-Version verfolgen. BMD/B-07-Firmen-/Schulentscheidungen und echte Staging-Umgebung sind offen. Die aktuelle VM enthält laut Chris nur Demo-Daten; bekannte Demo-Logins sind aktiv und vor echten Daten zu entfernen.
 
 Maßgeblich für den nächsten Arbeitsblock ist `Specification/CONTINUATION_PROMPT.md`.
 Die fachliche Ausbaureihenfolge steht in `Specification/PRODUCT_COMPLETION_PLAN.md`;
@@ -18,8 +18,8 @@ Aktive OpenSpec-Changes: `harden-deployment-gateway` 3/4,
 `decouple-partner-number-from-login` 0/6 und `add-unique-bmd-article-number` 0/6.
 `harden-tax-identifier-rollout` ist vollständig und archiviert. Die vollständige offene Liste, Protokollauswertung und der Startprompt stehen in
 `Specification/CONTINUATION_PROMPT.md`. Chris hat Push auf `main` samt Deploy für
-den geprüften Stand erlaubt; vorher den Status der aktiven Demo-Logins und der
-VM-Daten klären. Secrets und Volumes bleiben geschützt.
+den geprüften Stand erlaubt. VM-Demo-Status ist geklärt; kein echter
+Kundenbetrieb freigegeben. Secrets und Volumes bleiben geschützt.
 
 ## Project owner
 This project belongs to **Chris**.
