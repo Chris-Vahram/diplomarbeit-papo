@@ -33,6 +33,7 @@ class BusinessTaxIdentifierMigrationTest {
             if (unknown != null) {
                 unknown.partnerNumber = "P-1003";
             }
+            partner("PARTNER-DEMO").name = "Huemer GmbH";
             setIdentifier("PARTNER-DEMO", "ATU12345678");
             setIdentifier("P-1002", "ATU23456789");
             setIdentifier("P-1003", "ATU34567890");
@@ -61,6 +62,25 @@ class BusinessTaxIdentifierMigrationTest {
             assertEquals(1, CompanyProfile.count("singletonKey", CompanyProfile.CURRENT_KEY));
             assertEquals(3, requiredTaxColumnCount("partner"));
             assertEquals(3, requiredTaxColumnCount("companyprofile"));
+        });
+    }
+
+    @Test
+    void migratesOlderVmDemoNameWithoutRenamingPartner() {
+        QuarkusTransaction.requiringNew().run(() -> {
+            dropNotNullConstraints();
+            Partner legacyDemo = partner("PARTNER-DEMO");
+            legacyDemo.name = "Elektro Huber GmbH";
+            legacyDemo.taxIdentifier = null;
+            CompanyProfile.deleteAll();
+        });
+
+        migrationService.migrate(true);
+
+        QuarkusTransaction.requiringNew().run(() -> {
+            assertEquals("Elektro Huber GmbH", partner("PARTNER-DEMO").name);
+            assertEquals("ATU12345678", partner("PARTNER-DEMO").taxIdentifier.value);
+            assertEquals(1, CompanyProfile.count("singletonKey", CompanyProfile.CURRENT_KEY));
         });
     }
 

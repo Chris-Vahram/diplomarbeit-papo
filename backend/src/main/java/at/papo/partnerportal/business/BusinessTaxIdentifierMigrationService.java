@@ -91,7 +91,8 @@ public class BusinessTaxIdentifierMigrationService {
                 .map(partner -> partner.partnerNumber)
                 .collect(Collectors.toSet());
         return partners.size() == DEMO_IDENTIFIERS.size() && partnerNumbers.equals(DEMO_IDENTIFIERS.keySet())
-                && hasName(partners, "PARTNER-DEMO", "Huemer GmbH")
+                && (hasName(partners, "PARTNER-DEMO", "Huemer GmbH")
+                        || hasName(partners, "PARTNER-DEMO", "Elektro Huber GmbH"))
                 && hasName(partners, "P-1002", "Sanitär Bauer KG")
                 && hasName(partners, "P-1003", "Baumarkt Weber e.U.");
     }
