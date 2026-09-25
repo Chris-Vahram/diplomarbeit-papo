@@ -139,7 +139,10 @@
 
 
 
-| AUSSTEHEND-01a0cf11 | 2026-09-23 | Chris | Codex | Trade-Proof-Review, Dublettenbereinigung, Thesis-Prüfung und Phase-2-Handoff | lokale Sitzung `01a0cf11-c556-7f51-8066-421ae5875b69` | `EXAKT` | 122 Dubletten bereinigt; Trade Proof inklusive Review-Fix auf Feature-Branch gepusht; Dokumentation korrigiert und Produktausbau mit offenen Entscheidungen geplant; Prüfungen: ./mvnw package: 129 Tests, 0 Fehler, Build erfolgreich; node --check frontend/src: bestanden; openspec validate complete-thesis-documentation --strict: bestanden; git diff --check: bestanden; 62 Markdown-Links: 0 fehlende Ziele; PR #27 Backend-CI: bestanden |
+| AUSSTEHEND-01a0cf11 | 2026-09-23 | Chris | Codex | Trade-Proof-Review, Dublettenbereinigung, Thesis-Prüfung, Phase-2-Handoff und sichere Demo-VM-Migration | lokale Sitzung `01a0cf11-c556-7f51-8066-421ae5875b69` | `EXAKT` | 122 Suffix-2-Duplikate geprüft und entfernt; Trade Proof inklusive Review-Fix und Thesis-/Produktplanung über PR 27 gemergt; ersten Deploy nach Backend-Absturz ohne Datenverlust zurückgestellt; historische Demo-Namenserkennung mit Regressionstest korrigiert und über PR 28 gemergt; VM-Backend und öffentliche Endpunkte geprüft; Übergabedateien aktualisiert; Prüfungen: ./mvnw package: vor Migration 129/129 Tests, nach Fix 130/130 Tests und Build erfolgreich; ./mvnw test: 130/130; node --check frontend/src bestanden; openspec validate complete-thesis-documentation --strict bestanden; 62 Markdown-Links ohne fehlendes Ziel; git diff --check bestanden; GitHub main Run 36115368910 success; VM backend running RestartCount 0, Frontend 200, geschützte API ohne Login 401, OIDC 200 |
+
+
+
 
 | AUSSTEHEND-01a06809 | 2026-09-03 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a06809-6bda-70c3-922a-59e5eeeeff28` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a0676e | 2026-09-03 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a0676e-bfa1-7241-89c0-43de935e78ee` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |

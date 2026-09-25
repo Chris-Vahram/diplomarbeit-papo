@@ -2,9 +2,9 @@
 
 ### Vorrangiger Next-Session-Orchesterstand — 25.09.2026
 
-- Branch: `codex/archive-business-tax-identifiers`. Die 122 Suffix-` 2`-Duplikate wurden mit Chris' Freigabe geprüft und entfernt; kanonische Dateien bleiben erhalten.
-- Trade Proof/Registerkennung und Review-Fixes (`7b2d4b7`), Thesis-/Plan-Sync (`f373a0b`) sowie die Integration des lokalen `main` (`b05667c`) sind auf dem Feature-Branch gepusht. PR #27 hatte vor dem letzten Merge-Push Backend-CI bestanden; erneute Prüfung steht aus.
-- Verifiziert: 129/129 Backend-Tests mit erfolgreichem Package, OpenSpec strict, JavaScript-Syntax und `git diff --check`. `main` wurde noch nicht aktualisiert; der bestehende Workflow würde produktiv deployen.
+- Branch: `main`, synchron mit `origin/main` nach PR #27 (`5fff3b0`) und dem Migrationsfix aus PR #28 (`b5ab7fb`). Die 122 Suffix-` 2`-Duplikate wurden mit Chris' Freigabe geprüft und entfernt; kanonische Dateien bleiben erhalten.
+- Trade Proof/Registerkennung, Review-Fixes und Thesis-/Plan-Sync sind gepusht. Der erste `main`-Deploy zeigte trotz grünem Job einen Backend-Startfehler am alten VM-Demo-Namen; auf das vorige Image zurückgestellt, Fix per PR #28, danach live geprüft.
+- Verifiziert: 130/130 Backend-Tests mit erfolgreichem Package nach dem Fix; `main`-Run `36115368910` grün. VM: Backend läuft ohne Restarts, Frontend 200, geschützte API ohne Login 401, OIDC 200. Der Deploy-Gateway braucht vor der nächsten größeren Änderung Health-Check und Rollback.
 - Chris möchte nun Phase 2 plus Mandantenfähigkeit/persönliche Konten für eine sicher deploybare Staging-Version verfolgen. BMD/B-07-Firmen-/Schulentscheidungen und echte Staging-Umgebung sind offen. Die aktuelle VM enthält laut Chris nur Demo-Daten; bekannte Demo-Logins sind aktiv und vor echten Daten zu entfernen.
 
 Maßgeblich für den nächsten Arbeitsblock ist `Specification/CONTINUATION_PROMPT.md`.
@@ -70,11 +70,11 @@ Also in the current stage: central partner + article management by the company, 
 - Partner dashboard totals (commission/revenue/order count) count only `fulfilled` own orders; latest-orders list shows any status.
 - The current research question was confirmed by the supervisor. It frames the internal ordering MVP as the first step of an extensible portal; the external partner shop remains Phase 2.
 - In user-facing UI and thesis language use **Artikel**, not alternating Product/Artikel terminology. Internal code/entity/API names such as `Product` may remain until a real technical reason requires renaming.
-- BMD is the leading article-master system. PAPO uses import data and does not own a competing master record. A direct BMD interface remains unapproved/out of scope.
+- BMD is the leading article-master system. PAPO currently uses import data and does not own a competing master record. Chris reopened a direct BMD interface for decision; company/school approval and an integration contract are still absent.
 - Target decision: the unique visible business identifier should be the BMD article number; the existing database id remains technical and no second visible ID is required. In the current code snapshot, `Product` has no BMD-number field yet and import dedupe still uses the article name, so implementation waits for the simplified company mail/sample export. `Preislistenbereich` remains omitted.
 - Category remains relevant. Fachbereich, product group A/B/C/D, bundles/BOMs, training permissions, and PP/margin-based commission rules are future directions, not current requirements; wait for the simplified company follow-up.
 
-The future target in `Specification/ROADMAP_2026-08-25.md` changes partner identifiers only through separate approved changes: generated partner numbers become company-local business identifiers and imported existing numbers become external references. One shared partner-company access is confirmed for the current stage. Do not implement tenant/auth restructuring now; revisit it when onboarding a second company or when its thesis deadline is explicitly set.
+The future target in `Specification/ROADMAP_2026-08-25.md` changes partner identifiers only through separate approved changes: generated partner numbers become company-local business identifiers and imported existing numbers become external references. One shared partner-company access is the implemented stage. Chris now requests two manually onboarded test companies and personal accounts on both sides; specify tenant isolation and identity migration in separate OpenSpec changes before implementation. Subdomains remain undecided.
 
 ## Fixed tech stack (no alternatives — do not suggest others)
 - **Frontend:** HTML, CSS, native Web Components / Custom Elements (no framework).
@@ -92,7 +92,7 @@ Partner (commissionPercent, active), Product (technical name; fachlich „Artike
 - **End customer:** does **not** use the portal in the MVP; receives goods and the (simulated) confirmations.
 
 ## Out of scope / deferred (`phase2_backlog.md` — say "implement B-XX" to build)
-B-01 external end-customer shop (CUT) · B-02 shop design customization (CUT) · B-03 auto commission level-up (STUB, manual in current stage) · B-04 real e-mail sending (STUB, simulated currently) · B-05 shop inquiry auto-forward (CUT) · B-06 direct BMD interface (CUT; BMD remains leading source via import) · B-07 commission settlement/payout (CUT) · B-08 full/cross-dashboard previous-period analytics (STUB; partner-dashboard client-side comparison exists). Also later/not current: personal partner-employee accounts, public company self-registration, Fachbereich-based training authorization, product groups/PP-margin rules, bundles/BOMs. Permanently out unless explicitly re-scoped: ERP/CRM completeness, real payments, inventory/shipping detail, accounting.
+B-01 external end-customer shop (CUT in MVP) · B-02 shop design customization (CUT in MVP) · B-03 auto commission level-up (STUB, manual in current stage) · B-04 real e-mail sending (STUB, simulated currently) · B-05 shop inquiry auto-forward (CUT in MVP) · B-06 direct BMD interface (reopened for decision) · B-07 commission settlement/payout (reopened for decision) · B-08 full/cross-dashboard previous-period analytics (STUB; partner-dashboard client-side comparison exists). Chris requests Phase 2 plus tenant isolation and personal accounts for a staged product; see `Specification/PRODUCT_COMPLETION_PLAN.md`. Fachbereich-based training authorization, product groups/PP-margin rules and bundles/BOMs still lack company rules. Actual bank transfers are not yet approved.
 
 ## Repo layout & conventions
 - `backend/` Quarkus; `frontend/` static Web Components app; `docs/` CONVENTIONS.md + SETUP.md; `Specification/`; `Documentation/`; `openspec/`.
@@ -103,9 +103,8 @@ B-01 external end-customer shop (CUT) · B-02 shop design customization (CUT) ·
 - Import file column sets for partner/article files and BMD export rules — waiting on sample data (blocks final import finalization only).
 - Partner-number/BMD-number rules still require anonymized company/BMD data. Tax-identifier and trade-proof rules are specified in their completed planning artifacts; do not invent legal retention periods or expand the current-document-only scope.
 - Dormancy threshold is currently 60 days; confirm it with the client at the next meeting.
-- Production domain is `paportal.at`; final Hetzner DNS, certificate and deployment details remain open. Wildcard subdomains are future tenant work, not an immediate deployment blocker.
-- Exact thesis deadline/scope for multi-company tenancy; do not start it merely because it is the target architecture.
-- Company-side employee/account model is not resolved; partner-company access is resolved as one shared access for the current stage.
+- Production domain is `paportal.at`; the demo deployment is live. A separate Staging environment and any wildcard-subdomain decision remain open.
+- Chris requests two isolated test companies and personal accounts for company and partner staff, with admin/employee roles and actor/time audit. Provisioning/recovery details and the binding Herbstferien acceptance list remain open.
 - MVP documentation tasks 8.3/8.4 and visual task FD.4 remain open; see the continuation prompt for ownership and scope.
 
 ## KI evidence
