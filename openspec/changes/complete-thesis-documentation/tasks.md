@@ -11,4 +11,4 @@
 ## 3. Gemeinsame Abnahme (Chris + Tobias, wesentlich)
 
 - [ ] 3.1 Dokumentation und Matrix gemeinsam gegen FSD, Besprechungsprotokolle und Phase-2-Backlog prüfen; keine CUT-/STUB-Funktion als vollständig umgesetzt darstellen.
-- [ ] 3.2 Markdown-Links, Matrixstruktur und `git diff --check` prüfen, `openspec validate complete-thesis-documentation --strict` ausführen und tatsächliche Ergebnisse dokumentieren.
+- [x] 3.2 Markdown-Links, Matrixstruktur und `git diff --check` prüfen, `openspec validate complete-thesis-documentation --strict` ausführen und tatsächliche Ergebnisse dokumentieren. 25.09.2026: 61 Markdown-Links/Ziele/Anker und alle drei Matrixtabellen geprüft; `git diff --check` ohne Befund; OpenSpec strict gültig. Diese automatischen Checks ersetzen nicht die offene gemeinsame Text-/Fachabnahme aus 3.1.

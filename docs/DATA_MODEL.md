@@ -20,6 +20,7 @@ erDiagram
     PRODUCT ||--o{ ORDER_ITEM : "wird bestellt"
     ORDER ||--|| COMMISSION_RECORD : "erzeugt"
     PARTNER ||--o{ COMMISSION_RECORD : "erhält"
+    PARTNER ||--o| PARTNER_TRADE_PROOF : "reicht ein"
 
     COMPANY_PROFILE {
         Long id PK
@@ -28,6 +29,9 @@ erDiagram
         String taxCountry "ISO-3166-1 Alpha-2"
         BusinessTaxIdentifierType taxIdentifierType "VAT_ID oder NATIONAL_TAX_ID"
         String taxIdentifierValue "normalisiert, max. 64 Zeichen"
+        String registerCountry "ISO-3166-1 Alpha-2"
+        TradeRegisterIdentifierType registerType "GISA oder OTHER_TRADE_REGISTER"
+        String registerValue "max. 64 Zeichen"
     }
 
     PARTNER {
@@ -43,6 +47,23 @@ erDiagram
         String internalNote "nullable, max. 4.000 Zeichen, nur Company-DTO"
         BigDecimal commissionPercent "5.2, Preset 5/10/15 + individuell"
         boolean active "DB-Flag, nicht mit Keycloak synced"
+    }
+
+    PARTNER_TRADE_PROOF {
+        Long id PK
+        Long partner_id FK UK
+        String registerCountry "ISO-3166-1 Alpha-2"
+        TradeRegisterIdentifierType registerType
+        String registerValue "max. 64 Zeichen"
+        String version "Versionskennung"
+        bytea data "validierte PDF/JPEG/PNG-Daten"
+        String contentType
+        String filename "nur Anzeige"
+        long sizeBytes "max. 10 MiB"
+        Instant uploadedAt
+        PartnerTradeProofStatus status "PENDING, ACCEPTED, REJECTED"
+        Instant reviewedAt
+        String rejectionReason "nullable"
     }
 
     PRODUCT {
@@ -141,13 +162,27 @@ Self-Service, Importe, Exporte, Bestellungen und Provisionsantworten erhalten
 dieses Feld nicht. Die Firma verwaltet außerdem genau eine syntaktisch geprüfte
 Steueridentifikation aus Land, Art (`VAT_ID` oder `NATIONAL_TAX_ID`) und Wert;
 Details und Grenzen stehen in [`docs/TAX_IDENTIFIERS.md`](TAX_IDENTIFIERS.md).
+Zusätzlich kann ein Partner genau einen aktuellen Trade-Proof mit geprüfter
+Registerkennung und PDF/JPEG/PNG-Datei besitzen. Ein Ersatz überschreibt den
+aktuellen Datensatz ohne Historie; der Status wird durch die Firma geprüft und
+ändert `active` nicht automatisch. Binärdaten werden nicht in normalen
+Partner-DTOs ausgeliefert.
 
 ### CompanyProfile
 Das `CompanyProfile` ist ein Singleton für die aktuell einzige Portal-Firma.
 `singletonKey=CURRENT` verhindert eine zweite aktive Profilzeile; es gibt keine
 Mandanten-, Subdomain- oder Routing-Beziehung. Firmenrollen lesen und ändern
-Firmenname und Steueridentifikation über `/api/company/profile`. Partnerrollen
-erhalten keinen Zugriff. Demo-Werte sind synthetisch.
+Firmenname, Steueridentifikation und Registerkennung über
+`/api/company/profile`. Partnerrollen erhalten keinen Zugriff. Demo-Werte sind
+synthetisch.
+
+### PartnerTradeProof
+`PartnerTradeProof` ist eine optionale 1:1-Beziehung zu `Partner` für genau das
+aktuelle Nachweisdokument. Partner dürfen ihren eigenen Nachweis hochladen oder
+ersetzen und den eigenen Status sehen. Die Firma darf Metadaten und das private
+Dokument abrufen sowie die aktuelle Version akzeptieren oder ablehnen. Uploads
+sind auf 10 MiB und verifizierte PDF/JPEG/PNG-Inhalte begrenzt; Downloads setzen
+`Cache-Control: private, no-store` und `X-Content-Type-Options: nosniff`.
 
 ### Product
 Zentral von der Firma verwaltete Artikel. `available` steuert Bestellbarkeit

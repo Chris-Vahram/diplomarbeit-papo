@@ -6,16 +6,18 @@ Codex companion to `CLAUDE.md`. Keep all Claude files and `.claude/` configurati
 
 PAPO is an extensible B2B partner-ordering platform, not the unnamed reference client. First stage replaces partner e-mail/telephone orders with an internal portal: Company → Partner → End Customer.
 
-For every fresh deep-work session read `Specification/CONTINUATION_PROMPT.md` fully first and verify its volatile Git/OpenSpec snapshot. Before a non-trivial change, use these sources in order:
+For every fresh deep-work session read `Specification/CONTINUATION_PROMPT.md` fully and verify its volatile Git/OpenSpec snapshot. Before a non-trivial change, use these sources in order:
 
-1. `Specification/CONTINUATION_PROMPT.md` — current handoff.
+1. `Specification/CONTINUATION_PROMPT.md` — sole operative next-session handoff.
 2. `CLAUDE.md` — stable context, scope, stack, roles, routing.
-3. `Documentation/Besprechungsprotokolle/` — newer notes override older notes and FSD; newest: `Besprechungsprotokoll_10.9.md`.
+3. `Documentation/Besprechungsprotokolle/` — newer notes override older notes and FSD; newest: `Besprechungsprotokoll_14.9.md`.
 4. `Specification/functional_specification_document_partnerportal_final.md` — baseline requirements until an approved documentation/OpenSpec sync.
 5. `Specification/phase2_backlog.md` — deferred features/decisions; do not pull into this stage.
 6. `Specification/ROADMAP_2026-08-25.md` — future planning, not implemented behavior.
-7. `openspec/changes/<active-change>/` and `openspec/specs/` — active tasks and merged behavior.
-8. `docs/CONVENTIONS.md`, `docs/SETUP.md`, `docs/DATA_MODEL.md` — implementation/runtime/data rules.
+7. `openspec/changes/<active-change>/` and `openspec/specs/` — relevant active tasks and merged behavior.
+8. `docs/CONVENTIONS.md`, `docs/SETUP.md`, `docs/DATA_MODEL.md` — capability-specific implementation/runtime/data rules.
+
+Historical session plans and planning reviews belong in Git history, not active context.
 
 Never copy stale Claude-memory facts into code/docs: client is never “PAPO”; verify model names, branch/environment state, and completed UI work against primary sources.
 
@@ -25,6 +27,13 @@ Never copy stale Claude-memory facts into code/docs: client is never “PAPO”;
 - Current core is partner-driven orders with one shared organizational login per partner company; public end-customer shop and personal employee accounts are Phase 2/later.
 - User-facing/thesis term is **Artikel**; internal `Product` names may remain. BMD leads article data; PAPO imports Excel/CSV only, with no approved direct BMD interface. Visible ID is unique BMD article number; DB ID remains technical and price lists are omitted.
 - Category matters. Fachbereich, product groups A–D, bundles/BOMs, training permissions, and PP/margin commission await the simplified company follow-up.
+
+Chris reopened the full Phase-2 product goal on 25.09.2026 and confirmed two manually
+onboarded test companies, personal company/partner employee accounts and a public
+shop with guest orders and optional customer accounts. This supersedes the older
+"not the next step" planning priority, not the current implementation facts or
+missing company/school approvals. Follow `Specification/PRODUCT_COMPLETION_PLAN.md`;
+do not infer BMD, commission or payment rules.
 
 ## Team, Git, workflow
 

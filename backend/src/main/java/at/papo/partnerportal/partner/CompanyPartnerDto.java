@@ -15,12 +15,19 @@ public record CompanyPartnerDto(
         String internalNote,
         BigDecimal commissionPercent,
         boolean active,
-        BusinessTaxIdentifierDto taxIdentifier
+        BusinessTaxIdentifierDto taxIdentifier,
+        PartnerTradeProofDto tradeProof
 ) {
     public static CompanyPartnerDto from(Partner partner) {
+        PartnerTradeProof proof = PartnerTradeProof.find("partner.id", partner.id).firstResult();
+        return from(partner, PartnerTradeProofDto.from(proof));
+    }
+
+    public static CompanyPartnerDto from(Partner partner, PartnerTradeProofDto tradeProof) {
         return new CompanyPartnerDto(partner.id, partner.partnerNumber, partner.name,
                 AddressRequest.from(partner.address), partner.email, partner.phone,
                 partner.internalNote, partner.commissionPercent, partner.active,
-                BusinessTaxIdentifierDto.from(partner.taxIdentifier));
+                BusinessTaxIdentifierDto.from(partner.taxIdentifier),
+                tradeProof);
     }
 }

@@ -1,13 +1,5 @@
 # MVP-Präsentation
 
-## Abschlussnachtrag — 14.09.2026
-
-Das Deck umfasst jetzt 22 Folien und wurde nach dem Besprechungsprotokoll 14.9 überarbeitet:
-verständliche Akteurs- und Ablauftexte, GitHub-Stars, drei sachliche Folien zu digitaler
-Souveränität, zwei zusätzliche echte Browseraufnahmen, eine Clockify-Übersicht für Chris und
-Tobias sowie das [Demo-Drehbuch](demo-drehbuch.md). Die Clockify-Folie weist die im Workspace
-„DA“ ausgelesene Ist-Summe von 151:41:38 für Chris und Tobias aus.
-
 reveal.js-Deck für die Diplomarbeits-Präsentation (Thema: MVP, Use Cases, Tech-Stack).
 
 ## Öffnen
@@ -28,7 +20,7 @@ externen Schriftarten oder CDN-Links, System-Font-Stack).
 
 ## Status
 
-Die Präsentation verwendet die fachliche Terminologie „Artikel“ und ist für die Abnahme nach
-dem Besprechungsprotokoll 14.9 vorbereitet. Produktive Deployment-/Live-Nachweise sind über
-CI/CD und Live-Smoke belegt; die Clockify-Auswertung für Chris und Tobias stammt aus Workspace
-„DA“ und wurde am 14.09.2026 geprüft.
+22 Folien, Terminologie „Artikel“, offline lauffähig. Inhalt nach Besprechungsprotokoll 14.9
+überarbeitet: GitHub-Stars, digitale Souveränität, echte Browseraufnahmen,
+Clockify-Übersicht und [Demo-Drehbuch](demo-drehbuch.md). Clockify-Istwert für Chris und
+Tobias im Workspace „DA“, 01.03.–30.09.2026: 151:41:38.

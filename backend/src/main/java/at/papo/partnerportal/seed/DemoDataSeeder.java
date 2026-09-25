@@ -3,8 +3,11 @@ package at.papo.partnerportal.seed;
 import at.papo.partnerportal.category.CategoryMigrationService;
 import at.papo.partnerportal.commission.CommissionService;
 import at.papo.partnerportal.business.BusinessTaxIdentifier;
+import at.papo.partnerportal.business.BusinessTaxIdentifierMigrationService;
 import at.papo.partnerportal.business.BusinessTaxIdentifierType;
 import at.papo.partnerportal.business.CompanyProfile;
+import at.papo.partnerportal.business.TradeRegisterIdentifier;
+import at.papo.partnerportal.business.TradeRegisterIdentifierType;
 import at.papo.partnerportal.common.Address;
 import at.papo.partnerportal.customer.Kunde;
 import at.papo.partnerportal.enablement.ProductEnablement;
@@ -50,12 +53,16 @@ public class DemoDataSeeder {
     @Inject
     CategoryMigrationService categoryMigrationService;
 
+    @Inject
+    BusinessTaxIdentifierMigrationService businessTaxIdentifierMigrationService;
+
     @ConfigProperty(name = "papo.seed-demo-data", defaultValue = "false")
     boolean seedDemoData;
 
     @Transactional
     void onStart(@Observes StartupEvent event) {
         LaunchMode launchMode = LaunchMode.current();
+        businessTaxIdentifierMigrationService.lockPartnerTable();
         if (shouldSeed(launchMode, Partner.count(), seedDemoData)) {
             seedCompanyProfile();
             seedPartners();
@@ -68,6 +75,7 @@ public class DemoDataSeeder {
                 seedOrders();
             }
         }
+        businessTaxIdentifierMigrationService.migrate(launchMode != LaunchMode.NORMAL || seedDemoData);
         categoryMigrationService.migrate();
     }
 
@@ -100,6 +108,7 @@ public class DemoDataSeeder {
         profile.singletonKey = CompanyProfile.CURRENT_KEY;
         profile.businessName = "Huemer GmbH";
         profile.taxIdentifier = new BusinessTaxIdentifier("AT", BusinessTaxIdentifierType.VAT_ID, "ATU87654321");
+        profile.tradeRegisterIdentifier = new TradeRegisterIdentifier("AT", TradeRegisterIdentifierType.GISA, "12345678");
         profile.persist();
     }
 

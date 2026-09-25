@@ -1,0 +1,54 @@
+{
+  "realm": "partnerportal",
+  "enabled": true,
+  "registrationAllowed": false,
+  "accessTokenLifespan": 900,
+  "roles": {
+    "realm": [
+      { "name": "company", "description": "Company / operator role" },
+      { "name": "partner", "description": "Sales partner role" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "partnerportal-frontend",
+      "publicClient": true,
+      "enabled": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["*"],
+      "webOrigins": ["*"]
+    }
+  ],
+  "users": [
+    {
+      "username": "company-demo",
+      "enabled": true,
+      "email": "company-demo@papo.local",
+      "firstName": "Company",
+      "lastName": "Demo",
+      "credentials": [{ "type": "password", "value": "company-demo", "temporary": false }],
+      "realmRoles": ["company"]
+    },
+    {
+      "username": "partner-demo",
+      "enabled": true,
+      "email": "partner-demo@papo.local",
+      "firstName": "Partner",
+      "lastName": "Demo",
+      "credentials": [{ "type": "password", "value": "partner-demo", "temporary": false }],
+      "realmRoles": ["partner"]
+    },
+    {
+      "username": "partner-second",
+      "enabled": true,
+      "email": "partner-second@papo.local",
+      "firstName": "Partner",
+      "lastName": "Second",
+      "credentials": [{ "type": "password", "value": "partner-second", "temporary": false }],
+      "realmRoles": ["partner"]
+    }
+  ]
+}

@@ -7,8 +7,13 @@ Status legend:
 - `CUT` = not in MVP at all, only specified here.
 - `STUB` = partially in MVP (simulated / manual / mock), full version deferred.
 - `PLANNED` = agreed for later, not started.
+- `REOPENED FOR DECISION` = Chris wants to revisit the previously excluded scope;
+  business rules, school/company approval and implementation contract remain open.
 
-Last updated: 2026-08-25
+Last updated: 2026-09-25. Chris möchte Phase 2 und weitere Produktfunktionen bis zur
+Herbstferien-Staging-Version verfolgen. Das hebt die bisherigen MVP-Abgrenzungen nicht
+rückwirkend auf. Fachliche Regeln und Freigaben durch Firma/Schule sind teils noch offen;
+die Reihenfolge und Fragen stehen in `PRODUCT_COMPLETION_PLAN.md`.
 
 ---
 
@@ -44,14 +49,14 @@ Last updated: 2026-08-25
 **Why cut:** Auto-forward half depends on B-01 (shop). Manual entry part = already covered by MVP core order flow.
 **Trigger:** "implement B-05". Needs B-01.
 
-## B-06 — BMD interface  `CUT (permanent)`
+## B-06 — BMD interface  `REOPENED FOR DECISION`
 **What:** Direct BMD accounting-system interface.
-**Status:** Explicitly excluded by meeting 17.06 ("Keine BMD Schnittstelle, zuerst Daten importieren"). Not planned. Data comes via Excel import instead.
+**Status:** Explicitly excluded from the MVP by meeting 17.06 ("Keine BMD Schnittstelle, zuerst Daten importieren"). Chris reopened the product goal on 25.09.2026; the company and school have not confirmed scope. Excel/CSV remains the current implemented transfer. Product/version, interface, direction (articles in; possibly orders/commissions out), conflict rules and test access are unknown. Do not implement from an invented contract.
 
-## B-07 — Commission settlement / payout workflow  `CUT`
+## B-07 — Commission settlement / payout workflow  `REOPENED FOR DECISION`
 **What full version is:** Real payout/settlement of accumulated commission.
-**Why cut:** Out of scope all versions per FSD. MVP only shows commission transparently (own datensatz + dashboard sums).
-**Trigger:** "implement B-07".
+**Why cut from MVP:** The FSD only shows commission transparently (own record + dashboard sums).
+**Current direction (25.09.2026):** Chris wants to revisit B-07. Auditable periodic settlement, approval and export are a recommended first step, not yet a confirmed company rule. Actual bank transfers would be a separate, higher-risk decision requiring payment-provider/bank access, authorization, reconciliation and legal review. Neither is implementation-ready until the company confirms formula, approval and output requirements.
 
 ## B-08 — Dashboard "ggü. Vorperiode" trend indicators  `STUB`
 **What full version is:** Metric cards across the relevant dashboards show a +/-x% delta vs the previous equal-length period (e.g. "+4.6% ggü. Vorperiode"), with a red/green trend arrow and sufficient historical data for meaningful comparison.
@@ -90,3 +95,4 @@ Last updated: 2026-08-25
 - 2026-08-31: Current partner access is one shared organizational login per partner company; personal partner-employee accounts remain later. User-facing terminology is `Artikel`; internal `Product` names may stay. BMD is the leading article-master source via import. Use its unique article number plus PAPO's technical DB id; no extra visible article id and no price-list-area field. Category remains relevant; Fachbereich, product groups, bundles/BOMs, training permissions and PP/margin logic are future directions pending a simplified company follow-up.
 - 2026-08-25: Real order-email recipients clarified for B-04: Endkunde if an address exists, responsible partner users, and company. Current code remains a simulation until B-04 is implemented.
 - 2026-08-25: Partner number target clarified: generated `P-####` within a company, imported legacy number as an external reference, and a global technical ID for relations. Whether a partner company receives one shared access or personal employee accounts remains open pending the supervisor's recommendation. The current MVP behavior remains documented in the FSD.
+- 2026-09-25: Chris confirmed personal employee logins on both company and partner sides (admin and employee; admin manages/suspends accounts) and audit events with actor/time, without performance scoring. Two manually provisioned test companies suffice initially. The public shop should support guest orders and optional customer accounts, with paid orders fulfilled later and no confirmed online payment. This is a requested future scope, not a statement of current implementation or school/company approval. B-06/B-07 are reopened for decision as above.

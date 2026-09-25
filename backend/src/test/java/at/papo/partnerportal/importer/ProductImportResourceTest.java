@@ -148,6 +148,23 @@ class ProductImportResourceTest {
         }
     }
 
+    @Test
+    void oversizedImportIsRejectedBeforeParsingForPreviewAndCommit() {
+        String token = companyToken();
+        byte[] tooLarge = new byte[2 * 1024 * 1024 + 1];
+
+        given().auth().oauth2(token)
+                .multiPart("file", "products.csv", tooLarge, "text/csv")
+                .when().post("/api/company/import/products/preview")
+                .then().statusCode(413);
+
+        given().auth().oauth2(token)
+                .multiPart("file", "products.csv", tooLarge, "text/csv")
+                .multiPart("mapping", "{}")
+                .when().post("/api/company/import/products/commit")
+                .then().statusCode(413);
+    }
+
     private String companyToken() {
         return tokens.tokenFor("company-demo", "company-demo");
     }

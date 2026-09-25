@@ -1,4 +1,4 @@
-import { apiFetch } from "../lib/api.js";
+import { apiFetch, apiDownload } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import { formatNumber } from "../lib/format.js";
 import { addressFieldsHtml, readAddress, fillAddress } from "../lib/address-fields.js";
@@ -52,6 +52,32 @@ class CompanyPartnerListPage extends HTMLElement {
       <modal-dialog id="enablement-modal" title="Artikel freischalten">
         <data-table id="enablement-table"></data-table>
       </modal-dialog>
+      <modal-dialog id="proof-modal" title="Gewerbeberechtigungsnachweis prüfen">
+        <div id="proof-content">
+          <p id="proof-status" aria-live="polite">Nachweis wird geladen …</p>
+          <p id="proof-error" class="trade-proof-card__error" role="alert" hidden></p>
+          <button type="button" id="proof-retry" hidden>Erneut laden</button>
+          <dl id="proof-metadata" class="profile-readonly" hidden></dl>
+          <div class="entity-form__actions">
+            <button type="button" id="proof-download" hidden>Nachweis herunterladen</button>
+          </div>
+          <form id="proof-review-form" class="entity-form" hidden>
+            <input type="hidden" name="version" />
+            <form-field label="Prüfstatus" name="status" required>
+              <select name="status">
+                <option value="ACCEPTED">Akzeptieren</option>
+                <option value="REJECTED">Ablehnen</option>
+              </select>
+            </form-field>
+            <form-field label="Ablehnungsgrund" name="rejectionReason">
+              <textarea name="rejectionReason" maxlength="1000" rows="4"></textarea>
+            </form-field>
+            <div class="entity-form__actions">
+              <button type="submit">Prüfung speichern</button>
+            </div>
+          </form>
+        </div>
+      </modal-dialog>
     `;
 
     this.table = this.querySelector("#partner-table");
@@ -60,6 +86,7 @@ class CompanyPartnerListPage extends HTMLElement {
       { key: "name", label: "Name" },
       { key: "commissionLabel", label: "Provision" },
       { key: "statusBadge", label: "Status", html: true },
+      { key: "proofStatus", label: "Nachweis" },
       { key: "actions", label: "", html: true },
     ];
     this.table.emptyMessage = "Noch keine Partner angelegt.";
@@ -92,6 +119,16 @@ class CompanyPartnerListPage extends HTMLElement {
       { key: "enabledCheckbox", label: "Freigeschaltet", html: true },
     ];
     this.enablementTable.emptyMessage = "Noch keine Artikel angelegt.";
+    this.proofModal = this.querySelector("#proof-modal");
+    this.proofStatus = this.querySelector("#proof-status");
+    this.proofError = this.querySelector("#proof-error");
+    this.proofRetry = this.querySelector("#proof-retry");
+    this.proofMetadata = this.querySelector("#proof-metadata");
+    this.proofDownload = this.querySelector("#proof-download");
+    this.proofReviewForm = this.querySelector("#proof-review-form");
+    this.proofRetry.addEventListener("click", () => this.loadProof());
+    this.proofDownload.addEventListener("click", () => this.downloadProof());
+    this.proofReviewForm.addEventListener("submit", (event) => this.reviewProof(event));
 
     this.presetSelect.addEventListener("change", () => this.toggleCustomField());
 
@@ -101,6 +138,8 @@ class CompanyPartnerListPage extends HTMLElement {
       if (editButton) this.openEdit(editButton.dataset.editId);
       const manageButton = event.target.closest("[data-manage-id]");
       if (manageButton) this.openEnablement(manageButton.dataset.manageId);
+      const proofButton = event.target.closest("[data-proof-id]");
+      if (proofButton) this.openProof(proofButton.dataset.proofId);
     });
     this.form.addEventListener("submit", (event) => this.handleSubmit(event));
     this.enablementTable.addEventListener("change", (event) => {
@@ -130,8 +169,10 @@ class CompanyPartnerListPage extends HTMLElement {
         commissionLabel: `${p.commissionPercent}%`,
         activeLabel: p.active ? "active" : "inactive",
         statusBadge: `<status-badge status="${p.active ? "active" : "inactive"}"></status-badge>`,
+        proofStatus: this.proofStatusLabel(p.tradeProof),
         actions: `<div class="row-actions">
           <button type="button" data-edit-id="${p.id}">Partnerdaten Bearbeiten</button>
+          <button type="button" class="row-actions__secondary" data-proof-id="${p.id}">Nachweis</button>
           <button type="button" class="row-actions__secondary" data-manage-id="${p.id}">Artikel</button>
         </div>`,
       }));
@@ -140,6 +181,88 @@ class CompanyPartnerListPage extends HTMLElement {
     } catch (error) {
       showToast(error.message, "error");
     }
+  }
+
+  async openProof(partnerId) {
+    this.proofPartnerId = partnerId;
+    this.proofModal.open();
+    await this.loadProof();
+  }
+
+  async loadProof() {
+    this.proofStatus.textContent = "Nachweis wird geladen …";
+    this.proofError.hidden = true;
+    this.proofRetry.hidden = true;
+    this.proofMetadata.hidden = true;
+    this.proofDownload.hidden = true;
+    this.proofReviewForm.hidden = true;
+    try {
+      const proof = await apiFetch(`/company/partners/${this.proofPartnerId}/trade-proof`);
+      if (!proof.present) {
+        this.proofStatus.textContent = "Für diesen Partner ist noch kein Nachweis hinterlegt.";
+        return;
+      }
+      this.proofStatus.textContent = this.proofStatusLabel(proof);
+      this.proofMetadata.innerHTML = "";
+      for (const [label, value] of [["Datei", proof.filename], ["Register", `${proof.registerIdentifier.country} / ${proof.registerIdentifier.type}`], ["Kennzeichen", proof.registerIdentifier.value]]) {
+        const term = document.createElement("dt");
+        term.textContent = label;
+        const description = document.createElement("dd");
+        description.textContent = value ?? "–";
+        this.proofMetadata.append(term, description);
+      }
+      this.proofMetadata.hidden = false;
+      this.proofDownload.hidden = false;
+      this.proofReviewForm.hidden = false;
+      this.proofReviewForm.elements.version.value = proof.version;
+      this.proofReviewForm.elements.status.value = proof.status === "REJECTED" ? "REJECTED" : "ACCEPTED";
+      this.proofReviewForm.elements.rejectionReason.value = proof.rejectionReason ?? "";
+    } catch (error) {
+      this.proofStatus.textContent = "Nachweis konnte nicht geladen werden.";
+      this.proofError.textContent = error.message;
+      this.proofError.hidden = false;
+      this.proofRetry.hidden = false;
+    }
+  }
+
+  async downloadProof() {
+    try {
+      const proof = await apiFetch(`/company/partners/${this.proofPartnerId}/trade-proof`);
+      await apiDownload(`/company/partners/${this.proofPartnerId}/trade-proof/download`, proof.filename);
+    } catch (error) {
+      this.proofError.textContent = error.message;
+      this.proofError.hidden = false;
+    }
+  }
+
+  async reviewProof(event) {
+    event.preventDefault();
+    if (this.proofReviewing) return;
+    this.proofReviewing = true;
+    const formData = new FormData(this.proofReviewForm);
+    try {
+      await apiFetch(`/company/partners/${this.proofPartnerId}/trade-proof/review`, {
+        method: "PUT",
+        body: JSON.stringify({
+          version: formData.get("version"),
+          status: formData.get("status"),
+          rejectionReason: formData.get("rejectionReason") || null,
+        }),
+      });
+      showToast("Prüfung gespeichert.", "success");
+      this.proofModal.close();
+      await this.load();
+    } catch (error) {
+      this.proofError.textContent = error.message;
+      this.proofError.hidden = false;
+    } finally {
+      this.proofReviewing = false;
+    }
+  }
+
+  proofStatusLabel(proof) {
+    if (!proof?.present) return "Fehlt";
+    return { PENDING: "Ausstehend", ACCEPTED: "Akzeptiert", REJECTED: "Abgelehnt" }[proof.status] ?? "Unbekannt";
   }
 
   openCreate() {

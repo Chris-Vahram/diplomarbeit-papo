@@ -1,6 +1,7 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import { taxIdentifierFieldsHtml, readTaxIdentifier, fillTaxIdentifier } from "../lib/tax-identifier-fields.js";
+import { tradeRegisterIdentifierFieldsHtml, readTradeRegisterIdentifier, fillTradeRegisterIdentifier } from "../lib/trade-register-fields.js";
 
 class CompanyProfilePage extends HTMLElement {
   connectedCallback() {
@@ -11,6 +12,7 @@ class CompanyProfilePage extends HTMLElement {
       <form id="company-profile-form" class="entity-form entity-form--grid">
         <form-field class="form-field--wide" label="Firmenname" name="businessName" required></form-field>
         ${taxIdentifierFieldsHtml()}
+        ${tradeRegisterIdentifierFieldsHtml()}
         <div class="entity-form__actions">
           <button type="submit">Speichern</button>
         </div>
@@ -26,6 +28,7 @@ class CompanyProfilePage extends HTMLElement {
       const profile = await apiFetch("/company/profile");
       this.form.elements.businessName.value = profile.businessName ?? "";
       fillTaxIdentifier(this.form, profile.taxIdentifier);
+      fillTradeRegisterIdentifier(this.form, profile.tradeRegisterIdentifier);
     } catch (error) {
       showToast(error.message, "error");
     }
@@ -38,6 +41,7 @@ class CompanyProfilePage extends HTMLElement {
     const payload = {
       businessName: this.form.elements.businessName.value,
       taxIdentifier: readTaxIdentifier(this.form),
+      tradeRegisterIdentifier: readTradeRegisterIdentifier(this.form),
     };
     try {
       await apiFetch("/company/profile", { method: "PUT", body: JSON.stringify(payload) });

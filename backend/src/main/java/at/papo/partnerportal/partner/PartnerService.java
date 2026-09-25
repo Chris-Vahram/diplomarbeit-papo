@@ -8,6 +8,8 @@ import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class PartnerService {
@@ -16,7 +18,17 @@ public class PartnerService {
     BusinessTaxIdentifierValidator taxIdentifierValidator;
 
     public List<CompanyPartnerDto> list() {
-        return Partner.<Partner>listAll().stream().map(CompanyPartnerDto::from).toList();
+        List<Partner> partners = Partner.listAll();
+        if (partners.isEmpty()) {
+            return List.of();
+        }
+        List<Long> partnerIds = partners.stream().map(partner -> partner.id).toList();
+        Map<Long, PartnerTradeProofDto> proofs = PartnerTradeProof.<PartnerTradeProof>find("partner.id in ?1", partnerIds)
+                .list().stream()
+                .collect(Collectors.toMap(proof -> proof.partner.id, PartnerTradeProofDto::from));
+        PartnerTradeProofDto absentProof = PartnerTradeProofDto.from(null);
+        return partners.stream().map(partner -> CompanyPartnerDto.from(partner,
+                proofs.getOrDefault(partner.id, absentProof))).toList();
     }
 
     public CompanyPartnerDto get(Long id) {

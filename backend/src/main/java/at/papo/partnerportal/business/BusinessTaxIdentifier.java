@@ -8,14 +8,14 @@ import jakarta.persistence.Enumerated;
 @Embeddable
 public class BusinessTaxIdentifier {
 
-    @Column(name = "tax_country", nullable = false, length = 2)
+    @Column(name = "tax_country", length = 2)
     public String country;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "tax_identifier_type", nullable = false, length = 32)
+    @Column(name = "tax_identifier_type", length = 32)
     public BusinessTaxIdentifierType type;
 
-    @Column(name = "tax_identifier_value", nullable = false, length = 64)
+    @Column(name = "tax_identifier_value", length = 64)
     public String value;
 
     public BusinessTaxIdentifier() {

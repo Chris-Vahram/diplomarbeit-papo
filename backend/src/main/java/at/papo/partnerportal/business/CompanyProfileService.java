@@ -11,6 +11,9 @@ public class CompanyProfileService {
     @Inject
     BusinessTaxIdentifierValidator taxIdentifierValidator;
 
+    @Inject
+    TradeRegisterIdentifierValidator tradeRegisterIdentifierValidator;
+
     public CompanyProfileDto get() {
         return CompanyProfileDto.from(findCurrent());
     }
@@ -20,6 +23,7 @@ public class CompanyProfileService {
         CompanyProfile profile = findCurrent();
         profile.businessName = request.businessName().trim();
         profile.taxIdentifier = taxIdentifierValidator.normalize(request.taxIdentifier());
+        profile.tradeRegisterIdentifier = tradeRegisterIdentifierValidator.normalize(request.tradeRegisterIdentifier());
         return CompanyProfileDto.from(profile);
     }
 

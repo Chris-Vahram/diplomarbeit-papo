@@ -1,7 +1,7 @@
 # UI-/UX-Dokumentation des PAPO-MVP
 
-Stand: 2026-09-14
-Revisionsgrundlage: gemergter Stand `599146f`
+Stand: 2026-09-25
+Revisionsgrundlage: lokaler Arbeitsstand `a9c36bd`; keine menschliche Endabnahme
 
 Dieses Kapitel beschreibt die tatsächlich vorhandene Benutzeroberfläche. Die fachliche
 Anforderungszuordnung steht in der [Traceability-Matrix](REQUIREMENTS_TRACEABILITY.md).
@@ -44,6 +44,18 @@ Wichtige Routen:
 - `#/partner/profile` — begrenzte eigene Stammdaten
 
 Endkunden besitzen im MVP keinen eigenen Portalzugang.
+
+Im Profil kann der Partner zusätzlich genau einen aktuellen Gewerbeberechtigungsnachweis
+mit Registerkennung als PDF, JPEG oder PNG (maximal 10 MiB) hochladen oder ersetzen. Der
+Status „ausstehend“, „akzeptiert“ oder „abgelehnt“ und ein Ablehnungsgrund werden dort
+angezeigt. Es gibt keine Dokumenthistorie.
+
+### Nachweis durch die Company prüfen
+
+In der Partnerverwaltung zeigt die Spalte „Nachweis“ den Prüfstatus. Die Aktion öffnet einen
+Dialog mit Dateiname, Registerkennung, Download und Formular zum Akzeptieren oder Ablehnen;
+bei Ablehnung kann ein Grund eingetragen werden. Die Prüfung bezieht sich auf die angezeigte
+Version. Sie ändert den Aktivstatus des Partners nicht.
 
 ## 2. Hauptflows
 
@@ -106,7 +118,7 @@ Breite für Tabellen und Cards. Auf Mobile-/Tabletgrößen wird die Navigation �
 Menübutton geöffnet. Tabellen, Formulare und Bestellschritte werden untereinander angeordnet;
 die zentralen Aktionen bleiben erreichbar.
 
-Vorhandene Belege:
+Historische Screenshot-Belege aus dem UX-Audit vom 17.07.2026 (geprüfter HEAD `9a9f5cd`):
 
 - [Partner-Dashboard, Desktop](partner_portal_audit_suite/Audit/evidence/04-ux/partner-dashboard-1440.png)
 - [Neue Bestellung, Desktop](partner_portal_audit_suite/Audit/evidence/04-ux/order-new-1440.png)
@@ -116,7 +128,9 @@ Vorhandene Belege:
 - [Artikelverwaltung, Desktop](partner_portal_audit_suite/Audit/evidence/04-ux/company-products-1440.png)
 - [Partnerverwaltung, Desktop](partner_portal_audit_suite/Audit/evidence/04-ux/company-partners-1440.png)
 
-Zusätzliche aktuelle Browseraufnahmen für die Präsentation:
+Zusätzliche Browseraufnahmen unter `output/playwright/` illustrieren spätere UI-Stände. Für
+diese Dateien sind Datum und geprüfte Revision im Repository nicht festgehalten; sie gelten
+daher nicht als datierte Abnahmebelege:
 
 - [Partner-Firmenname, Desktop](../output/playwright/show-partner-company-name-desktop.png)
 - [Artikelkategorien, Desktop](../output/playwright/article-categories-desktop.png)
@@ -147,10 +161,11 @@ Zusätzliche aktuelle Browseraufnahmen für die Präsentation:
 
 ## 7. Offene Beleggrenze
 
-Die oben verlinkten Bilder lösen die im Repository vorhandenen Screenshotpfade auf. Die
-abschließende Prüfung von Text, Bildauswahl und fachlicher Darstellung durch Tobias ist noch
-offen. Fehlende oder nur historische Belege werden in der Matrix als solche gekennzeichnet und
-nicht als aktuelle technische Abnahme ausgegeben.
+Die verlinkten Pfade sind vorhanden. Die Audit-Bilder stammen vom 17.07.2026 und zeigen nicht
+den aktuellen UI-Stand; die späteren `output/playwright/`-Bilder haben keine dokumentierte
+Revision. Für den Trade-Proof-Flow ist in diesem Dokument kein Screenshot hinterlegt. Tobias'
+abschließende Prüfung von Text und Bildauswahl sowie die gemeinsame fachliche Endabnahme bleiben
+offen. Diese Dokumentation nimmt die menschliche Abnahme nicht vorweg.
 
 ## Quellen
 

@@ -13,6 +13,8 @@ import static org.hamcrest.Matchers.hasKey;
 @QuarkusTest
 class CompanyProfileResourceTest {
 
+    private static final String SAMPLE_TRADE_JSON = "{\"country\":\"AT\",\"type\":\"GISA\",\"value\":\"12345678\"}";
+
     @Inject
     KeycloakTestTokens tokens;
 
@@ -21,11 +23,13 @@ class CompanyProfileResourceTest {
         String token = tokens.tokenFor("company-demo", "company-demo");
 
         given().auth().oauth2(token).when().get("/api/company/profile")
-                .then().statusCode(200).body("businessName", is("Huemer GmbH"));
+                .then().statusCode(200).body("businessName", is("Huemer GmbH"))
+                .body("tradeRegisterIdentifier.type", is("GISA"));
 
         given().auth().oauth2(token).contentType("application/json")
                 .body("{\"businessName\":\"Demo Portal\",\"taxIdentifier\":"
-                        + "{\"country\":\"at\",\"type\":\"VAT_ID\",\"value\":\" atu23456789 \"}}")
+                        + "{\"country\":\"at\",\"type\":\"VAT_ID\",\"value\":\" atu23456789 \"},\"tradeRegisterIdentifier\":"
+                        + SAMPLE_TRADE_JSON + "}")
                 .when().put("/api/company/profile")
                 .then().statusCode(200)
                 .body("taxIdentifier.country", is("AT"))
@@ -33,14 +37,23 @@ class CompanyProfileResourceTest {
 
         given().auth().oauth2(token).contentType("application/json")
                 .body("{\"businessName\":\"Ungültig\",\"taxIdentifier\":"
-                        + "{\"country\":\"AT\",\"type\":\"VAT_ID\",\"value\":\"AT123\"}}")
+                        + "{\"country\":\"AT\",\"type\":\"VAT_ID\",\"value\":\"AT123\"},\"tradeRegisterIdentifier\":"
+                        + SAMPLE_TRADE_JSON + "}")
+                .when().put("/api/company/profile")
+                .then().statusCode(400);
+
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"businessName\":\"Ungültig\",\"taxIdentifier\":"
+                        + "{\"country\":\"AT\",\"type\":\"VAT_ID\",\"value\":\"ATU87654321\"},\"tradeRegisterIdentifier\":"
+                        + "{\"country\":\"AT\",\"type\":\"OTHER_TRADE_REGISTER\",\"value\":\"123\"}}")
                 .when().put("/api/company/profile")
                 .then().statusCode(400);
 
         // Restore the synthetic fixture for the rest of the suite.
         given().auth().oauth2(token).contentType("application/json")
                 .body("{\"businessName\":\"Huemer GmbH\",\"taxIdentifier\":"
-                        + "{\"country\":\"AT\",\"type\":\"VAT_ID\",\"value\":\"ATU87654321\"}}")
+                        + "{\"country\":\"AT\",\"type\":\"VAT_ID\",\"value\":\"ATU87654321\"},\"tradeRegisterIdentifier\":"
+                        + SAMPLE_TRADE_JSON + "}")
                 .when().put("/api/company/profile").then().statusCode(200);
     }
 
@@ -50,10 +63,42 @@ class CompanyProfileResourceTest {
         given().auth().oauth2(partnerToken).when().get("/api/company/profile").then().statusCode(403);
         given().auth().oauth2(partnerToken).contentType("application/json")
                 .body("{\"businessName\":\"Manipuliert\",\"taxIdentifier\":"
-                        + "{\"country\":\"AT\",\"type\":\"VAT_ID\",\"value\":\"ATU00000000\"}}")
+                        + "{\"country\":\"AT\",\"type\":\"VAT_ID\",\"value\":\"ATU00000000\"},\"tradeRegisterIdentifier\":"
+                        + SAMPLE_TRADE_JSON + "}")
                 .when().put("/api/company/profile").then().statusCode(403);
 
         given().auth().oauth2(partnerToken).when().get("/api/partner/profile")
                 .then().statusCode(200).body("$", not(hasKey("taxIdentifier")));
+    }
+
+    @Test
+    void businessNameRespectsDatabaseLengthWithoutChangingStoredProfile() {
+        String token = tokens.tokenFor("company-demo", "company-demo");
+        String accepted = "A".repeat(255);
+
+        try {
+            given().auth().oauth2(token).contentType("application/json")
+                    .body(profileJson(accepted))
+                    .when().put("/api/company/profile")
+                    .then().statusCode(200).body("businessName", is(accepted));
+
+            given().auth().oauth2(token).contentType("application/json")
+                    .body(profileJson("B".repeat(256)))
+                    .when().put("/api/company/profile")
+                    .then().statusCode(400);
+
+            given().auth().oauth2(token).when().get("/api/company/profile")
+                    .then().statusCode(200).body("businessName", is(accepted));
+        } finally {
+            given().auth().oauth2(token).contentType("application/json")
+                    .body(profileJson("Huemer GmbH"))
+                    .when().put("/api/company/profile").then().statusCode(200);
+        }
+    }
+
+    private String profileJson(String businessName) {
+        return "{\"businessName\":\"" + businessName + "\",\"taxIdentifier\":"
+                + "{\"country\":\"AT\",\"type\":\"VAT_ID\",\"value\":\"ATU87654321\"},\"tradeRegisterIdentifier\":"
+                + SAMPLE_TRADE_JSON + "}";
     }
 }

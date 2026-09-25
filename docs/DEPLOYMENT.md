@@ -107,6 +107,12 @@ Der `%prod`-Profil-Container läuft standardmäßig als `LaunchMode.NORMAL` und 
 Demo-Daten — die Kunden-Realm-Logins (`company-demo`/`partner-demo`, siehe Keycloak-
 Realm-Template) treffen sonst auf eine leere Datenbank.
 
+Die Realm-Vorlage enthält weiterhin aktivierte Demo-Logins mit bekannten Passwörtern.
+`SEED_DEMO_DATA=false` deaktiviert diese Logins nicht. Vor echten Firmen- oder
+Kundendaten müssen sie in der laufenden Keycloak-Realm deaktiviert oder entfernt,
+echte Zugänge angelegt und der Zustand nach einem Neustart geprüft werden. Ein
+Code-Deployment allein ändert eine bereits importierte Realm nicht zuverlässig.
+
 Setzt `SEED_DEMO_DATA=true` in der VM-lokalen `.env.prod` (nie im Image, nie als
 Default), läuft beim nächsten Start derselbe Seed wie in `%dev`/`%test`
 (`DemoDataSeeder`): Partner, Artikel, Artikel-Freischaltungen und ~5 Monate
@@ -132,3 +138,28 @@ CORS ist bewusst nur im `%dev`-Profil aktiv (`application.properties`, für den 
 laufenden lokalen Frontend-Devserver auf Port 3000). Im `%prod`-Profil ist keine CORS-
 Konfiguration gesetzt — Caddy serviert Frontend und Backend same-origin (siehe oben), daher
 ist CORS dort schlicht nicht nötig, nicht nur deaktiviert.
+
+## Gewerbeberechtigungsnachweis
+
+Der Gewerbeberechtigungsnachweis dient der manuellen Prüfung, ob ein Partnerunternehmen
+aktuell gewerberechtlich berechtigt ist. Für österreichische Unternehmen wird als
+Registerart **GISA** (Gewerbeinformationssystem Austria) mit zweistelligem ISO-Ländercode
+`AT` und dem GISA-Kennzeichen verwendet. Für andere Länder steht **Anderes
+Handelsregister** zur Verfügung; eine automatische Registerabfrage findet nicht statt.
+
+Es wird pro Partner nur der aktuelle Nachweis gespeichert. Ein Ersatz überschreibt den
+bisherigen Nachweis; eine Historie oder OCR-Auswertung gibt es nicht. Erlaubt sind PDF,
+JPEG und PNG bis maximal 10 MiB. Dateityp und Dateisignatur werden geprüft, eine
+Malware-Freiheit kann PAPO ohne Virenscanner nicht garantieren.
+
+Die Datei liegt als Teil des Partnerdatensatzes in PostgreSQL und ist nur über die
+geschützten Partner-/Firmen-Endpunkte mit `private, no-store` abrufbar. Die regulären
+PostgreSQL-Backups enthalten daher ebenfalls den aktuellen Nachweis. Ein separates
+Lösch- oder Aufbewahrungsdatum ist derzeit nicht festgelegt; vor echtem Produktivbetrieb
+müssen Aufbewahrungs- und Löschregeln sowie der Umgang mit Backups fachlich und rechtlich
+definiert werden.
+
+Bei bereits vorhandenen Firmenprofilen bleiben die neuen Registerfelder nach dem
+Schema-Update leer. PAPO erfindet dafür keine echte Registernummer. Ein berechtigter
+Firmenadministrator muss vor der nächsten Profiländerung das tatsächliche
+Registerkennzeichen im Firmenprofil eintragen und den Speichervorgang prüfen.

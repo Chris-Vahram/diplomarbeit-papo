@@ -1,5 +1,6 @@
 package at.papo.partnerportal.product;
 
+import at.papo.partnerportal.common.UploadLimits;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -39,6 +40,8 @@ public class ProductImageResource {
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public ProductImageDto upload(@RestForm("file") FileUpload file) throws IOException {
+        UploadLimits.rejectIfLarger(file.uploadedFile(), UploadLimits.PRODUCT_IMAGE_BYTES,
+                "Bild ist zu groß (maximal 2 MiB erlaubt).");
         return productImageService.upload(Files.readAllBytes(file.uploadedFile()), file.fileName());
     }
 
