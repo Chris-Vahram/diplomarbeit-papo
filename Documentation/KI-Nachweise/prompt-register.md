@@ -60,6 +60,85 @@
 
 | AUSSTEHEND-01a0a51d | 2026-09-15 | Chris | Codex | Next-Session-Kontext für add-partner-trade-proof synchronisieren | lokale Sitzung `01a0a51d-60d0-7461-9df7-0f2f9404192b` | `EXAKT` | CONTINUATION_PROMPT.md und die aktuellen Statusblöcke in CLAUDE.md auf Branch, OpenSpec-Status, abgeschlossenen Tax-Rollout und Trade-Proof-Startreihenfolge aktualisiert.; Prüfungen: openspec status/instructions/list geprüft; git diff --check erfolgreich. |
 
+
+| AUSSTEHEND-01a0a89c | 2026-09-16 | Chris | Codex | Spec-Sync und Archivierung des abgeschlossenen Tax-Identifier-Rollouts | lokale Sitzung `01a0a89c-8f5f-7db0-acb3-0fd15ca41bd2` | `EXAKT` | harden-tax-identifier-rollout synchronisiert und archiviert; Next-Session-Startprompt aktualisiert; Prüfungen: openspec validate harden-tax-identifier-rollout --strict; git diff --check; openspec list --json und Archivpfad geprüft |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 | AUSSTEHEND-01a06809 | 2026-09-03 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a06809-6bda-70c3-922a-59e5eeeeff28` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a0676e | 2026-09-03 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a0676e-bfa1-7241-89c0-43de935e78ee` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a06ab1 | 2026-09-04 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a06ab1-5040-7761-b84f-b202b6db6cc8` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
@@ -69,6 +148,7 @@
 | AUSSTEHEND-01a07969 | 2026-09-07 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a07969-fb4c-7442-b106-45b8188208b5` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a0863c | 2026-09-09 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a0863c-505a-7f30-b0f4-ac430c1866cb` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a05dcf | 2026-09-01 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a05dcf-2be8-7021-89cc-07ddb9a4aaca` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-01a0cf11 | 2026-09-23 | Chris | Codex | Trade-Proof-Review, Dublettenbereinigung, Thesis-Prüfung und Phase-2-Handoff | lokale Sitzung `01a0cf11-c556-7f51-8066-421ae5875b69` | `EXAKT` | 122 Dubletten bereinigt; Trade Proof inklusive Review-Fix auf Feature-Branch gepusht; Dokumentation korrigiert und Produktausbau mit offenen Entscheidungen geplant; Prüfungen: ./mvnw package: 129 Tests, 0 Fehler, Build erfolgreich; node --check frontend/src: bestanden; openspec validate complete-thesis-documentation --strict: bestanden; git diff --check: bestanden; 62 Markdown-Links: 0 fehlende Ziele; PR #27 Backend-CI: bestanden |
 | AUSSTEHEND-01a0a229 | 2026-09-14 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a0a229-f40a-74e3-9d3a-c0e4e56885c5` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a09bbc | 2026-09-13 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a09bbc-835b-7082-8168-80fdd72001dc` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a0991c | 2026-09-13 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a0991c-8bfe-7740-acde-03ac93efb975` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |

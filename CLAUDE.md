@@ -1,24 +1,25 @@
 # CLAUDE.md – Partnerportal (Diplomarbeit)
 
-### Vorrangiger Next-Session-Orchesterstand — 16.09.2026
+### Vorrangiger Next-Session-Orchesterstand — 25.09.2026
 
-- Branch: `codex/archive-business-tax-identifiers`; bestehende Änderungen und untracked Dateien mit Suffix ` 2` bleiben unangetastet.
-- `harden-tax-identifier-rollout` ist **3/3 abgeschlossen**; Migration, Firmenprofil-Constraints und Startup-Locking sind geprüft.
-- `add-partner-trade-proof` ist vollständig geplant, **0/6**, Status `in-progress`/`ready`; Trade Proof selbst ist noch nicht implementiert.
-- Vorbereitung verifiziert: PostgreSQL-Fokustests 9/9, Backend-Test und Package 115/115, strikte OpenSpec-Validierung, Diff-Check sowie Datenbank-/Securityreviews.
-- Keine Produktcode- oder Infrastrukturänderung aus diesem Kontextupdate ableiten; Gateway, Clockify und BMD bleiben separate Folgearbeiten.
+- Branch: `codex/archive-business-tax-identifiers`. Die 122 Suffix-` 2`-Duplikate wurden mit Chris' Freigabe geprüft und entfernt; kanonische Dateien bleiben erhalten.
+- Trade Proof/Registerkennung, Tax-Identifier-Archivierung und Review-Fixes sind als `7b2d4b7` auf dem Feature-Branch gepusht; PR #27 hat Backend-CI bestanden.
+- Verifiziert: 129/129 Backend-Tests mit erfolgreichem Package, OpenSpec strict, JavaScript-Syntax und `git diff --check`. `main` wurde noch nicht aktualisiert; der bestehende Workflow würde produktiv deployen.
+- Chris möchte nun Phase 2 plus Mandantenfähigkeit/persönliche Konten für eine sicher deploybare Staging-Version verfolgen. BMD/B-07-Firmen-/Schulentscheidungen, echte Staging-Umgebung und Produktions-Demo-Login-Status sind noch offen.
 
-Der folgende ältere Orchesterblock ist historische Planung und für den aktuellen
-Arbeitsauftrag überholt. Maßgeblich sind `Specification/CONTINUATION_PROMPT.md` und
-der Stand vom 16.09.2026: Als Nächstes `add-partner-trade-proof` implementieren.
+Maßgeblich für den nächsten Arbeitsblock ist `Specification/CONTINUATION_PROMPT.md`.
+Die fachliche Ausbaureihenfolge steht in `Specification/PRODUCT_COMPLETION_PLAN.md`;
+der Handoff trennt davon menschliche Thesis-/UI-Abnahme und die SSH-Negativmatrix.
 
-## Aktueller Orchesterstatus — 16.09.2026
+## Aktueller Orchesterstatus — 25.09.2026
 
-Nächster Agent: `add-partner-trade-proof` anhand der OpenSpec-Tasks strikt implementieren. Vor Beginn aktuellen Git-/OpenSpec-Stand und die Tax-Rollout-Abschlussbedingungen prüfen. Push/Pull/Merge/Deployment/VM sind nicht freigegeben; Secrets/Volumes schützen.
-
-Nächste Session: 5.9 durch den autorisierten Subagenten mit echten VM-/Key-/Host-Key-/sudoers-/Remote-Nachweisen erledigen. Danach Stammdaten/BMD mit höherem Modell, hohem Reasoning, OpenSpec und Caveman planen. Clockify als retrospektiv geschätzte, konkrete Datum-/Uhrzeit-/Beschreibungseinträge erstellen und als Schätzung markieren.
-
-Kategorie-Navigation ist geprüft und archiviert. `origin/main` `05e0bdd` ist kontrolliert integriert; Tobias' Basis-CI/CD-Change bleibt archiviert. Gateway-Härtung wird separat in `harden-deployment-gateway` 2/4 fortgeführt. Demo-Seeding ist standardmäßig aus und erhält die Kategorie-Migration; Integrationstests und Package 100/100 grün. Präsentation nutzt „Artikel“. Clockify-Einträge dürfen retrospektiv geschätzt werden, müssen aber als Schätzung markiert werden und sind keine technische Evidenz.
+Aktive OpenSpec-Changes: `harden-deployment-gateway` 3/4,
+`complete-thesis-documentation` 4/6,
+`decouple-partner-number-from-login` 0/6 und `add-unique-bmd-article-number` 0/6.
+`harden-tax-identifier-rollout` ist vollständig und archiviert. Die vollständige offene Liste, Protokollauswertung und der Startprompt stehen in
+`Specification/CONTINUATION_PROMPT.md`. Chris hat Push auf `main` samt Deploy für
+den geprüften Stand erlaubt; vorher den Status der aktiven Demo-Logins und der
+VM-Daten klären. Secrets und Volumes bleiben geschützt.
 
 ## Project owner
 This project belongs to **Chris**.
@@ -28,7 +29,7 @@ Web-based, extensible **B2B partner-ordering platform** for partner-driven sales
 
 ## Authoritative documents (read in this order for deep work)
 1. `Specification/CONTINUATION_PROMPT.md` — **self-contained current operational handoff**; read it fully in every fresh session, then verify volatile Git/OpenSpec claims.
-2. `Documentation/Besprechungsprotokolle/` — newer meeting notes override older documents when they conflict; newest is `Besprechungsprotokoll_10.9.md`.
+2. `Documentation/Besprechungsprotokolle/` — newer meeting notes override older documents when they conflict; newest is `Besprechungsprotokoll_14.9.md`.
 3. `Specification/functional_specification_document_partnerportal_final.md` — authoritative baseline for the implemented internal ordering stage (FR-01..FR-25) until synchronized with newer decisions.
 4. `Specification/phase2_backlog.md` — deferred features **B-01..B-08** + decisions log. Honor it; do not silently promote future directions.
 5. `Specification/ROADMAP_2026-08-25.md` — persisted future plan, updated through 31.08.2026; planning context, not implemented behavior.
@@ -38,17 +39,17 @@ Web-based, extensible **B2B partner-ordering platform** for partner-driven sales
 
 **Hard rule:** meetings override the FSD when they conflict (newer = authoritative). The FSD may lag behind the meetings of 25.08/31.08 until an explicit documentation sync; use the continuation prompt and roadmap for that delta. Do not reintroduce v1 assumptions (external shop as current stage, one-product orders, 3-person team).
 
-## Current status (2026-09-16; verify volatile claims)
-- Active OpenSpec: `add-partner-trade-proof` 0/6 and ready for implementation; `harden-tax-identifier-rollout` 3/3 complete. `harden-deployment-gateway` remains 3/4 and `complete-thesis-documentation` 3/6.
+## Historischer Stand (2026-09-16; durch den Block vom 25.09. überholt)
+- Active OpenSpec: `harden-deployment-gateway` 3/4, `complete-thesis-documentation` 3/6, `decouple-partner-number-from-login` 0/6 and `add-unique-bmd-article-number` 0/6. `add-partner-trade-proof` and `harden-tax-identifier-rollout` are archived after implementation.
 - Branch: `codex/archive-business-tax-identifiers`; verify `git status --short --branch` and `openspec list --json` at session start.
-- Verified locally: Trade-Proof-preparation focused tests 9/9, backend/package 115/115, strict OpenSpec validation and diff check. Trade Proof itself has not been implemented.
+- Verified locally: 125/125 backend tests, package and clean-package, strict OpenSpec validation, JavaScript syntax, `git diff --check`, Playwright Desktop/Mobile and quality/security/database reviews.
 - Gateway remote evidence remains open. “Tobias evidence” means sanitized VM/key/sudoers/host-key/negative-SSH/live/rollback proof; Chris can produce it himself if he has the same authorized VM and key access. GitHub commits alone do not prove VM installation or runtime state.
-- Tax-identifier foundation and company profile are implemented and hardened. Trade-proof details are fixed in `openspec/changes/add-partner-trade-proof/`: current document only, no history/OCR, private access, versioned review and bounded uploads. Legal retention must not be invented; document only the specified current-document/backup boundary. Direct BMD integration is not approved.
+- Tax-identifier foundation and company profile are implemented and hardened. Trade-proof details are fixed in `openspec/changes/archive/2026-09-16-add-partner-trade-proof/`: current document only, no history/OCR, private access, versioned review and bounded uploads. Legal retention must not be invented; document only the specified current-document/backup boundary. Direct BMD integration is not approved.
 - The public VM still renders old “Produkte” labels; local source corrections are pending deployment and are not yet claimed as live.
-- This section supersedes older dated status blocks in this file; those blocks remain as history.
+- Der vorrangige Block vom 25.09. und `Specification/CONTINUATION_PROMPT.md` ersetzen die volatilen Angaben dieses historischen Abschnitts.
 - Meetings on 25.08 and 31.08 established PAPO as a company-independent, extensible product. Domain `paportal.at` is assigned. The current demo uses one company, but this is an implementation stage rather than the thesis product boundary.
-- Multi-company tenancy and `firma-x.paportal.at` are the correct architecture once a second company is onboarded. They are explicitly not the next change; their thesis delivery date/scope remains open.
-- The current stage uses one shared organizational login per partner company. Personal partner-employee accounts are not required.
+- Am 31.08. war Multi-Company noch nicht der nächste Change; Chris hat am 25.09. zwei Testunternehmen als neue Zielrichtung bestätigt. Subdomains bleiben unentschieden.
+- Der implementierte Stand nutzt weiterhin einen gemeinsamen Partner-Login; Chris hat persönliche Firmen- und Partnerkonten als Ausbauscope bestätigt.
 - The future plan and ordered change candidates are persisted in `Specification/ROADMAP_2026-08-25.md`.
 - Full current implementation state, exact open work and next-step order: `Specification/CONTINUATION_PROMPT.md`.
 
