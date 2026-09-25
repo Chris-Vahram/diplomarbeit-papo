@@ -25,4 +25,12 @@ public class CompanyProfile extends PanacheEntity {
             @AttributeOverride(name = "value", column = @Column(name = "tax_identifier_value", nullable = false, length = 64))
     })
     public BusinessTaxIdentifier taxIdentifier;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "country", column = @Column(name = "register_country", length = 2)),
+            @AttributeOverride(name = "type", column = @Column(name = "register_type", length = 32)),
+            @AttributeOverride(name = "value", column = @Column(name = "register_value", length = 64))
+    })
+    public TradeRegisterIdentifier tradeRegisterIdentifier;
 }

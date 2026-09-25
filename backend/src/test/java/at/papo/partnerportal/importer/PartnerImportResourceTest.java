@@ -209,4 +209,21 @@ class PartnerImportResourceTest {
                 .when().post("/api/company/import/partners/preview")
                 .then().statusCode(403);
     }
+
+    @Test
+    void oversizedImportIsRejectedBeforeParsingForPreviewAndCommit() {
+        String token = tokens.tokenFor("company-demo", "company-demo");
+        byte[] tooLarge = new byte[2 * 1024 * 1024 + 1];
+
+        given().auth().oauth2(token)
+                .multiPart("file", "partner.csv", tooLarge, "text/csv")
+                .when().post("/api/company/import/partners/preview")
+                .then().statusCode(413);
+
+        given().auth().oauth2(token)
+                .multiPart("file", "partner.csv", tooLarge, "text/csv")
+                .multiPart("mapping", "{}")
+                .when().post("/api/company/import/partners/commit")
+                .then().statusCode(413);
+    }
 }

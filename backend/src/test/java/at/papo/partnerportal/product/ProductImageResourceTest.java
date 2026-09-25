@@ -111,7 +111,7 @@ class ProductImageResourceTest {
         given().auth().oauth2(token)
                 .multiPart("file", "huge.jpg", tooLarge, "image/jpeg")
                 .when().post("/api/product-images")
-                .then().statusCode(400);
+                .then().statusCode(413);
     }
 
     @Test

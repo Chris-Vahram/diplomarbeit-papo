@@ -2175,6 +2175,20 @@ form-field {
 
 .profile-readonly dd { margin: 0; }
 
+.trade-proof-card {
+  max-width: 52rem;
+  margin-top: var(--spacing-8);
+  padding: var(--spacing-5);
+  background: var(--bg-surface);
+  border: 0.0625rem solid var(--border-default);
+  border-radius: var(--radius-lg);
+}
+
+.trade-proof-card h2 { margin-top: 0; }
+.trade-proof-card__status { font-weight: var(--font-weight-semibold); }
+.trade-proof-card__error { color: var(--color-error-700); }
+#proof-review-form[hidden] { display: none !important; }
+
 /* ============================================================
    Toasts
    ============================================================ */

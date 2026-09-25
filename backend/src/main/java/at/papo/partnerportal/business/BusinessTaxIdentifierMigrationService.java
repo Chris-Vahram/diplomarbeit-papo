@@ -81,6 +81,8 @@ public class BusinessTaxIdentifierMigrationService {
         profile.businessName = "Huemer GmbH";
         profile.taxIdentifier = new BusinessTaxIdentifier(
                 "AT", BusinessTaxIdentifierType.VAT_ID, "ATU87654321");
+        profile.tradeRegisterIdentifier = new TradeRegisterIdentifier(
+                "AT", TradeRegisterIdentifierType.GISA, "12345678");
         profile.persist();
     }
 

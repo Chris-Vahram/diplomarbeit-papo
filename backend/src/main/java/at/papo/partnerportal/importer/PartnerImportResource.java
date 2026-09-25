@@ -1,6 +1,7 @@
 package at.papo.partnerportal.importer;
 
 import at.papo.partnerportal.common.ApiException;
+import at.papo.partnerportal.common.UploadLimits;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.security.RolesAllowed;
@@ -35,6 +36,8 @@ public class PartnerImportResource {
     @Path("/preview")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public ImportPreviewDto preview(@RestForm("file") FileUpload file) throws IOException {
+        UploadLimits.rejectIfLarger(file.uploadedFile(), UploadLimits.IMPORT_FILE_BYTES,
+                "Importdatei ist zu groß (maximal 2 MiB erlaubt).");
         return importService.preview(definition, Files.readAllBytes(file.uploadedFile()), file.fileName());
     }
 
@@ -43,6 +46,8 @@ public class PartnerImportResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public ImportReportDto commit(@RestForm("file") FileUpload file, @RestForm("mapping") String mappingJson)
             throws IOException {
+        UploadLimits.rejectIfLarger(file.uploadedFile(), UploadLimits.IMPORT_FILE_BYTES,
+                "Importdatei ist zu groß (maximal 2 MiB erlaubt).");
         Map<String, String> mapping = parseMapping(mappingJson);
         return importService.commit(definition, Files.readAllBytes(file.uploadedFile()), file.fileName(), mapping);
     }
