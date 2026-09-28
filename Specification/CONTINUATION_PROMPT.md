@@ -1,75 +1,60 @@
 # PAPO – Next-Session-Context
 
-**Stand:** 25.09.2026. Operative Übergabe; volatile Angaben beim Start prüfen.
+**Stand:** 28.09.2026. Operative Übergabe; volatile Angaben beim Start prüfen.
 Stabile Regeln stehen in `AGENTS.md` und `CLAUDE.md`. Der beschlossene/noch zu
 beschließende Ausbau ist in [PRODUCT_COMPLETION_PLAN.md](PRODUCT_COMPLETION_PLAN.md)
 geordnet. Dieses Dokument bleibt der einzige operative Session-Handoff.
 
-## Startprompt für den nächsten Agenten
+## Wichtiger Wiedereinstieg — Deploy-Health/Rollback-Fix
 
-> Lies `AGENTS.md`, `CLAUDE.md`, diese Datei, `PRODUCT_COMPLETION_PLAN.md`, die
-> Protokolle vom 31.08., 10.09. und 14.09. sowie `phase2_backlog.md`. Prüfe
-> `git status --short --branch`, `git log -5 --oneline --decorate`,
-> `openspec list --json` und den letzten `main`-Deploy. Arbeite an **einem** nächsten freigegebenen
-> Produkt-Change mit OpenSpec; keine pauschale Umsetzung von Phase 2. Bewahre
-> Tobias-Dateien und fremde Änderungen. BMD-/Auszahlungsregeln nicht erfinden.
+Aktueller lokaler Branch: `fix/deploy-health-rollback`, Basis `origin/main`
+`075bd93`. Deployment-Code, Gateway-Harness, Doku, OpenSpec-Changes, B-07-Plan
+und KI-Nachweis wurden geprüft; der Harness hat 30/30 Prüfungen bestanden.
+Chris autorisierte in dieser Sitzung Commit, Push, Merge und Demo-Deploy.
 
-## Verifizierter Stand dieser Session
+Der neue OpenSpec-Change validierte mit `openspec validate
+verify-deploy-health-and-rollback --strict`. Gateway/Harness `sh -n` bestanden;
+der lokale Harness bestand mit **30 Prüfungen**; `git diff --check` sauber.
+Unabhängiger finaler Security-Review fand und half beheben: aktiven Frontend-
+Release durch Signal-Trap löschen; Curl-Konfig via `.curlrc`; Frontend-Rollback-
+Fehler verschlucken; Recovery-Status bis zum Ende eines expliziten Rollbacks
+aktiv lassen, damit TERM/HUP/INT den Rollback erneut anstößt. Wiederholte Signale
+werden während der Wiederherstellung ignoriert, damit sie den Rollback nicht
+abbrechen. Der Harness prüft zwei TERM-Signale bis zur wiederhergestellten
+Backend-Bereitschaft; finaler Review bestätigte **keine Blocker**.
+Gateway verlangt zwei stabile HTTPS-401-Antworten mit gleicher Container-ID,
+Image und Restart-Zahl, nutzt `curl -q --noproxy '*' --resolve ...` mit TLS-
+Validierung, rollt Backend/Frontend bei Compose-/Health-/Signalfehler zurück und
+löscht kein aktives Release. OpenSpec Tasks 1.1, 1.2, 2.1, 2.2 und 3.1 sind
+erledigt. Task 3.1 wurde am 25.09.2026 zuerst auf der Demo-VM abgeschlossen;
+das ursprüngliche Backup bleibt unter
+`/usr/local/libexec/papo-deploy-gateway.backup-20260925T144611Z`. Nach dem
+TERM-Rollback-Fix wurde die vorige VM-Version als
+`/usr/local/libexec/papo-deploy-gateway.backup-20260928T122840Z` gesichert; die
+neue Installation `root:root 755` hat SHA-256
+`e967b77f2499edd99a74edeafd8534d96e02948b2e67a29d6a0dc6ef8d79481a` (identisch
+zum lokalen Stand), Remote-`sh -n` erfolgreich. Sudoers und SSH-Schlüssel wurden
+nicht geändert. Eine nicht geheime Staging-Kopie liegt unter
+`/tmp/papo-deploy-gateway.new-20260928T122840Z`. Offen ist Task 3.2:
+Feature-Branch push/PR/CI, danach Merge in `main`
+(dessen Produktions-Deploy Chris ausdrücklich akzeptiert hat) und
+Live-Verifikation. Chris bestätigte am 28.09.2026 den Widerruf des zuvor
+sichtbaren GitHub-PAT. Damit ist diese Sperre aufgehoben; den Token niemals
+anfordern oder verwenden. Chris hat Commit, Push, Merge und den Demo-Deploy für
+diesen Branch ausdrücklich autorisiert.
 
-- Chris hat die 122 Dateien mit Suffix ` 2` ausdrücklich zur Bereinigung
-  freigegeben. 119 waren bitgleich, eine ältere Frontend-Kopie, zwei enthielten
-  den bereits versionierten Inhalt; vier versionierte OpenSpec-Kopien wurden
-  ebenfalls entfernt. Kanonische Dateien bleiben erhalten; gelöschte versionierte
-  Kopien sind aus Git wiederherstellbar. Keine ` 2`-Datei blieb im Inventar.
-- Trade Proof/Registerkennung samt OpenSpec-Archiv und dem Fix für inaktive
-  Partner und Partner ohne Nachweis: Commit `7b2d4b7`; Thesis-/Plan-Sync
-  `f373a0b`; lokales `main` konfliktfrei im Ergebnis integriert als
-  Merge-Commit `b05667c`. PR #27 ist in `main` gemergt (`5fff3b0`). Der
-  Review fand und behob den `tradeProof:null`-Listenregressionsfall.
-- Backend `./mvnw test`: 128/128 grün vor dem letzten Regressionstest;
-  `./mvnw package`: 129/129 grün und Build erfolgreich nach dem Fix.
-  Ein paralleler Paketlauf scheiterte zwischenzeitlich nur an Test-Port 8081;
-  der anschließende einzelne Lauf war erfolgreich. `git diff --check`,
-  JavaScript-`node --check` und `openspec validate
-  complete-thesis-documentation --strict` bestanden. PR #27 und sein erster
-  `main`-Workflow bestanden; der erste Deploy hatte trotz grünem Job einen
-  Backend-Startfehler (Details unten).
-- Thesis-Dokumentation und Matrix wurden gegen FSD, Phase 2, Code und Audit
-  unabhängig überprüft und korrigiert. Insbesondere sind FR-03/04 laut geltender
-  FSD erfüllt; die BMD-Artikelnummer ist eine separate spätere Erweiterung.
-  Der alte Import-Screenshot zeigt einen Fehler, keinen Erfolgsbeleg.
-- `complete-thesis-documentation` steht bei **4/6**. Technische Link-/Matrix-/
-  Diff-/OpenSpec-Prüfung 3.2 ist erledigt. 2.2 ist Tobias' UI-/Screenshot-
-  Abnahme; 3.1 ist die gemeinsame fachliche Text-/Matrixabnahme von Chris und
-  Tobias. Kein Agent darf diese menschlichen Unterschriften fingieren.
-- `harden-deployment-gateway` bleibt **3/4**. Einzig die externe SSH-Negativmatrix
-  in Task 2.2 fehlt. GitHub-Secret `VM_SSH_KEY` ist vorhanden, aber dessen
-  privater Wert ist nicht rücklesbar. VM-IP wurde von Chris bestätigt; autorisierte
-  Administration liegt bei Chris/Tobias. Admin-SSH als `papo@178.104.109.45`
-  wurde in dieser Session erfolgreich verwendet; das ist **nicht** automatisch
-  der separate `papo-deploy`-Schlüssel. Private Schlüssel nie in Chat/Git.
-- `decouple-partner-number-from-login` und `add-unique-bmd-article-number`
-  stehen **0/6**. Die fachlichen BMD-Feldregeln/Beispiele fehlen. Für persönliche
-  Konten ist jedoch die **Identitätsentkopplung** vorab nötig; den aktiven
-  Partnernummer-Change dafür nach gesonderter Prüfung in einen technischen
-  Identitäts- und einen BMD-/Legacy-Nummern-Teil aufteilen.
-- Die Firmenmail vom 25.08. ist fachlich bereits in
-  `Documentation/Besprechungsprotokolle/Besprechungsprotokoll31_08_2026.md`
-  ohne Kontaktdaten erfasst: eindeutige BMD-Artikelnummer; Kategorie,
-  Fachbereich und Produktgruppe sind getrennt; Preislistenbereich kann entfallen;
-  Pakete/Schulungsrechte/PP-Margen sind Zukunftsrichtungen, keine fertigen Regeln.
-
-## Neue bestätigte Produktentscheidungen und Grenzen
-
-Chris möchte Phase 2 vollständig und darüber hinaus zwei manuell angelegte
-Testunternehmen, persönliche Konten auf Firmen- und Partnerseite sowie Audit mit
-Person/Zeitpunkt. Partner- und Firmenorganisationen erhalten Admins und Mitarbeiter;
-Admins verwalten Konten, aber es gibt keine Leistungsbewertung. Ein öffentlicher
-Partnershop soll Gastbestellungen und optionale Endkundenkonten erlauben;
+Die lokale Datei `~/Desktop/papo-deploy-key` ist parsebar, aber ihr
+Fingerprint passt **nicht** zum einzigen Key in
+`/home/papo-deploy/.ssh/authorized_keys`; Anmeldung mit `IdentitiesOnly=yes`
+wurde abgewiesen. Auch die einzige SSH-Agent-Identität passt nicht. Chris
+bestätigt, dass das passende Schlüsselpaar derzeit nicht verfügbar ist. Es wird
+nur für die externe SSH-Negativmatrix benötigt; lokale Implementierung, PR-CI
+und das normale Actions-Deployment können ohne diese Datei weiterlaufen, sofern
+das nicht rücklesbare GitHub-Secret `VM_SSH_KEY` stimmt. Keine VM-Autorisierung
+ändern und die Matrix erst nach Fingerprint-Abgleich ausführen. Keine
 kostenpflichtige Bestellung mit späterer Abwicklung, **keine bestätigte
 Online-Zahlung**. Ziel ist eine sicher deploybare Staging-Version bis Herbstferien,
-nicht die schriftliche Thesis. Chris akzeptiert grundsätzlich, dass `main` den
-aktuellen Produktions-Deploy auslöst.
+nicht die schriftliche Thesis.
 
 **Nicht entschieden:** verbindliche Herbstferien-Abnahmeliste; Firmen-/Schulfreigabe
 für B-06 und B-07; BMD-Produkt/API und Export-/Rückkanal; Provisionsformel/
@@ -81,8 +66,10 @@ keinen technischen BMD-Vertrag.
 
 ## Git/Deployment-Grenze
 
-`main` enthält PR #27 (`5fff3b0`) und den Migrationsfix aus PR #28
-(`b5ab7fb`); lokaler `main` ist auf `origin/main` fast-forwarded. Archivdateien
+`main` enthält PR #27 (`5fff3b0`), Migrationsfix aus PR #28 (`b5ab7fb`) und
+Post-Deploy-Handoff aus PR #29 (`19fa02b`) und Präsentationsänderung aus PR #30
+(`075bd93`); Branch `fix/deploy-health-rollback` wurde auf `origin/main`
+`075bd93` fast-forwarded. Archivdateien
 und neuere Spezifikationen aus dem früheren lokalen `main` blieben erhalten.
 Der erste Deploy von `5fff3b0` startete das Backend nicht: Die VM hatte den
 historischen Demo-Namen „Elektro Huber GmbH“, die Migration erkannte nur
@@ -121,11 +108,13 @@ pauschales Aufgabenpaket zum nächsten Feature-Agenten:
 2. Chris + Tobias gehen FR-01–FR-25 und die ergänzenden Changes in
    `docs/REQUIREMENTS_TRACEABILITY.md` gegen FSD, Protokolle und B-01–B-08 durch,
    unterscheiden implementiert/simuliert/offen und bestätigen Task 3.1.
-3. Chris/Tobias suchen den **lokalen Dateipfad** des privaten Deploy-Keys, der
-   für `VM_SSH_KEY` hinterlegt wurde, oder rotieren ein dediziertes Schlüsselpaar
-   mit VM-Adminzugang. Danach SSH-Negativmatrix aus
-   `openspec/changes/harden-deployment-gateway/tasks.md` autorisiert ausführen;
-   keine Schlüsseldatei und keinen Inhalt im Chat teilen.
+3. Die lokale Datei `~/Desktop/papo-deploy-key` ist parsebar und hat Modus `600`,
+   aber ihr Fingerprint weicht vom einzigen `papo-deploy`-Key in der VM-
+   `authorized_keys` ab. Keine VM-Schlüssel oder Zugriffsrechte ändern und den
+   SSH-Negativtest nicht mit diesem Key ausführen. Tobias muss das korrespondierende
+   private Schlüsselpaar sicher bereitstellen. Nach erneut bestätigtem Fingerprint-
+   Match die SSH-Negativmatrix aus `openspec/changes/harden-deployment-gateway/tasks.md`
+   ausführen. Keine Schlüsseldatei und keinen Schlüsselinhalt im Chat teilen.
 
 ## Jev, Evidence und KI-Nachweis
 

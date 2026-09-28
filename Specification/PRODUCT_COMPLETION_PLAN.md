@@ -1,6 +1,6 @@
 # PAPO – Plan zur funktionalen Fertigstellung
 
-Stand: 25.09.2026. Dieser Plan ist eine Arbeitsgrundlage, keine Freigabe durch Schule
+Stand: 28.09.2026. Dieser Plan ist eine Arbeitsgrundlage, keine Freigabe durch Schule
 oder Referenzunternehmen. Die aktuelle FSD beschreibt das interne MVP; die gewünschte
 Erweiterung wird in kleinen OpenSpec-Changes spezifiziert und einzeln umgesetzt.
 `Specification/CONTINUATION_PROMPT.md` bleibt der einzige operative Session-Handoff.
@@ -9,9 +9,11 @@ Erweiterung wird in kleinen OpenSpec-Changes spezifiziert und einzeln umgesetzt.
 
 - Ergebnis bis zu den Herbstferien: sicher deploybare Staging-Version der erweiterten
   Produktfunktionen; schriftliche Diplomarbeit kann danach weitergeführt werden.
-- Phase 2 soll nicht beim MVP enden. B-06 (direkte BMD-Anbindung) und B-07
-  (Provisionsabrechnung/Auszahlung) werden zur Entscheidung wieder geöffnet, aber
-  nicht ohne Firmen-/Schulabstimmung als fertig spezifizierte Funktionen ausgegeben.
+- Phase 2 soll nicht beim MVP enden. B-06 (direkte BMD-Anbindung) bleibt zur
+  Entscheidung geöffnet. Für B-07 bestätigt Chris die Reihenfolge: zuerst
+  prüfbare Abrechnung/Freigabe/Export umsetzen; echte Banküberweisungen danach
+  separat spezifizieren und planen, später implementieren. Firmen-/Schulregeln
+  und Freigaben sind dadurch noch nicht ersetzt.
 - Zwei Testunternehmen dürfen manuell angelegt werden. Die Trennung ihrer Daten und
   Zugriffe ist zwingend. Subdomains sind noch nicht bestätigt.
 - Persönliche Logins auf Firmen- und Partnerseite: je Organisation Administratoren
@@ -20,9 +22,12 @@ Erweiterung wird in kleinen OpenSpec-Changes spezifiziert und einzeln umgesetzt.
 - Öffentlicher Partnershop: einmalige Gastbestellung oder optionales Kundenkonto zum
   Speichern eigener Daten. Bestellung ist kostenpflichtig, Zahlung/Erfüllung erfolgen
   später; kein Online-Bezahlvorgang bestätigt.
-- Chris und Tobias können die aktuelle VM administrieren. Der private Schlüssel für
-  den eingeschränkten GitHub-Deploy-Zugang ist lokal noch nicht gefunden; das
-  GitHub-Secret ist vorhanden, aber sein Wert ist nicht rücklesbar.
+- Chris und Tobias können die aktuelle VM administrieren. Die lokale Datei
+  `~/Desktop/papo-deploy-key` ist lesbar, aber ihr Fingerprint passt nicht zum
+  autorisierten `papo-deploy`-Key auf der VM. Chris bestätigt, dass das passende
+  Schlüsselpaar derzeit nicht verfügbar ist; die externe SSH-Negativmatrix wartet
+  darauf. Das GitHub-Secret `VM_SSH_KEY` ist vorhanden, sein Wert ist nicht
+  rücklesbar.
 - Chris bestätigt für die aktuelle VM ausschließlich Demo-Daten und aktive,
   bekannte Demo-Logins. Sie ist keine sichere Umgebung für echte Kundendaten;
   Demo-Logins vor echtem Onboarding deaktivieren und gesondert prüfen.
@@ -32,7 +37,7 @@ Erweiterung wird in kleinen OpenSpec-Changes spezifiziert und einzeln umgesetzt.
 Chris wünscht die **gesamte Phase 2 plus Mandantenfähigkeit und persönliche Konten**
 funktional fertig, nicht nur das MVP. Das ist der gewünschte Umfang, aber noch keine
 von Firma/Schule bestätigte Abnahme oder belastbare Terminzusage. Zwischen diesem
-Stand und dem 27.10. liegen rund 32 Tage; B-03, B-06 und B-07 haben wesentliche
+Stand und dem 27.10. liegen rund 29 Tage; B-03, B-06 und B-07 haben wesentliche
 fehlende Regeln/Zugänge. Ohne deren rechtzeitige Klärung kann „alles fertig“ nicht
 seriös zugesagt werden. Chris entscheidet nach dem nächsten Termin ausdrücklich,
 welche Funktionen zwingend bis Herbstferien in Staging abgenommen werden und welche
@@ -107,11 +112,11 @@ von B-01 bis B-08. Vor jedem Change aktuelle Protokolle und Git-Stand prüfen.
    anonymisierte Exportzeilen und Feldregeln. B-06 braucht Produkt/Version,
    freigegebene Schnittstelle,
    Synchronisationsrichtung, Fehler-/Konfliktregeln und Testzugang. B-07 beginnt
-   empfohlen mit prüfbarer Abrechnung/Freigabe/Export. **Dieser erste Schritt ist
-   nicht das volle B-07**, wenn tatsächliche Auszahlung gefordert wird. Echte
-   Banküberweisungen sind ein eigener Sicherheits- und Rechts-Change; ob sie zum
-   beauftragten Umfang gehören, entscheiden Firma/Schule/Chris. Keine
-   Produktionsbuchung oder Auszahlung aus Testcode.
+   nach Chris' Entscheidung mit prüfbarer Abrechnung/Freigabe/Export. **Dieser
+   erste Schritt ist nicht das volle B-07.** Echte Banküberweisungen danach als
+   eigenen Sicherheits- und Rechts-Change spezifizieren und planen, später
+   implementieren. Die Firma muss Zahlungsregeln, Bankzugang und Freigaben
+   bestätigen; keine Produktionsbuchung oder Auszahlung aus Testcode.
 
 Unabhängig vom Umsetzungstermin: Bundles/Stücklisten, Schulungsberechtigungen und
 PP-/Margen-Provisionen sind **keine automatisch beschlossenen Phase-2-Aufgaben**.
@@ -138,9 +143,10 @@ Die Firmenmail beschreibt künftige Möglichkeiten, nicht vollständige Regeln.
    Herr Hammer fragt die Firma nach anonymisiertem CSV/XLSX-Export, Feldregelblatt,
    Schnittstellendokumentation und freigegebenem Testzugang.
 6. **B-07:** Welche Provisionsformel, Abrechnungsperiode, Korrekturen und
-   Freigabeperson? Welche Exportformate? Sind echte Banküberweisungen überhaupt
-   beauftragt und rechtlich/organisatorisch freigegeben? Empfehlung: zuerst
-   prüfbare Abrechnung ohne Geldtransfer, Bankanbindung nur als eigener Change.
+   Freigabeperson? Welche Exportformate? Welcher Bank-/Zahlungsweg und welche
+   organisatorischen/rechtlichen Freigaben gelten für die spätere echte
+   Überweisung? Entscheidung von Chris: Abrechnung zuerst; Bankanbindung
+   anschließend separat spezifizieren, planen und später implementieren.
 7. **Mehrmandant/Accounts:** Sollen Subdomains schon im Staging gelten? Wer legt
    ersten Firmen-/Partner-Admin an, wer rettet gesperrten letzten Admin und wer
    liest Audit-Ereignisse? Empfehlung: erst tokenbasierte Tenant-Grenze ohne
