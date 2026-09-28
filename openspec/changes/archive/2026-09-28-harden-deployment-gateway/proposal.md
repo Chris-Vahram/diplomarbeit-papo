@@ -1,6 +1,6 @@
 ## Why
 
-The completed base deployment pipeline used a broadly capable SSH key and third-party SCP/SSH actions. Gateway hardening must remain traceable after that base change is archived, without treating the still-unverified VM installation as complete.
+The base deployment pipeline used a broadly capable remote deployment path. This change records the constrained gateway, installed VM boundary and verified release behavior alongside that archived pipeline.
 
 ## What Changes
 
@@ -8,7 +8,7 @@ The completed base deployment pipeline used a broadly capable SSH key and third-
 - Validate the uploaded frontend byte-for-byte against a server-generated Git archive before activation.
 - Deploy the backend by immutable SHA and switch the existing frontend release symlink atomically without recreating PostgreSQL, Keycloak or Caddy.
 - Pin third-party workflow Actions to full commit SHAs.
-- Keep VM installation, ownership, sudoers and negative remote tests explicitly open until Tobias supplies evidence.
+- Verify the installed VM boundary and deployed runtime using configuration evidence, the local harness, and successful release/rollback checks.
 
 ## Capabilities
 

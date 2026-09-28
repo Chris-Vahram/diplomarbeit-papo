@@ -42,26 +42,32 @@ The system SHALL build a Quarkus JVM-mode container image targeting `linux/amd64
 - **THEN** it SHALL be built for the `linux/amd64` platform to match the deployment VM's architecture (VM is `x86_64`, same as GitHub-hosted runners — no cross-arch build needed)
 
 ### Requirement: Automated deployment via SSH
-The system SHALL deploy the newly built image to the production VM over SSH. The deployment SHALL report success only after the exact new backend image responds through the production API route. It SHALL keep the old frontend active until that check passes and SHALL attempt to restore the prior immutable backend image if activation fails, without requiring the pipeline to hold standing VM access outside the workflow run.
+The system SHALL deploy through a forced-command SSH gateway that accepts only `upload`, `verify` and `activate` for one lowercase 40-hex SHA matching server-fetched `origin/main`. The uploaded frontend archive SHALL byte-match the server-generated canonical archive and contain only regular Git blobs.
 
 #### Scenario: Deploy job runs after successful build
-- **WHEN** the build-and-push job completes successfully for a push to `main`
-- **THEN** the deploy job connects to the production VM via SSH using a GitHub Actions secret for the deploy key
-- **AND** pulls and starts only the backend for that exact `main` SHA
+- **WHEN** build-and-push succeeds for a commit on `main`
+- **THEN** the workflow uploads, verifies and activates that exact commit
+- **AND** the backend image tag equals the verified SHA
+- **AND** the frontend is extracted directly to `frontend-live/releases/<sha>/`
+- **AND** `frontend-live/current` is switched atomically only after backend deployment succeeds
 
 #### Scenario: Only the Quarkus service is recreated
-- **WHEN** a release is activated on the VM
-- **THEN** only the Quarkus container is replaced with the new image
-- **AND** the Postgres, Keycloak and Caddy containers continue running without interruption or data loss
+- **WHEN** a normal release is activated
+- **THEN** PostgreSQL, Keycloak and Caddy SHALL NOT be recreated
+
+#### Scenario: Deploy job fails without breaking existing deployment
+- **WHEN** the command, SHA, archive, repository revision, file type or runtime prerequisite is invalid
+- **THEN** the gateway rejects the request
+- **AND** the previous `frontend-live/current` target remains unchanged
 
 #### Scenario: Healthy backend activates frontend
-- **WHEN** the exact new backend image returns the expected unauthenticated HTTP 401 through the local HTTPS API route on consecutive checks without a container restart within the bounded readiness period
-- **THEN** the frontend release pointer switches to the matching SHA
+- **WHEN** the exact backend SHA returns HTTP 401 through the local HTTPS API route on consecutive checks without a container restart within the bounded readiness period
+- **THEN** the gateway switches `frontend-live/current` to the matching release
 - **AND** the deploy job reports success
 
 #### Scenario: New backend fails after Compose accepts it
 - **WHEN** the backend does not pass the bounded readiness check
-- **THEN** the frontend pointer remains on its previous release
+- **THEN** the previous frontend remains selected
 - **AND** the gateway attempts to restore the previous immutable backend image when one exists
 - **AND** the deploy job fails even if that restoration succeeds
 
@@ -70,12 +76,6 @@ The system SHALL deploy the newly built image to the production VM over SSH. The
 - **THEN** the previous frontend remains selected
 - **AND** the gateway attempts to restore the previous immutable backend image
 - **AND** the deploy job fails
-
-#### Scenario: Deploy job fails without breaking existing deployment
-- **WHEN** SSH, image pull, Compose activation or backend readiness fails
-- **THEN** the deploy job reports failure rather than success
-- **AND** the previous frontend remains selected
-- **AND** the gateway attempts to restore a previous immutable backend image if backend replacement may have begun
 
 #### Scenario: No safe rollback image or rollback fails
 - **WHEN** activation fails and no previous immutable backend image exists, or restoring it does not become healthy
@@ -87,6 +87,10 @@ The system SHALL deploy the newly built image to the production VM over SSH. The
 - **THEN** it keeps or restores the previous frontend pointer
 - **AND** attempts to restore and verify the previous immutable backend image
 - **AND** exits unsuccessfully without deleting an active frontend release
+
+#### Scenario: Verification has no deployment side effects
+- **WHEN** a valid `verify` request is processed
+- **THEN** no container, release directory or active frontend link is changed
 
 ### Requirement: No secrets committed to the repository
 The system SHALL keep all deployment credentials (database password, Keycloak admin credentials, deploy SSH key, VM public IP) out of the repository, sourced exclusively from GitHub Actions secrets or VM-local configuration not checked into version control.
