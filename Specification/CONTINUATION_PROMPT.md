@@ -7,13 +7,13 @@ geordnet. Dieses Dokument bleibt der einzige operative Session-Handoff.
 
 ## Wichtiger Wiedereinstieg — Deploy-Health/Rollback-Fix
 
-Aktueller lokaler Branch: `fix/deploy-health-rollback`, Basis `origin/main`
-`075bd93`. Deployment-Code, Gateway-Harness, Doku, OpenSpec-Changes, B-07-Plan
-und KI-Nachweis wurden geprüft; der Harness hat 30/30 Prüfungen bestanden.
-Chris autorisierte in dieser Sitzung Commit, Push, Merge und Demo-Deploy.
+Aktueller lokaler Branch: `fix/deploy-health-rollback`; PR #31 wurde gemergt,
+Merge-Commit `6853e78`. Deployment-Code, Gateway-Harness, Doku, OpenSpec-Changes,
+B-07-Plan und KI-Nachweis sind geprüft; der Harness hat 30/30 Prüfungen
+bestanden. PR, `main`-Deploy und Live-Prüfung sind erfolgreich.
 
-Der neue OpenSpec-Change validierte mit `openspec validate
-verify-deploy-health-and-rollback --strict`. Gateway/Harness `sh -n` bestanden;
+Der OpenSpec-Change `verify-deploy-health-and-rollback` wurde nach dem
+erfolgreichen Live-Deploy archiviert. Gateway/Harness `sh -n` bestanden;
 der lokale Harness bestand mit **30 Prüfungen**; `git diff --check` sauber.
 Unabhängiger finaler Security-Review fand und half beheben: aktiven Frontend-
 Release durch Signal-Trap löschen; Curl-Konfig via `.curlrc`; Frontend-Rollback-
@@ -25,23 +25,26 @@ Backend-Bereitschaft; finaler Review bestätigte **keine Blocker**.
 Gateway verlangt zwei stabile HTTPS-401-Antworten mit gleicher Container-ID,
 Image und Restart-Zahl, nutzt `curl -q --noproxy '*' --resolve ...` mit TLS-
 Validierung, rollt Backend/Frontend bei Compose-/Health-/Signalfehler zurück und
-löscht kein aktives Release. OpenSpec Tasks 1.1, 1.2, 2.1, 2.2 und 3.1 sind
-erledigt. Task 3.1 wurde am 25.09.2026 zuerst auf der Demo-VM abgeschlossen;
-das ursprüngliche Backup bleibt unter
-`/usr/local/libexec/papo-deploy-gateway.backup-20260925T144611Z`. Nach dem
-TERM-Rollback-Fix wurde die vorige VM-Version als
-`/usr/local/libexec/papo-deploy-gateway.backup-20260928T122840Z` gesichert; die
-neue Installation `root:root 755` hat SHA-256
+löscht kein aktives Release. OpenSpec-Change `verify-deploy-health-and-rollback`
+ist nach erfolgreichem Live-Deploy archiviert unter
+`openspec/changes/archive/2026-09-28-verify-deploy-health-and-rollback/`.
+Tasks 1.1–3.2 sind erledigt. PR #31 wurde als `6853e78` gemergt; `main`-Run
+`36422792734` bestand Tests (2:26), Image-Build/Push (1:13) und VM-Deploy (0:43).
+Live ist Backend-Image exakt `6853e78e59f8c3c756bdea7f28ef5e02101b4ca3`,
+`running`, RestartCount 0. Postgres, Keycloak und Caddy laufen mit RestartCount 0;
+ihre Container wurden vor dem Deploy erstellt. VM-lokale HTTPS-Prüfung: Frontend
+200, geschützte API 401, OIDC Discovery 200. Die Deployment-Credential aus
+GitHub Actions wurde damit praktisch bestätigt.
+
+Task 3.1: Das ursprüngliche Backup bleibt unter
+`/usr/local/libexec/papo-deploy-gateway.backup-20260925T144611Z`; vorige
+Gateway-Version `577c21d…` wurde vor der finalen Installation als
+`/usr/local/libexec/papo-deploy-gateway.backup-20260928T122840Z` gesichert.
+Aktuelle VM-Installation `root:root 755`, SHA-256
 `e967b77f2499edd99a74edeafd8534d96e02948b2e67a29d6a0dc6ef8d79481a` (identisch
 zum lokalen Stand), Remote-`sh -n` erfolgreich. Sudoers und SSH-Schlüssel wurden
-nicht geändert. Eine nicht geheime Staging-Kopie liegt unter
-`/tmp/papo-deploy-gateway.new-20260928T122840Z`. Offen ist Task 3.2:
-Feature-Branch push/PR/CI, danach Merge in `main`
-(dessen Produktions-Deploy Chris ausdrücklich akzeptiert hat) und
-Live-Verifikation. Chris bestätigte am 28.09.2026 den Widerruf des zuvor
-sichtbaren GitHub-PAT. Damit ist diese Sperre aufgehoben; den Token niemals
-anfordern oder verwenden. Chris hat Commit, Push, Merge und den Demo-Deploy für
-diesen Branch ausdrücklich autorisiert.
+nicht geändert. Die nicht geheime Staging-Kopie liegt unter
+`/tmp/papo-deploy-gateway.new-20260928T122840Z`.
 
 Die lokale Datei `~/Desktop/papo-deploy-key` ist parsebar, aber ihr
 Fingerprint passt **nicht** zum einzigen Key in
@@ -49,12 +52,24 @@ Fingerprint passt **nicht** zum einzigen Key in
 wurde abgewiesen. Auch die einzige SSH-Agent-Identität passt nicht. Chris
 bestätigt, dass das passende Schlüsselpaar derzeit nicht verfügbar ist. Es wird
 nur für die externe SSH-Negativmatrix benötigt; lokale Implementierung, PR-CI
-und das normale Actions-Deployment können ohne diese Datei weiterlaufen, sofern
-das nicht rücklesbare GitHub-Secret `VM_SSH_KEY` stimmt. Keine VM-Autorisierung
-ändern und die Matrix erst nach Fingerprint-Abgleich ausführen. Keine
-kostenpflichtige Bestellung mit späterer Abwicklung, **keine bestätigte
-Online-Zahlung**. Ziel ist eine sicher deploybare Staging-Version bis Herbstferien,
-nicht die schriftliche Thesis.
+und das normale Actions-Deployment laufen ohne diese Datei. Der erfolgreiche
+`main`-Run `36422792734` bestätigt das GitHub-Secret `VM_SSH_KEY`, dessen Wert
+nicht rücklesbar ist. Keine VM-Autorisierung ändern und die Matrix erst nach
+Fingerprint-Abgleich ausführen. Keine kostenpflichtige Bestellung mit späterer
+Abwicklung, **keine bestätigte Online-Zahlung**. Ziel ist eine sicher deploybare
+Staging-Version bis Herbstferien, nicht die schriftliche Thesis.
+
+## Konkreter nächster Schritt
+
+- Deployment: Es ist keine weitere Gateway-Implementierung für diesen Change
+  offen. Sobald das passende Schlüsselpaar verfügbar ist, Fingerprint vergleichen
+  und nur dann die externe SSH-Negativmatrix aus Task 2.2 in
+  `harden-deployment-gateway` ausführen. Die GitHub-Actions-Deploy-Credential
+  wurde bereits erfolgreich bestätigt.
+- Weitere Changes: `complete-thesis-documentation` wartet auf Tobias' Screenshot-
+  Prüfung und die gemeinsame Abnahme von Chris/Tobias. `decouple-partner-number-from-login`
+  und `add-unique-bmd-article-number` warten auf verbindliche Daten-/Fachregeln;
+  aktuell ist dort nichts sicher implementierungsbereit.
 
 **Nicht entschieden:** verbindliche Herbstferien-Abnahmeliste; Firmen-/Schulfreigabe
 für B-06 und B-07; BMD-Produkt/API und Export-/Rückkanal; Provisionsformel/
@@ -66,10 +81,10 @@ keinen technischen BMD-Vertrag.
 
 ## Git/Deployment-Grenze
 
-`main` enthält PR #27 (`5fff3b0`), Migrationsfix aus PR #28 (`b5ab7fb`) und
-Post-Deploy-Handoff aus PR #29 (`19fa02b`) und Präsentationsänderung aus PR #30
-(`075bd93`); Branch `fix/deploy-health-rollback` wurde auf `origin/main`
-`075bd93` fast-forwarded. Archivdateien
+`main` enthält PR #27 (`5fff3b0`), Migrationsfix aus PR #28 (`b5ab7fb`),
+Post-Deploy-Handoff aus PR #29 (`19fa02b`), Präsentationsänderung aus PR #30
+(`075bd93`) und Deploy-Health/Rollback aus PR #31 (`6853e78`). Die archivierte
+Deployment-Spezifikation ist mit dem Code synchronisiert. Archivdateien
 und neuere Spezifikationen aus dem früheren lokalen `main` blieben erhalten.
 Der erste Deploy von `5fff3b0` startete das Backend nicht: Die VM hatte den
 historischen Demo-Namen „Elektro Huber GmbH“, die Migration erkannte nur
@@ -83,10 +98,10 @@ RestartCount 0, Frontend-Link auf denselben SHA, 3/3 Partner mit Steuerkennung,
 1 Firmenprofil; Frontend HTTP 200, geschützte API ohne Login HTTP 401, OIDC
 HTTP 200. Noch keine angemeldete End-to-End-Browserabnahme.
 
-**Deploy-Risiko:** Der Gateway meldete beim ersten Versuch „Release aktiviert“,
-obwohl der Backend-Prozess danach abstürzte; GitHub Actions zeigte Erfolg.
-Post-Activation-Health-Check und automatischer Rollback sind ein separater,
-prioritärer Infrastruktur-Fix vor der nächsten größeren `main`-Änderung.
+**Deploy-Risiko behoben:** Der Gateway meldete beim ersten Versuch „Release
+aktiviert“, obwohl der Backend-Prozess danach abstürzte. PR #31 ergänzt
+Post-Activation-Health-Check und automatischen Backend-/Frontend-Rollback; der
+Live-Deploy von `6853e78` bestätigte den Ablauf.
 
 Der bestehende Keycloak-Produktions-Template enthält **aktive Demo-Konten mit
 bekannten Passwörtern**. `SEED_DEMO_DATA=false` deaktiviert sie nicht; eine bereits

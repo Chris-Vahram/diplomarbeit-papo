@@ -87,6 +87,9 @@ fehlgeschlagen. Ohne bekanntes SHA-Image oder bei fehlgeschlagenem Rollback ist 
 manueller Eingriff nötig. Bei HUP, INT oder TERM während der Aktivierung versucht
 der Gateway ebenfalls den alten Frontend-Zeiger und das vorige Backend
 wiederherzustellen. Die Datenbank wird nie automatisch zurückgerollt.
+Wiederholte HUP-, INT- und TERM-Signale werden während der Wiederherstellung
+ignoriert, damit sie den Rollback nicht abbrechen. Hängt der Docker-Daemon dabei,
+ist ein Eingriff über den VM-Adminzugang nötig.
 
 Für einen manuellen Backend-Rollback zuerst Image-SHA, Logs und Datenbank-
 Kompatibilität prüfen. Danach mit einer bekannt guten SHA gezielt nur `backend`

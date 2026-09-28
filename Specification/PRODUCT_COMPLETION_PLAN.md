@@ -26,8 +26,8 @@ Erweiterung wird in kleinen OpenSpec-Changes spezifiziert und einzeln umgesetzt.
   `~/Desktop/papo-deploy-key` ist lesbar, aber ihr Fingerprint passt nicht zum
   autorisierten `papo-deploy`-Key auf der VM. Chris bestätigt, dass das passende
   Schlüsselpaar derzeit nicht verfügbar ist; die externe SSH-Negativmatrix wartet
-  darauf. Das GitHub-Secret `VM_SSH_KEY` ist vorhanden, sein Wert ist nicht
-  rücklesbar.
+  darauf. Das GitHub-Secret `VM_SSH_KEY` bleibt nicht rücklesbar, wurde aber vom
+  erfolgreichen `main`-Deploy am 28.09.2026 nachweislich verwendet.
 - Chris bestätigt für die aktuelle VM ausschließlich Demo-Daten und aktive,
   bekannte Demo-Logins. Sie ist keine sichere Umgebung für echte Kundendaten;
   Demo-Logins vor echtem Onboarding deaktivieren und gesondert prüfen.
