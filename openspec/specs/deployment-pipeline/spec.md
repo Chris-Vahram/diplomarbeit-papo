@@ -1,9 +1,10 @@
 # deployment-pipeline Specification
 
 ## Purpose
-TBD - created by archiving change ci-cd-deployment-with-gh-actions. Update Purpose after archive.
+Builds and deploys the PAPO services on the demo VM through tested, constrained workflows while preserving persistent data and healthy releases.
 
 ## Requirements
+
 ### Requirement: Automated build on push to main
 The system SHALL automatically run the backend test suite on every push to `main` and on every pull request, using a GitHub Actions workflow.
 
@@ -41,21 +42,51 @@ The system SHALL build a Quarkus JVM-mode container image targeting `linux/amd64
 - **THEN** it SHALL be built for the `linux/amd64` platform to match the deployment VM's architecture (VM is `x86_64`, same as GitHub-hosted runners — no cross-arch build needed)
 
 ### Requirement: Automated deployment via SSH
-The system SHALL deploy the newly built image to the production VM by connecting over SSH and running `docker compose pull && docker compose up -d`, without requiring the pipeline to hold standing access to the VM outside of the workflow run.
+The system SHALL deploy the newly built image to the production VM over SSH. The deployment SHALL report success only after the exact new backend image responds through the production API route. It SHALL keep the old frontend active until that check passes and SHALL attempt to restore the prior immutable backend image if activation fails, without requiring the pipeline to hold standing VM access outside the workflow run.
 
 #### Scenario: Deploy job runs after successful build
 - **WHEN** the build-and-push job completes successfully for a push to `main`
 - **THEN** the deploy job connects to the production VM via SSH using a GitHub Actions secret for the deploy key
-- **AND** runs `docker compose pull` followed by `docker compose up -d` in the production compose directory
+- **AND** pulls and starts only the backend for that exact `main` SHA
 
 #### Scenario: Only the Quarkus service is recreated
-- **WHEN** `docker compose pull && docker compose up -d` runs on the VM
+- **WHEN** a release is activated on the VM
 - **THEN** only the Quarkus container is replaced with the new image
-- **AND** the Postgres and Keycloak containers continue running without interruption or data loss
+- **AND** the Postgres, Keycloak and Caddy containers continue running without interruption or data loss
+
+#### Scenario: Healthy backend activates frontend
+- **WHEN** the exact new backend image returns the expected unauthenticated HTTP 401 through the local HTTPS API route on consecutive checks without a container restart within the bounded readiness period
+- **THEN** the frontend release pointer switches to the matching SHA
+- **AND** the deploy job reports success
+
+#### Scenario: New backend fails after Compose accepts it
+- **WHEN** the backend does not pass the bounded readiness check
+- **THEN** the frontend pointer remains on its previous release
+- **AND** the gateway attempts to restore the previous immutable backend image when one exists
+- **AND** the deploy job fails even if that restoration succeeds
+
+#### Scenario: Frontend switch fails after backend becomes healthy
+- **WHEN** the new backend passes readiness but the frontend pointer cannot be switched
+- **THEN** the previous frontend remains selected
+- **AND** the gateway attempts to restore the previous immutable backend image
+- **AND** the deploy job fails
 
 #### Scenario: Deploy job fails without breaking existing deployment
-- **WHEN** the SSH connection or the deploy commands fail
-- **THEN** the previously running containers SHALL remain unaffected (no partial state that removes a working deployment)
+- **WHEN** SSH, image pull, Compose activation or backend readiness fails
+- **THEN** the deploy job reports failure rather than success
+- **AND** the previous frontend remains selected
+- **AND** the gateway attempts to restore a previous immutable backend image if backend replacement may have begun
+
+#### Scenario: No safe rollback image or rollback fails
+- **WHEN** activation fails and no previous immutable backend image exists, or restoring it does not become healthy
+- **THEN** the gateway reports failure and leaves the frontend pointer unchanged
+- **AND** it does not report a successful rollback
+
+#### Scenario: Deployment process receives a termination signal during activation
+- **WHEN** the gateway receives HUP, INT or TERM after backend replacement begins
+- **THEN** it keeps or restores the previous frontend pointer
+- **AND** attempts to restore and verify the previous immutable backend image
+- **AND** exits unsuccessfully without deleting an active frontend release
 
 ### Requirement: No secrets committed to the repository
 The system SHALL keep all deployment credentials (database password, Keycloak admin credentials, deploy SSH key, VM public IP) out of the repository, sourced exclusively from GitHub Actions secrets or VM-local configuration not checked into version control.

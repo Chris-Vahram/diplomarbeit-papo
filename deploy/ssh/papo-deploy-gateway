@@ -175,6 +175,7 @@ restore_frontend() {
 }
 
 on_signal() {
+    # ponytail: finish rollback across repeated signals; bound Docker calls if the daemon hangs.
     trap '' HUP INT TERM
     if [ "${activation_in_progress-0}" = 1 ]; then
         if ! restore_frontend; then printf '%s\n' 'Frontend-Rollback nach Signal fehlgeschlagen' >&2; fi

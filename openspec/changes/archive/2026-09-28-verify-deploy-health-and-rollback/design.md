@@ -20,6 +20,7 @@ The gateway currently validates the exact `main` SHA and frontend archive, then 
 
 - [Risk] A release changes database schema incompatibly, so the old backend cannot start against the new schema. Mitigation: rollback is best-effort and its health is checked; deployments with migrations still require staging, compatible migration design and backup. Never claim DB rollback.
 - [Risk] TLS/DNS or proxy failure causes a false negative. Mitigation: probe the production hostname via local loopback with normal certificate validation, and report failure rather than activating an unverified release.
+- [Risk] Docker Compose can hang while signal recovery is running; repeated HUP/INT/TERM are ignored to let rollback finish. Mitigation: use the VM admin path for a hung daemon; add bounded Compose calls if this occurs operationally.
 - [Risk] The repository script changes but the root-owned VM copy remains old. Mitigation: install the reviewed script through authorized admin access before merging, verify owner/mode/hash, then monitor the main deploy and public endpoints. Keep a root-owned backup for recovery.
 
 ## Migration Plan
