@@ -17,7 +17,7 @@ The base CI/CD change is archived on `origin/main`. The current workflow still g
 
 The workflow uses native OpenSSH and pinned Actions. The root-owned gateway fetches `origin/main` through a separate read-only repository key, generates the canonical frontend archive itself and compares it byte-for-byte with the uploaded stream. Activation extracts into a temporary directory, requires a regular top-level `index.html`, moves the release into place, deploys only `backend` with `IMAGE_TAG=<sha>`, then switches `current`. PostgreSQL, Keycloak and Caddy are excluded from normal release commands.
 
-The dedicated `papo-deploy` account has no Docker-group membership or general sudo. `authorized_keys` forces one empty-argument sudo invocation; `SSH_ORIGINAL_COMMAND` carries the validated protocol request. Installation remains blocked until Tobias supplies sanitized ownership, key, host-key and sudoers evidence plus remote negative tests.
+The dedicated `papo-deploy` account has no Docker-group membership or general sudo. `authorized_keys` forces one empty-argument sudo invocation; `SSH_ORIGINAL_COMMAND` carries the validated protocol request. Task 2.1's installation and sanitized VM evidence are complete. The external SSH negative-test matrix remains Task 2.2 and must pass before this change is complete.
 
 ## Risks / Trade-offs
 

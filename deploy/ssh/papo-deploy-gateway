@@ -103,6 +103,88 @@ verify() { fetch_main; validate_pending; printf '%s\n' 'Release geprüft'; }
 run_as_papo() { if [ "$TESTING" = 1 ]; then "$@"; else runuser --user "$DEPLOY_USER" -- "$@"; fi; }
 file_mode() { stat -c '%a' "$1" 2>/dev/null || stat -f '%Lp' "$1" 2>/dev/null; }
 
+backend_image() { docker inspect --format '{{.Config.Image}}' papo-prod-backend 2>/dev/null; }
+
+ready_backend() {
+    expected_image=$1
+    attempts=20
+    [ "$TESTING" = 0 ] || attempts=3
+    consecutive=0
+    previous_sample=
+    while [ "$attempts" -gt 0 ]; do
+        sample=$(docker inspect --format '{{.Id}}|{{.Config.Image}}|{{.RestartCount}}|{{.State.Running}}' papo-prod-backend 2>/dev/null) || sample=
+        container_id=${sample%%|*}
+        case "$sample" in
+            "$container_id|$expected_image|"*'|true')
+                status=$(curl -q --noproxy '*' --silent --show-error --connect-timeout 2 --max-time 5 \
+                    --output /dev/null --write-out '%{http_code}' \
+                    --resolve "$domain:443:127.0.0.1" "https://$domain/api/company/profile" 2>/dev/null) || status=
+                after=$(docker inspect --format '{{.Id}}|{{.Config.Image}}|{{.RestartCount}}|{{.State.Running}}' papo-prod-backend 2>/dev/null) || after=
+                if [ -n "$container_id" ] && [ "$status" = 401 ] && [ "$sample" = "$after" ]; then
+                    if [ "$sample" = "$previous_sample" ]; then consecutive=$((consecutive + 1)); else consecutive=1; fi
+                    [ "$consecutive" -lt 2 ] || return 0
+                    previous_sample=$sample
+                else
+                    consecutive=0; previous_sample=
+                fi
+                ;;
+            *) consecutive=0; previous_sample= ;;
+        esac
+        attempts=$((attempts - 1))
+        [ "$attempts" -eq 0 ] || { [ "$TESTING" = 1 ] || sleep 3; }
+    done
+    return 1
+}
+
+restore_backend() {
+    if [ -z "$previous_tag" ]; then
+        printf '%s\n' 'Deployment fehlgeschlagen; kein sicherer Backend-Rollback vorhanden' >&2
+        return 1
+    fi
+    if ! run_as_papo sh -c 'cd "$1" && exec env IMAGE_TAG="$2" docker compose -f docker-compose.prod.yml --env-file "$3" up -d --no-deps backend' sh "$DEPLOY_ROOT" "$previous_tag" "$ENV_FILE"; then
+        printf '%s\n' 'Deployment fehlgeschlagen; Backend-Rollback fehlgeschlagen' >&2
+        return 1
+    fi
+    if ! ready_backend "$previous_image"; then
+        printf '%s\n' 'Deployment fehlgeschlagen; wiederhergestelltes Backend nicht erreichbar' >&2
+        return 1
+    fi
+    printf '%s\n' 'Deployment fehlgeschlagen; vorheriges Backend wiederhergestellt' >&2
+}
+
+restore_frontend() {
+    [ "${frontend_switched-0}" = 1 ] || return 0
+    current_target=$(readlink "$CURRENT_LINK" 2>/dev/null) || current_target=
+    if [ "$current_target" = "$old_target" ] && { [ -n "$old_target" ] || { [ ! -e "$CURRENT_LINK" ] && [ ! -L "$CURRENT_LINK" ]; }; }; then
+        frontend_switched=0
+        return 0
+    fi
+    [ "$current_target" = "releases/$sha" ] || return 1
+    if [ -z "$old_target" ]; then
+        rm -f -- "$CURRENT_LINK"
+    else
+        restore_link="$FRONTEND_ROOT/.restore.$sha.$$"
+        cleanup_file2=$restore_link
+        ln -s "$old_target" "$restore_link" || return 1
+        if [ "$TESTING" = 1 ]; then mv -fh -- "$restore_link" "$CURRENT_LINK"; else mv -Tf -- "$restore_link" "$CURRENT_LINK"; fi || return 1
+        cleanup_file2=
+    fi
+    restored_target=$(readlink "$CURRENT_LINK" 2>/dev/null) || restored_target=
+    if [ "$old_target" != "$restored_target" ] || { [ -z "$old_target" ] && { [ -e "$CURRENT_LINK" ] || [ -L "$CURRENT_LINK" ]; }; }; then return 1; fi
+    frontend_switched=0
+}
+
+on_signal() {
+    trap '' HUP INT TERM
+    if [ "${activation_in_progress-0}" = 1 ]; then
+        if ! restore_frontend; then printf '%s\n' 'Frontend-Rollback nach Signal fehlgeschlagen' >&2; fi
+        restore_backend || :
+    fi
+    cleanup
+    exit 1
+}
+trap 'on_signal' HUP INT TERM
+
 activate() {
     fetch_main
     validate_pending
@@ -110,7 +192,28 @@ activate() {
     [ -f "$ENV_FILE" ] && [ ! -L "$ENV_FILE" ] || fail
     [ "$(file_mode "$ENV_FILE")" = 600 ] || fail
     if [ "$TESTING" = 0 ]; then [ "$(stat -c '%U:%G' "$ENV_FILE" 2>/dev/null)" = papo:papo ] || fail; fi
+    domain=$(sed -n 's/^DOMAIN=//p' "$ENV_FILE")
+    case "$domain" in ''|*[!a-zA-Z0-9.-]*|.*|*..*|*.) fail ;; esac
     [ ! -e "$CURRENT_LINK" ] || [ -L "$CURRENT_LINK" ] || fail
+    old_target=
+    if [ -L "$CURRENT_LINK" ]; then
+        old_target=$(readlink "$CURRENT_LINK") || fail
+        case "$old_target" in releases/*) ;; *) fail ;; esac
+        old_sha=${old_target#releases/}
+        [ "${#old_sha}" -eq 40 ] || fail
+        case "$old_sha" in *[!0-9a-f]*|'') fail ;; esac
+        [ -d "$FRONTEND_ROOT/$old_target" ] && [ ! -L "$FRONTEND_ROOT/$old_target" ] || fail
+    fi
+    previous_image=$(backend_image) || previous_image=
+    previous_tag=
+    case "$previous_image" in
+        ghcr.io/chris-vahram/diplomarbeit-papo-backend:*)
+            candidate=${previous_image##*:}
+            if [ "${#candidate}" -eq 40 ]; then
+                case "$candidate" in *[!0-9a-f]*|'') ;; *) previous_tag=$candidate ;; esac
+            fi
+            ;;
+    esac
     release="$RELEASES_DIR/$sha"
     cleanup_dir=$(mktemp -d "$RELEASES_DIR/.release-$sha.XXXXXX") || fail
     tar -xf "$canonical" --strip-components=1 -C "$cleanup_dir" || fail
@@ -124,12 +227,40 @@ activate() {
     fi
     rm -f -- "$canonical"; cleanup_file=
     run_as_papo sh -c 'cd "$1" && exec env IMAGE_TAG="$2" docker compose -f docker-compose.prod.yml --env-file "$3" pull backend' sh "$DEPLOY_ROOT" "$sha" "$ENV_FILE" || fail
-    run_as_papo sh -c 'cd "$1" && exec env IMAGE_TAG="$2" docker compose -f docker-compose.prod.yml --env-file "$3" up -d --no-deps backend' sh "$DEPLOY_ROOT" "$sha" "$ENV_FILE" || fail
-    next_link="$FRONTEND_ROOT/.current.$sha.$$"
-    ln -s "releases/$sha" "$next_link"
-    if [ "$TESTING" = 1 ]; then mv -fh -- "$next_link" "$CURRENT_LINK"; else mv -Tf -- "$next_link" "$CURRENT_LINK"; fi
+    activation_in_progress=1
+    if ! run_as_papo sh -c 'cd "$1" && exec env IMAGE_TAG="$2" docker compose -f docker-compose.prod.yml --env-file "$3" up -d --no-deps backend' sh "$DEPLOY_ROOT" "$sha" "$ENV_FILE"; then
+        restore_backend || :
+        activation_in_progress=0
+        exit 1
+    fi
+    if ! ready_backend "ghcr.io/chris-vahram/diplomarbeit-papo-backend:$sha"; then
+        restore_backend || :
+        activation_in_progress=0
+        exit 1
+    fi
     cleanup_dir=
-    ls -1dt "$RELEASES_DIR"/* 2>/dev/null | tail -n +6 | while IFS= read -r old; do rm -rf -- "$old"; done
+    next_link="$FRONTEND_ROOT/.current.$sha.$$"
+    cleanup_file2=$next_link
+    if ! ln -s "releases/$sha" "$next_link"; then
+        restore_backend || :
+        activation_in_progress=0
+        exit 1
+    fi
+    frontend_switched=1
+    if [ "$TESTING" = 1 ]; then
+        switched=$(mv -fh -- "$next_link" "$CURRENT_LINK" && printf yes) || switched=
+    else
+        switched=$(mv -Tf -- "$next_link" "$CURRENT_LINK" && printf yes) || switched=
+    fi
+    if [ "$switched" != yes ]; then
+        if ! restore_frontend; then printf '%s\n' 'Frontend-Rollback fehlgeschlagen; manueller Eingriff nötig' >&2; fi
+        restore_backend || :
+        activation_in_progress=0
+        exit 1
+    fi
+    cleanup_file2=
+    activation_in_progress=0
+    ls -1dt "$RELEASES_DIR"/* 2>/dev/null | tail -n +6 | while IFS= read -r old; do rm -rf -- "$old"; done || :
     printf '%s\n' 'Release aktiviert'
 }
 

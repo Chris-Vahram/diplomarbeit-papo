@@ -20,8 +20,9 @@ Produktionstopologie, CI/CD-Pipeline und Rollback-Prozedur. Setup/Dev-Umgebung s
    `latest` und `<git-sha>`.
 3. **`deploy`** (nach erfolgreichem `build-and-push`) — sendet ein kanonisches Frontend-
    Archiv an den Forced-Command-Gateway und ruft `upload`, `verify`, `activate` für den
-   exakten `main`-SHA auf. Der Gateway ersetzt nur `backend`, hängt danach
-   `frontend-live/current` atomar um und lässt Postgres, Keycloak und Caddy unverändert.
+   exakten `main`-SHA auf. Der Gateway ersetzt nur `backend`, prüft dessen Start über
+   die lokale HTTPS-Route und hängt erst danach `frontend-live/current` atomar um.
+   Postgres, Keycloak und Caddy bleiben unverändert.
 
 Ein fehlgeschlagener Test-Job verhindert Build und Deploy vollständig.
 
@@ -69,23 +70,38 @@ Hand entfernt werden, sobald der erste Deploy mit diesem Schema durchgelaufen is
 Der eingeschränkte SSH-Account `papo-deploy` erhält keine Shell und keine Docker-Gruppe.
 Sein erzwungener Befehl ruft ausschließlich das root-owned
 `/usr/local/libexec/papo-deploy-gateway` über die enge Regel aus
-`deploy/ssh/papo-deploy.sudoers` auf. Installation und Remote-Negativtests sind Task 5.9
-und dürfen erst nach Tobias' VM-, Key-, Host-Key- und sudoers-Nachweisen erfolgen.
+`deploy/ssh/papo-deploy.sudoers` auf. Installation und externe SSH-Negativtests sind
+im OpenSpec-Change `harden-deployment-gateway` dokumentiert; die Negativtests mit
+dem eingeschränkten Deploy-Key sind noch offen.
 
-## Rollback (manuell)
+## Bereitschaft und Rollback
 
-Kein automatisches Rollback in dieser Pipeline. Bei einem fehlerhaften Deploy:
+Der Gateway akzeptiert das neue Backend erst, wenn das exakte SHA-Image zweimal
+hintereinander ohne Container-Neustart über
+`https://<DOMAIN>/api/company/profile` per lokalem Loopback mit gültigem TLS-Zertifikat
+HTTP 401 liefert. Die Prüfung ist zeitlich begrenzt. Bei einem Start- oder
+Frontend-Umschaltfehler bleibt das bisherige Frontend aktiv. Der Gateway versucht,
+das zuvor laufende, unveränderliche SHA-Image nur für `backend` wiederherzustellen
+und ebenfalls zu prüfen. Der Deploy-Job bleibt auch nach erfolgreichem Rollback
+fehlgeschlagen. Ohne bekanntes SHA-Image oder bei fehlgeschlagenem Rollback ist ein
+manueller Eingriff nötig. Bei HUP, INT oder TERM während der Aktivierung versucht
+der Gateway ebenfalls den alten Frontend-Zeiger und das vorige Backend
+wiederherzustellen. Die Datenbank wird nie automatisch zurückgerollt.
+
+Für einen manuellen Backend-Rollback zuerst Image-SHA, Logs und Datenbank-
+Kompatibilität prüfen. Danach mit einer bekannt guten SHA gezielt nur `backend`
+starten; `.env.prod` muss dafür nicht geändert werden:
 
 ```bash
 ssh papo@<VM_HOST>
 cd ~/papo-deploy
-# IMAGE_TAG in .env.prod auf eine bekannt-gute Commit-SHA setzen, z. B.:
-sed -i 's/^IMAGE_TAG=.*/IMAGE_TAG=<bekannt-gute-sha>/' .env.prod
-docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
+IMAGE_TAG=<bekannt-gute-sha> docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --no-deps backend
 ```
 
-Jedes Image wird sowohl mit `latest` als auch mit der Commit-SHA getaggt — die SHA bleibt
-also für einen manuellen Rollback erreichbar, auch wenn `latest` inzwischen weitergezogen ist.
+Bei einem fehlgeschlagenen Gateway-Deploy zeigt das Frontend weiter auf die vorige
+SHA. Bei einem später bemerkten Fehler nach einem abgeschlossenen Deploy muss dessen
+Symlink separat auf ein bekannt gutes Frontend-Release gesetzt werden. Jedes Image
+wird mit `latest` und der Commit-SHA getaggt; `latest` ist kein sicheres Rollback-Ziel.
 
 ## Backups
 
