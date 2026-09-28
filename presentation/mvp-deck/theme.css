@@ -659,6 +659,8 @@ table.stars a { color: var(--blue-mid); }
 
 .quote-box p { margin: 0; }
 
+.grid-3 + .quote-box { margin-top: 26px; }
+
 table.scope-table td:first-child {
   width: 30%;
   font-weight: 700;
