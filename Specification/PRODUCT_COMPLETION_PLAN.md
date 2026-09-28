@@ -22,12 +22,10 @@ Erweiterung wird in kleinen OpenSpec-Changes spezifiziert und einzeln umgesetzt.
 - Öffentlicher Partnershop: einmalige Gastbestellung oder optionales Kundenkonto zum
   Speichern eigener Daten. Bestellung ist kostenpflichtig, Zahlung/Erfüllung erfolgen
   später; kein Online-Bezahlvorgang bestätigt.
-- Chris und Tobias können die aktuelle VM administrieren. Die lokale Datei
-  `~/Desktop/papo-deploy-key` ist lesbar, aber ihr Fingerprint passt nicht zum
-  autorisierten `papo-deploy`-Key auf der VM. Chris bestätigt, dass das passende
-  Schlüsselpaar derzeit nicht verfügbar ist; die externe SSH-Negativmatrix wartet
-  darauf. Das GitHub-Secret `VM_SSH_KEY` bleibt nicht rücklesbar, wurde aber vom
-  erfolgreichen `main`-Deploy am 28.09.2026 nachweislich verwendet.
+- Der Deploy-Gateway, Health-Check und automatische Anwendungs-Rollback sind
+  implementiert, auf der Demo-VM verifiziert und archiviert. Der am 28.09.2026
+  verifizierte Stand ist `711d8f2`; den neuesten Workflow beim Sessionstart prüfen.
+  Kein Deployment-Task blockiert die Produktimplementierung.
 - Chris bestätigt für die aktuelle VM ausschließlich Demo-Daten und aktive,
   bekannte Demo-Logins. Sie ist keine sichere Umgebung für echte Kundendaten;
   Demo-Logins vor echtem Onboarding deaktivieren und gesondert prüfen.
@@ -52,6 +50,37 @@ Jeder Schritt erhält **einen eigenen** OpenSpec-Change mit Proposal, Design,
 Capability-Specs und überprüfbaren Tasks. Erst Change validieren und freigeben,
 dann implementieren, testen, reviewen und archivieren. Keine Sammel-Implementierung
 von B-01 bis B-08. Vor jedem Change aktuelle Protokolle und Git-Stand prüfen.
+
+## Nächster konkreter Arbeitsblock
+
+Beginne mit dem technischen Identity-Grundlagen-Teil aus
+`decouple-partner-number-from-login`: eine stabile OIDC-`sub`-Bindung statt der
+Kopplung von Loginname und Partnernummer. Dieser Teil darf laut aktivem Change
+unabhängig von BMD-Partnernummernregeln umgesetzt werden. Teile ihn daher in einen
+eigenen OpenSpec-Change; lasse BMD-Feldregeln und spätere Partnernummer-Änderungen
+im bestehenden BMD-Change, bis anonymisierte Beispieldaten vorliegen. Beschränke
+die erste Umsetzung auf lokale dev/test-Realm und sichere Migration; keine
+produktive Identitätsänderung oder Demo-VM-Deployment ohne separaten geprüften
+Rollout-/Rollbackplan.
+
+Für diesen Auth-/Persistenzplan ist **höheres Reasoning** sinnvoll: Vertrauensgrenze
+des OIDC-Subjects, eindeutige Bindung, bestehende Demo-Identitäten, Migration,
+Rollback und Autorisierung müssen zusammenpassen. Danach unabhängiger Security-
+und Datenbank-Review.
+
+Höheres Reasoning für spätere Planung wird außerdem benötigt für:
+
+- Mehrmandanten-Grenzen und Cross-Tenant-Isolation über alle Daten/Dateien,
+  Autorisierungswege und Migrationen hinweg.
+- Persönliche Firmen-/Partnerkonten mit Admin-Provisionierung, Kontosperre,
+  letztem Admin und Wiederherstellung.
+- Öffentlichen Partnershop/Gastbestellung, wenn dieser freigegeben wird:
+  Partnerzuordnung, Preis-Snapshot, Missbrauchsschutz und Datenschutz.
+- B-06 BMD-Synchronisation und echte B-07-Zahlungen erst nach verbindlichen
+  Firmen-/Schulregeln, technischem Zugang und Freigaben.
+
+Screenshotabnahme, BMD-Beispiellieferung und fachliche Textfreigabe sind konkrete
+menschliche Aufgaben; sie erfordern keine zusätzliche Architekturplanung.
 
 1. **Staging-Grenze klären und herstellen.** Bachl um eine getrennte Testumgebung
    oder freigegebenes gleichwertiges Staging fragen. Getrennte Daten, Zugangsdaten,
