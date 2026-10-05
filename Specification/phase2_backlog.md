@@ -10,7 +10,7 @@ Status legend:
 - `REOPENED FOR DECISION` = Chris wants to revisit the previously excluded scope;
   business rules, school/company approval and implementation contract remain open.
 
-Last updated: 2026-09-25. Chris möchte Phase 2 und weitere Produktfunktionen bis zur
+Last updated: 2026-10-06. Chris möchte Phase 2 und weitere Produktfunktionen bis zur
 Herbstferien-Staging-Version verfolgen. Das hebt die bisherigen MVP-Abgrenzungen nicht
 rückwirkend auf. Fachliche Regeln und Freigaben durch Firma/Schule sind teils noch offen;
 die Reihenfolge und Fragen stehen in `PRODUCT_COMPLETION_PLAN.md`.
@@ -66,7 +66,26 @@ die Reihenfolge und Fragen stehen in `PRODUCT_COMPLETION_PLAN.md`.
 
 ---
 
+## B-09 — Partner-employee team commissions, points and milestones — REOPENED FOR DECISION
+
+**Requested scope (2026-10-01):** Personal employee/team-leader accounts within one Partner company; order attribution to a seller with audited reassignment; configurable employee/team commission split; separate own/team revenue and commission; points and career levels; team bonus progress; dedicated team administration. Subordinate Partner companies and seminars/training are excluded from this team model.
+
+**Current behavior:** Not implemented. Partner login is shared; Partner.commissionPercent is the company-level commission percentage. CommissionRecord is created at order creation. Order states do not capture payment receipt. The public customer shop and affiliate links are not implemented.
+
+**User decisions (updated 2026-10-06):** One commission budget per order, calculated by the existing Partner.commissionPercent; seller/team/bonus shares cannot exceed it. Seller receives 100% by default when attributed, unless a different split is explicitly enabled. Initially internal allocation/display only; individual claims and payouts need company decisions. Seller is the initial attribution for employee-created orders; Partner admins may create for or assign orders to employees; changes retain actor/time/history. A valid affiliate assigns its employee, otherwise no personal seller and the order belongs to the Partner/team pool. Fulfilled and paid orders qualify for the requested metrics; current code still has no payment receipt. Historical rules/results and approved settlements must not silently change. Career levels initially do not change money commissions.
+
+**Accepted planning direction, not company approval:** Chris accepts the recommendations on 2026-10-06: propose order/team attribution and money values plus separate payment recording first; one team per Partner, equal distribution to approved eligible employees, rule snapshot at order creation and a limited bonus reserve. Points/career require an independent purpose and company confirmation of first-version scope; bonus requires rules. The full desired feature set remains, with no confirmed thresholds, rights or allocation formulas.
+
+**Open before implementation:** Whether PAPO calculates only the Partner company's commission or individual employee claims; commission basis and product-specific rates; exact seller/team/leader/bonus split and team-pool allocation; definition/evidence of payment, partial payments and corrections; rule authority/version effective date; one team or multiple leader groups and visibility; affiliate attribution window/click conflict; point formula/period/threshold/demotion; bonus thresholds, recipients, frequency and budget cap. Detailed prompts and recommended answers: Specification/TEAM_COMMISSION_DISCOVERY.md.
+
+**Important distinction:** B-03 remains automatic commission-rate level-up for a Partner company. B-09 concerns employees inside a Partner company; employee career levels must not silently alter B-03 or historical CommissionRecords.
+
+**Dependencies:** Stable OIDC subject identity; personal accounts and Partner membership; team roles and audit; tenant-scoped configuration where multiple PAPO customer companies are enabled; a separately recorded payment event before paid-order metrics; B-01 for public-shop affiliate attribution.
+
+**Next gate:** Eight company questions and the non-binding calculation example are in Specification/TEAM_COMMISSION_DISCOVERY.md. Chris plans to arrange a company appointment with his teacher on 2026-10-07; no company meeting date is confirmed. Preserve legacy records as Partner-company-only and never invent historical employee attribution. B-09 is not implementation-ready until company rules, examples and prerequisites are approved; no OpenSpec artifacts or application implementation yet.
+
 ## Decisions log (so we don't re-litigate)
+- 2026-10-06: Chris confirms the single order-commission budget and internal allocation scope, accepts planning recommendations but not company rules, and authorizes publishing the reviewed documentation. Appointment scheduling with the teacher is planned for 2026-10-07; company approval is still absent. B-03 remains separate from B-09.
 - 2026-07-01: Meetings override FSD when they conflict (newer = authoritative).
 - 2026-07-01: MVP = internal B2B partner-ordering portal. External shop → B-01 (cut).
 - 2026-07-01: Julian left DA. Work split Chris + Tobias only.

@@ -1,6 +1,6 @@
 # PAPO – Plan zur funktionalen Fertigstellung
 
-Stand: 28.09.2026. Dieser Plan ist eine Arbeitsgrundlage, keine Freigabe durch Schule
+Stand: 06.10.2026. Dieser Plan ist eine Arbeitsgrundlage, keine Freigabe durch Schule
 oder Referenzunternehmen. Die aktuelle FSD beschreibt das interne MVP; die gewünschte
 Erweiterung wird in kleinen OpenSpec-Changes spezifiziert und einzeln umgesetzt.
 `Specification/CONTINUATION_PROMPT.md` bleibt der einzige operative Session-Handoff.
@@ -35,21 +35,57 @@ Erweiterung wird in kleinen OpenSpec-Changes spezifiziert und einzeln umgesetzt.
 Chris wünscht die **gesamte Phase 2 plus Mandantenfähigkeit und persönliche Konten**
 funktional fertig, nicht nur das MVP. Das ist der gewünschte Umfang, aber noch keine
 von Firma/Schule bestätigte Abnahme oder belastbare Terminzusage. Zwischen diesem
-Stand und dem 27.10. liegen rund 29 Tage; B-03, B-06 und B-07 haben wesentliche
+Stand vom 06.10.2026 und dem 27.10.2026 liegen 21 Tage; B-03, B-06 und B-07 haben wesentliche
 fehlende Regeln/Zugänge. Ohne deren rechtzeitige Klärung kann „alles fertig“ nicht
 seriös zugesagt werden. Chris entscheidet nach dem nächsten Termin ausdrücklich,
 welche Funktionen zwingend bis Herbstferien in Staging abgenommen werden und welche
 als späterer Teil des vollständigen Produktumfangs gelten. Empfehlung für den ersten
 prüfbaren Meilenstein: getrenntes Staging, zwei isolierte Testunternehmen,
 persönliche Konten/Audit, B-08 und B-04. Das ist **keine stillschweigende Kürzung**
-des Gesamtziels; B-01 bis B-07 bleiben im Plan und brauchen eigene Entscheidungen.
+des Gesamtziels; B-01 bis B-09 bleiben im Plan und brauchen eigene Entscheidungen.
 
 ## Sequenz für den nächsten Implementierungsagenten
 
 Jeder Schritt erhält **einen eigenen** OpenSpec-Change mit Proposal, Design,
 Capability-Specs und überprüfbaren Tasks. Erst Change validieren und freigeben,
 dann implementieren, testen, reviewen und archivieren. Keine Sammel-Implementierung
-von B-01 bis B-08. Vor jedem Change aktuelle Protokolle und Git-Stand prüfen.
+von B-01 bis B-09. Vor jedem Change aktuelle Protokolle und Git-Stand prüfen.
+
+## Aktive Feature-Erkundung: Teamprovision und Mitarbeiterziele
+
+Am 01.10.2026 hat Chris Teamprovision für Mitarbeiter innerhalb einer Partnerfirma
+als spätere Produktfunktion konkretisiert. Der Scope umfasst zunächst persönliche
+Verkäufer-/Teamleiterkonten, nachvollziehbare Verkaufszuordnung, Eigen-/Teamwerte,
+Punkte, Karrierestufen, Team-Boni und Teamverwaltung. Untergeordnete Partnerfirmen
+sowie Seminare/Schulungen sind ausgeschlossen. Entscheidungen und offene Fragen
+stehen in [TEAM_COMMISSION_DISCOVERY.md](TEAM_COMMISSION_DISCOVERY.md).
+
+Am 06.10.2026 bestätigt Chris ein einziges Bestell-Provisionsbudget, standardmäßig
+100 % Verkäufer bei Zuordnung und zunächst interne Anzeige ohne beschlossene
+Mitarbeiteransprüche/Auszahlungen. Verkäufer, Team und Bonus teilen höchstens den
+bestehenden Betrag. Zahlung und Erfüllung werden getrennt betrachtet; historische
+Regeln/Zuordnungen und freigegebene Abrechnungen dürfen sich nicht still verändern.
+
+Chris akzeptiert die Empfehlungen als Planungsrichtung: zunächst Zuordnung/Geldwerte
+und Zahlungserfassung, ein Team, Gleichverteilung, Regelstand bei Bestellung und
+begrenzte Bonusreserve. Punkte/Karriere nach eigenständigem Nutzen, Bonus nach
+bestätigten Regeln. Das Gesamtziel bleibt erhalten; Firmenfreigaben fehlen weiterhin.
+Offen sind Geldbasis, berechtigte Empfänger/Stichtag, Gewichtung/Rundung, Zahlungs-
+und Korrekturregeln, Rechte, Regelautorität, Affiliate sowie Punkte-/Bonusschwellen.
+Das Feature bleibt nicht implementierungsreif; kein B-09-Change angelegt.
+
+Am 07.10.2026 möchte Chris mit dem Lehrer einen Firmentermin vereinbaren;
+die Firmenbesprechung selbst ist nicht terminiert. Die acht Firmenfragen stehen
+im Discovery-Dokument. Bereits beantwortete Nutzerfragen nicht erneut stellen.
+
+**Empfohlene Reihenfolge:** zuerst die bestehende Identity-Grundlage auf OIDC-sub
+absichern; danach Mandanten-/Organisationsgrenzen und persönliche Konten samt
+Adminrechten/Audit spezifizieren. Vor der Team-Provisionsberechnung außerdem einen
+getrennten Zahlungsstatus mit nachvollziehbarem Zahlungseingang benötigen. Danach
+Teamprovisions- und Zielregeln als eigenen OpenSpec-Change umsetzen. Affiliate-
+Zuordnung hängt vom B-01-Endkundenshop ab und ist als Shop-Integration einzuplanen.
+B-03 bleibt automatische Provisionsstufe der Partnerfirma und wird nicht mit
+Mitarbeiter-Karrierestufen gleichgesetzt.
 
 ## Nächster konkreter Arbeitsblock
 
@@ -186,6 +222,13 @@ Die Firmenmail beschreibt künftige Möglichkeiten, nicht vollständige Regeln.
    Diplomarbeitsumfang? Empfehlung: Chris und Tobias legen je Feature einen
    Staging-Demoablauf und Testbeleg vor; Herr Hammer klärt Schule/Firma beim
    nächsten Termin. Ohne diese Antwort kein seriöses Versprechen „alles fertig“.
+9. **Teamprovision B-09:** Wer erhält Provision, wie wird sie aus einem begrenzten
+   Budget verteilt, wann gilt ein Auftrag als bezahlt, wie werden Punkte/Stufen
+   berechnet und welche Bonusobergrenze gilt? Chris' Budget- und Produktrichtung
+   sowie Planungsempfehlungen sind dokumentiert. Die acht verbleibenden Firmenfragen in
+   [TEAM_COMMISSION_DISCOVERY.md](TEAM_COMMISSION_DISCOVERY.md) beantworten und
+   mit Beispielrechnungen von der Firma bestätigen lassen, bevor OpenSpec als
+   implementierungsreif gilt.
 
 ## Begriffsklärung
 

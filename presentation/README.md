@@ -1,5 +1,10 @@
 # MVP-Präsentation
 
+Aktuelle Inhaltsvorbereitung für das Lehrergespräch am 07.10.2026:
+[Projektstand und Ideen vom 06.10.2026](PROJEKTSTAND_2026-10-06.md).
+Das Deck ist dadurch noch nicht aktualisiert; Umsetzung und geplante Erweiterungen
+bleiben getrennt. Der Firmentermin muss erst vereinbart werden.
+
 reveal.js-Deck für die Diplomarbeits-Präsentation (Thema: MVP, Use Cases, Tech-Stack).
 
 ## Öffnen

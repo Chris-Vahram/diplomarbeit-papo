@@ -14,25 +14,33 @@ context: |
     - Auth: Keycloak (roles: company, partner)
 
   Scale reference: ~200 partners, ~800 articles. Data enters via Excel/CSV import (no BMD interface).
-  Commission: field on Partner (Partner.commissionPercent), company sets via dropdown 5/10/15 + optional
-  custom value; percentage of total order value; stored as own CommissionRecord. No separate level entity.
+  Current MVP commission: field on Partner (Partner.commissionPercent), company sets via dropdown 5/10/15 +
+  optional custom value; percentage of total order value; stored as own CommissionRecord. B-03 automatic
+  Partner-company commission level-up remains deferred. B-09 employee team commissions, points, career
+  levels and bonuses are reopened for planning; see Specification/TEAM_COMMISSION_DISCOVERY.md. Its formulas
+  and payment rules still need company approval. Chris confirmed one existing order-commission budget,
+  internal allocation/display first and accepted recommendations as planning direction on 2026-10-06,
+  not company approval of recipients, rights, formulas or settlement. B-09 is not implementation-ready;
+  do not create its artifacts from unanswered company questions. Keep employee career levels separate from B-03.
   Active status: DB-only flag Partner.active, enforced server-side after login (Keycloak stays simple).
   Order status: submitted -> reviewed -> fulfilled (company-controlled). Confirmations simulated in-app (no real email).
   Team: Chris + Tobias only (Julian left).
 
-  DEFERRED / OUT OF MVP (see phase2_backlog.md, do NOT plan these into MVP):
+  DEFERRED / OUT OF MVP (see phase2_backlog.md; scope only into a requested Phase-2 change):
     B-01 external partner shop + direct end-customer ordering
     B-02 shop design customization
     B-03 automatic commission level-up
     B-04 real email sending
     B-05 shop inquiry auto-forward
-    B-06 BMD interface (permanent)
+    B-06 BMD interface (reopened; not approved)
     B-07 commission settlement/payout
+    B-09 employee team commissions, points, career levels and bonuses (planning open)
 
 # Per-artifact rules (optional)
 rules:
   proposal:
-    - Keep scope strictly to MVP; deferred B-01..B-07 stay out (mention only as non-goals).
+    - Match the explicitly requested change scope; distinguish implemented MVP from requested Phase 2.
+    - For B-09 use Specification/TEAM_COMMISSION_DISCOVERY.md; do not turn recommendations or open rules into decisions.
   tasks:
     - Organize tasks into phases; mark essential vs optional; realistic for a 2-person school project.
     - Use only the fixed tech stack.

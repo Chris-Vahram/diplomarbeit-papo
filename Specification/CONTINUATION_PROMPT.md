@@ -1,9 +1,55 @@
 # PAPO – Next-Session-Context
 
-**Stand:** 28.09.2026. Operative Übergabe; volatile Angaben beim Start prüfen.
+**Stand:** 06.10.2026 (lokales Datum geprüft). Operative Übergabe; volatile Angaben beim Start prüfen.
 Stabile Regeln stehen in `AGENTS.md` und `CLAUDE.md`. Der beschlossene/noch zu
 beschließende Ausbau ist in [PRODUCT_COMPLETION_PLAN.md](PRODUCT_COMPLETION_PLAN.md)
 geordnet. Dieses Dokument bleibt der einzige operative Session-Handoff.
+
+## Aktiver Gesprächsfaden — Teamprovision für Partner-Mitarbeiter
+
+Chris hat ein gemeinsames Provisionsbudget bestätigt: Verkäufer, Team und Bonus
+teilen höchstens die bestehende Partnerprovision. Standard bei Verkäuferzuordnung
+ist 100 % Verkäufer; zunächst nur interne Zuordnung/Anzeige, keine beschlossenen
+Mitarbeiteransprüche oder Auszahlungen. Team besteht aus Mitarbeitern derselben
+Partnerfirma, ohne untergeordnete Partnerfirmen oder Schulungen. Zahlung bleibt
+getrennt von Erfüllung, Regeln/Zuordnungen auditiert, Historie unverändert.
+
+Chris akzeptiert die Empfehlungen als **Planungsrichtung**, nicht als
+Firmenfreigaben. Vorschlag für erste Version: Zuordnung/Geldwerte und getrennte
+Zahlungserfassung; Punkte/Karriere nach eigenständigem Nutzen, Bonus nach Regeln.
+Ein Team, Gleichverteilung und Regelstand bei Erstellung sind akzeptierte Vorschläge;
+Empfänger, Stichtag, konkrete Rechte, Geldbasis und Abrechnung bleiben Firmenfragen.
+
+**Nächster Gesprächsschritt:** Am **07.10.2026** möchte Chris mit dem Lehrer einen
+Firmentermin vereinbaren, nicht bereits die Firmenbesprechung durchführen.
+[TEAM_COMMISSION_DISCOVERY.md](TEAM_COMMISSION_DISCOVERY.md) enthält bestätigte
+Nutzerentscheidungen, akzeptierte Planungsempfehlungen, acht verbleibende
+Firmenfragen, unverbindliches Rechenbeispiel und Risiken. Bereits beantwortete
+Nutzerfragen nicht erneut stellen. B-09 bleibt nicht implementierungsreif;
+kein neuer OpenSpec-Change und keine Anwendung implementiert.
+
+**Technischer Ist-Stand:** Aktueller Code kennt weder persönliche Partner-Mitarbeiter
+noch Zahlungsstatus oder Shop-Affiliate-Zuordnung. Provision wird bei
+Bestellerstellung als Partner-Prozentsatz gespeichert. Diese Grenze steht samt
+Risiken und Abhängigkeiten im Discovery-Dokument.
+
+## Allgemeiner Stand und Präsentationsvorbereitung
+
+- Prüfung vor Veröffentlichung am 06.10.2026: Branch
+  `docs/team-commission-discovery-context`, HEAD `25ce0ee`; Main enthält bereits
+  PR #33 (Gateway-Hardening abgeschlossen). Neuester geprüfter Main-Workflow
+  `36433087198`: erfolgreich, SHA `25ce0ee`. Historische Live-Nachweise unten sind
+  keine neue VM-/Browserabnahme.
+- Aktive Changes unverändert: Thesis 4/6, Login-Entkopplung 0/6, BMD-Artikelnummer 0/6.
+- Chris autorisiert Commit/Push/Merge des geprüften Dokumentationsstands.
+  Bestehende Graphify-Vorarbeiten bleiben unverändert lokal; kein pauschales
+  Publizieren fremder Änderungen. Ein Main-Merge löst bestehende Demo-CI/CD aus.
+- Präsentationsinhalte für den Lehrertermin sind in
+  [PROJEKTSTAND_2026-10-06.md](../presentation/PROJEKTSTAND_2026-10-06.md)
+  vorbereitet: umgesetzt / Produktrichtung / Firmenfragen getrennt. Das bestehende
+  reveal.js-Deck und Tobias' Design sind noch nicht verändert.
+- Keine neue B-09-Implementierungsfreigabe. Als nächster unabhängiger technischer
+  Plan eignet sich die OIDC-Identity-Grundlage; vor Code eigener geprüfter Change.
 
 ## Wichtiger Wiedereinstieg — Deployment abgeschlossen
 
@@ -57,8 +103,9 @@ aktiven OpenSpec-Tasks sowie `docs/CONVENTIONS.md`/`docs/DATA_MODEL.md` prüfen.
 Danach `git status --short --branch`, `git log -5 --oneline --decorate`,
 `openspec list --json` und den neuesten Main-Workflow via
 `gh run list --branch main -L 1 --json databaseId,status,conclusion` verifizieren.
-Anschließend die Identity-Grundlage als
-separaten OpenSpec-Change planen und umsetzen. Vor dem ersten Edit die drei
+Anschließend den aktuellen Auftrag beachten: Firmen-/Präsentationsvorbereitung
+fortsetzen oder die Identity-Grundlage als separaten OpenSpec-Change planen.
+Keine automatische Implementierung allein wegen dieses Handoffs. Vor dem ersten Edit die drei
 aktiven Changes samt noch offenen Aufgaben, menschlichen/data gates und Themen
 für höheres Reasoning kurz priorisieren; nicht mit einem allgemeinen
 „weiter implementieren?“ stoppen.
@@ -84,18 +131,19 @@ Reasoning-Stufe, sondern Tobias-/Firmeninput.
 
 **Nicht entschieden:** verbindliche Herbstferien-Abnahmeliste; Firmen-/Schulfreigabe
 für B-06 und B-07; BMD-Produkt/API und Export-/Rückkanal; Provisionsformel/
-Auszahlungsart; B-03-Schwellen; Subdomains; Shop-Layouts/Anfragefelder; Staging-
-Infrastruktur. Der Plan dokumentiert Empfehlungen, nicht stillschweigende
-Entscheidungen. Herr Hammer ist Verbindung zur Firma; nach dem nächsten Termin
-liefert Chris ein neues Besprechungsprotokoll. Die öffentliche Website ersetzt
-keinen technischen BMD-Vertrag.
+Auszahlungsart; B-03-Schwellen; Teamprovisionsregeln aus
+[TEAM_COMMISSION_DISCOVERY.md](TEAM_COMMISSION_DISCOVERY.md); Subdomains;
+Shop-Layouts/Anfragefelder; Staging-Infrastruktur. Der Plan dokumentiert
+Empfehlungen, nicht stillschweigende Entscheidungen. Herr Hammer ist Verbindung
+zur Firma; nach dem nächsten Termin liefert Chris ein neues Besprechungsprotokoll.
+Die öffentliche Website ersetzt keinen technischen BMD-Vertrag.
 
 ## Git/Deployment-Grenze
 
 `main` enthält PR #27 (`5fff3b0`), Migrationsfix aus PR #28 (`b5ab7fb`),
 Post-Deploy-Handoff aus PR #29 (`19fa02b`), Präsentationsänderung aus PR #30
 (`075bd93`), Deploy-Health/Rollback aus PR #31 (`6853e78`) und OpenSpec-/Doku-
-Abschluss aus PR #32 (`711d8f2`). Die archivierte Deployment-Spezifikation ist
+Abschluss aus PR #32 (`711d8f2`) sowie Gateway-Abschluss aus PR #33 (`25ce0ee`). Die archivierte Deployment-Spezifikation ist
 mit dem Code synchronisiert. Archivdateien
 und neuere Spezifikationen aus dem früheren lokalen `main` blieben erhalten.
 Der erste Deploy von `5fff3b0` startete das Backend nicht: Die VM hatte den
@@ -148,6 +196,13 @@ TypeSafe-Key kann ein optionaler lokaler Wrapper außerhalb der PAPO-Laufzeit
 separat geplant werden; Tests/Git bleiben deterministische Evidenz.
 
 ## Verifikation beim nächsten Start
+
+Prüfung dieser Dokumentationsarbeit: `git diff --check`, Markdown-Ziele und
+Rechenbeispiel prüfen; die drei aktiven Changes gezielt strict validieren.
+Die globale Prüfung `openspec validate --all --strict` meldete am 06.10.2026
+11 gültige und 24 fehlgeschlagene Einträge wegen bereits bestehender Purpose-
+Platzhalter in unveränderten Capability-Specs. Kein B-09-Spec-Fehler und keine
+neue Implementierung; diese allgemeine Spec-Bereinigung bleibt separate Arbeit.
 
 ```bash
 git status --short --branch
