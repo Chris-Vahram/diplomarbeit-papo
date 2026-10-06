@@ -1,6 +1,6 @@
 # PAPO – Next-Session-Context
 
-**Stand:** 06.10.2026 (lokales Datum geprüft). Operative Übergabe; volatile Angaben beim Start prüfen.
+**Stand:** 07.10.2026 (lokales Datum geprüft). Operative Übergabe; volatile Angaben beim Start prüfen.
 Stabile Regeln stehen in `AGENTS.md` und `CLAUDE.md`. Der beschlossene/noch zu
 beschließende Ausbau ist in [PRODUCT_COMPLETION_PLAN.md](PRODUCT_COMPLETION_PLAN.md)
 geordnet. Dieses Dokument bleibt der einzige operative Session-Handoff.
@@ -22,6 +22,8 @@ Empfänger, Stichtag, konkrete Rechte, Geldbasis und Abrechnung bleiben Firmenfr
 
 **Nächster Gesprächsschritt:** Am **07.10.2026** möchte Chris mit dem Lehrer einen
 Firmentermin vereinbaren, nicht bereits die Firmenbesprechung durchführen.
+Ein tatsächlich vereinbarter Termin oder ein neues Gesprächsprotokoll ist noch
+nicht bestätigt. Das neueste Protokoll bleibt vom 14.09.2026.
 [TEAM_COMMISSION_DISCOVERY.md](TEAM_COMMISSION_DISCOVERY.md) enthält bestätigte
 Nutzerentscheidungen, akzeptierte Planungsempfehlungen, acht verbleibende
 Firmenfragen, unverbindliches Rechenbeispiel und Risiken. Bereits beantwortete
@@ -35,21 +37,42 @@ Risiken und Abhängigkeiten im Discovery-Dokument.
 
 ## Allgemeiner Stand und Präsentationsvorbereitung
 
-- Prüfung vor Veröffentlichung am 06.10.2026: Branch
-  `docs/team-commission-discovery-context`, HEAD `25ce0ee`; Main enthält bereits
-  PR #33 (Gateway-Hardening abgeschlossen). Neuester geprüfter Main-Workflow
-  `36433087198`: erfolgreich, SHA `25ce0ee`. Historische Live-Nachweise unten sind
-  keine neue VM-/Browserabnahme.
+- Git-Prüfung am 07.10.2026 vor diesem Folgecommit: Branch
+  `docs/team-commission-discovery-context`, auf `origin/main` fast-forwarded;
+  HEAD `7eddc127f31b004051794e752612b1115ebb86fe`. PR #34 ist gemergt.
+  Neuester geprüfter Main-Workflow `37385508517`: erfolgreich, SHA `7eddc12`
+  (Tests, Paket/Image und Demo-Deployment). Das ist keine neue angemeldete
+  VM-/Browserabnahme. Nach Veröffentlichung dieses Updates den neuen PR/Merge
+  und dessen Main-Workflow prüfen, nicht diesen Snapshot als aktuell übernehmen.
 - Aktive Changes unverändert: Thesis 4/6, Login-Entkopplung 0/6, BMD-Artikelnummer 0/6.
-- Chris autorisiert Commit/Push/Merge des geprüften Dokumentationsstands.
+- Chris autorisiert am 07.10.2026 ausdrücklich Commit/Push/Merge der aktualisierten
+  Kontextdateien und beiden Präsentationen.
   Bestehende Graphify-Vorarbeiten bleiben unverändert lokal; kein pauschales
-  Publizieren fremder Änderungen. Ein Main-Merge löst bestehende Demo-CI/CD aus.
+  Publizieren fremder Änderungen oder temporärer Testbilder. Ein Main-Merge löst
+  bestehende Demo-CI/CD aus; keine Freigabe für echte Firmendaten.
 - Präsentationsinhalte für den Lehrertermin sind in
   [PROJEKTSTAND_2026-10-06.md](../presentation/PROJEKTSTAND_2026-10-06.md)
-  vorbereitet: umgesetzt / Produktrichtung / Firmenfragen getrennt. Das bestehende
-  reveal.js-Deck und Tobias' Design sind noch nicht verändert.
+  dokumentiert: umgesetzt / Produktrichtung / Firmenfragen getrennt. Auf Chris'
+  Folgeauftrag sind zwei gekürzte reveal.js-Decks entstanden:
+  [Projektüberblick](../presentation/mvp-deck/index.html) mit 13 Folien und
+  [Sprint-Update](../presentation/sprint-deck/index.html) mit 8 Folien statt
+  zusammen 35. Keine Zeiterfassung; die acht B-09-Fragegruppen stehen auf den
+  Sprintfolien 6/7. Tobias' Theme und bestehende Aufnahmen bleiben erhalten.
+  Veröffentlichung dieser Folgearbeit über PR #35 mit dem Titel
+  `docs: publish split presentations and session context`; PR #34 betrifft nur
+  den zuvor gemergten Entscheidungsstand. Der Sprint-Inhaltsstand bleibt bewusst
+  06.10.2026; die Übergabe ist vom 07.10.2026. Inhaltscommit: `67a5acf`.
+  Merge-/CI-Status von PR #35 und den neuesten Main-Workflow beim Start prüfen.
+- Prüfung der Decks am 06.10.2026: 13 + 8 Folien, acht B-09-Fragegruppen,
+  Desktop 1280 × 720 und Mobil 390 × 844 ohne Überlauf, Navigation/Bilder und
+  Inline-Skripte geprüft. Keine externen Requests oder JS-Laufzeitfehler.
+  Direkte `file:`-Navigation war toolgesperrt; keine neue Live-Anwendungsabnahme.
 - Keine neue B-09-Implementierungsfreigabe. Als nächster unabhängiger technischer
   Plan eignet sich die OIDC-Identity-Grundlage; vor Code eigener geprüfter Change.
+  B-08 ist unabhängig planbar, B-04 braucht SMTP/Testempfänger. Die konkrete
+  Account-Verwaltung braucht Erst-/Letzter-Admin, Recovery und Rechte-Matrix.
+  BMD-Artikelnummern warten auf anonymisierten Export/Feldregeln. B-06/B-07
+  brauchen Firmen-/Schulfreigaben; B-07 zuerst Abrechnung, Bank separat später.
 
 ## Wichtiger Wiedereinstieg — Deployment abgeschlossen
 
@@ -103,6 +126,8 @@ aktiven OpenSpec-Tasks sowie `docs/CONVENTIONS.md`/`docs/DATA_MODEL.md` prüfen.
 Danach `git status --short --branch`, `git log -5 --oneline --decorate`,
 `openspec list --json` und den neuesten Main-Workflow via
 `gh run list --branch main -L 1 --json databaseId,status,conclusion` verifizieren.
+Den Veröffentlichungs-PR dieses Updates über Branch/Titel suchen und dessen
+Status prüfen; Git- und CI-Ergebnisse aus diesem Dokument sind datierte Belege.
 Anschließend den aktuellen Auftrag beachten: Firmen-/Präsentationsvorbereitung
 fortsetzen oder die Identity-Grundlage als separaten OpenSpec-Change planen.
 Keine automatische Implementierung allein wegen dieses Handoffs. Vor dem ersten Edit die drei
@@ -208,7 +233,8 @@ neue Implementierung; diese allgemeine Spec-Bereinigung bleibt separate Arbeit.
 git status --short --branch
 git log -5 --oneline --decorate
 openspec list --json
-gh run view 36426325791 --json status,conclusion
+gh pr list --state all --head docs/team-commission-discovery-context --json number,title,state,mergeCommit
+gh run list --branch main -L 1 --json databaseId,status,conclusion,headSha
 ```
 
 Bei Backendänderungen gemäß `AGENTS.md`:

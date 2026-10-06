@@ -1,11 +1,15 @@
 # Teamprovision, Punkte und Karrierestufen — Entscheidungsstand
 
-**Stand:** 06.10.2026 (lokales Datum geprüft)
+**Stand:** 07.10.2026 (Kontextabgleich; fachliche Entscheidungen vom 06.10.2026 unverändert)
 
 **Status:** Produktrichtung und Planungsempfehlungen durch Chris bestätigt; Firmenregeln offen. Noch nicht implementierungsreif; kein OpenSpec-Change angelegt.
 **Zweck:** Verlässlicher Wiedereinstieg in die Featureplanung ohne erneute Befragung zu bereits beantworteten Punkten.
 
-## Wiedereinstiegsprompt für die nächste Session
+## Fachlicher Fortsetzungsprompt
+
+Die operative Session-Übergabe steht ausschließlich in
+[CONTINUATION_PROMPT.md](CONTINUATION_PROMPT.md). Dieser Abschnitt beschreibt
+nur die Fortsetzung der B-09-Erkundung, keinen separaten Git-/Arbeitsauftrag.
 
 Lies zuerst Specification/CONTINUATION_PROMPT.md und dieses Dokument vollständig,
 danach Specification/PRODUCT_COMPLETION_PLAN.md, Specification/phase2_backlog.md,
@@ -19,6 +23,12 @@ beantwortete Nutzerfragen nicht erneut stellen. Die acht verbleibenden
 Firmenfragen unten sind die Gesprächsagenda. Am 07.10.2026 möchte Chris mit dem
 Lehrer einen Firmentermin vereinbaren; der Firmentermin selbst steht noch nicht
 fest. Keine Geschäftsregel aus fehlenden Firmenantworten ableiten.
+
+Ein erfolgtes Lehrer-/Firmengespräch ist am 07.10.2026 noch nicht bestätigt.
+Die acht Firmenfragegruppen stehen kompakt auf Sprintfolien 6/7; vollständige
+Unterfragen bleiben hier. Decks und Belege: [Präsentationen](../presentation/README.md).
+Kontext und Decks werden auf ausdrücklichen Auftrag veröffentlicht; daraus
+folgt keine Implementierungsfreigabe und keine zusätzliche Firmenentscheidung.
 
 Ziel ist ein implementierungsreifer OpenSpec-Change mit Proposal, Design,
 Capability-Specs, Abnahmekriterien, Daten-/Migrationsplan und abhängigen
@@ -221,7 +231,11 @@ Firmenantworten; Planungszustimmung ersetzt diese nicht:
 6. B-03 bleibt separat: automatische Änderung des Provisionssatzes einer Partnerfirma. B-09 beschreibt Mitarbeiter-Teamverteilung, Punkte, Karrierestufen und Team-Boni.
 7. Nach akzeptiertem OpenSpec-Plan die Implementierung top-down gemäß Abhängigkeiten starten; keine offenen Geschäftsregeln stillschweigend als Defaults kodieren.
 
-## Git-/Arbeitsstand beim Erfassen
+## Historische Erfassungsnachweise
+
+Diese Nachweise betreffen die ursprüngliche Erkundung, nicht den aktuellen
+Git-/Veröffentlichungsstand. Aktuelle Prüfung und nächste Arbeit stehen nur
+in [CONTINUATION_PROMPT.md](CONTINUATION_PROMPT.md).
 
 - Branch vor dieser Dokumentationsarbeit: main, Commit 25ce0ee (origin/main synchron).
 - Vorbestehende lokale Änderungen des Nutzers betrafen Graphify (AGENTS.md, .gitignore, .codex/skills/graphify/, .graphifyignore) und Documentation/KI-Nachweise/prompt-register.md; diese sind zu erhalten.

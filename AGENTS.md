@@ -17,6 +17,10 @@ For every fresh deep-work session read `Specification/CONTINUATION_PROMPT.md` fu
 7. `openspec/changes/<active-change>/` and `openspec/specs/` — relevant active tasks and merged behavior.
 8. `docs/CONVENTIONS.md`, `docs/SETUP.md`, `docs/DATA_MODEL.md` — capability-specific implementation/runtime/data rules.
 
+For employee-team commissions, also read `Specification/PRODUCT_COMPLETION_PLAN.md` and `Specification/TEAM_COMMISSION_DISCOVERY.md`. Chris accepted recommendations as planning direction, not company approval. Preserve confirmed user decisions; do not ask them again. The eight company decision groups remain open; B-09 is not implementation-ready and stays separate from B-03.
+
+Presentations are separate: `presentation/mvp-deck/index.html` is the general overview, `presentation/sprint-deck/index.html` the sprint update. Use `presentation/README.md` and `presentation/PROJEKTSTAND_2026-10-06.md` for content, evidence and company questions. Keep the shared theme, existing images and Tobias' design; neither deck includes time recording.
+
 Historical session plans and planning reviews belong in Git history, not active context.
 
 Never copy stale Claude-memory facts into code/docs: client is never “PAPO”; verify model names, branch/environment state, and completed UI work against primary sources.

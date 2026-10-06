@@ -52,6 +52,24 @@ Satz dazu: „Der Partner führt die Bestellung für den Endkunden durch. Der En
 - **Status:** Das Unternehmen führt eine Bestellung von **Eingereicht** über **Geprüft** zu **Abgeschlossen**.
 - **Provision:** Der Prozentsatz des Partners wird pro Bestellung gespeichert und aus dem Bestellwert berechnet.
 
+## 6. Neue Funktionen seit dem Protokollstand 14.09. zeigen (optional, 2 Minuten)
+
+Nur vorbereitete synthetische Demo-Daten verwenden; keine echten Steuerkennungen
+oder vertraulichen Nachweise im Unterricht zeigen. Die folgenden Schritte vor
+dem Vortrag einmal selbst durchgehen; diese Anleitung ersetzt keine Abnahme.
+
+1. Als Unternehmen das Firmenprofil mit Steuer- und Registerkennung zeigen.
+2. Bei einem Demo-Partner die interne Notiz zeigen. Beim Wechsel zur Partnerrolle
+   erklären, dass diese Notiz nicht im Partnerbereich ausgegeben wird.
+3. Einen vorbereiteten Partnernachweis im Partnerprofil zeigen; anschließend in der
+   Firmenansicht Prüfstatus und Annahme/Ablehnung erläutern. Ein Ersatz setzt die
+   Prüfung zurück; Annahme aktiviert den Partner nicht automatisch.
+4. Beim Hosting keine neue Live-Störung provozieren. Die belegten Health-/Rollback-
+   Prüfungen anhand der Folie erklären; ein Rollback stellt keine DB-Daten zurück.
+
+Satz dazu: „Diese Stammdaten und Nachweise sind umgesetzt. Persönliche Konten,
+Zahlungserfassung und Teamprovision sind dagegen erst als Ausbau geplant.“
+
 ## Abschluss
 
 Kurz zusammenfassen: „Der bisher manuelle Ablauf per E-Mail oder Telefon wird zu einer nachvollziehbaren Struktur: Das Unternehmen verwaltet die Stammdaten, der Partner bestellt für seinen Endkunden.“
