@@ -86,6 +86,7 @@ die Reihenfolge und Fragen stehen in `PRODUCT_COMPLETION_PLAN.md`.
 
 ## Decisions log (so we don't re-litigate)
 - 2026-10-06: Chris confirms the single order-commission budget and internal allocation scope, accepts planning recommendations but not company rules, and authorizes publishing the reviewed documentation. Appointment scheduling with the teacher is planned for 2026-10-07; company approval is still absent. B-03 remains separate from B-09.
+- 2026-10-07: Context synchronized and publication of the two shortened presentations requested (13 general slides, 8 sprint slides, no time recording). B-09's eight company decision groups remain open; no meeting, implementation approval or new OpenSpec artifacts confirmed. Presentation sources: presentation/README.md and presentation/PROJEKTSTAND_2026-10-06.md. Operative handoff remains Specification/CONTINUATION_PROMPT.md.
 - 2026-07-01: Meetings override FSD when they conflict (newer = authoritative).
 - 2026-07-01: MVP = internal B2B partner-ordering portal. External shop → B-01 (cut).
 - 2026-07-01: Julian left DA. Work split Chris + Tobias only.

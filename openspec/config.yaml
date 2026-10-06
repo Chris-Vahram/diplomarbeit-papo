@@ -22,6 +22,11 @@ context: |
   internal allocation/display first and accepted recommendations as planning direction on 2026-10-06,
   not company approval of recipients, rights, formulas or settlement. B-09 is not implementation-ready;
   do not create its artifacts from unanswered company questions. Keep employee career levels separate from B-03.
+  Context sync on 2026-10-07 changes documentation/presentations only, not application scope or approval.
+  Sole operative handoff: Specification/CONTINUATION_PROMPT.md; full desired scope: Specification/PRODUCT_COMPLETION_PLAN.md.
+  Separate general/sprint decks and evidence: presentation/README.md. Eight B-09 company decision groups
+  remain unanswered; no new company meeting or approval confirmed. Next independent planning candidate:
+  OIDC identity foundation, separate from BMD-number rules; no automatic implementation authorization.
   Active status: DB-only flag Partner.active, enforced server-side after login (Keycloak stays simple).
   Order status: submitted -> reviewed -> fulfilled (company-controlled). Confirmations simulated in-app (no real email).
   Team: Chris + Tobias only (Julian left).

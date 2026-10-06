@@ -1,9 +1,16 @@
 # PAPO – Plan zur funktionalen Fertigstellung
 
-Stand: 06.10.2026. Dieser Plan ist eine Arbeitsgrundlage, keine Freigabe durch Schule
+Stand: 07.10.2026. Dieser Plan ist eine Arbeitsgrundlage, keine Freigabe durch Schule
 oder Referenzunternehmen. Die aktuelle FSD beschreibt das interne MVP; die gewünschte
 Erweiterung wird in kleinen OpenSpec-Changes spezifiziert und einzeln umgesetzt.
 `Specification/CONTINUATION_PROMPT.md` bleibt der einzige operative Session-Handoff.
+
+Die Lehrerpräsentation ist in einen allgemeinen Projektüberblick (13 Folien) und
+ein Sprint-Update (8 Folien) geteilt; Einstieg und Inhaltsbelege stehen in
+[presentation/README.md](../presentation/README.md). Der Inhaltsstand ist
+06.10.2026. Noch kein neuer Firmentermin, kein neues Protokoll und keine neue
+Firmenfreigabe bestätigt. Veröffentlichungsauftrag vom 07.10.2026 betrifft
+Dokumentation/Präsentationen, nicht Implementierung oder neue OpenSpec-Artefakte.
 
 ## Bestätigte Zielrichtung durch Chris
 
@@ -23,8 +30,9 @@ Erweiterung wird in kleinen OpenSpec-Changes spezifiziert und einzeln umgesetzt.
   Speichern eigener Daten. Bestellung ist kostenpflichtig, Zahlung/Erfüllung erfolgen
   später; kein Online-Bezahlvorgang bestätigt.
 - Der Deploy-Gateway, Health-Check und automatische Anwendungs-Rollback sind
-  implementiert, auf der Demo-VM verifiziert und archiviert. Der am 28.09.2026
-  verifizierte Stand ist `711d8f2`; den neuesten Workflow beim Sessionstart prüfen.
+  implementiert, auf der Demo-VM verifiziert und archiviert. Letzter geprüfter
+  Main-Workflow am 07.10.2026: `37385508517`, SHA `7eddc12`, erfolgreich;
+  den neuesten Workflow beim Sessionstart prüfen. Keine neue Login-Abnahme.
   Kein Deployment-Task blockiert die Produktimplementierung.
 - Chris bestätigt für die aktuelle VM ausschließlich Demo-Daten und aktive,
   bekannte Demo-Logins. Sie ist keine sichere Umgebung für echte Kundendaten;
@@ -35,7 +43,7 @@ Erweiterung wird in kleinen OpenSpec-Changes spezifiziert und einzeln umgesetzt.
 Chris wünscht die **gesamte Phase 2 plus Mandantenfähigkeit und persönliche Konten**
 funktional fertig, nicht nur das MVP. Das ist der gewünschte Umfang, aber noch keine
 von Firma/Schule bestätigte Abnahme oder belastbare Terminzusage. Zwischen diesem
-Stand vom 06.10.2026 und dem 27.10.2026 liegen 21 Tage; B-03, B-06 und B-07 haben wesentliche
+Stand vom 07.10.2026 und dem 27.10.2026 liegen 20 Tage; B-03, B-06 und B-07 haben wesentliche
 fehlende Regeln/Zugänge. Ohne deren rechtzeitige Klärung kann „alles fertig“ nicht
 seriös zugesagt werden. Chris entscheidet nach dem nächsten Termin ausdrücklich,
 welche Funktionen zwingend bis Herbstferien in Staging abgenommen werden und welche

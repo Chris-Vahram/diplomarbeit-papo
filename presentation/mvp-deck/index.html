@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Partnerportal – Diplomarbeit</title>
+  <title>PAPO – Projektüberblick</title>
   <link rel="stylesheet" href="reveal/reveal.css" />
   <link rel="stylesheet" href="theme.css" />
 </head>
@@ -11,7 +11,6 @@
   <div class="reveal">
     <div class="slides">
 
-      <!-- 1. Titel -->
       <section class="dark">
         <p class="eyebrow">HTL Diplomarbeit · Informatik / IT Medientechnik</p>
         <h1>Partnerportal</h1>
@@ -19,10 +18,10 @@
         <p class="meta">
           <strong>Chris Vahram</strong> &amp; <strong>Tobias Huemer</strong>
           <span class="sep">·</span> 2026
+          <span class="sep">·</span> Projektüberblick
         </p>
       </section>
 
-      <!-- 2. Akteure & Struktur -->
       <section>
         <p class="eyebrow">Akteure &amp; Struktur</p>
         <h2>Unternehmen → Partner → Endkunde</h2>
@@ -70,10 +69,9 @@
         </div>
       </section>
 
-      <!-- 3. USP -->
       <section>
-        <p class="eyebrow">Der USP</p>
-        <h2>PAPO wird die Drehscheibe des Unternehmens</h2>
+        <p class="eyebrow">Ausgangslage &amp; Nutzen</p>
+        <h2>Vom manuellen Auftrag zum Portal</h2>
         <p class="lead">Kernprozess der Anwendung: <strong>der Partner führt die Bestellung für seinen Endkunden durch.</strong></p>
 
         <div class="usp-compare">
@@ -90,7 +88,7 @@
             <ul>
               <li>Bestellung direkt im Portal</li>
               <li>Zentrale Partner- &amp; Artikelverwaltung</li>
-              <li>Automatische Zuordnung &amp; Provision</li>
+              <li>Automatische Partnerzuordnung &amp; Provisionsberechnung</li>
             </ul>
           </div>
         </div>
@@ -98,102 +96,6 @@
         <p class="kernsatz">„Dieses Partnerportal (PAPO) wird zukünftig die Drehscheibe für das ganze Unternehmen bilden.“</p>
       </section>
 
-      <!-- Digitale Souveränität als USP: Ausgangslage -->
-      <section>
-        <p class="eyebrow">Der USP · Digitale Souveränität</p>
-        <h2>Warum Souveränität zum Kaufargument wird</h2>
-        <p class="lead">Europäische IT hängt überwiegend von Nicht-EU-Anbietern ab – Kontrolle über Daten und Betrieb geht dabei verloren.</p>
-
-        <div class="grid-3">
-          <div class="card">
-            <h3>80 % Abhängigkeit</h3>
-            <p>Anteil digitaler Produkte und Dienste in Europa aus Nicht-EU-Quellen.</p>
-          </div>
-          <div class="card">
-            <h3>15 % Cloud-Anteil</h3>
-            <p>Anteil europäischer Anbieter am EU-Cloud-Markt; rund 70 % halten drei US-Konzerne.</p>
-          </div>
-          <div class="card">
-            <h3>264 Mrd. € / Jahr</h3>
-            <p>EU-Ausgaben für überwiegend US-amerikanische proprietäre IT.</p>
-          </div>
-        </div>
-
-        <div class="quote-box">
-          <strong>Warum das für ein Bestellportal zählt</strong>
-          <p>Der US CLOUD Act erlaubt Zugriff auf Daten von US-Anbietern – unabhängig vom Serverstandort. Partner- und Endkundendaten sind genau solche Daten.</p>
-        </div>
-
-        <p class="source-note">Quellen: Draghi-Bericht 2024, COM(2026) 503; Synergy Research Group 2025.</p>
-      </section>
-
-      <!-- Digitale Souveränität als USP: Abgrenzung -->
-      <section>
-        <p class="eyebrow">Der USP · Digitale Souveränität</p>
-        <h2>PAPO ist souverän gebaut, nicht beworben</h2>
-        <p class="lead">Der Unterschied zeigt sich in Betrieb, Datenhaltung und Austauschbarkeit der Daten.</p>
-
-        <div class="usp-compare">
-          <div class="usp-col before">
-            <h4>Zugekauftes SaaS-Portal</h4>
-            <ul>
-              <li>Betrieb und Rechtsraum beim Anbieter</li>
-              <li>Partnerdaten in fremder Cloud</li>
-              <li>Proprietäre Formate, kein freier Export</li>
-            </ul>
-          </div>
-          <div class="usp-col after">
-            <h4>PAPO</h4>
-            <ul>
-              <li>Eigene VM im eigenen Rechtsraum</li>
-              <li>PostgreSQL &amp; Keycloak im Eigenbetrieb</li>
-              <li>Offener Stack, austauschbare Komponenten</li>
-            </ul>
-          </div>
-        </div>
-
-        <p class="kernsatz">„Souveränität ist bei PAPO Architektur, nicht Zusatzmodul.“</p>
-      </section>
-
-      <!-- Digitale Souveränität als USP: Einlösung -->
-      <section>
-        <p class="eyebrow">Der USP · Digitale Souveränität</p>
-        <h2>Vom Prinzip zum Produktvorteil</h2>
-        <p class="lead">Souveränität heißt Wahlfreiheit, Wechselfähigkeit, Gestaltungsmacht und Kompetenz.</p>
-
-        <table class="scope-table">
-          <thead><tr><th>Anspruch</th><th>Einlösung in PAPO</th></tr></thead>
-          <tbody>
-            <tr><td>Wahlfreiheit</td><td>Jede Komponente ist offen und durch eine gleichwertige Alternative ersetzbar.</td></tr>
-            <tr><td>Wechselfähigkeit</td><td>Standardschnittstellen (REST, OIDC, JDBC) statt proprietärer Kopplung.</td></tr>
-            <tr><td>Gestaltungsmacht</td><td>Quellcode und Deployment liegen beim Unternehmen selbst.</td></tr>
-            <tr><td>Kompetenz</td><td>Der Stack ist dokumentiert, prüfbar und selbst zu betreiben.</td></tr>
-          </tbody>
-        </table>
-        <p class="source-note">Kriterien: Parlament Österreich, Fachdossier 03.06.2026; ÖFIT 2017.</p>
-      </section>
-
-      <!-- 4. Problem -->
-      <section>
-        <p class="eyebrow">Ausgangslage</p>
-        <h2>Bestellungen laufen derzeit manuell</h2>
-        <p class="lead">Derzeit gibt es kein gemeinsames System für Partner- und Artikeldaten – jede Bestellung braucht Abstimmung und Übertragung.</p>
-
-        <div class="stats">
-          <div class="stat"><div class="num">B2B</div><div class="lbl">B2B-Portal</div></div>
-          <div class="stat"><div class="num">1</div><div class="lbl">Demo-Unternehmen</div></div>
-          <div class="stat"><div class="num">n</div><div class="lbl">Partnerfirmen</div></div>
-          <div class="stat"><div class="num">n</div><div class="lbl">Artikel</div></div>
-        </div>
-
-        <ul class="plain">
-          <li><strong>Partner- und Artikeldaten</strong> liegen getrennt vor</li>
-          <li><strong>Artikel-Freigaben</strong> brauchen manuelle Pflege</li>
-          <li><strong>Bestellung und Provision</strong> werden manuell zugeordnet</li>
-        </ul>
-      </section>
-
-      <!-- 5. Use Case -->
       <section>
         <p class="eyebrow">Use Case</p>
         <h2>Partner bestellt für Endkunde</h2>
@@ -216,7 +118,6 @@
         </div>
       </section>
 
-      <!-- 6. Funktionsumfang -->
       <section>
         <p class="eyebrow">Funktionsumfang</p>
         <h2>Was das MVP leistet</h2>
@@ -249,7 +150,48 @@
         </div>
       </section>
 
-      <!-- 7. Technologie-Stack -->
+      <section>
+        <p class="eyebrow">Digitale Souveränität</p>
+        <h2>Kontrolle über Code, Daten und Betrieb</h2>
+        <p class="lead">Wir behalten die Kontrolle über Quellcode, Daten und den Betrieb der Anwendung.</p>
+
+        <div class="sovereignty-layout">
+          <div>
+            <h3>Für dieses Projekt heißt das</h3>
+            <ul class="plain sovereignty-list">
+              <li><strong>Verstehen:</strong> Der Stack bleibt nachvollziehbar und dokumentiert.</li>
+              <li><strong>Betreiben:</strong> Die Anwendung läuft in einer eigenen Betriebsumgebung.</li>
+              <li><strong>Wechseln:</strong> Offene Komponenten und Standard-Schnittstellen halten Alternativen möglich.</li>
+            </ul>
+          </div>
+          <div class="quote-box">
+            <strong>Konkreter Anspruch</strong>
+            <p>Eine Plattform, deren zentrale Funktionen wir selbst erklären, prüfen und betreiben können.</p>
+          </div>
+        </div>
+        <p class="source-note">Einordnung aus dem dokumentierten PAPO-Stack und der Deployment-Architektur.</p>
+      </section>
+
+      <section>
+        <p class="eyebrow">Digitale Souveränität · Umsetzung und Grenzen</p>
+        <h2>Eigener Betrieb, offener Stack</h2>
+        <div class="grid-3">
+          <div class="card">
+            <h3>Eigene Datenhaltung</h3>
+            <p>PostgreSQL und Keycloak laufen auf der VM. Frontend, API und Anmeldung sind klar getrennt.</p>
+          </div>
+          <div class="card">
+            <h3>Offene Schnittstellen</h3>
+            <p>REST, OIDC und JDBC statt einer proprietären Gesamtlösung. BMD-Daten kommen derzeit per Excel/CSV.</p>
+          </div>
+          <div class="card">
+            <h3>Bewusste Abhängigkeiten</h3>
+            <p>GitHub Actions und GHCR bleiben externe Dienste. Updates, Backups und Zugriffsrechte bleiben Betreiberaufgaben.</p>
+          </div>
+        </div>
+        <p class="source-note">Digitale Souveränität bedeutet Kontrolle und Wechselmöglichkeiten, nicht vollständige Unabhängigkeit von externen Diensten.</p>
+      </section>
+
       <section>
         <p class="eyebrow">Technologie</p>
         <h2>Technologie-Stack</h2>
@@ -276,98 +218,9 @@
             <td class="v">Apache POI (xlsx) + opencsv (csv)</td>
           </tr>
         </table>
+        <p class="source-note">GitHub-Stars, historischer Stand 14.09.2026: Quarkus 15.884 · Keycloak 36.764 · PostgreSQL 22.104. Kein neu erhobener Wert.</p>
       </section>
 
-      <!-- 8. GitHub-Stars -->
-      <section>
-        <p class="eyebrow">Technologie · GitHub</p>
-        <h2>Offene Komponenten, aktuell verifiziert</h2>
-        <p class="lead">GitHub-Stars am 14.09.2026. Die Werte sind Momentaufnahmen der jeweiligen Repositories.</p>
-
-        <table class="stars">
-          <thead>
-            <tr><th>Baustein</th><th>Repository</th><th>Stars</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Quarkus</td><td><a href="https://github.com/quarkusio/quarkus">quarkusio/quarkus</a></td><td>15.884</td></tr>
-            <tr><td>Keycloak</td><td><a href="https://github.com/keycloak/keycloak">keycloak/keycloak</a></td><td>36.764</td></tr>
-            <tr><td>PostgreSQL</td><td><a href="https://github.com/postgres/postgres">postgres/postgres</a></td><td>22.104</td></tr>
-            <tr><td>Caddy</td><td><a href="https://github.com/caddyserver/caddy">caddyserver/caddy</a></td><td>75.732</td></tr>
-            <tr><td>Apache POI</td><td><a href="https://github.com/apache/poi">apache/poi</a></td><td>2.270</td></tr>
-            <tr><td>opencsv</td><td><a href="https://github.com/cygri/opencsv">cygri/opencsv</a></td><td>14</td></tr>
-            <tr><td>reveal.js</td><td><a href="https://github.com/hakimel/reveal.js">hakimel/reveal.js</a></td><td>72.292</td></tr>
-          </tbody>
-        </table>
-        <p class="source-note">Quelle: GitHub-Repositorydaten, abgerufen am 14.09.2026. Native HTML/CSS/JavaScript haben kein eigenes Repository im Stack.</p>
-      </section>
-
-      <!-- 9. Digitale Souveränität: Begriff -->
-      <section>
-        <p class="eyebrow">Digitale Souveränität</p>
-        <h2>PaPo auf Basis digitaler Souveränität</h2>
-        <p class="lead">Wir behalten die Kontrolle über Quellcode, Daten und den Betrieb der Anwendung.</p>
-
-        <div class="sovereignty-layout">
-          <div>
-            <h3>Für dieses Projekt heißt das</h3>
-            <ul class="plain sovereignty-list">
-              <li><strong>Verstehen:</strong> Der Stack bleibt nachvollziehbar und dokumentiert.</li>
-              <li><strong>Betreiben:</strong> Die Anwendung läuft in einer eigenen Betriebsumgebung.</li>
-              <li><strong>Wechseln:</strong> Offene Komponenten und Standard-Schnittstellen halten Alternativen möglich.</li>
-            </ul>
-          </div>
-          <div class="quote-box">
-            <strong>Konkreter Anspruch</strong>
-            <p>Eine Plattform, deren zentrale Funktionen wir selbst erklären, prüfen und betreiben können.</p>
-          </div>
-        </div>
-        <p class="source-note">Einordnung aus dem dokumentierten PAPO-Stack und der Deployment-Architektur.</p>
-      </section>
-
-      <!-- 10. Digitale Souveränität: Umsetzung -->
-      <section>
-        <p class="eyebrow">Digitale Souveränität</p>
-        <h2>Im MVP konkret umgesetzt</h2>
-
-        <div class="sovereignty-columns">
-          <div>
-            <h3>Software</h3>
-            <ul class="plain sovereignty-list">
-              <li>Statisches Frontend mit nativen Web Components, ohne CDN-Laufzeit.</li>
-              <li>Quarkus REST, OIDC und JDBC als klar getrennte Schnittstellen.</li>
-              <li>PostgreSQL und Keycloak als selbst betriebene Open-Source-Komponenten.</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Betrieb</h3>
-            <ul class="plain sovereignty-list">
-              <li>Caddy übernimmt TLS und Pfadrouting auf der VM.</li>
-              <li>BMD bleibt führendes System; PAPO übernimmt Excel/CSV-Daten.</li>
-              <li>Die Datenhaltung bleibt vom öffentlichen Frontend getrennt.</li>
-            </ul>
-          </div>
-        </div>
-        <p class="source-note">Grundlage: `docs/DEPLOYMENT.md`, `docs/SETUP.md` und der festgelegte Technologie-Stack.</p>
-      </section>
-
-      <!-- 11. Digitale Souveränität: Grenzen -->
-      <section>
-        <p class="eyebrow">Digitale Souveränität</p>
-        <h2>Souveränität braucht klare Grenzen</h2>
-        <p class="lead">Der MVP reduziert Abhängigkeiten, beseitigt sie aber nicht vollständig.</p>
-
-        <table class="scope-table">
-          <thead><tr><th>Abhängigkeit</th><th>Bewusster Umgang</th></tr></thead>
-          <tbody>
-            <tr><td>GitHub Actions und GHCR</td><td>Build und Registry bleiben externe Dienste; die Laufzeit liegt auf der eigenen VM.</td></tr>
-            <tr><td>Open-Source-Betrieb</td><td>Updates, Backups und Zugriffsrechte bleiben Verantwortung des Betreibers.</td></tr>
-            <tr><td>BMD</td><td>BMD bleibt führend; der aktuelle Austausch läuft über Excel/CSV, ohne direkte Schnittstelle.</td></tr>
-          </tbody>
-        </table>
-        <p class="source-note">Keine Marketingaussage: Die Folie beschreibt den aktuellen MVP-Umfang und seine offenen Betriebsaufgaben.</p>
-      </section>
-
-      <!-- 12. Architektur -->
       <section>
         <p class="eyebrow">Architektur</p>
         <h2>Wie die Komponenten zusammenarbeiten</h2>
@@ -413,7 +266,6 @@
         </div>
       </section>
 
-      <!-- 13. Bildschirmaufnahmen -->
       <section>
         <p class="eyebrow">Beispiel aus der Oberfläche</p>
         <h2>Artikelverwaltung mit Artikelkategorien</h2>
@@ -431,7 +283,6 @@
         </div>
       </section>
 
-      <!-- 14. Bildschirmaufnahme: Partner-Dashboard -->
       <section>
         <p class="eyebrow">Browsernachweis</p>
         <h2>Dashboard der Partnerfirma</h2>
@@ -447,7 +298,6 @@
         </div>
       </section>
 
-      <!-- 15. Bildschirmaufnahme: Artikelkategorien -->
       <section>
         <p class="eyebrow">Browsernachweis</p>
         <h2>Artikelkategorien verwalten</h2>
@@ -463,93 +313,10 @@
         </div>
       </section>
 
-      <!-- 16. Clockify -->
-      <section>
-        <p class="eyebrow">Arbeitsaufwand</p>
-        <h2>Clockify-Gesamtübersicht</h2>
-        <p class="lead">Workspace „DA“ · Erfasst für: Chris &amp; Tobias</p>
-
-        <div class="time-summary">
-          <div class="time-total">
-            <span class="num">151 h 41 min</span>
-            <span class="lbl">Ist-Zeit für Chris &amp; Tobias</span>
-          </div>
-          <div class="time-detail">
-            <p><strong>Erfasst werden:</strong> Implementierung, Tests, Planung, Dokumentation, Besprechungen, Deployment und Präsentation.</p>
-            <p><strong>Auswertung:</strong> 01.03.–30.09.2026 · Teamfilter nur Chris + Tobias.</p>
-            <p><strong>Transparenz:</strong> Retrospektive Einträge werden in Clockify ausdrücklich als geschätzt gekennzeichnet.</p>
-          </div>
-        </div>
-        <p class="source-note">Clockify Workspace „DA“, Report „Summary“, Teamfilter Chris + Tobias; exakter Wert 151:41:38, ausgewertet am 14.09.2026.</p>
-      </section>
-
-      <!-- 17. Live-Demo (Übergang) -->
       <section class="dark">
         <p class="eyebrow">Ab hier live</p>
         <h1>Live-Demo</h1>
         <p class="lead">Partner-Login → Bestellung aufgeben → Status durch das Unternehmen ändern.</p>
-      </section>
-
-      <!-- 18. Out of scope / Phase-2-Backlog -->
-      <section>
-        <p class="eyebrow">Bewusst nicht gebaut</p>
-        <h2>Out of Scope / Phase-2-Backlog</h2>
-        <p class="lead" style="margin-bottom: 26px;">Diese Punkte sind spezifiziert, aber bewusst nicht Teil des MVP.</p>
-
-        <ul class="backlog">
-          <li><span class="btag">B-01</span> Externer Endkunden-Shop <span class="note">cut</span></li>
-          <li><span class="btag">B-02</span> Shop-Design-Anpassung (Logo, Farben, Layout) <span class="note">cut</span></li>
-          <li><span class="btag">B-03</span> Automatischer Provisions-Levelaufstieg <span class="note">stub – manuell im MVP</span></li>
-          <li><span class="btag">B-04</span> Echter E-Mail-Versand (SMTP) <span class="note">stub – simuliert im MVP</span></li>
-          <li><span class="btag">B-05</span> Automatische Weiterleitung von Shop-Anfragen <span class="note">cut</span></li>
-          <li><span class="btag">B-07</span> Provisionsauszahlung / Settlement <span class="note">cut</span></li>
-        </ul>
-      </section>
-
-      <!-- 19. Phase 2 – Zwischentitel -->
-      <section class="dark">
-        <p class="eyebrow">Phase 2</p>
-        <h1>Seit dem Termin am 10.07.</h1>
-        <p class="lead">Was seither umgesetzt wurde – und was noch aussteht.</p>
-      </section>
-
-      <!-- 20. Feedback umgesetzt -->
-      <section>
-        <p class="eyebrow">Feedback umgesetzt</p>
-        <h2>Umgesetzte UX- und MVP-Wünsche</h2>
-        <ul class="backlog">
-          <li><span class="btag">UX</span> Bestellablauf als geführter Schritt-für-Schritt-Wizard <span class="note done">erledigt</span></li>
-          <li><span class="btag">UX</span> Artikelsuche mit Suchleiste &amp; Filter im Bestellformular <span class="note done">erledigt</span></li>
-          <li><span class="btag">UX</span> Filter nach Endkunde/Partner in den Bestelllisten <span class="note done">erledigt</span></li>
-          <li><span class="btag">UX</span> Partner sieht Endkunden ohne kürzliche Bestellung <span class="note done">erledigt</span></li>
-          <li><span class="btag">Fix</span> Keycloak-Session hält länger, kein schnelles Auto-Logout mehr <span class="note done">erledigt</span></li>
-          <li><span class="btag">Fix</span> Unklares Feld „Keycloak-Username“ entfernt, Login läuft über Partnernummer <span class="note done">erledigt</span></li>
-          <li><span class="btag">UX</span> Mobile Ansicht und neue Artikel-/Kategorienseiten geprüft <span class="note done">belegt</span></li>
-        </ul>
-      </section>
-
-      <!-- 21. Hosting -->
-      <section>
-        <p class="eyebrow">Hosting</p>
-        <h2>Wie PaPo bereitgestellt wird</h2>
-        <p class="lead">PaPo ist online unter <code>paportal.at</code> erreichbar. Änderungen werden geprüft, verpackt und anschließend bereitgestellt.</p>
-        <ul class="plain">
-          <li><strong>Automatische Prüfungen</strong> laufen bei Änderungen<small>Backend-Tests und Build prüfen den aktuellen Stand.</small></li>
-          <li><strong>Eindeutige Versionen</strong> machen Änderungen nachvollziehbar<small>Eine bereitgestellte Version kann eindeutig zugeordnet werden.</small></li>
-          <li><strong>Geschützter Zugang</strong> trennt die Rollen<small>Unternehmen und Partner sehen jeweils die passenden Bereiche.</small></li>
-        </ul>
-      </section>
-
-      <!-- 22. Ausblick -->
-      <section class="dark">
-        <p class="eyebrow">Ausblick</p>
-        <h2>Nächste Schritte</h2>
-        <ul class="plain" style="max-width: 30em;">
-          <li><strong>Import:</strong> Spaltenmapping und Stammdatenregeln weiter präzisieren</li>
-          <li>Mobile Feinschliff fortsetzen</li>
-          <li>Weitere Verbesserungen bei Sicherheit, Effizienz und Bedienbarkeit</li>
-          <li>Diplomarbeits-Dokumentation fertigstellen</li>
-        </ul>
       </section>
 
     </div>

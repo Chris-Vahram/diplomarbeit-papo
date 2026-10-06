@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PAPO – Sprint-Update 06.10.2026</title>
+  <link rel="stylesheet" href="../mvp-deck/reveal/reveal.css" />
+  <link rel="stylesheet" href="../mvp-deck/theme.css" />
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <section class="dark">
+        <p class="eyebrow">PAPO · Statusgespräch</p>
+        <h1>Sprint-Update</h1>
+        <p class="lead">Projektstand 06.10.2026<br>Neuerungen gegenüber dem Protokollstand 14.09.</p>
+        <p class="meta"><strong>Chris Vahram</strong> &amp; <strong>Tobias Huemer</strong></p>
+        <p class="lead">Demo: ein Unternehmen, gemeinsame Partnerlogins. Mails simuliert; kein Zahlungsstatus oder Mitarbeiterprovision.</p>
+      </section>
+
+      <section>
+        <p class="eyebrow">Umgesetzt · Funktionen</p>
+        <h2>Neue Stammdaten und Nachweise</h2>
+        <div class="grid-3">
+          <div class="card">
+            <h3>Interne Partnernotiz</h3>
+            <p>Bis 4.000 Zeichen; nur das Unternehmen kann die Notiz lesen und ändern.</p>
+          </div>
+          <div class="card">
+            <h3>Firmenprofil &amp; Steuerkennung</h3>
+            <p>Land, Kennungsart und Wert; gemeinsame Formatprüfung in Formular und Import. Noch keine Mandantenfähigkeit.</p>
+          </div>
+          <div class="card">
+            <h3>Register &amp; Partnernachweis</h3>
+            <p>Privater Upload, Ersatz und Firmenprüfung. Annahme aktiviert den Partner nicht automatisch.</p>
+          </div>
+        </div>
+        <p class="source-note">Notiz/Steuerkennung: 14.09.; Register/Nachweis: 25.09.2026. Gleichentägige Ergänzungen mitgezählt, weil die Uhrzeit der Besprechung nicht dokumentiert ist.</p>
+      </section>
+
+      <section>
+        <p class="eyebrow">Umgesetzt · Betrieb</p>
+        <h2>Migration und Deployment abgesichert</h2>
+        <ul class="plain">
+          <li><strong>Bestandsmigration:</strong> bekannte Demo-Daten ergänzt<small>Keine erfundenen Steuerkennungen für unbekannte echte Daten.</small></li>
+          <li><strong>Geprüfter Release:</strong> exakter Main-Commit und Archivprüfung<small>Begrenzter Deployment-Zugang und unveränderliches Backend-Image per SHA.</small></li>
+          <li><strong>Health-Check und Rollback:</strong> fehlerhafte Aktivierung erkennen<small>Rückkehr zur vorherigen Backend-/Frontend-Version; kein Datenbank-Rollback.</small></li>
+        </ul>
+        <p class="source-note">25.–28.09.2026 umgesetzt. Letzter bestätigter Main-Run 37385508517 am 06.10. erfolgreich; PR-Testlauf: 130 ohne Fehler. Keine neue angemeldete Browserabnahme.</p>
+      </section>
+
+      <section>
+        <p class="eyebrow">Gewünscht · noch nicht umgesetzt</p>
+        <h2>Der nächste Produktausbau</h2>
+        <div class="grid-3">
+          <div class="card">
+            <h3>Firmen &amp; Mitarbeiter</h3>
+            <p>Zwei isolierte Testunternehmen; persönliche Konten, Rollen und Audit.</p>
+          </div>
+          <div class="card">
+            <h3>Shop &amp; Kommunikation</h3>
+            <p>Gastbestellungen, optionale Kundenkonten, Shopgestaltung/Anfragen; echte Bestellmails und vollständige Dashboard-Trends.</p>
+          </div>
+          <div class="card">
+            <h3>Teamprovision B-09</h3>
+            <p>Interne Mitarbeiterzuordnung; Punkte/Karriere und Bonus nach Firmenregeln. B-03 bleibt ein separater Partner-Levelaufstieg.</p>
+          </div>
+        </div>
+        <p class="source-note">Chris' Produktrichtung, keine Firmen-/Schulfreigabe. Verkäufer + Team + Bonus teilen höchstens die bestehende Partnerprovision; keine beschlossenen individuellen Ansprüche oder Auszahlungen.</p>
+      </section>
+
+      <section>
+        <p class="eyebrow">Nächster Schritt · Voraussetzungen statt Terminversprechen</p>
+        <h2>Was wir jetzt sinnvoll vorbereiten</h2>
+        <ul class="plain">
+          <li><strong>Technisch unabhängig:</strong> OIDC-Identitätsgrundlage durchplanen<small>Danach Organisationsgrenzen, persönliche Konten und Audit; Subdomains sind keine Voraussetzung.</small></li>
+          <li><strong>Vor echten Tests:</strong> getrenntes Staging und bereinigte Zugänge<small>B-09 erst nach Zahlungserfassung und bestätigten Regeln; BMD-Felder benötigen Beispieldaten.</small></li>
+          <li><strong>Lehrer und Team:</strong> Pflichtumfang und Abnahme klären<small>Thesis 4/6: Tobias' UI-Prüfung und gemeinsame Fachabnahme offen. Login-Entkopplung und BMD-Artikelnummer jeweils 0/6.</small></li>
+        </ul>
+        <p class="source-note">Firmentermin erst vereinbaren. Keine Zusage „alles fertig bis Herbstferien“ ohne Umfang und Freigaben; jede Umsetzung als eigener geprüfter OpenSpec-Change.</p>
+      </section>
+
+      <section>
+        <p class="eyebrow">Firma entscheidet · Teamprovision 1/2</p>
+        <h2>Geld, Empfänger und Regeln</h2>
+        <table class="scope-table">
+          <thead><tr><th>Entscheidung</th><th>Offene Firmenfrage</th></tr></thead>
+          <tbody>
+            <tr><td>1 · Basis / Systemgrenze</td><td>Rabatt, Versand, Steuer, Artikelsätze? Nur interne Anzeige oder individuelle Mitarbeiteransprüche/Abrechnungen?</td></tr>
+            <tr><td>2 · Teamverteilung</td><td>Wer zählt, welcher Stichtag, welche Gewichtung? Restcents, Reserve und Budget ohne berechtigte Empfänger?</td></tr>
+            <tr><td>3 · Zahlung / Korrektur</td><td>Wer bestätigt welchen Nachweis? Teilzahlungen, Stornos, Rückgaben, Rückbuchungen oder Zahlung nach Austritt? Periode und Freigabe?</td></tr>
+            <tr><td>4 · Regelversion</td><td>Wer ändert und genehmigt? Welcher Stand gilt bei späterer Erfüllung/Zahlung, ab wann und mit welchen Ausnahmen?</td></tr>
+          </tbody>
+        </table>
+        <p class="source-note">Chris' Zielregel: nur erfüllt + bezahlt zählen. Empfehlungen, nicht Firmenregeln: Empfänger und Regelstand speichern, Zahlung separat erfassen. Freigegebene Abrechnungen nur nachvollziehbar korrigieren.</p>
+      </section>
+
+      <section>
+        <p class="eyebrow">Firma entscheidet · Teamprovision 2/2</p>
+        <h2>Rechte, Zuordnung und Bonus</h2>
+        <table class="scope-table">
+          <thead><tr><th>Entscheidung</th><th>Offene Firmenfrage</th></tr></thead>
+          <tbody>
+            <tr><td>5 · Teams / Rechte</td><td>Ein Team oder mehrere Leiter? Wer verwaltet Mitglieder, Rollen und Zuordnung; wer sieht Mitarbeiterdaten und persönliche Geldwerte?</td></tr>
+            <tr><td>6 · Affiliate</td><td>Linkdauer, mehrere Links, Austritt vor Bestellung? Wer korrigiert die Zuordnung bis wann?</td></tr>
+            <tr><td>7 · Punkte / Karriere</td><td>Schon in Version 1, mit welchem Nutzen? Werte, Perioden, Schwellen, Verfall, Abstieg, Korrekturen; Verkäufe ohne Verkäufer?</td></tr>
+            <tr><td>8 · Bonus</td><td>Zeitraum, Schwellen, Empfänger, Häufigkeit, Obergrenze? Reserve, Freigabe, Rest und zusätzliche Firmenfinanzierung?</td></tr>
+          </tbody>
+        </table>
+        <p class="source-note">Chris' Entscheidung: zunächst keine Geldwirkung der Karriere. Empfehlungen: begrenzte Teamleiterrechte, bestellbezogene Zuordnung. Vollständige Unterfragen stehen im Begleitdokument; B-09 bleibt nicht implementierungsreif.</p>
+      </section>
+
+      <section>
+        <p class="eyebrow">Firma / Betriebsverantwortliche · weiterer Ausbau</p>
+        <h2>Was wir von der Firma benötigen</h2>
+        <table class="scope-table">
+          <thead><tr><th>Thema</th><th>Entscheidung / benötigter Nachweis</th></tr></thead>
+          <tbody>
+            <tr><td>Staging &amp; Admins</td><td>Getrennte Testumgebung, erste Admins, Wiederherstellung und Audit-Zugriff?</td></tr>
+            <tr><td>BMD / B-06</td><td>Beispielexport, Feldregeln, Produkt/Version, Übertragungsrichtung, Dokumentation und Testzugang?</td></tr>
+            <tr><td>Shop / Mails</td><td>Layouts und Anfragefelder; Absender, Empfänger, Testpostfächer und Mailereignisse?</td></tr>
+            <tr><td>Partner-Level B-03</td><td>Umsatzschwellen, Zeitraum, Stornobehandlung und manuelle Ausnahmen?</td></tr>
+            <tr><td>Abrechnung B-07</td><td>Periode, Freigabeperson, Korrekturen, Exportformat; später Bankweg und Freigaben?</td></tr>
+          </tbody>
+        </table>
+        <p class="source-note">Chris' Entscheidung: Abrechnung zuerst, Bankanbindung separat später. B-06/B-07 sind nicht freigegeben; Pflichtumfang und schulische Abnahme mit dem Lehrer klären.</p>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="../mvp-deck/reveal/reveal.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      controls: true,
+      progress: true,
+      center: false,
+      transition: 'slide',
+      slideNumber: 'c/t',
+      width: 1280,
+      height: 720,
+      margin: 0.04
+    });
+  </script>
+</body>
+</html>
