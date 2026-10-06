@@ -74,14 +74,14 @@ Tobias' Design bleiben unverändert. Keine neue angemeldete Live-Anwendungsabnah
 ## Kontextabgleich und Veröffentlichung — 07.10.2026
 
 Chris hat Commit/Push/Merge der beiden Decks und Kontextdateien beauftragt.
-Zuordnung zum Veröffentlichungs-PR über den Titel
+Zuordnung zu PR #35 (Inhaltscommit `67a5acf`) über den Titel
 `docs: publish split presentations and session context`; Merge und neuesten
 Main-Workflow beim Wiedereinstieg prüfen. Der Sprint-Inhaltsstand bleibt 06.10.2026.
 Ein neuer Lehrer-/Firmentermin und weitere fachliche Freigaben sind nicht bestätigt.
 
 Erneut geprüft: `git diff --check`, gültige HTML-Struktur mit 13 + 8 Folien,
 acht Firmenfragegruppen, `node --check` beider Inline-Skripte, sieben bzw. drei
-lokale Deckressourcen und 30 lokale Markdown-Ziele. Alle drei aktiven Changes
+lokale Deckressourcen und 31 lokale Markdown-Ziele. Alle drei aktiven Changes
 bestehen `openspec validate <change> --strict`. Die globale Spec-Prüfung hatte
 am 06.10.2026 24 bestehende Purpose-Platzhalterfehler; keine Spec-Bereinigung
 oder neue Live-Anwendungsabnahme Bestandteil dieser Dokumentationsarbeit.

@@ -107,7 +107,7 @@ Main-Workflow 36433087198 erfolgreich. PR #34 und der danach erfolgreiche
 Main-Run sind oben gesondert dokumentiert. Browserprüfungen der Präsentationen
 sind keine neue angemeldete Anwendungsabnahme; Veröffentlichung ersetzt keine
 fachliche Abnahme. Am 07.10.2026 hat Chris Veröffentlichung der getrennten Decks
-und aktualisierten Kontextdateien beauftragt. Der zugehörige PR trägt den Titel
+und aktualisierten Kontextdateien beauftragt. PR #35 (Inhaltscommit `67a5acf`) trägt den Titel
 `docs: publish split presentations and session context`; seinen Merge-/CI-Status
 beim Wiedereinstieg prüfen. Der Folien-Inhaltsstand vom 06.10.2026 bleibt erhalten;
 ein neuer Lehrer-/Firmentermin oder neue Geschäftsregeln sind nicht bestätigt.

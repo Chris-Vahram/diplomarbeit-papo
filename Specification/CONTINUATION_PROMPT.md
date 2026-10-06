@@ -58,10 +58,11 @@ Risiken und Abhängigkeiten im Discovery-Dokument.
   [Sprint-Update](../presentation/sprint-deck/index.html) mit 8 Folien statt
   zusammen 35. Keine Zeiterfassung; die acht B-09-Fragegruppen stehen auf den
   Sprintfolien 6/7. Tobias' Theme und bestehende Aufnahmen bleiben erhalten.
-  Veröffentlichung dieser Folgearbeit über einen neuen PR mit dem Titel
+  Veröffentlichung dieser Folgearbeit über PR #35 mit dem Titel
   `docs: publish split presentations and session context`; PR #34 betrifft nur
   den zuvor gemergten Entscheidungsstand. Der Sprint-Inhaltsstand bleibt bewusst
-  06.10.2026; die Übergabe ist vom 07.10.2026.
+  06.10.2026; die Übergabe ist vom 07.10.2026. Inhaltscommit: `67a5acf`.
+  Merge-/CI-Status von PR #35 und den neuesten Main-Workflow beim Start prüfen.
 - Prüfung der Decks am 06.10.2026: 13 + 8 Folien, acht B-09-Fragegruppen,
   Desktop 1280 × 720 und Mobil 390 × 844 ohne Überlauf, Navigation/Bilder und
   Inline-Skripte geprüft. Keine externen Requests oder JS-Laufzeitfehler.
