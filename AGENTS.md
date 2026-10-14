@@ -10,7 +10,7 @@ For every fresh deep-work session read `Specification/CONTINUATION_PROMPT.md` fu
 
 1. `Specification/CONTINUATION_PROMPT.md` — sole operative next-session handoff.
 2. `CLAUDE.md` — stable context, scope, stack, roles, routing.
-3. `Documentation/Besprechungsprotokolle/` — newer notes override older notes and FSD; newest: `Besprechungsprotokoll_14.9.md`.
+3. `Documentation/Besprechungsprotokolle/` — newer notes override older notes and FSD; newest: `Besprechungsprotokoll_12.10.md`.
 4. `Specification/functional_specification_document_partnerportal_final.md` — baseline requirements until an approved documentation/OpenSpec sync.
 5. `Specification/phase2_backlog.md` — deferred features/decisions; do not pull into this stage.
 6. `Specification/ROADMAP_2026-08-25.md` — future planning, not implemented behavior.
@@ -27,15 +27,12 @@ Never copy stale Claude-memory facts into code/docs: client is never “PAPO”;
 
 ## Locked direction
 
-- Thesis delivers an extensible product; current demo has one reference company. Multi-company subdomains are correct only when a second company is onboarded, not the next step and without fixed thesis deadline.
-- Current core is partner-driven orders with one shared organizational login per partner company; public end-customer shop and personal employee accounts are Phase 2/later.
-- User-facing/thesis term is **Artikel**; internal `Product` names may remain. BMD leads article data; PAPO imports Excel/CSV only, with no approved direct BMD interface. Visible ID is unique BMD article number; DB ID remains technical and price lists are omitted.
+- Thesis delivers an extensible product. **Implemented today:** one reference company, partner-driven orders, one shared organizational login per partner company. **Requested target (25.09.2026):** two manually onboarded test companies with strict isolation, personal company/partner accounts with audit, and a public shop. Each needs its own approved OpenSpec change; subdomains are undecided.
+- Shop (meeting 12.10.2026): partner-side homepage builder "Mein Webshop", guest order plus optional customer account, no confirmed online payment, URL by path or subdomain open. Tobias drafts recommendations/spec; open questions go to the company via Prof. Hammer.
+- User-facing/thesis term is **Artikel**; internal `Product` names may remain. BMD leads article data; PAPO imports Excel/CSV only (import stays a dummy until company data exists). A direct BMD interface (B-06) is reopened for decision but not approved. Visible ID is unique BMD article number; DB ID remains technical and price lists are omitted.
 - Category matters. Fachbereich, product groups A–D, bundles/BOMs, training permissions, and PP/margin commission await the simplified company follow-up.
 
-Chris reopened the full Phase-2 product goal on 25.09.2026 and confirmed two manually
-onboarded test companies, personal company/partner employee accounts and a public
-shop with guest orders and optional customer accounts. This supersedes the older
-"not the next step" planning priority, not the current implementation facts or
+These target statements do not change current implementation facts or replace
 missing company/school approvals. Follow `Specification/PRODUCT_COMPLETION_PLAN.md`;
 do not infer BMD, commission or payment rules.
 

@@ -10,7 +10,7 @@ Status legend:
 - `REOPENED FOR DECISION` = Chris wants to revisit the previously excluded scope;
   business rules, school/company approval and implementation contract remain open.
 
-Last updated: 2026-10-06. Chris möchte Phase 2 und weitere Produktfunktionen bis zur
+Last updated: 2026-10-14 (meeting 12.10.2026). Chris möchte Phase 2 und weitere Produktfunktionen bis zur
 Herbstferien-Staging-Version verfolgen. Das hebt die bisherigen MVP-Abgrenzungen nicht
 rückwirkend auf. Fachliche Regeln und Freigaben durch Firma/Schule sind teils noch offen;
 die Reihenfolge und Fragen stehen in `PRODUCT_COMPLETION_PLAN.md`.
@@ -23,12 +23,14 @@ die Reihenfolge und Fragen stehen in `PRODUCT_COMPLETION_PLAN.md`.
 **MVP replacement:** none. Partner enters orders internally on behalf of Endkunde.
 **Trigger to build:** "implement B-01".
 **Depends on:** B-02, B-05 (part of same shop).
+**Update 25.09/12.10.2026:** Requested target: guest order plus optional customer account, no confirmed online payment (25.09). Meeting 12.10: the shop becomes a partner-side homepage builder (sidebar "Mein Webshop", inspiration Jimdo), reachable via `paportal.at/<partner>` or `<partner>.paportal.at` (open). No dummy shop yet; Tobias drafts recommendations for the open shop questions, which go to the company by e-mail via Prof. Hammer. Still `CUT` until its own OpenSpec change exists.
 
 ## B-02 — Shop design customization  `CUT`
 **What full version is:** Partner customizes logo, colors, shop name, + 2 layout variants. Central product data (price/description) stays locked.
 **Why cut:** Belongs to B-01. Meeting: layout variants "später, nicht MVP".
 **Was:** old FSD FR-08 / FR-09.
 **Trigger:** "implement B-02". Needs B-01 first.
+**Update 12.10.2026:** Design customization is part of the homepage builder "Mein Webshop"; builder scope, layouts and legal pages are open.
 
 ## B-03 — Automatic provision level-up  `STUB`
 **What full version is:** 3 provision levels each with fixed %. System auto-promotes partner when sales cross a threshold ("mehr Verkäufe -> LevelUp").
@@ -85,6 +87,7 @@ die Reihenfolge und Fragen stehen in `PRODUCT_COMPLETION_PLAN.md`.
 **Next gate:** Eight company questions and the non-binding calculation example are in Specification/TEAM_COMMISSION_DISCOVERY.md. Chris plans to arrange a company appointment with his teacher on 2026-10-07; no company meeting date is confirmed. Preserve legacy records as Partner-company-only and never invent historical employee attribution. B-09 is not implementation-ready until company rules, examples and prerequisites are approved; no OpenSpec artifacts or application implementation yet.
 
 ## Decisions log (so we don't re-litigate)
+- 2026-10-12: Meeting (Prof. Hammer, Chris, Tobias): presentations approved; dashboards get week/month/year presets with month as default; partner side shows latest orders first, a more prominent "Neue Bestellung", editable end customers and the labels "Meine Endkunden"/"Meine Artikel" (implemented 14.10, PR #37/#38). Data import stays a dummy until company data exists. Shop = partner homepage builder "Mein Webshop" (see B-01/B-02); open questions go to the company via Prof. Hammer. Company appointment is not yet arranged. "KI einbauen?" is only an idea without scope. Time recording: WorkAddict login must be fixed; Tobias should commit more regularly.
 - 2026-10-06: Chris confirms the single order-commission budget and internal allocation scope, accepts planning recommendations but not company rules, and authorizes publishing the reviewed documentation. Appointment scheduling with the teacher is planned for 2026-10-07; company approval is still absent. B-03 remains separate from B-09.
 - 2026-10-07: Context synchronized and publication of the two shortened presentations requested (13 general slides, 8 sprint slides, no time recording). B-09's eight company decision groups remain open; no meeting, implementation approval or new OpenSpec artifacts confirmed. Presentation sources: presentation/README.md and presentation/PROJEKTSTAND_2026-10-06.md. Operative handoff remains Specification/CONTINUATION_PROMPT.md.
 - 2026-07-01: Meetings override FSD when they conflict (newer = authoritative).

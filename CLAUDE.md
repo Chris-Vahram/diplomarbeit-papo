@@ -1,6 +1,12 @@
 # CLAUDE.md – Partnerportal (Diplomarbeit)
 
-### Vorrangiger Next-Session-Orchesterstand — 25.09.2026
+### Vorrangiger Next-Session-Orchesterstand — 14.10.2026
+
+- Neuestes Protokoll: `Besprechungsprotokoll_12.10.md`. Präsentationen abgenommen. UI-Feedback umgesetzt und gemergt (PR #37 Zeitraum-Presets/Partner-Dashboard/„Meine Endkunden“/„Meine Artikel“, PR #38 Endkunden bearbeiten); beide Changes archiviert.
+- Shop = partnerseitiger Homepage-Baukasten „Mein Webshop“ (Pfad oder Subdomain offen); Tobias erstellt Empfehlungen/Spezifikation, Fragen gehen über Prof. Hammer an die Firma. Datenimport bleibt Dummy. Firmentermin offen.
+- Nächster technischer Block für Chris: OIDC-Identity-Grundlage (siehe `Specification/CONTINUATION_PROMPT.md`).
+
+### Älterer Orchesterstand — 25.09.2026
 
 - Branch: `main`, synchron mit `origin/main` nach PR #27 (`5fff3b0`) und dem Migrationsfix aus PR #28 (`b5ab7fb`). Die 122 Suffix-` 2`-Duplikate wurden mit Chris' Freigabe geprüft und entfernt; kanonische Dateien bleiben erhalten.
 - Trade Proof/Registerkennung, Review-Fixes und Thesis-/Plan-Sync sind gepusht. Der erste `main`-Deploy zeigte trotz grünem Job einen Backend-Startfehler am alten VM-Demo-Namen; auf das vorige Image zurückgestellt, Fix per PR #28, danach live geprüft.
@@ -13,8 +19,7 @@ der Handoff trennt davon menschliche Thesis-/UI-Abnahme und die SSH-Negativmatri
 
 ## Aktueller Orchesterstatus — 25.09.2026
 
-Aktive OpenSpec-Changes: `harden-deployment-gateway` 3/4,
-`complete-thesis-documentation` 4/6,
+Aktive OpenSpec-Changes (Stand 14.10.2026): `complete-thesis-documentation` 4/6,
 `decouple-partner-number-from-login` 0/6 und `add-unique-bmd-article-number` 0/6.
 `harden-tax-identifier-rollout` ist vollständig und archiviert. Die vollständige offene Liste, Protokollauswertung und der Startprompt stehen in
 `Specification/CONTINUATION_PROMPT.md`. Chris hat Push auf `main` samt Deploy für
@@ -29,7 +34,7 @@ Web-based, extensible **B2B partner-ordering platform** for partner-driven sales
 
 ## Authoritative documents (read in this order for deep work)
 1. `Specification/CONTINUATION_PROMPT.md` — **self-contained current operational handoff**; read it fully in every fresh session, then verify volatile Git/OpenSpec claims.
-2. `Documentation/Besprechungsprotokolle/` — newer meeting notes override older documents when they conflict; newest is `Besprechungsprotokoll_14.9.md`.
+2. `Documentation/Besprechungsprotokolle/` — newer meeting notes override older documents when they conflict; newest is `Besprechungsprotokoll_12.10.md`.
 3. `Specification/functional_specification_document_partnerportal_final.md` — authoritative baseline for the implemented internal ordering stage (FR-01..FR-25) until synchronized with newer decisions.
 4. `Specification/phase2_backlog.md` — deferred features **B-01..B-08** + decisions log. Honor it; do not silently promote future directions.
 5. `Specification/ROADMAP_2026-08-25.md` — persisted future plan, updated through 31.08.2026; planning context, not implemented behavior.
