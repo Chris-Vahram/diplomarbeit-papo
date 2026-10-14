@@ -2,7 +2,7 @@ import { apiFetch } from "../lib/api.js";
 import { ensureValidSession, getSession } from "../lib/auth.js";
 import { showToast } from "../components/toast-notice.js";
 import { formatEuro, formatNumber, formatDate } from "../lib/format.js";
-import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue, previousPeriod, trendInfo, trailingWindowTrend, toLocalIsoDate } from "../lib/dashboard-data.js";
+import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue, previousPeriod, trendInfo, trailingWindowTrend, toLocalIsoDate, presetPeriod, PERIOD_PRESETS } from "../lib/dashboard-data.js";
 import { escapeHtml } from "../lib/html.js";
 
 const eur = new Intl.NumberFormat("de-AT", { style: "currency", currency: "EUR" });
@@ -55,9 +55,10 @@ function renderMonthChart(title, monthLabels, monthlyValues) {
 class PartnerDashboardPage extends HTMLElement {
   connectedCallback() {
     this.classList.add("area--partner");
-    // No explicit range by default - headline totals show the backend's true
-    // all-time values (partner-dashboard spec: "without a range, all-time values").
-    this.period = null;
+    // Opens on the current month (meeting 12.10.2026); "Gesamter Zeitraum" sets
+    // period = null and shows the backend's exact all-time totals.
+    this.periodPreset = "month";
+    this.period = presetPeriod(this.periodPreset);
 
     const greeting = "Willkommen zurück zum";
 
@@ -69,7 +70,7 @@ class PartnerDashboardPage extends HTMLElement {
           <p id="profile-name-status" hidden></p>
         </div>
         <div class="dashboard-header__actions">
-          <button type="button" class="button-primary" id="new-order-btn">Neue Bestellung</button>
+          <button type="button" class="button-primary button-primary--hero" id="new-order-btn"><i data-lucide="plus"></i>Neue Bestellung</button>
           <div class="period-picker">
             <button type="button" class="period-picker__button" id="period-button">
               <i data-lucide="calendar"></i>
@@ -77,6 +78,9 @@ class PartnerDashboardPage extends HTMLElement {
               <i data-lucide="chevron-down" class="period-picker__caret"></i>
             </button>
             <div class="period-picker__panel is-closed" id="period-panel">
+              <div class="period-picker__presets">
+                ${Object.entries(PERIOD_PRESETS).map(([kind, label]) => `<button type="button" data-preset="${kind}">${label}</button>`).join("")}
+              </div>
               <div class="period-picker__field">
                 <label for="period-from">Von</label>
                 <input type="date" id="period-from" />
@@ -86,17 +90,17 @@ class PartnerDashboardPage extends HTMLElement {
                 <input type="date" id="period-to" />
               </div>
               <div class="period-picker__actions">
-                <button type="button" class="period-picker__reset" id="period-reset">Zurücksetzen</button>
+                <button type="button" class="period-picker__reset" id="period-reset">Gesamter Zeitraum</button>
                 <button type="button" class="period-picker__apply" id="period-apply">Anwenden</button>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="metric-row" id="metric-row"></div>
-      <div class="chart-row" id="chart-row"></div>
       <h2>Letzte Bestellungen</h2>
       <data-table id="latest-orders-table"></data-table>
+      <div class="metric-row" id="metric-row"></div>
+      <div class="chart-row" id="chart-row"></div>
     `;
 
     this.metricRow = this.querySelector("#metric-row");
@@ -161,6 +165,16 @@ class PartnerDashboardPage extends HTMLElement {
     });
     this.periodPanel.addEventListener("click", (event) => event.stopPropagation());
 
+    for (const button of this.periodPanel.querySelectorAll("[data-preset]")) {
+      button.addEventListener("click", () => {
+        this.periodPreset = button.dataset.preset;
+        this.period = presetPeriod(this.periodPreset);
+        this.periodPanel.classList.add("is-closed");
+        this.updatePeriodUi();
+        this.render();
+      });
+    }
+
     this.querySelector("#period-apply").addEventListener("click", () => {
       const [fy, fm, fd] = this.periodFromInput.value.split("-").map(Number);
       const [ty, tm, td] = this.periodToInput.value.split("-").map(Number);
@@ -171,6 +185,7 @@ class PartnerDashboardPage extends HTMLElement {
         return;
       }
       this.period = { from, to };
+      this.periodPreset = null;
       this.periodPanel.classList.add("is-closed");
       this.updatePeriodUi();
       this.render();
@@ -178,6 +193,7 @@ class PartnerDashboardPage extends HTMLElement {
 
     this.querySelector("#period-reset").addEventListener("click", () => {
       this.period = null;
+      this.periodPreset = null;
       this.periodPanel.classList.add("is-closed");
       this.updatePeriodUi();
       this.render();
@@ -185,11 +201,15 @@ class PartnerDashboardPage extends HTMLElement {
   }
 
   updatePeriodUi() {
+    for (const button of this.periodPanel.querySelectorAll("[data-preset]")) {
+      button.setAttribute("aria-pressed", String(button.dataset.preset === this.periodPreset));
+    }
     if (this.period) {
       this.periodFromInput.value = toLocalIsoDate(this.period.from);
       this.periodToInput.value = toLocalIsoDate(this.period.to);
-      this.querySelector("#period-label").textContent =
-        `${dateLabel.format(this.period.from)} – ${dateLabel.format(this.period.to)}`;
+      this.querySelector("#period-label").textContent = this.periodPreset
+        ? PERIOD_PRESETS[this.periodPreset]
+        : `${dateLabel.format(this.period.from)} – ${dateLabel.format(this.period.to)}`;
     } else {
       this.periodFromInput.value = "";
       this.periodToInput.value = "";

@@ -14,7 +14,7 @@ const routes = {
   "/company/orders": { tag: "company-order-list-page", role: "company", title: "Bestellungen" },
   "/company/import": { tag: "company-import-page", role: "company", title: "Datenimport" },
   "/partner/dashboard": { tag: "partner-dashboard-page", role: "partner", title: "Partner-Dashboard" },
-  "/partner/products": { tag: "partner-product-list-page", role: "partner", title: "Artikel" },
+  "/partner/products": { tag: "partner-product-list-page", role: "partner", title: "Meine Artikel" },
   "/partner/orders": { tag: "partner-order-list-page", role: "partner", title: "Meine Bestellungen" },
   "/partner/orders/new": { tag: "partner-order-new-page", role: "partner", title: "Neue Bestellung" },
   "/partner/customers": { tag: "partner-customer-list-page", role: "partner", title: "Meine Endkunden" },
@@ -145,8 +145,8 @@ function renderNav() {
     : [
         ["/partner/dashboard", "Dashboard"],
         ["/partner/orders", "Meine Bestellungen"],
-        ["/partner/customers", "Endkunden"],
-        ["/partner/products", "Artikel"],
+        ["/partner/customers", "Meine Endkunden"],
+        ["/partner/products", "Meine Artikel"],
       ];
 
   const path = currentPath();
