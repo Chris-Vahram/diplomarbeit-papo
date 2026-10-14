@@ -29,7 +29,13 @@ Neuestes Protokoll: `Documentation/Besprechungsprotokolle/Besprechungsprotokoll_
   Arbeitspunkt (Prof. Hammer wollte nur die URL sehen).
 - Zeiterfassung: WorkAddict (Daten im Repo `diplomarbeit-papo/time-data`);
   Chris' Einträge bis 14.10.2026 nachgetragen, Uhrzeit des Meetings 12.10. geschätzt.
-- Nächster technischer Block für Chris: OIDC-Identity-Grundlage (siehe unten).
+- 15.10.2026: OIDC-Identity-Grundlage als eigener Change
+  `bind-partner-login-to-oidc-subject` spezifiziert (Tabelle `PartnerLogin`,
+  Subject-Auflösung, Firmen-Dialog „Logins“, Release A mit Übergangs-Fallback,
+  VM-Bindung, Release B ohne Fallback). `decouple-partner-number-from-login`
+  enthält nur noch den BMD-Nummern-Teil und wartet auf BMD-Beispieldaten.
+- Nächster technischer Block für Chris: `bind-partner-login-to-oidc-subject`
+  Release A umsetzen (Tasks 1–3), danach VM-Bindung und Release B.
 
 ## Aktiver Gesprächsfaden — Teamprovision für Partner-Mitarbeiter
 
