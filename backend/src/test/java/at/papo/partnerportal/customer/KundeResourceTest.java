@@ -177,4 +177,110 @@ class KundeResourceTest {
             QuarkusTransaction.requiringNew().run(() -> partner("PARTNER-DEMO").active = active);
         }
     }
+
+    private Number createCustomer(String token, String lastName) {
+        return given().auth().oauth2(token).contentType("application/json")
+                .body("{\"lastName\":\"" + lastName + "\",\"firstName\":\"Eva\",\"email\":\"eva@example.at\","
+                        + "\"phone\":\"0732 1234\",\"address\":" + VALID_ADDRESS + "}")
+                .when().post("/api/partner/customers")
+                .then().statusCode(200).extract().path("id");
+    }
+
+    @Test
+    void partnerUpdatesOwnCustomerAndExistingOrderShowsNewData() {
+        String token = tokens.tokenFor("partner-demo", "partner-demo");
+        long productId = Product.<Product>find("name", "Akkuschrauber 18V Set").firstResult().id;
+        Number id = createCustomer(token, "Vor Änderung");
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"kundeId\":" + id + ",\"items\":[{\"productId\":" + productId + ",\"quantity\":1}]}")
+                .when().post("/api/partner/orders").then().statusCode(200);
+
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"lastName\":\"Größbacher\",\"address\":{\"street\":\"Hauptstraße\",\"houseNumber\":\"7a\","
+                        + "\"postalCode\":\"8010\",\"city\":\"Graz\",\"country\":\"Österreich\"}}")
+                .when().put("/api/partner/customers/" + id)
+                .then().statusCode(200)
+                .body("lastName", is("Größbacher"))
+                .body("address.street", is("Hauptstraße"))
+                .body("firstName", nullValue())
+                .body("email", nullValue())
+                .body("phone", nullValue())
+                .body("lastOrderDate", is(LocalDate.now().toString()));
+
+        given().auth().oauth2(token)
+                .when().get("/api/partner/orders")
+                .then().statusCode(200)
+                .body("find { it.kunde.id == " + id + " }.kunde.lastName", is("Größbacher"))
+                .body("find { it.kunde.id == " + id + " }.kunde.address.city", is("Graz"));
+    }
+
+    @Test
+    void updateWithMissingRequiredDataIsRejectedAndKeepsData() {
+        String token = tokens.tokenFor("partner-demo", "partner-demo");
+        Number id = createCustomer(token, "Bleibt Gleich");
+
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"address\":" + VALID_ADDRESS + "}")
+                .when().put("/api/partner/customers/" + id).then().statusCode(400);
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"lastName\":\"Neu\",\"address\":" + invalidAddress("city") + "}")
+                .when().put("/api/partner/customers/" + id).then().statusCode(400);
+
+        QuarkusTransaction.requiringNew().run(() -> {
+            Kunde unchanged = Kunde.findById(id.longValue());
+            assertEquals("Bleibt Gleich", unchanged.lastName);
+            assertEquals("Linz", unchanged.address.city);
+            assertEquals("Eva", unchanged.firstName);
+        });
+    }
+
+    @Test
+    void updateOfForeignOrUnknownCustomerIsNotFound() {
+        String token = tokens.tokenFor("partner-demo", "partner-demo");
+        long foreignId = QuarkusTransaction.requiringNew().call(() -> {
+            Kunde foreign = new Kunde();
+            foreign.ownerPartner = partner("P-1002");
+            foreign.lastName = "Fremd";
+            foreign.address = new at.papo.partnerportal.common.Address("Testweg", "1", "4020", "Linz", "Österreich");
+            foreign.persist();
+            return foreign.id;
+        });
+        try {
+            for (long id : new long[] { foreignId, 999_999_999L }) {
+                given().auth().oauth2(token).contentType("application/json")
+                        .body("{\"lastName\":\"Übernommen\",\"address\":" + VALID_ADDRESS + "}")
+                        .when().put("/api/partner/customers/" + id)
+                        .then().statusCode(404)
+                        .body("message", is("Kunde nicht gefunden."));
+            }
+            QuarkusTransaction.requiringNew().run(() ->
+                    assertEquals("Fremd", Kunde.<Kunde>findById(foreignId).lastName));
+        } finally {
+            QuarkusTransaction.requiringNew().run(() -> Kunde.deleteById(foreignId));
+        }
+    }
+
+    @Test
+    void updateRejectsWrongRolesAndInactivePartner() {
+        String partnerToken = tokens.tokenFor("partner-demo", "partner-demo");
+        String companyToken = tokens.tokenFor("company-demo", "company-demo");
+        Number id = createCustomer(partnerToken, "Rollentest");
+        String body = "{\"lastName\":\"Geändert\",\"address\":" + VALID_ADDRESS + "}";
+
+        given().contentType("application/json").body(body)
+                .when().put("/api/partner/customers/" + id).then().statusCode(401);
+        given().auth().oauth2(companyToken).contentType("application/json").body(body)
+                .when().put("/api/partner/customers/" + id).then().statusCode(403);
+
+        boolean active = QuarkusTransaction.requiringNew().call(() -> partner("PARTNER-DEMO").active);
+        QuarkusTransaction.requiringNew().run(() -> partner("PARTNER-DEMO").active = false);
+        try {
+            given().auth().oauth2(partnerToken).contentType("application/json").body(body)
+                    .when().put("/api/partner/customers/" + id).then().statusCode(403);
+        } finally {
+            QuarkusTransaction.requiringNew().run(() -> partner("PARTNER-DEMO").active = active);
+        }
+        QuarkusTransaction.requiringNew().run(() ->
+                assertEquals("Rollentest", Kunde.<Kunde>findById(id.longValue()).lastName));
+    }
 }
