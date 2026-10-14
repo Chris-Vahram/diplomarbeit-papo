@@ -48,6 +48,23 @@ public class KundeService {
         return kunde;
     }
 
+    // Edits the shared record in place, so existing orders show the new data too
+    // (no snapshot - edit-partner-end-customers design).
+    @Transactional
+    public KundeDto update(Partner partner, Long id, KundeRequest request) {
+        Kunde kunde = findOwnedOrThrow(partner, id);
+        kunde.lastName = request.lastName();
+        kunde.address = request.address().toEntity();
+        kunde.firstName = request.firstName();
+        kunde.email = request.email();
+        kunde.phone = request.phone();
+        LocalDate lastOrderDate = Kunde.getEntityManager()
+                .createQuery("select max(o.orderDate) from Order o where o.kunde = :kunde", LocalDate.class)
+                .setParameter("kunde", kunde)
+                .getSingleResult();
+        return KundeDto.from(kunde, lastOrderDate);
+    }
+
     public Kunde findOwnedOrThrow(Partner partner, Long id) {
         Kunde kunde = Kunde.find("id = ?1 and ownerPartner = ?2", id, partner).firstResult();
         if (kunde == null) {
