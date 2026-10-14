@@ -1,11 +1,13 @@
 # Functional Specification Document — Full Project Vision (Whole Project)
 
-> **Scope of this document:** the complete, original Partnerportal vision — not just the MVP. The MVP (`functional_specification_document_partnerportal_final.md`, FSD v2) is **Phase 1** of this vision: the internal Company ↔ Partner ordering core. Everything cut/deferred from the MVP (`phase2_backlog.md`, B-01…B-07) is **Phase 2+** here, folded back into one coherent end-state picture. Say "implement B-XX" to build a specific deferred piece; this document exists so the full picture isn't lost while the MVP is being built.
+> **Scope of this document:** the complete, original Partnerportal vision — not just the MVP. The MVP (`functional_specification_document_partnerportal_final.md`, FSD v2) is **Phase 1** of this vision: the internal Company ↔ Partner ordering core. Everything cut/deferred from the MVP (`phase2_backlog.md`, B-01…B-09) is **Phase 2+** here, folded back into one coherent end-state picture. Say "implement B-XX" to build a specific deferred piece; this document exists so the full picture isn't lost while the MVP is being built.
 >
 > Relationship between the three specification files:
 > - `functional_specification_document_full_vision.md` (this file) — the whole project, all phases, permanent reference.
 > - `functional_specification_document_partnerportal_final.md` (FSD v2) — MVP-only, authoritative for current build.
-> - `phase2_backlog.md` — deferred-feature specs (B-01…B-07) with activation triggers; this document narrates them as one story, the backlog is the terse per-feature reference.
+> - `phase2_backlog.md` — deferred-feature specs (B-01…B-09) with activation triggers; this document narrates them as one story, the backlog is the terse per-feature reference.
+>
+> **Stand 14.10.2026:** synchronized with Chris' decisions of 25.09.2026 and the meeting of 12.10.2026 (`Documentation/Besprechungsprotokolle/Besprechungsprotokoll_12.10.md`). Points marked *open* are not decided by the company or school.
 
 ---
 
@@ -21,7 +23,7 @@ The system goes beyond classic PRM (Partner Relationship Management). It does no
 **Company → Partner → End Customer**
 
 ### Reference Client
-Reference client (unnamed) — ~200 partners, ~800 articles. Partner orders currently arrive by e-mail (~10–15/day) and phone (~3–4/day), processed manually. (PAPO is this project's own name, not the client.)
+Reference client (unnamed) — roughly 100 partners according to newer notes (older estimate: ~200 partners, ~800 articles; to be verified with company data). Partner orders currently arrive by e-mail (~10–15/day) and phone (~3–4/day), processed manually. (PAPO is this project's own name, not the client.)
 
 ### Full Project Goal
 Develop a web-based system that:
@@ -62,7 +64,7 @@ In the full vision, End Customer is a primary user, not just a secondary one:
 Part of the partner portal, not a full second shop. Internal catalog, management and release area. Includes partner management, partner master data, article/product data, product release, dashboard functions, partner-related process visibility, billing/commission reference (incl. settlement history), and internal coordination. Partners can also enter orders here manually on a customer's behalf (this internal ordering path is what the MVP builds first, and it remains available even once the external shop exists).
 
 ### External Area — Partner → End Customer
-The **external partner shop** (Phase 2, B-01/B-02). Visible to end customers. Based on centrally maintained products; shows only released products. Customizable in partner design (logo, colors, shop name, choice of ≥2 layout variants) — central product data (price/description) stays locked regardless of shop customization. Allows direct ordering by the end customer. Assigns the sale to the partner automatically. Leads to fulfillment by the company in the background, same as internally-entered orders.
+The **external partner shop** (Phase 2, B-01/B-02). Visible to end customers. Based on centrally maintained products; shows only released products. Built by the partner in a homepage builder ("Mein Webshop" in the partner sidebar, meeting 12.10.2026; inspiration: website builders such as Jimdo) and reachable by path (`paportal.at/<partner>`) or subdomain (`<partner>.paportal.at`) — URL scheme, builder scope, layouts and legal pages are *open*. Customizable in partner design (logo, colors, shop name, layout variants) — central product data (price/description) stays locked regardless of shop customization. Allows direct ordering by the end customer. Assigns the sale to the partner automatically. Leads to fulfillment by the company in the background, same as internally-entered orders.
 
 ---
 
@@ -105,21 +107,26 @@ Everything below is the union of the MVP (FSD v2, Phase 1) and the deferred back
 | 17 | **Automatic commission level-up** by sales threshold | Phase 2 | B-03 |
 | 18 | **Real e-mail sending** (SMTP) for order/shipping confirmations | Phase 2 | B-04 |
 | 19 | **Shop inquiry auto-forwarding** to the responsible partner | Phase 2 | B-05 |
-| 20 | BMD accounting-system interface | Permanently excluded | B-06 |
+| 20 | BMD accounting-system interface | Reopened for decision (25.09.2026) | B-06 |
 | 21 | **Commission settlement/payout workflow** | Phase 2 | B-07 |
-| 22 | End-customer self-service ordering (no partner-entry needed) | Phase 2 | (part of B-01) |
+| 22 | End-customer self-service ordering (guest order, optional customer account) | Phase 2 | (part of B-01) |
+| 23 | Dashboard trend indicators "ggü. Vorperiode" (partner side implemented, company-wide deferred) | Phase 2 | B-08 |
+| 24 | Partner-employee team commissions, points and milestones | Reopened for decision | B-09 |
+| 25 | Multi-company operation (two manually onboarded test companies, tenant isolation) | Phase 2 | — |
+| 26 | Personal company and partner accounts (admin/employee) with actor/time audit | Phase 2 | — |
+| 27 | Period presets on dashboards, editable end customers | MVP (12.10.2026) | — |
 
-Permanently out of scope regardless of phase: full ERP, general-purpose CRM, real payment gateway/checkout, full inventory and detailed shipping-workflow management, financial bookkeeping/accounting, general learning/enablement portal, full recreation of large enterprise platforms (Salesforce, Magentrix, etc.), BMD interface.
+Out of scope regardless of phase: full ERP, general-purpose CRM, full inventory and detailed shipping-workflow management, financial bookkeeping/accounting, general learning/enablement portal, full recreation of large enterprise platforms (Salesforce, Magentrix, etc.). Online payment in the shop is not confirmed (25.09.2026). A direct BMD interface is no longer excluded but needs company/school approval and an integration contract (B-06). Data import stays a dummy/Excel-CSV path until company data exists (meeting 12.10.2026).
 
 ---
 
 ## 6. Use Cases (Full Vision, Beyond MVP)
 
 ### UC-A: End Customer Orders Through a Partner's External Shop (Phase 2, B-01)
-An end customer visits a partner's branded shop URL, browses the products the company has enabled for that partner, adds items to a cart, and places a direct order — no login, no partner involvement at order time. The order is automatically assigned to the partner whose shop it came through, exactly like an internally-entered order, and enters the same submitted → reviewed → fulfilled pipeline. Confirmation e-mails go out to the end customer directly (real, not simulated — B-04).
+An end customer visits a partner's branded shop URL, browses the products the company has enabled for that partner, adds items to a cart, and places a direct order — as a guest or with an optional customer account (25.09.2026), without online payment and without partner involvement at order time. The order is automatically assigned to the partner whose shop it came through, exactly like an internally-entered order, and enters the same submitted → reviewed → fulfilled pipeline. Confirmation e-mails go out to the end customer directly (real, not simulated — B-04).
 
-### UC-B: Partner Customizes Their Shop (Phase 2, B-02)
-A partner logs into the internal area and configures their external shop's logo, color scheme, shop name, and picks one of the provided layout variants. Central product data (price, description, availability) remains company-controlled and cannot be edited by the partner regardless of shop customization.
+### UC-B: Partner Builds Their Shop (Phase 2, B-02)
+A partner logs into the internal area, opens "Mein Webshop" and builds their shop homepage with a builder: logo, color scheme, shop name and one of the provided layout variants. Builder scope and URL scheme are open (meeting 12.10.2026; questions sent to the company via Prof. Hammer). Central product data (price, description, availability) remains company-controlled and cannot be edited by the partner regardless of shop customization.
 
 ### UC-C: Partner Crosses a Commission Threshold (Phase 2, B-03)
 As a partner's cumulative sales cross a defined threshold, the system automatically promotes them to the next commission level and applies the new percentage to subsequent orders, without company intervention. (Thresholds per level are an open question to define before this is built.)
@@ -134,7 +141,7 @@ An inquiry submitted through the external shop (not yet a full order — e.g. a 
 
 ## 7. Data Model — Full Vision
 
-Same core entities as the MVP; the full vision does not require new entity types, only extended behavior on existing ones:
+The MVP core entities stay. The full vision adds new concepts, each to be specified in its own OpenSpec change before implementation:
 
 - **Partner** — partner identity, **commission level with auto-promotion** (Phase 2 adds threshold-tracking logic), active/inactive status, **shop design settings** (Phase 2: logo, colors, name, layout variant reference).
 - **Product** — company-managed article data (unchanged from MVP).
@@ -143,15 +150,21 @@ Same core entities as the MVP; the full vision does not require new entity types
 - **Kunde (End Customer)** — reusable end-customer record; in Phase 2, can also be created directly by an end customer's own external-shop order rather than only by a partner.
 - **Order / OrderItem** — same shape as MVP; source distinguishes internal-partner-entry vs. external-shop-direct in Phase 2 (both funnel into the same status pipeline).
 - **CommissionRecord** — same as MVP; Phase 2 adds a **settlement/payout record** linking multiple CommissionRecords to a payout event (B-07).
+- **Tenant (customer company)** — isolates partners, articles, orders and settings per PAPO customer company.
+- **User account / membership** — personal company and partner accounts (admin/employee) linked by stable OIDC subject, replacing the shared partner login.
+- **Audit event** — actor and time of relevant changes.
+- **Shop customer account** — optional end-customer login for the public shop (B-01).
+- **Team/attribution records** — seller attribution and team allocation (B-09, open).
 
 ---
 
 ## 8. Roadmap
 
-1. **Phase 1 (MVP, in progress)** — internal Company ↔ Partner ordering core. See `functional_specification_document_partnerportal_final.md`, `IMPLEMENTATION_PLAN.md`, and the OpenSpec change `build-partnerportal-mvp`.
-2. **Phase 2 (future, triggered on request)** — external partner shop (B-01) + shop design customization (B-02), real e-mail (B-04), shop inquiry auto-forward (B-05). Say "implement B-01" etc.
-3. **Phase 3 (future, triggered on request)** — automatic commission level-up (B-03), commission settlement/payout (B-07). Needs sales-threshold decisions first.
-4. **Permanently excluded** — BMD interface (B-06); data always enters via Excel/CSV import instead.
+1. **Phase 1 (MVP, implemented and deployed as demo)** — internal Company ↔ Partner ordering core (FR-01…FR-25), extended by the 12.10.2026 feedback (period presets, partner navigation, editable end customers). See `functional_specification_document_partnerportal_final.md`.
+2. **Identity and tenancy** — stable OIDC identity, personal accounts with audit, two test companies. Order and details: `PRODUCT_COMPLETION_PLAN.md`.
+3. **Shop** — partner homepage builder "Mein Webshop" (B-01/B-02) with guest order and optional customer account; Tobias drafts the specification, open questions go to the company via Prof. Hammer. Then real e-mail (B-04) and shop inquiries (B-05).
+4. **Commission** — auditable settlement/export first (B-07), automatic level-up (B-03) and team commissions (B-09) after company rules exist.
+5. **Reopened for decision** — BMD interface (B-06); until then data enters via Excel/CSV import.
 
 ---
 

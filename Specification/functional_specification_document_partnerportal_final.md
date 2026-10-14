@@ -1,6 +1,8 @@
 # Functional Specification Document (v2)
 
 > **Version note:** This v2 reflects the client meetings (17.06.2026 + 24.06.2026), which override the earlier FSD where they conflict (newer = authoritative). The MVP is an **internal B2B partner-ordering portal**. The external end-customer shop from v1 is deferred (see `phase2_backlog.md`, B-01). The full original vision (v1 scope incl. external shop) is preserved in `functional_specification_document_full_vision.md`; there is no separate v1 backup file.
+>
+> **Stand 10/2026:** FR-01…FR-25 remain the implemented baseline and keep their numbering for `docs/REQUIREMENTS_TRACEABILITY.md`. Later decisions are documented elsewhere: BMD (B-06) and settlement (B-07) were reopened for decision on 25.09.2026; the meeting of 12.10.2026 added dashboard period presets (week/month/year, month as default), "Meine Endkunden"/"Meine Artikel" labels and editable end customers (see `openspec/specs/`). Future scope (shop as "Mein Webshop" builder, tenancy, personal accounts) is described in `functional_specification_document_full_vision.md` and `PRODUCT_COMPLETION_PLAN.md`.
 
 ## 1. Project Overview
 
@@ -13,7 +15,7 @@ Working title: **Web-Based Partner Portal for Managing Sales Partners, Products,
 This project is a web-based partner portal for partner-driven sales models. The system follows the chain **Company -> Partner -> End Customer**. The company centrally manages partners and products (imported and maintained), and selectively enables products for specific partners. The **core MVP process** is partner-driven ordering: a partner logs in, selects or creates an end customer, and places an order (articles + quantities) on that customer's behalf. Each order is automatically assigned to the partner, forms the basis for a per-partner commission, and the company handles fulfillment (Konfektionierung and shipping) to the end customer.
 
 ### Background / Current Situation
-The reference client currently manages roughly **200 partners and 800 articles**. Partner orders today arrive by e-mail (~10–15/day) and phone (~3–4/day), processed manually. Central article management and partner management are the highest-priority pain points, followed by a reliable partner-driven ordering process with automatic order confirmation and shipping confirmation.
+The reference client currently manages roughly **200 partners and 800 articles** (older estimate; newer notes say about 100 partners — to be verified with company data). Partner orders today arrive by e-mail (~10–15/day) and phone (~3–4/day), processed manually. Central article management and partner management are the highest-priority pain points, followed by a reliable partner-driven ordering process with automatic order confirmation and shipping confirmation.
 
 Existing solutions (PRM systems, partner portals, affiliate platforms) usually cover only parts of the required process and are often too broad, too expensive, or too complex. In particular, the combination of **central article management, partner management, product enablement, partner-driven ordering, and per-partner commission assignment** is rarely available as one clear, lean process.
 
@@ -72,7 +74,7 @@ Tracked in `phase2_backlog.md`:
 - **Automatic commission level-up** by sales threshold (B-03) — MVP sets level manually
 - **Real e-mail sending** via SMTP (B-04) — MVP simulates the e-mail in-app
 - **Shop inquiry auto-forwarding** (B-05)
-- **BMD interface** (B-06) — permanently excluded; data enters via Excel import
+- **BMD interface** (B-06) — not part of the MVP; data enters via Excel import. Reopened for decision on 25.09.2026 (company/school approval and integration contract open)
 - **Commission settlement / payout workflow** (B-07)
 
 ### Permanently Out of Scope
@@ -88,7 +90,7 @@ Tracked in `phase2_backlog.md`:
 - Order status limited to **submitted / reviewed / fulfilled**.
 - Commission = fixed percentage per partner (per-partner level), on total order value; no settlement/payout.
 - Confirmation e-mails are **simulated** (rendered in-app), not really sent.
-- Excel import is the data-entry path for the ~200 partners / ~800 articles; no BMD interface.
+- Excel import is the data-entry path for the partner and article master data (reference scale to be verified); no BMD interface in the MVP.
 
 ---
 
