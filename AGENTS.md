@@ -68,3 +68,9 @@ cd backend
 No frontend build/lint/npm/typecheck exists. For UI changes, use existing browser tooling at desktop and mobile; use `docs/SETUP.md` for runtime. If infrastructure blocks a check, report exact failure/current diagnosis, never a stale workaround.
 
 Before handoff: focused tests; full backend suite and package for backend/implementation changes; `openspec validate <change>` for OpenSpec changes; exact commands and outcomes.
+
+## Graphify (local navigation cache)
+
+For architecture or cross-file questions, use `graphify query "<specific question>" --budget 800` from the repo root when `graphify-out/graph.json` exists. Use `graphify explain "<node>"` or `graphify path "<A>" "<B>"` to narrow further. For exact text or symbol lookup, use `rg` directly. Read only the relevant source lines after graph lookup; do not load the full graph report into context by default.
+
+The graph is derived and may be stale or inferred. Verify consequential claims against the source-of-truth order above. `graphify update .` refreshes code after edits; refresh semantic document extraction separately when current docs change. The ignored `graphify-out/` directory is local cache, not project memory or a specification.
