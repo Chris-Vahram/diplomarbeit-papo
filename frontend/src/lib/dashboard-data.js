@@ -59,6 +59,21 @@ export function monthlyRevenue(orders, keys) {
   return keys.map((k) => byKey[k]);
 }
 
+// Calendar presets for the period picker, each running up to today (local time,
+// week starts Monday). Returns the same { from, to } shape as a custom range.
+export const PERIOD_PRESETS = { week: "Diese Woche", month: "Dieser Monat", year: "Dieses Jahr" };
+
+export function presetPeriod(kind, now = new Date()) {
+  const y = now.getFullYear();
+  const m = now.getMonth();
+  const d = now.getDate();
+  const to = new Date(y, m, d, 23, 59, 59, 999);
+  if (kind === "week") return { from: new Date(y, m, d - ((now.getDay() + 6) % 7)), to };
+  if (kind === "month") return { from: new Date(y, m, 1), to };
+  if (kind === "year") return { from: new Date(y, 0, 1), to };
+  throw new Error(`Unbekannter Zeitraum: ${kind}`);
+}
+
 // The immediately preceding period of the same length as [from, to] — for the
 // metric-card "up/down vs. previous period" arrows. Non-overlapping: ends the
 // instant before `from`.
