@@ -15,7 +15,7 @@ export function toLocalIsoDate(date) {
   return `${year}-${month}-${day}`;
 }
 
-export function inPeriod(isoDate, fromIso, toIso) {
+function inPeriod(isoDate, fromIso, toIso) {
   return (!fromIso || isoDate >= fromIso) && (!toIso || isoDate <= toIso);
 }
 
