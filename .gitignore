@@ -91,3 +91,7 @@ deploy/rclone.conf
 
 ### Local Graphify index ###
 /graphify-out/
+
+### Local scratch / rendered research files ###
+/tmp/
+/.scratch/
