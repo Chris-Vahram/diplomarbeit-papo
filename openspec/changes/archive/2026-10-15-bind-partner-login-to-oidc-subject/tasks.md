@@ -12,8 +12,8 @@
 
 - [x] 3.1 Upgrade check: start Release A against a database created by the current `main` release with schema `update`; verify existing rows, NOT NULL/UNIQUE/FK constraints of `partner_login` and an authenticated bind plus partner login.
 - [x] 3.2 Update `docs/DATA_MODEL.md` and `docs/SETUP.md` (binding procedure on the VM); run focused tests, full `./mvnw test`, `./mvnw package`, `node --check`, `openspec validate bind-partner-login-to-oidc-subject --strict`, `git diff --check`, partnerportal-quality and an independent security/database review; fix findings.
-- [ ] 3.3 After deploying Release A: bind the VM `partner-demo` user ID via the dialog without logging tokens or passwords, then confirm a real partner login and dashboard.
+- [x] 3.3 After deploying Release A: bind the VM `partner-demo` user ID via the dialog without logging tokens or passwords, then confirm a real partner login and dashboard.
 
 ## 4. Release B — essential
 
-- [ ] 4.1 (code ready on branch `feat/oidc-release-b`, deploy pending) Only after 3.3: remove the fallback, adapt tests (unbound subject with matching username → 403), full test suite, deploy and confirm the VM partner login again.
+- [x] 4.1 (deployed 15.10.2026, PR #44, VM login verified) Only after 3.3: remove the fallback, adapt tests (unbound subject with matching username → 403), full test suite, deploy and confirm the VM partner login again.

@@ -4,7 +4,7 @@
 
 - Neuestes Protokoll: `Besprechungsprotokoll_12.10.md`. Präsentationen abgenommen. UI-Feedback umgesetzt und gemergt (PR #37 Zeitraum-Presets/Partner-Dashboard/„Meine Endkunden“/„Meine Artikel“, PR #38 Endkunden bearbeiten); beide Changes archiviert.
 - Shop = partnerseitiger Homepage-Baukasten „Mein Webshop“ (Pfad oder Subdomain offen); Tobias erstellt Empfehlungen/Spezifikation, Fragen gehen über Prof. Hammer an die Firma. Datenimport bleibt Dummy. Firmentermin offen.
-- Nächster technischer Block für Chris: `bind-partner-login-to-oidc-subject` (OIDC-Subject-Bindung, spezifiziert 15.10.) umsetzen; `decouple-partner-number-from-login` wartet nur noch auf BMD-Beispieldaten.
+- 15.10.: B-08, B-04 (Mailversand vorbereitet, auf der VM aus bis SMTP-Daten da sind) und OIDC-Login-Bindung (Release A+B, `partner-demo` auf der VM verknüpft) live. `decouple-partner-number-from-login` wartet nur noch auf BMD-Beispieldaten. Geplant: `refine-portal-frontend`, `derive-product-category-from-catalog`, Ponytail-Audit.
 
 ### Älterer Orchesterstand — 25.09.2026
 
@@ -20,7 +20,7 @@ der Handoff trennt davon menschliche Thesis-/UI-Abnahme und die SSH-Negativmatri
 ## Aktueller Orchesterstatus — 25.09.2026
 
 Aktive OpenSpec-Changes (Stand 15.10.2026): `complete-thesis-documentation` 4/6,
-`bind-partner-login-to-oidc-subject` 0/8, `send-order-emails` 5/6, `decouple-partner-number-from-login` 0/4 und `add-unique-bmd-article-number` 0/6.
+`send-order-emails` 5/6, `decouple-partner-number-from-login` 0/4 und `add-unique-bmd-article-number` 0/6.
 `harden-tax-identifier-rollout` ist vollständig und archiviert. Die vollständige offene Liste, Protokollauswertung und der Startprompt stehen in
 `Specification/CONTINUATION_PROMPT.md`. Chris hat Push auf `main` samt Deploy für
 den geprüften Stand erlaubt. VM-Demo-Status ist geklärt; kein echter
