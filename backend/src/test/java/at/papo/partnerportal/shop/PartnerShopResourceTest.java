@@ -222,7 +222,27 @@ class PartnerShopResourceTest {
     }
 
     @Test
+    void companyOverviewListsStatusPerPartner() {
+        long online = createPartner("Uebersicht Online KG", AVAILABLE_PRODUCT);
+        long noArticles = createPartner("Uebersicht Leer KG", UNAVAILABLE_PRODUCT);
+        release(online);
+        release(noArticles);
+
+        given().auth().oauth2(companyToken())
+                .when().get("/api/company/shops")
+                .then().statusCode(200)
+                .body("find { it.partnerId == " + online + " }.status", is("ONLINE"))
+                .body("find { it.partnerId == " + online + " }.kennung", is("uebersicht-online-kg"))
+                .body("find { it.partnerId == " + noArticles + " }.status", is("OFFLINE_NO_ARTICLES"));
+
+        given().auth().oauth2(tokens.tokenFor("partner-demo", "partner-demo"))
+                .when().get("/api/company/shops")
+                .then().statusCode(403);
+    }
+
+    @Test
     void internalApisStayProtected() {
+        given().when().get("/api/company/shops").then().statusCode(401);
         given().when().get("/api/company/partners").then().statusCode(401);
         given().when().get("/api/company/partners/1/shop").then().statusCode(401);
         given().when().get("/api/partner/shop").then().statusCode(401);
