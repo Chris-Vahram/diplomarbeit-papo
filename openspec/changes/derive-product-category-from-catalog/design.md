@@ -24,5 +24,6 @@
 ## Migration Plan
 
 Deploy normally (no schema change). Before a rollback run:
-`update product p set category = c.name from article_category c where c.id = p.article_category_id;`
+`update product p set category = c.name from article_categories c where c.id = p.article_category_id;
+update product set category = null where article_category_id is null;`
 Follow-up (separate task): on the VM check `select count(*) from product where category is not null and article_category_id is null` = 0, then remove `CategoryMigrationService`.

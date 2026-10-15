@@ -160,7 +160,8 @@ Ab diesem Release schreibt die App den Kategorietext nicht mehr. Vor einem Rollb
 einen älteren Release den Text einmal aus dem Katalog nachziehen:
 
 ```sql
-update product p set category = c.name from article_category c where c.id = p.article_category_id;
+update product p set category = c.name from article_categories c where c.id = p.article_category_id;
+update product set category = null where article_category_id is null;
 ```
 
 ## Demo-Daten (`SEED_DEMO_DATA`)

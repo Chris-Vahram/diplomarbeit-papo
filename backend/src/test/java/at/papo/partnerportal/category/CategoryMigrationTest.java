@@ -103,7 +103,13 @@ class CategoryMigrationTest {
             Product product = Product.findById(productId);
             assertEquals("FK Kategorie", product.articleCategory.name);
             assertEquals(0, Category.count("normalizedName", "andere kategorie"));
+            assertNull(product.legacyCategory, "stale text is cleared on linked rows too");
         });
+
+        // Company removes the category later: the next start must not bring it back.
+        QuarkusTransaction.requiringNew().run(() -> Product.<Product>findById(productId).articleCategory = null);
+        QuarkusTransaction.requiringNew().run(() -> migrationService.migrate());
+        QuarkusTransaction.requiringNew().run(() -> assertNull(Product.<Product>findById(productId).articleCategory));
     }
 
     private Product legacyProduct(String category) {

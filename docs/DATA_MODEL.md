@@ -221,9 +221,9 @@ Unicode-validierter Längenprüfung gespeichert; `normalized_name` ist
 case-insensitive eindeutig. `active=false` verhindert neue Artikelzuordnungen
 und Importzeilen, lässt bestehende Artikelzuordnungen aber unverändert. Es
 gibt keinen DELETE-Endpunkt. Die additive ORM-Übernahme liest vorhandene
-Alttext nur bei Artikeln ohne Zuordnung, erstellt nur eindeutig belegte Kategorien,
-leert den Alttext danach und bricht bei Kollisionen ohne Teilübernahme ab. Bereits
-verknüpfte Artikel bleiben unberührt. Der Seeder verknüpft Kategorien direkt.
+Alttext und verknüpft nur Artikel ohne Zuordnung (eindeutig belegte Kategorien,
+Abbruch bei Kollisionen ohne Teilübernahme). Danach leert sie den Alttext bei allen
+Artikeln, damit entfernte Kategorien nie wieder auftauchen. Der Seeder verknüpft Kategorien direkt.
 
 ### ProductImage
 Ein serverseitig gespeichertes Artikelbild. Die binären Daten liegen direkt in

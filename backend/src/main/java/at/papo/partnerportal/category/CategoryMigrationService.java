@@ -19,9 +19,10 @@ public class CategoryMigrationService {
     public void migrate() {
         List<Category> categories = Category.<Category>find("order by id")
                 .withLock(LockModeType.PESSIMISTIC_WRITE).list();
-        // Only legacy rows still without a catalogue reference; linked rows are the source of
-        // truth and their old text is ignored (derive-product-category-from-catalog).
-        List<Product> products = Product.<Product>find("articleCategory is null order by id")
+        // Every row that still carries legacy text: unlinked rows get linked, all rows lose the
+        // text afterwards, so stale text can never re-link a category the company removed later
+        // (derive-product-category-from-catalog). Linked rows keep their reference unchanged.
+        List<Product> products = Product.<Product>find("legacyCategory is not null order by id")
                 .withLock(LockModeType.PESSIMISTIC_WRITE).list();
 
         Map<String, Set<String>> legacyNames = collectLegacyNames(products);
@@ -45,12 +46,10 @@ public class CategoryMigrationService {
 
         for (Product product : products) {
             String legacyName = trimmedOrNull(product.legacyCategory);
-            if (legacyName != null) {
+            if (product.articleCategory == null && legacyName != null) {
                 product.articleCategory = categoriesByName.get(CategoryNames.normalized(legacyName));
-                // Consumed once: otherwise a category the company later removes would be
-                // re-linked on the next start.
-                product.legacyCategory = null;
             }
+            product.legacyCategory = null;
         }
     }
 
@@ -58,7 +57,7 @@ public class CategoryMigrationService {
         Map<String, Set<String>> names = new LinkedHashMap<>();
         for (Product product : products) {
             String legacyName = trimmedOrNull(product.legacyCategory);
-            if (legacyName == null) {
+            if (legacyName == null || product.articleCategory != null) {
                 continue;
             }
             String normalizedName;
