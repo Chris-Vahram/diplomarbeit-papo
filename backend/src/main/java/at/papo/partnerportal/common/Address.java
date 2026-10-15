@@ -33,8 +33,4 @@ public class Address {
         this.city = city;
         this.country = country;
     }
-
-    public String toDisplayString() {
-        return street + " " + houseNumber + ", " + postalCode + " " + city + ", " + country;
-    }
 }

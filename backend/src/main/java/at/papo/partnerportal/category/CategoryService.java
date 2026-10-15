@@ -65,14 +65,6 @@ public class CategoryService {
         return CategoryDto.from(category);
     }
 
-    public Category resolveForProduct(Long categoryId, String legacyName) {
-        Category category = findForProductInput(categoryId, legacyName);
-        if (category != null && !category.active) {
-            throw new ApiException(400, "Artikelkategorie ist deaktiviert.");
-        }
-        return category;
-    }
-
     public Category findForProductInput(Long categoryId, String legacyName) {
         if (categoryId != null && legacyName != null && !legacyName.isBlank()) {
             throw new ApiException(400, "Artikelkategorie darf entweder über ID oder Namen angegeben werden.");
