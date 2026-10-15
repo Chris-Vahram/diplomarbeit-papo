@@ -22,6 +22,6 @@
 
 ## 4. Verification
 
-- [ ] 4.1 Backend tests + package green; `git diff --check`
-- [ ] 4.2 Browser check: shop page loads no portal requests (network log), desktop/mobile
-- [ ] 4.3 Update traceability and `phase2_backlog.md` B-01 status
+- [x] 4.1 Backend tests + package green; `git diff --check`
+- [x] 4.2 Browser check: shop page loads no portal requests (network log), desktop/mobile
+- [x] 4.3 Update traceability and `phase2_backlog.md` B-01 status
