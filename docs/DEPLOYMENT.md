@@ -120,6 +120,23 @@ Offsite-Kopie (S3-kompatibler Object-Storage-Bucket via `rclone`) ist bewusst au
 "vor echtem Produktivbetrieb" verschoben (siehe design.md Decision 7) — lokale Backups
 grenzen das Risiko während der Evaluationsphase (Kunde/Betreuer) ausreichend ein.
 
+## Partner-Login binden (`bind-partner-login-to-oidc-subject`)
+
+Release A löst Partner über die verifizierte Keycloak-Benutzer-ID auf; Partner ohne
+jede Bindung melden sich übergangsweise noch per Benutzername = Partnernummer an.
+Nach dem Deploy von Release A einmalig auf der VM:
+
+1. In der Keycloak-Administration (`https://<DOMAIN>/auth/admin`, Realm `partnerportal`)
+   den Benutzer `partner-demo` öffnen und die **ID** kopieren (keine Tokens/Passwörter
+   notieren).
+2. Als `company-demo` in der Partnerverwaltung beim Partner `PARTNER-DEMO` auf „Logins“
+   klicken, die ID eintragen, „Verknüpfen“.
+3. Als `partner-demo` anmelden und prüfen, dass das Dashboard lädt.
+
+Erst danach Release B (Fallback entfernt) deployen. Rollback B → A ist sicher; A → davor
+nur, solange kein Login entfernt, kein Keycloak-Benutzer umbenannt und keine
+Partnernummer geändert wurde.
+
 ## Demo-Daten (`SEED_DEMO_DATA`)
 
 Der `%prod`-Profil-Container läuft standardmäßig als `LaunchMode.NORMAL` und seedet nie

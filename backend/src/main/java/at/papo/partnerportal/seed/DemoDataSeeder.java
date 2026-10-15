@@ -15,6 +15,7 @@ import at.papo.partnerportal.order.Order;
 import at.papo.partnerportal.order.OrderItem;
 import at.papo.partnerportal.order.OrderStatus;
 import at.papo.partnerportal.partner.Partner;
+import at.papo.partnerportal.partner.PartnerLogin;
 import at.papo.partnerportal.product.DemoPngGenerator;
 import at.papo.partnerportal.product.Product;
 import at.papo.partnerportal.product.ProductImage;
@@ -66,6 +67,12 @@ public class DemoDataSeeder {
         if (shouldSeed(launchMode, Partner.count(), seedDemoData)) {
             seedCompanyProfile();
             seedPartners();
+            // Fixed Keycloak user id of partner-demo exists only in the committed dev/test realms;
+            // a deployed Keycloak generates its own id, so NORMAL mode never seeds a binding
+            // (bind-partner-login-to-oidc-subject design "Dev/test identity").
+            if (launchMode != LaunchMode.NORMAL) {
+                seedPartnerDemoLogin();
+            }
             seedProducts();
             seedProductImages();
             seedEnablements();
@@ -85,6 +92,17 @@ public class DemoDataSeeder {
 
     static boolean shouldSeed(LaunchMode launchMode, long partnerCount, boolean seedDemoData) {
         return partnerCount == 0 && (launchMode != LaunchMode.NORMAL || seedDemoData);
+    }
+
+    // Must match the "id" of partner-demo in keycloak/partnerportal-realm.json and the test realm.
+    public static final String PARTNER_DEMO_SUBJECT = "7c1d9a2e-4b3f-4e5a-9d6c-2f8b1a0e5c01";
+
+    private void seedPartnerDemoLogin() {
+        PartnerLogin login = new PartnerLogin();
+        login.oidcSubject = PARTNER_DEMO_SUBJECT;
+        login.partner = Partner.find("partnerNumber", "PARTNER-DEMO").firstResult();
+        login.createdBy = "demo-seed";
+        login.persist();
     }
 
     private void seedPartners() {

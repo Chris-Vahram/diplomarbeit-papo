@@ -326,53 +326,8 @@ class PartnerResourceTest {
                 .body("partnerNumber", is("PARTNER-DEMO"));
     }
 
-    @Test
-    void unlinkedPartnerLoginIsRejectedWithUnchangedGermanMessage() {
-        String companyToken = tokens.tokenFor("company-demo", "company-demo");
-        long partnerId = partner1001Id();
-        String originalState = given().auth().oauth2(companyToken)
-                .when().get("/api/company/partners/" + partnerId)
-                .then().statusCode(200)
-                .extract().asString();
-
-        // Rename the seeded partner's number away from PARTNER-DEMO so the partner-demo
-        // login claim (upper-cased to PARTNER-DEMO) matches no partner record. try/finally so a
-        // failed assertion below still restores the shared seeded fixture other tests rely on.
-        try {
-            renamePartnerNumber(companyToken, partnerId, originalState, "PARTNER-DEMO-RENAMED");
-
-            String partnerToken = tokens.tokenFor("partner-demo", "partner-demo");
-            given().auth().oauth2(partnerToken)
-                    .when().get("/api/partner/profile")
-                    .then().statusCode(403)
-                    .body("message", is("Kein Partnerkonto mit diesem Login verknüpft."));
-        } finally {
-            renamePartnerNumber(companyToken, partnerId, originalState, "PARTNER-DEMO");
-        }
-    }
-
-    private void renamePartnerNumber(String companyToken, long partnerId, String currentStateJson,
-            String newPartnerNumber) {
-        io.restassured.path.json.JsonPath current = io.restassured.path.json.JsonPath.from(currentStateJson);
-        String addressJson = String.format(
-                "{\"street\":\"%s\",\"houseNumber\":\"%s\",\"postalCode\":\"%s\",\"city\":\"%s\",\"country\":\"%s\"}",
-                current.getString("address.street"), current.getString("address.houseNumber"),
-                current.getString("address.postalCode"), current.getString("address.city"),
-                current.getString("address.country"));
-        String body = String.format(
-                "{\"partnerNumber\":\"%s\",\"name\":\"%s\",\"address\":%s,\"email\":%s,\"phone\":%s,"
-                        + "\"commissionPercent\":%s,\"taxIdentifier\":" + SAMPLE_TAX_JSON + ",\"internalNote\":%s,\"active\":%s}",
-                newPartnerNumber, current.getString("name"), addressJson,
-                quoteOrNull(current.getString("email")), quoteOrNull(current.getString("phone")),
-                current.getString("commissionPercent"), quoteOrNull(current.getString("internalNote")),
-                current.getBoolean("active"));
-
-        given().auth().oauth2(companyToken).contentType("application/json")
-                .body(body)
-                .when().put("/api/company/partners/" + partnerId)
-                .then().statusCode(200)
-                .body("partnerNumber", is(newPartnerNumber));
-    }
+    // Renaming the partner number no longer unlinks the login (bind-partner-login-to-oidc-subject);
+    // unlinked/fallback cases are covered in PartnerLoginTest.
 
     @Test
     void partnerCannotAccessCompanyPartnerManagement() {

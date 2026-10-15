@@ -21,6 +21,7 @@ erDiagram
     ORDER ||--|| COMMISSION_RECORD : "erzeugt"
     PARTNER ||--o{ COMMISSION_RECORD : "erhält"
     PARTNER ||--o| PARTNER_TRADE_PROOF : "reicht ein"
+    PARTNER ||--o{ PARTNER_LOGIN : "hat Logins"
 
     COMPANY_PROFILE {
         Long id PK
@@ -147,15 +148,13 @@ Ein Vertriebspartner (Firma). `commissionPercent` ist ein einfaches numerisches
 Feld (kein `CommissionLevel`), von der Firma per Dropdown (5/10/15 % oder
 individueller Wert) gesetzt. `active` ist ein reines DB-Flag — Keycloak weiß
 nichts von Aktiv/Inaktiv; `CurrentPartner.resolve()` prüft es serverseitig bei
-jedem partnerbezogenen Request. Der Login-Link läuft über `partnerNumber`:
-Keycloak-Logins werden manuell mit Benutzername = Partnernummer angelegt.
-`partnerNumber` wird bei jedem Schreibzugriff (Anlage/Bearbeitung/Import) auf
-Großschreibung kanonisiert, damit der case-sensitive DB-Unique-Constraint
-Groß-/Kleinschreibungs-Duplikate wirklich verhindert; `resolve()` gleicht den
-(von Keycloak kleingeschriebenen) Login-Claim großgeschrieben exakt gegen
-`partnerNumber` ab. Ein Partner ohne passenden Keycloak-Login kann sich nicht
-anmelden. Eine Änderung der Partnernummer ändert damit auch den Login — die
-Firma wird im Bearbeiten-Formular entsprechend gewarnt.
+jedem partnerbezogenen Request. Der Login-Link läuft über `PartnerLogin`
+(siehe unten): `resolve()` sucht die Bindung zum verifizierten OIDC-Subject
+(`sub`, Keycloak-Benutzer-ID). `partnerNumber` wird bei jedem Schreibzugriff
+(Anlage/Bearbeitung/Import) auf Großschreibung kanonisiert, damit der
+case-sensitive DB-Unique-Constraint Groß-/Kleinschreibungs-Duplikate verhindert.
+Übergangsweise (Release A) dürfen Partner, die noch nie eine Bindung hatten, sich
+weiter mit Benutzername = Partnernummer anmelden; Release B entfernt das.
 `internalNote` ist eine optionale Plain-Text-Notiz mit maximal 4.000 Zeichen,
 die ausschließlich in Company-Partnerantworten enthalten ist. Partner-
 Self-Service, Importe, Exporte, Bestellungen und Provisionsantworten erhalten
@@ -167,6 +166,14 @@ Registerkennung und PDF/JPEG/PNG-Datei besitzen. Ein Ersatz überschreibt den
 aktuellen Datensatz ohne Historie; der Status wird durch die Firma geprüft und
 ändert `active` nicht automatisch. Binärdaten werden nicht in normalen
 Partner-DTOs ausgeliefert.
+
+### PartnerLogin (Tabelle `partner_login`)
+Bindet ein verifiziertes OIDC-Subject (`oidcSubject`, eindeutig) an einen Partner;
+mehrere Logins pro Partner sind möglich (heute geteilter Login, später persönliche
+Konten). `createdBy`/`revokedBy` speichern das Subject des handelnden Firmenbenutzers.
+Entfernen ist weich (`revokedAt`): ein entfernter Login löst nie mehr auf, und ein
+Partner mit irgendeiner (auch entfernten) Bindung bekommt keinen Benutzername-Fallback.
+Verwaltet nur von der Firma (`/api/company/partners/{id}/logins`, Dialog „Logins“).
 
 ### CompanyProfile
 Das `CompanyProfile` ist ein Singleton für die aktuell einzige Portal-Firma.
