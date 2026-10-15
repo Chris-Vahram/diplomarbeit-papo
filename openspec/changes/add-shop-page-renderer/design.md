@@ -15,7 +15,7 @@ Decisions in `Specification/ENDKUNDENSHOP_DECISIONS.md` §4: shop as data, one r
 3. **Theme likewise as `draftTheme`/`publishedTheme` JSON on `ShopTheme`.** Colour values validated as `#RRGGBB`; fonts validated against `ShopFonts` registry (id → files, licence).
 4. **Renderer as custom elements in `frontend/src/shop/blocks/`**, each taking a config object property and theme CSS custom properties (`--shop-primary` …). Overrides set custom properties on the block host. No shadow DOM per block, so theme CSS cascades; escaping via the existing `html.js` helper.
 5. **Templates as JSON resources (`backend/src/main/resources/shop-templates/default/*.json`)** loaded on shop creation. `add-shop-templates` only adds files.
-6. **Curated font list starts small (6–8 OFL families, latin + latin-ext woff2)**, served from `/vendor/fonts`. Final selection with Tobias.
+6. **Curated font list of about 10–15 OFL families (latin + latin-ext woff2)**, served from `/vendor/fonts`. Final selection with Tobias.
 7. **Catalogue query reuses `EnablementService` rules** (enabled ∧ available ∧ partner active) to avoid divergence from the portal.
 
 ## Risks / Trade-offs
