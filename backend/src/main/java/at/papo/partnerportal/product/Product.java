@@ -25,7 +25,10 @@ public class Product extends PanacheEntity {
     @Column(nullable = false)
     public boolean available = true;
 
-    public String category;
+    // Legacy free-text category (before the catalogue, 13.09.2026). Never written by the app;
+    // only CategoryMigrationService reads it to link old rows. The name comes from articleCategory.
+    @Column(name = "category")
+    public String legacyCategory;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_category_id")

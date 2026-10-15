@@ -38,7 +38,8 @@ class CategoryMigrationTest {
             Product second = Product.findById(productIds[1]);
             Product blank = Product.findById(productIds[2]);
             assertEquals(first.articleCategory.id, second.articleCategory.id);
-            assertEquals("Übernahme Kategorie", first.category);
+            assertEquals("Übernahme Kategorie", first.articleCategory.name);
+            assertNull(first.legacyCategory, "legacy text is consumed once");
             assertNull(blank.articleCategory);
         });
     }
@@ -58,7 +59,6 @@ class CategoryMigrationTest {
         QuarkusTransaction.requiringNew().run(() -> {
             Product product = Product.findById(productId);
             product.articleCategory = null;
-            product.category = null;
         });
         QuarkusTransaction.requiringNew().run(() -> migrationService.migrate());
 
@@ -84,7 +84,7 @@ class CategoryMigrationTest {
     }
 
     @Test
-    void inconsistentExistingForeignKeyStopsMigration() {
+    void existingForeignKeyWinsOverLegacyText() {
         long productId = QuarkusTransaction.requiringNew().call(() -> {
             Category category = new Category();
             category.name = "FK Kategorie";
@@ -97,21 +97,26 @@ class CategoryMigrationTest {
             return product.id;
         });
 
-        assertThrows(IllegalStateException.class,
-                () -> QuarkusTransaction.requiringNew().run(() -> migrationService.migrate()));
+        QuarkusTransaction.requiringNew().run(() -> migrationService.migrate());
 
         QuarkusTransaction.requiringNew().run(() -> {
             Product product = Product.findById(productId);
-            assertEquals("Andere Kategorie", product.category);
             assertEquals("FK Kategorie", product.articleCategory.name);
+            assertEquals(0, Category.count("normalizedName", "andere kategorie"));
+            assertNull(product.legacyCategory, "stale text is cleared on linked rows too");
         });
+
+        // Company removes the category later: the next start must not bring it back.
+        QuarkusTransaction.requiringNew().run(() -> Product.<Product>findById(productId).articleCategory = null);
+        QuarkusTransaction.requiringNew().run(() -> migrationService.migrate());
+        QuarkusTransaction.requiringNew().run(() -> assertNull(Product.<Product>findById(productId).articleCategory));
     }
 
     private Product legacyProduct(String category) {
         Product product = new Product();
         product.name = "Migrationstest-" + System.nanoTime();
         product.price = java.math.BigDecimal.ONE;
-        product.category = category;
+        product.legacyCategory = category;
         product.persist();
         return product;
     }

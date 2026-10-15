@@ -154,6 +154,16 @@ Bestellungen zeigen dann „E-Mail-Versand ist nicht aktiviert“. Einschalten a
 „Abgeschlossen“ ein (Entscheidung 15.10.2026). Absender: `no-reply@paportal.at`. Änderungen an Umleitung/Aktivierung wirken auch auf wartende Mails:
 diese werden dann nicht mehr gesendet („Konfiguration geändert“).
 
+## Rollback nach `derive-product-category-from-catalog`
+
+Ab diesem Release schreibt die App den Kategorietext nicht mehr. Vor einem Rollback auf
+einen älteren Release den Text einmal aus dem Katalog nachziehen:
+
+```sql
+update product p set category = c.name from article_categories c where c.id = p.article_category_id;
+update product set category = null where article_category_id is null;
+```
+
 ## Demo-Daten (`SEED_DEMO_DATA`)
 
 Der `%prod`-Profil-Container läuft standardmäßig als `LaunchMode.NORMAL` und seedet nie

@@ -1,6 +1,8 @@
 package at.papo.partnerportal.seed;
 
+import at.papo.partnerportal.category.Category;
 import at.papo.partnerportal.category.CategoryMigrationService;
+import at.papo.partnerportal.category.CategoryNames;
 import at.papo.partnerportal.commission.CommissionService;
 import at.papo.partnerportal.business.BusinessTaxIdentifier;
 import at.papo.partnerportal.business.BusinessTaxIdentifierMigrationService;
@@ -188,7 +190,18 @@ public class DemoDataSeeder {
         product.price = new BigDecimal(price);
         product.description = description;
         product.available = available;
-        product.category = category;
+        if (category != null) {
+            String normalized = CategoryNames.normalized(category);
+            Category existing = Category.find("normalizedName", normalized).firstResult();
+            if (existing == null) {
+                existing = new Category();
+                existing.name = category;
+                existing.normalizedName = normalized;
+                existing.active = true;
+                existing.persist();
+            }
+            product.articleCategory = existing;
+        }
         product.imageUrl = imageUrl;
         product.persist();
     }
