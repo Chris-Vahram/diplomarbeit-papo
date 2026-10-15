@@ -207,7 +207,10 @@ Reasoning-Stufe, sondern Tobias-/Firmeninput.
 für B-06 und B-07; BMD-Produkt/API und Export-/Rückkanal; Provisionsformel/
 Auszahlungsart; B-03-Schwellen; Teamprovisionsregeln aus
 [TEAM_COMMISSION_DISCOVERY.md](TEAM_COMMISSION_DISCOVERY.md); Subdomains;
-Shop-Layouts/Anfragefelder; Staging-Infrastruktur. Der Plan dokumentiert
+Firmenbestätigung der Endkundenshop-Entscheidungen; Staging-Infrastruktur.
+Endkundenshop (B-01/B-02/B-05): vorläufig am 15.10.2026 entschieden, inklusive
+Baukasten „Mein Webshop“ (Protokoll 12.10.) und Changes-Schnitt, siehe
+[ENDKUNDENSHOP_DECISIONS.md](ENDKUNDENSHOP_DECISIONS.md); Vorbehalt Firmenmeeting. Der Plan dokumentiert
 Empfehlungen, nicht stillschweigende Entscheidungen. Herr Hammer ist Verbindung
 zur Firma; nach dem nächsten Termin liefert Chris ein neues Besprechungsprotokoll.
 Die öffentliche Website ersetzt keinen technischen BMD-Vertrag.
