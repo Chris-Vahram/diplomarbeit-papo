@@ -45,7 +45,8 @@ der Firma im Dialog „Logins“ (Partnerverwaltung) über ihre Keycloak-Benutze
 mit dem Partner verknüpft. `partner-demo` hat in beiden Realm-Dateien die feste ID
 `7c1d9a2e-4b3f-4e5a-9d6c-2f8b1a0e5c01`; der `DemoDataSeeder` legt die Bindung in
 dev/test an. Ein älterer lokaler Keycloak-Container hat noch eine zufällige ID —
-dann einmal neu erstellen (kein Datenvolume, der Realm wird neu importiert):
+dann einmal neu erstellen (kein Datenvolume, der Realm wird neu importiert), sonst
+scheitert der Partner-Login mit „Kein Partnerkonto mit diesem Login verknüpft.“:
 
 ```bash
 docker compose up -d --force-recreate keycloak

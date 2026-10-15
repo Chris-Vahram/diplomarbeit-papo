@@ -16,4 +16,4 @@
 
 ## 4. Release B — essential
 
-- [ ] 4.1 Only after 3.3: remove the fallback, adapt tests (unbound subject with matching username → 403), full test suite, deploy and confirm the VM partner login again.
+- [ ] 4.1 (code ready on branch `feat/oidc-release-b`, deploy pending) Only after 3.3: remove the fallback, adapt tests (unbound subject with matching username → 403), full test suite, deploy and confirm the VM partner login again.

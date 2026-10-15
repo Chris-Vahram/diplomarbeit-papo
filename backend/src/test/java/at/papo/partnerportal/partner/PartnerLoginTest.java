@@ -41,13 +41,9 @@ class PartnerLoginTest {
     }
 
     @Test
-    void fallbackWorksOnlyForPartnersThatNeverHadABinding() {
-        String p1002 = tokens.tokenFor("p-1002", "p-1002");
-        profile(p1002).then().statusCode(200).body("partnerNumber", is("P-1002"));
-
-        // Another subject gets bound to P-1002: the username match no longer counts.
-        bind(partnerId("P-1002"), "fremdes-subject-1002").then().statusCode(200);
-        profile(p1002).then().statusCode(403).body("message", is(UNLINKED));
+    void unboundSubjectIsRejectedEvenIfUsernameMatchesAPartnerNumber() {
+        // Release B: no username -> partner number fallback any more.
+        profile(tokens.tokenFor("p-1002", "p-1002")).then().statusCode(403).body("message", is(UNLINKED));
     }
 
     @Test

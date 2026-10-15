@@ -164,8 +164,7 @@ jedem partnerbezogenen Request. Der Login-Link läuft über `PartnerLogin`
 (`sub`, Keycloak-Benutzer-ID). `partnerNumber` wird bei jedem Schreibzugriff
 (Anlage/Bearbeitung/Import) auf Großschreibung kanonisiert, damit der
 case-sensitive DB-Unique-Constraint Groß-/Kleinschreibungs-Duplikate verhindert.
-Übergangsweise (Release A) dürfen Partner, die noch nie eine Bindung hatten, sich
-weiter mit Benutzername = Partnernummer anmelden; Release B entfernt das.
+Ohne aktive Bindung ist kein Partner-Login möglich (Release B, kein Benutzername-Fallback mehr).
 `internalNote` ist eine optionale Plain-Text-Notiz mit maximal 4.000 Zeichen,
 die ausschließlich in Company-Partnerantworten enthalten ist. Partner-
 Self-Service, Importe, Exporte, Bestellungen und Provisionsantworten erhalten
