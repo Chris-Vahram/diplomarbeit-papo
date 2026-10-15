@@ -2254,7 +2254,8 @@ form-field {
    partner, no available articles). */
 .shop-signal--online  { background: var(--color-success-600); color: #ffffff; }
 .shop-signal--offline { background: var(--color-error-600);   color: #ffffff; }
-.shop-signal--warning { background: #f59e0b;                  color: #451a03; }
+/* Same yellow as the order status "Eingereicht". */
+.shop-signal--warning { background: var(--status-submitted-bg); color: var(--status-submitted-text); }
 
 /* Partner table row action "Webshop": same size as the neighbouring row buttons. */
 .shop-action {
