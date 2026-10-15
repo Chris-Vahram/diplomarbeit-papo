@@ -2249,12 +2249,12 @@ form-field {
   border-radius: 50%;
   background: currentColor;
 }
-/* Signal colours (solid fills, readable text): green = online, red = taken offline by
-   the company, amber = offline for an automatic reason, grey = not yet released. */
+/* Signal colours (solid fills, readable text): green = online, amber = deliberately not
+   online (not released yet), red = unintentionally offline (company takedown, inactive
+   partner, no available articles). */
 .shop-signal--online  { background: var(--color-success-600); color: #ffffff; }
 .shop-signal--offline { background: var(--color-error-600);   color: #ffffff; }
 .shop-signal--warning { background: #f59e0b;                  color: #451a03; }
-.shop-signal--neutral { background: var(--color-neutral-600); color: #ffffff; }
 
 /* Partner table row action "Webshop": same size as the neighbouring row buttons. */
 .shop-action {

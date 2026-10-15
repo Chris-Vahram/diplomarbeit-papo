@@ -3,15 +3,15 @@ import { escapeHtml } from "./html.js";
 // Shared by the partner page "Mein Webshop", the company "Webshop" dialog and the
 // "Webshop" row action of the partner table.
 const STATUS = {
-  NOT_RELEASED: { badge: "Nicht freigegeben", tone: "neutral",
+  NOT_RELEASED: { badge: "Nicht freigegeben", tone: "warning",
     hint: "Der Shop wurde vom Unternehmen noch nicht freigegeben." },
   ONLINE: { badge: "Online", tone: "online",
     hint: "Der Shop ist öffentlich erreichbar." },
   OFFLINE_COMPANY: { badge: "Offline – vom Unternehmen", tone: "offline",
     hint: "Vom Unternehmen offline genommen." },
-  OFFLINE_INACTIVE: { badge: "Offline – Partner inaktiv", tone: "warning",
+  OFFLINE_INACTIVE: { badge: "Offline – Partner inaktiv", tone: "offline",
     hint: "Der Partner ist deaktiviert, daher ist der Shop offline." },
-  OFFLINE_NO_ARTICLES: { badge: "Offline – keine Artikel", tone: "warning",
+  OFFLINE_NO_ARTICLES: { badge: "Offline – keine Artikel", tone: "offline",
     hint: "Keine freigeschalteten Artikel – Shop ist offline." },
 };
 
@@ -24,7 +24,7 @@ export function shopStatusHint(status) {
 }
 
 export function shopStatusTone(status) {
-  return STATUS[status]?.tone ?? "neutral";
+  return STATUS[status]?.tone ?? "warning";
 }
 
 export function shopStatusBadge(status) {
