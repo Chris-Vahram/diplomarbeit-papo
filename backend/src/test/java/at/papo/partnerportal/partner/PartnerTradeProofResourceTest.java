@@ -210,6 +210,13 @@ class PartnerTradeProofResourceTest {
                     "ATU00000000");
             partner.commissionPercent = BigDecimal.ZERO;
             partner.persist();
+            // Release B: logins resolve only through an explicit subject binding.
+            PartnerLogin login = new PartnerLogin();
+            login.oidcSubject = io.restassured.path.json.JsonPath.from(new String(java.util.Base64.getUrlDecoder()
+                    .decode(secondPartnerToken.split("\\.")[1]), java.nio.charset.StandardCharsets.UTF_8)).getString("sub");
+            login.partner = partner;
+            login.createdBy = "test";
+            login.persist();
             return partner.id;
         });
         long firstPartnerId = Partner.<Partner>find("partnerNumber", "PARTNER-DEMO").firstResult().id;
@@ -232,6 +239,7 @@ class PartnerTradeProofResourceTest {
         } finally {
             QuarkusTransaction.requiringNew().run(() -> {
                 PartnerTradeProof.delete("partner.id", secondPartnerId);
+                PartnerLogin.delete("partner.id", secondPartnerId);
                 Partner.deleteById(secondPartnerId);
             });
         }

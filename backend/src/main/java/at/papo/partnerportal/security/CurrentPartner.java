@@ -7,8 +7,6 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
-import java.util.Locale;
-
 // Resolves the authenticated partner's own Partner record from the verified OIDC subject
 // (bind-partner-login-to-oidc-subject) - never trust a client-supplied partner id
 // (docs/CONVENTIONS.md). Username, e-mail and partner number are not identity.
@@ -36,12 +34,6 @@ public class CurrentPartner {
             }
             return login.partner;
         }
-        // Release A transitional fallback (removed in Release B, task 4.1): the former
-        // username -> partner number match, only for Partners that never had a binding.
-        Partner partner = Partner.find("partnerNumber", jwt.getName().toUpperCase(Locale.ROOT)).firstResult();
-        if (partner == null || PartnerLogin.count("partner", partner) > 0) {
-            throw new ApiException(403, UNLINKED);
-        }
-        return partner;
+        throw new ApiException(403, UNLINKED);
     }
 }

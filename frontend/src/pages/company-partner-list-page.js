@@ -22,7 +22,7 @@ class CompanyPartnerListPage extends HTMLElement {
           <input type="hidden" name="id" />
           <form-field label="Partnernummer" name="partnerNumber" required></form-field>
           <p class="partner-form__hint" id="partner-number-hint" hidden>
-            Verknüpfte Logins (Schaltfläche „Logins“) bleiben bei einer Änderung der Partnernummer erhalten. Nur Partner ohne verknüpftes Login melden sich übergangsweise noch mit der Partnernummer als Keycloak-Benutzername an.
+            Anmelden kann sich ein Partner nur über ein verknüpftes Login (Schaltfläche „Logins“). Eine Änderung der Partnernummer ändert daran nichts.
           </p>
           <form-field label="Name" name="name" required></form-field>
           ${addressFieldsHtml("address")}
