@@ -68,6 +68,22 @@ Dann http://localhost:3000 öffnen und mit einem Demo-User anmelden.
 Das Frontend spricht das Backend über `http://localhost:8080/api` an (CORS ist im
 Backend aktiviert); Login-Tokens holt es direkt vom Keycloak auf :8081.
 
+### Öffentlichen Partner-Shop lokal öffnen
+
+Der Shop hat einen eigenen Einstieg `frontend/shop.html`, der keinen Portal-Code lädt.
+In Produktion leitet Caddy `/shop/<kennung>` darauf um; der einfache Python-Server
+kann das nicht, daher lokal:
+
+1. Als `company-demo` anmelden → Partnerverwaltung → beim Partner **Webshop** →
+   **Freigeben**. Der Partner braucht mindestens einen freigeschalteten, verfügbaren Artikel.
+2. Den angezeigten Link öffnen, lokal in der Form
+   `http://localhost:3000/shop.html?kennung=<kennung>`.
+
+Als Partner zeigt **Mein Webshop** denselben Link und den Status. Unbekannte oder
+offline geschaltete Shops zeigen „Dieser Shop ist derzeit nicht erreichbar.“
+Das Rate-Limit der öffentlichen Shop-API (Standard 60 Anfragen/Minute je IP) ist über
+`SHOP_RATE_LIMIT_PER_MINUTE` einstellbar.
+
 ## 4. Tests
 
 ```bash

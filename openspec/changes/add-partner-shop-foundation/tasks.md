@@ -17,8 +17,8 @@
 
 ## 3. Deployment
 
-- [ ] 3.1 Caddy rule `/shop/*` → `shop.html`; verify SPA routes unaffected
-- [ ] 3.2 Dev setup (`docs/SETUP.md`) describes how to open a local shop
+- [x] 3.1 Caddy rule `/shop/*` → `shop.html`; verify SPA routes unaffected
+- [x] 3.2 Dev setup (`docs/SETUP.md`) describes how to open a local shop
 
 ## 4. Verification
 

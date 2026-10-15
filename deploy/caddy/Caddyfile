@@ -17,6 +17,17 @@
 		reverse_proxy backend:8080
 	}
 
+	# Public partner shops (add-partner-shop-foundation): every /shop/<kennung> path gets the
+	# separate shop.html entry, which loads no portal code. Must stay before the SPA fallback.
+	# noindex until a later change enables indexing for released live shops.
+	@shop path /shop/* /shop.html
+	handle @shop {
+		root * /srv/frontend-live/current
+		header X-Robots-Tag noindex
+		rewrite * /shop.html
+		file_server
+	}
+
 	# Static frontend - everything else. /srv/frontend-live is bind-mounted into the Caddy
 	# container (docker-compose.prod.yml); `current` is a symlink deploy repoints per release
 	# (ci-cd.yml), so this always serves the latest release without needing a container restart.
