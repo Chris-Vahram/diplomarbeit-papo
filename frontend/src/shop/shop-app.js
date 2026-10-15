@@ -7,12 +7,11 @@ const NOT_REACHABLE = "Dieser Shop ist derzeit nicht erreichbar.";
 const isLocalDev = location.hostname === "localhost" && location.port === "3000";
 const API_BASE = isLocalDev ? "http://localhost:8080/api" : `${location.origin}/api`;
 
-// Production: /shop/<kennung> (Caddy rewrites to shop.html). Local static server without
-// rewrites: /shop.html?kennung=<kennung> (docs/SETUP.md).
+// Every shop lives at /shop/<kennung>; Caddy (prod) and tools/dev_frontend_server.py (dev)
+// both answer that path with shop.html.
 function readKennung() {
-  const match = location.pathname.match(/^\/shop\/([^/]+)\/?/);
-  if (match) return decodeURIComponent(match[1]);
-  return new URLSearchParams(location.search).get("kennung") ?? "";
+  const match = location.pathname.match(/^\/shop\/([^/]+)\/?$/);
+  return match ? decodeURIComponent(match[1]) : "";
 }
 
 const root = document.getElementById("shop-root");

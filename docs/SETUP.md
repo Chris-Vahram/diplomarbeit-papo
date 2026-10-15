@@ -57,11 +57,11 @@ und keine echten Registerdaten.
 
 ## 3. Frontend starten
 
-Beliebiger statischer Server im Ordner `frontend/`, z. B.:
+Mitgelieferter statischer Server (nur Python-Standardbibliothek), der wie Caddy in
+Produktion `/shop/<kennung>` auf `shop.html` umleitet:
 
 ```bash
-cd frontend
-python3 -m http.server 3000
+python3 tools/dev_frontend_server.py
 ```
 
 Dann http://localhost:3000 öffnen und mit einem Demo-User anmelden.
@@ -71,13 +71,12 @@ Backend aktiviert); Login-Tokens holt es direkt vom Keycloak auf :8081.
 ### Öffentlichen Partner-Shop lokal öffnen
 
 Der Shop hat einen eigenen Einstieg `frontend/shop.html`, der keinen Portal-Code lädt.
-In Produktion leitet Caddy `/shop/<kennung>` darauf um; der einfache Python-Server
-kann das nicht, daher lokal:
+Caddy (Produktion) und `tools/dev_frontend_server.py` (lokal) beantworten jeden Pfad
+`/shop/<kennung>` damit; der Link sieht lokal und live gleich aus.
 
 1. Als `company-demo` anmelden → Partnerverwaltung → beim Partner **Webshop** →
    **Freigeben**. Der Partner braucht mindestens einen freigeschalteten, verfügbaren Artikel.
-2. Den angezeigten Link öffnen, lokal in der Form
-   `http://localhost:3000/shop.html?kennung=<kennung>`.
+2. Den angezeigten Link öffnen, lokal `http://localhost:3000/shop/<kennung>`.
 
 Als Partner zeigt **Mein Webshop** denselben Link und den Status. Unbekannte oder
 offline geschaltete Shops zeigen „Dieser Shop ist derzeit nicht erreichbar.“
