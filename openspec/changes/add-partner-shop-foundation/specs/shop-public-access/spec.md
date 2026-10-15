@@ -7,6 +7,10 @@ The system SHALL serve every shop at `/shop/<kennung>` from a separate frontend 
 - **WHEN** a visitor opens `/shop/huemer-elektro-gmbh`
 - **THEN** the browser loads the shop entry only, and no request to `/api/company/*`, `/api/partner/*` or Keycloak is made
 
+#### Scenario: Same address in development
+- **WHEN** a developer opens a shop on the local development server
+- **THEN** the shop is reached at `/shop/<kennung>` as in production, without query parameters
+
 #### Scenario: Unknown identifier
 - **WHEN** a visitor opens a shop identifier that does not exist or is not reachable
 - **THEN** the same neutral page "Dieser Shop ist derzeit nicht erreichbar." is shown, without revealing whether the shop exists

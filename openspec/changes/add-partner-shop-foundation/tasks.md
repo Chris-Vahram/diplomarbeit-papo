@@ -25,3 +25,9 @@
 - [x] 4.1 Backend tests + package green; `git diff --check`
 - [x] 4.2 Browser check: shop page loads no portal requests (network log), desktop/mobile
 - [x] 4.3 Update traceability and `phase2_backlog.md` B-01 status
+
+## 5. Review feedback (15.10.2026)
+
+- [x] 5.1 Shop URL also locally `/shop/<kennung>` via `tools/dev_frontend_server.py`; no `?kennung=` parameter
+- [x] 5.2 Company "Webshop" dialog restructured (status head, sections Freigabe/Kennung, buttons in one row)
+- [x] 5.3 Signal colours aligned with order status badges; coloured "Webshop" button per partner row; `GET /api/company/shops` overview with test
