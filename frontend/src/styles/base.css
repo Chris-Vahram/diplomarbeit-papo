@@ -2249,11 +2249,13 @@ form-field {
   border-radius: 50%;
   background: currentColor;
 }
-/* Signal colours (solid fills, readable text): green = online, amber = deliberately not
+/* Signal colours, matching the order status badges: green = online, amber = deliberately not
    online (not released yet), red = unintentionally offline (company takedown, inactive
    partner, no available articles). */
-.shop-signal--online  { background: var(--color-success-600); color: #ffffff; }
-.shop-signal--offline { background: var(--color-error-600);   color: #ffffff; }
+/* Same green as the order status "Abgeschlossen". */
+.shop-signal--online  { background: var(--status-fulfilled-bg); color: var(--status-fulfilled-text); }
+/* No red order status exists; same light-fill/dark-text pattern in the error palette. */
+.shop-signal--offline { background: var(--color-error-100); color: var(--color-error-800); }
 /* Same yellow as the order status "Eingereicht". */
 .shop-signal--warning { background: var(--status-submitted-bg); color: var(--status-submitted-text); }
 
