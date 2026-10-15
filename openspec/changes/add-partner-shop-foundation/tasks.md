@@ -1,13 +1,13 @@
 ## 1. Backend (essential)
 
-- [ ] 1.1 Create `PartnerShop` entity, repository and computed status
-- [ ] 1.2 Implement `ShopKennung` normalisation, transliteration, reserved words, collision suffix; unit tests
-- [ ] 1.3 Company endpoints: get/set identifier, release, take offline with reason (10–500 chars), re-release
-- [ ] 1.4 Partner endpoint: own shop status (creates record on first call)
-- [ ] 1.5 Public `GET /api/shop/{kennung}` with minimal DTO and uniform 404
-- [ ] 1.6 Rate-limit filter for `/api/shop/*` with 429 message; tests
-- [ ] 1.7 noindex response filter and `papo.shop.indexing-enabled` config
-- [ ] 1.8 Tests: partner cannot change identifier, internal APIs still 401, inactive partner / no articles → offline
+- [x] 1.1 Create `PartnerShop` entity, repository and computed status
+- [x] 1.2 Implement `ShopKennung` normalisation, transliteration, reserved words, collision suffix; unit tests
+- [x] 1.3 Company endpoints: get/set identifier, release, take offline with reason (10–500 chars), re-release
+- [x] 1.4 Partner endpoint: own shop status (creates record on first call)
+- [x] 1.5 Public `GET /api/shop/{kennung}` with minimal DTO and uniform 404
+- [x] 1.6 Rate-limit filter for `/api/shop/*` with 429 message; tests
+- [x] 1.7 noindex response filter and `papo.shop.indexing-enabled` config
+- [x] 1.8 Tests: partner cannot change identifier, internal APIs still 401, inactive partner / no articles → offline
 
 ## 2. Frontend (essential)
 

@@ -92,7 +92,7 @@ public class PartnerService {
         partner.active = request.active() == null || request.active();
     }
 
-    Partner findOrThrow(Long id) {
+    public Partner findOrThrow(Long id) {
         Partner partner = Partner.findById(id);
         if (partner == null) {
             throw new ApiException(404, "Partner nicht gefunden.");
