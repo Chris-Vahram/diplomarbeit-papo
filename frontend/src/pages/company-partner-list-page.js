@@ -1,6 +1,7 @@
 import { apiFetch, apiDownload } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
-import { formatNumber } from "../lib/format.js";
+import { formatNumber, formatDate } from "../lib/format.js";
+import { escapeHtml } from "../lib/html.js";
 import { addressFieldsHtml, readAddress, fillAddress } from "../lib/address-fields.js";
 import { taxIdentifierFieldsHtml, readTaxIdentifier, fillTaxIdentifier } from "../lib/tax-identifier-fields.js";
 
@@ -21,7 +22,7 @@ class CompanyPartnerListPage extends HTMLElement {
           <input type="hidden" name="id" />
           <form-field label="Partnernummer" name="partnerNumber" required></form-field>
           <p class="partner-form__hint" id="partner-number-hint" hidden>
-            Die Partnernummer ist der Login des Partners (Keycloak-Benutzername). Bei einer Änderung muss der Keycloak-Benutzername entsprechend angepasst werden.
+            Verknüpfte Logins (Schaltfläche „Logins“) bleiben bei einer Änderung der Partnernummer erhalten. Nur Partner ohne verknüpftes Login melden sich übergangsweise noch mit der Partnernummer als Keycloak-Benutzername an.
           </p>
           <form-field label="Name" name="name" required></form-field>
           ${addressFieldsHtml("address")}
@@ -46,6 +47,16 @@ class CompanyPartnerListPage extends HTMLElement {
           </label>
           <div class="entity-form__actions">
             <button type="submit">Speichern</button>
+          </div>
+        </form>
+      </modal-dialog>
+      <modal-dialog id="logins-modal" title="Logins">
+        <p>Verknüpft einen Keycloak-Benutzer mit diesem Partner. Die Keycloak-Benutzer-ID steht in der Keycloak-Administration beim Benutzer unter „ID“.</p>
+        <ul class="login-list" id="login-list"></ul>
+        <form id="login-form" class="entity-form">
+          <form-field label="Keycloak-Benutzer-ID" name="oidcSubject" required></form-field>
+          <div class="entity-form__actions">
+            <button type="submit">Verknüpfen</button>
           </div>
         </form>
       </modal-dialog>
@@ -140,6 +151,16 @@ class CompanyPartnerListPage extends HTMLElement {
       if (manageButton) this.openEnablement(manageButton.dataset.manageId);
       const proofButton = event.target.closest("[data-proof-id]");
       if (proofButton) this.openProof(proofButton.dataset.proofId);
+      const loginsButton = event.target.closest("[data-logins-id]");
+      if (loginsButton) this.openLogins(loginsButton.dataset.loginsId);
+    });
+    this.loginsModal = this.querySelector("#logins-modal");
+    this.loginList = this.querySelector("#login-list");
+    this.loginForm = this.querySelector("#login-form");
+    this.loginForm.addEventListener("submit", (event) => this.addLogin(event));
+    this.loginList.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-revoke-login-id]");
+      if (button) this.revokeLogin(button);
     });
     this.form.addEventListener("submit", (event) => this.handleSubmit(event));
     this.enablementTable.addEventListener("change", (event) => {
@@ -174,6 +195,7 @@ class CompanyPartnerListPage extends HTMLElement {
           <button type="button" data-edit-id="${p.id}">Partnerdaten Bearbeiten</button>
           <button type="button" class="row-actions__secondary" data-proof-id="${p.id}">Nachweis</button>
           <button type="button" class="row-actions__secondary" data-manage-id="${p.id}">Artikel</button>
+          <button type="button" class="row-actions__secondary" data-logins-id="${p.id}">Logins</button>
         </div>`,
       }));
       const requestedPartnerId = new URLSearchParams(location.hash.split("?")[1] ?? "").get("enablement");
@@ -300,6 +322,69 @@ class CompanyPartnerListPage extends HTMLElement {
 
     this.modal.setAttribute("title", "Partner bearbeiten");
     this.modal.open();
+  }
+
+  // Login bindings (bind-partner-login-to-oidc-subject): separate from the partner form.
+  async openLogins(partnerId) {
+    this.loginsPartnerId = partnerId;
+    this.loginForm.reset();
+    this.loginList.innerHTML = "<li>Lade Logins…</li>";
+    this.loginsModal.open();
+    await this.loadLogins();
+  }
+
+  async loadLogins() {
+    const partnerId = this.loginsPartnerId;
+    try {
+      const logins = await apiFetch(`/company/partners/${partnerId}/logins`);
+      // Ignore a late response for a dialog that was meanwhile opened for another partner.
+      if (partnerId !== this.loginsPartnerId) return;
+      this.loginList.innerHTML = logins.length === 0
+        ? "<li>Noch kein Login verknüpft.</li>"
+        : logins.map((l) => `
+          <li class="login-list__item${l.revokedAt ? " login-list__item--revoked" : ""}">
+            <code>${escapeHtml(l.oidcSubject)}</code>
+            <span>${l.revokedAt ? `entfernt am ${formatDate(l.revokedAt.slice(0, 10))}` : `seit ${formatDate(l.createdAt.slice(0, 10))}`}</span>
+            ${l.revokedAt ? "" : `<button type="button" class="row-actions__secondary" data-revoke-login-id="${l.id}">Entfernen</button>`}
+          </li>`).join("");
+    } catch (error) {
+      if (partnerId !== this.loginsPartnerId) return;
+      this.loginList.innerHTML = "<li>Logins konnten nicht geladen werden.</li>";
+      showToast(error.message, "error");
+    }
+  }
+
+  async addLogin(event) {
+    event.preventDefault();
+    if (this.loginPending) return;
+    this.loginPending = true;
+    const submit = this.loginForm.querySelector("button[type=submit]");
+    submit.disabled = true;
+    try {
+      await apiFetch(`/company/partners/${this.loginsPartnerId}/logins`, {
+        method: "POST",
+        body: JSON.stringify({ oidcSubject: this.loginForm.elements.oidcSubject.value }),
+      });
+      showToast("Login verknüpft.", "success");
+      this.loginForm.reset();
+      await this.loadLogins();
+    } catch (error) {
+      showToast(error.message, "error");
+    } finally {
+      this.loginPending = false;
+      submit.disabled = false;
+    }
+  }
+
+  async revokeLogin(button) {
+    button.disabled = true;
+    try {
+      await apiFetch(`/company/partners/${this.loginsPartnerId}/logins/${button.dataset.revokeLoginId}`, { method: "DELETE" });
+      showToast("Login entfernt.", "success");
+    } catch (error) {
+      showToast(error.message, "error");
+    }
+    await this.loadLogins();
   }
 
   async openEnablement(partnerId) {

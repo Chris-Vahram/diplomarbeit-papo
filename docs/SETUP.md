@@ -16,6 +16,12 @@ Wie man die Entwicklungs-/Demo-Umgebung startet. Konventionen siehe `docs/CONVEN
 | Keycloak | http://localhost:8081 (Admin: `admin` / `admin`) |
 | PostgreSQL | localhost:5432 (`partnerportal` / `partnerportal`, DB `partnerportal`) |
 | Frontend (statisch) | http://localhost:3000 (siehe unten) |
+| Mailpit (Bestell-E-Mails, nur dev) | http://localhost:8025 (SMTP `127.0.0.1:1025`) |
+
+Im Dev-Profil werden Bestell-E-Mails echt an Mailpit gesendet (Container `mailpit` aus
+`docker-compose.yml`); dort lassen sich alle Mails ansehen, nichts verlässt den Rechner.
+Tests nutzen den Quarkus-`MockMailbox`, auf der VM ist der Versand standardmäßig aus
+(`docs/DEPLOYMENT.md`, Abschnitt Bestell-E-Mails).
 
 ## 1. Container starten (Postgres + Keycloak)
 
@@ -34,11 +40,16 @@ Keycloak importiert beim Start automatisch den Realm `partnerportal`
 | `company-demo` | `company-demo` | company |
 | `partner-demo` | `partner-demo` | partner |
 
-**Provisionierungs-Konvention:** Keycloak-User werden manuell angelegt, mit
-Benutzername = Partnernummer (kanonisch großgeschrieben; Keycloak selbst
-speichert Logins kleingeschrieben, das Backend gleicht case-insensitiv ab).
-Der Demo-Partner hinter `partner-demo` trägt dev/test daher exakt die
-Partnernummer `PARTNER-DEMO`.
+**Provisionierungs-Konvention:** Keycloak-User werden manuell angelegt und von
+der Firma im Dialog „Logins“ (Partnerverwaltung) über ihre Keycloak-Benutzer-ID
+mit dem Partner verknüpft. `partner-demo` hat in beiden Realm-Dateien die feste ID
+`7c1d9a2e-4b3f-4e5a-9d6c-2f8b1a0e5c01`; der `DemoDataSeeder` legt die Bindung in
+dev/test an. Ein älterer lokaler Keycloak-Container hat noch eine zufällige ID —
+dann einmal neu erstellen (kein Datenvolume, der Realm wird neu importiert):
+
+```bash
+docker compose up -d --force-recreate keycloak
+```
 
 ## 2. Backend starten (Dev-Modus)
 

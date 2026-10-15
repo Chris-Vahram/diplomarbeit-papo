@@ -18,6 +18,27 @@ import {
 const STATUSES = ["SUBMITTED", "REVIEWED", "FULFILLED"];
 const STATUS_LABELS = { SUBMITTED: "Eingereicht", REVIEWED: "Geprüft", FULFILLED: "Abgeschlossen" };
 
+const EMAIL_TYPES = {
+  ORDER_CONFIRMATION: "Bestellbestätigung",
+  ORDER_NOTICE_PARTNER: "Bestellinfo",
+  ORDER_NOTICE_COMPANY: "Bestellinfo",
+  SHIPPING_CONFIRMATION: "Abschlussbestätigung",
+};
+const EMAIL_ROLES = { CUSTOMER: "Endkunde", PARTNER: "Partner", COMPANY: "Firma" };
+const EMAIL_STATUS = {
+  PENDING: "wartet auf Versand",
+  SENDING: "wird gesendet",
+  SENT: "vom Mailserver angenommen",
+  FAILED: "fehlgeschlagen",
+  SKIPPED: "nicht gesendet",
+};
+const EMAIL_REASONS = {
+  DISABLED: "Versand nicht aktiviert",
+  INVALID_ADDRESS: "ungültige Adresse",
+  CONFIG_CHANGED: "Konfiguration geändert",
+  RECIPIENT_CHANGED: "Empfänger geändert",
+};
+
 class CompanyOrderListPage extends HTMLElement {
   connectedCallback() {
     this.classList.add("area--company");
@@ -36,7 +57,7 @@ class CompanyOrderListPage extends HTMLElement {
       <modal-dialog id="manual-order-modal" title="Bestellung manuell anlegen">
         <div id="manual-order-content"></div>
       </modal-dialog>
-      <modal-dialog id="shipping-confirmation-modal" title="Versandbestätigung">
+      <modal-dialog id="shipping-confirmation-modal" title="Bestellung abgeschlossen">
         <div id="shipping-confirmation-content"></div>
       </modal-dialog>
     `;
@@ -129,8 +150,10 @@ class CompanyOrderListPage extends HTMLElement {
     const order = this.orders.find((o) => String(o.id) === String(id));
     if (!order) return;
     this.detailsModal.setAttribute("title", `Bestellung Nr. ${order.id}`);
-    this.detailsContent.innerHTML = renderOrderDetailsHtml(order, { showPartner: true });
+    this.detailsContent.innerHTML = `${renderOrderDetailsHtml(order, { showPartner: true })}
+      <section class="email-status"><h3>E-Mails</h3><div data-email-status><p>Lade E-Mail-Status…</p></div></section>`;
     this.detailsModal.open();
+    this.loadEmailStatus(order.id);
 
     if (!order.seenByCompany) {
       try {
@@ -141,6 +164,37 @@ class CompanyOrderListPage extends HTMLElement {
       } catch (error) {
         showToast(error.message, "error");
       }
+    }
+  }
+
+  // Company-only delivery status per order (order-emails spec). Addresses arrive masked.
+  async loadEmailStatus(orderId) {
+    const target = this.detailsContent.querySelector("[data-email-status]");
+    try {
+      const emails = await apiFetch(`/company/orders/${orderId}/emails`);
+      if (!target.isConnected) return;
+      target.innerHTML = emails.length === 0
+        ? "<p>Für diese Bestellung wurden keine E-Mails erfasst.</p>"
+        : `<ul class="email-status__list">${emails.map((e) => `
+            <li>
+              <strong>${EMAIL_TYPES[e.type]}</strong> an ${EMAIL_ROLES[e.recipientRole]}${e.maskedAddress ? ` (${escapeHtml(e.maskedAddress)})` : ""}:
+              ${EMAIL_STATUS[e.status]}${e.skipReason ? ` – ${EMAIL_REASONS[e.skipReason] ?? ""}` : ""}${e.attempts > 0 ? `, ${e.attempts} Versuch(e)` : ""}
+              ${e.status === "FAILED" || e.skipReason === "RECIPIENT_CHANGED" ? `<button type="button" data-retry-email="${e.id}">Erneut senden</button>` : ""}
+            </li>`).join("")}</ul>`;
+      target.querySelectorAll("[data-retry-email]").forEach((button) => {
+        button.addEventListener("click", async () => {
+          button.disabled = true;
+          try {
+            await apiFetch(`/company/orders/${orderId}/emails/${button.dataset.retryEmail}/retry`, { method: "POST" });
+            showToast("E-Mail wird erneut gesendet.", "success");
+          } catch (error) {
+            showToast(error.message, "error");
+          }
+          this.loadEmailStatus(orderId);
+        });
+      });
+    } catch (error) {
+      if (target.isConnected) target.innerHTML = "<p>E-Mail-Status konnte nicht geladen werden.</p>";
     }
   }
 
@@ -270,7 +324,7 @@ class CompanyOrderListPage extends HTMLElement {
       showToast("Status aktualisiert.", "success");
       this.load();
 
-      // FR-17: a simulated shipping confirmation is shown when an order reaches
+      // FR-17: the completion confirmation (with the customer e-mail notice) is shown when an order reaches
       // "fulfilled" — not on the submitted->reviewed step.
       if (status === "FULFILLED") {
         this.shippingConfirmationContent.innerHTML = renderOrderConfirmationHtml(order, {

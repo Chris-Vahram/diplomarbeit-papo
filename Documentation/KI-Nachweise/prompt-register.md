@@ -145,52 +145,482 @@
 
 
 
-| AUSSTEHEND-01a06809 | 2026-09-03 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a06809-6bda-70c3-922a-59e5eeeeff28` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-01a0676e | 2026-09-03 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a0676e-bfa1-7241-89c0-43de935e78ee` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-01a06ab1 | 2026-09-04 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a06ab1-5040-7761-b84f-b202b6db6cc8` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-01a090fe | 2026-09-11 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a090fe-6739-7501-8459-f9bf920f3bda` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-01a09091 | 2026-09-11 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a09091-5137-7b23-a8d6-e4f4d9b828d3` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-01a08c1f | 2026-09-10 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a08c1f-1fa4-7e11-badb-e05b02722b26` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-01a07969 | 2026-09-07 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a07969-fb4c-7442-b106-45b8188208b5` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-01a0863c | 2026-09-09 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a0863c-505a-7f30-b0f4-ac430c1866cb` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-01a05dcf | 2026-09-01 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a05dcf-2be8-7021-89cc-07ddb9a4aaca` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-01a0a229 | 2026-09-14 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a0a229-f40a-74e3-9d3a-c0e4e56885c5` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-01a09bbc | 2026-09-13 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a09bbc-835b-7082-8168-80fdd72001dc` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-01a0991c | 2026-09-13 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a0991c-8bfe-7740-acde-03ac93efb975` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-01a09bc1 | 2026-09-13 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a09bc1-6421-7b03-81c3-88f51bff5430` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-01a09d84 | 2026-09-14 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a09d84-f0df-7e52-9508-b2c829f98aa2` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-01a0d904 | 2026-09-25 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a0d904-da3f-75a3-8a03-162bb6476bdb` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-019f72d2 | 2026-07-18 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f72d2-d09e-7382-ad24-52f329a30e94` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-019f75a8 | 2026-07-18 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f75a8-0fb0-7721-9c66-e0a221a69661` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-019f70fe | 2026-07-17 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f70fe-8ec1-7a51-85c0-9f029a0a1ec3` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-019f7018 | 2026-07-17 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f7018-dd20-7d42-9b5b-926b893b78e0` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-019f62ea | 2026-07-14 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f62ea-1909-7862-8b2f-cf2b4298040e` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-019f5c64 | 2026-07-13 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f5c64-3a08-77e1-9a96-81c80e769413` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-019f5c5c | 2026-07-13 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f5c5c-804f-7ac0-91ee-f052631f8eea` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-019f5e49 | 2026-07-14 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f5e49-da41-7ba3-bab4-8ee924dc7cb7` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+| AUSSTEHEND-01a0e882 | 2026-09-28 | Chris | Codex | B-09 Teamprovision erkunden und Session-Handoff sichern | lokale Sitzung `01a0e882-d7eb-7f03-a6d1-a04111e43270` | `EXAKT` | Nutzerentscheidungen, offene Fragen, Empfehlungen, technische Abhängigkeiten und Wiedereinstiegsprompt in Projektkontexten dokumentiert; Prüfungen: git diff --check; openspec list --json; Dokumentdateien geprüft |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 | AUSSTEHEND-01a0f9fb | 2026-10-02 | Chris | Codex | Kontextübergabe und Veröffentlichung der getrennten Lehrerpräsentationen | lokale Sitzung `01a0f9fb-9342-7c70-9331-3f64f0ff53c9` | `EXAKT` | Kontextdateien auf 07.10.2026 synchronisiert; 13 allgemeine und 8 Sprintfolien, acht Firmenfragegruppen, keine Zeiterfassung. Nutzerentscheidungen und Firmenfreigaben getrennt; kein neuer Firmenbeschluss angenommen. Inhaltscommit 67a5acf auf bestehendem Dokumentationsbranch gepusht; Veröffentlichung über PR #35, Merge und neuesten Main-Workflow beim Wiedereinstieg prüfen. Kein Anwendungscode oder neue OpenSpec-Artefakte; Claude-Dateien, Design und fremde Graphify-Vorarbeiten erhalten.; Prüfungen: git diff --check und Staging-Prüfung erfolgreich; drei aktive Changes jeweils openspec validate --strict gültig. HTML 13+8, acht Fragegruppen, node --check beider Skripte, 7+3 lokale und getrackte Ressourcen sowie 31 Markdown-Ziele gültig. Unverbindliches Rechenbeispiel: Budget und Empfängersumme jeweils 100,03 EUR. Anfänglicher Prüfparser behandelte selbstschließende meta-Tags falsch; Prüfer korrigiert und erneuter Lauf erfolgreich, kein Deckfehler. Desktop/Mobil-Browserprüfung am 06.10. bereits erfolgt; keine neue Live-Anwendungsabnahme. Historischer Main-Run 37385508517 erfolgreich; aktuelle PR-/Main-CI gesondert in GitHub prüfen. Globale OpenSpec-Prüfung vom 06.10. mit 24 bestehenden Purpose-Platzhalterfehlern bleibt separate Arbeit. |
-| AUSSTEHEND-5a3d5cc8 | 2026-07-14 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `5a3d5cc8-1c89-4ac6-8780-ac9b53b8075f` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-8e6421f3 | 2026-07-15 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `8e6421f3-d7cf-488c-b709-9f5a9da34ee8` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-0a6f9df2 | 2026-07-06 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `0a6f9df2-8b6d-4396-bd90-0dc35d18a5d3` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-1364cd74 | 2026-07-15 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `1364cd74-25fe-42ec-b8dd-e84413529b78` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-9d1c2776 | 2026-07-02 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `9d1c2776-52ac-4e53-bcb3-18bad4ba6239` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-3d97eec7 | 2026-07-04 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `3d97eec7-35d0-4158-a58c-456e518264dc` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-855d66c3 | 2026-07-03 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `855d66c3-f5f3-4079-9c1b-ad8e78a78526` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-132056cb | 2026-07-04 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `132056cb-e0d4-4486-9c28-e08c750f693a` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-6d41f253 | 2026-07-17 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `6d41f253-d1d0-490f-9edc-30390d61f268` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-ebf3ccaf | 2026-07-16 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `ebf3ccaf-bf4a-4de9-b93e-56094b1d935d` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-39e673e0 | 2026-07-09 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `39e673e0-49cb-43c4-a78f-c9dd3ee24511` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-0dd619ff | 2026-07-15 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `0dd619ff-8c3a-41bd-becb-bf074907830f` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-d52ef674 | 2026-07-16 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `d52ef674-fdaf-473a-a6d0-05c60d50b5a9` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-1ba5da19 | 2026-07-16 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `1ba5da19-10e4-49d1-b650-d91d502a8386` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-e51fe421 | 2026-07-14 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `e51fe421-69a4-4e48-9833-d769cd351adf` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-d72b0b9f | 2026-07-16 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `d72b0b9f-b615-4990-ac0c-f98967775075` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-a7034a3f | 2026-07-01 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `a7034a3f-159c-4de3-9193-e647509951fe` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-fd8a1038 | 2026-07-13 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `fd8a1038-ef00-496d-92b5-e1fa2e6f0ba5` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-92ec7bf1 | 2026-07-05 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `92ec7bf1-ba16-4b60-9d0f-6ce355dc6a80` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-fc414896 | 2026-07-14 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `fc414896-9c91-4b57-8bc2-ea2ec337a0f7` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-438af9ec | 2026-07-04 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `438af9ec-64d8-4f0f-a077-980165157ec0` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-1798d34e | 2026-07-01 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `1798d34e-c42d-4563-9b77-f50fe6084679` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+| AUSSTEHEND-68dee11c | 2026-10-06 | Chris | Claude Code | Clockify-Zeiteinträge des DA-Teams nach Workaddict migrieren | lokale Sitzung `68dee11c-0cda-4d8b-aacd-a0fc136aa5e6` | `EXAKT` | Org diplomarbeit-papo + Repo time-data, 85 Einträge importiert, 3 Korrekturen; Prüfungen: Skriptvergleich aller Repo-Einträge gegen Clockify-API (85/85 ok) |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+| AUSSTEHEND-288df2aa | 2026-10-12 | Chris | Claude Code | B-04 Entscheidungen und VM-Vorbereitung; OIDC-Subject-Bindung Release A implementieren | lokale Sitzung `288df2aa-f604-4b4f-99f9-dabbb3084eb7` | `EXAKT` | 90-Tage-Regel und neutrale Abschlussmail umgesetzt, VM-Mailkonfiguration deaktiviert vorbereitet; PartnerLogin mit Subject-Auflösung, Fallback und Firmen-Dialog umgesetzt (6/8); Prüfungen: OrderEmail-Tests 20/20, OIDC-Branch mvnw package 144/144, Upgrade-Check mit schema update, Playwright Desktop/Mobil, openspec validate --strict, Codex-Reviews |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+| AUSSTEHEND-01a13e8c | 2026-10-15 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a13e8c-7abe-7ff2-be7b-5989d75680b5` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-01a13ca2 | 2026-10-14 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a13ca2-6360-7772-970d-fa9f21929545` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-01a13c7c | 2026-10-14 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a13c7c-f929-7160-9cd2-0cab602d3813` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 
 ## Noch rückwirkend aufzunehmen
 

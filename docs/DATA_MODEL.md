@@ -19,8 +19,10 @@ erDiagram
     ORDER ||--|{ ORDER_ITEM : "enthält"
     PRODUCT ||--o{ ORDER_ITEM : "wird bestellt"
     ORDER ||--|| COMMISSION_RECORD : "erzeugt"
+    ORDER ||--o{ ORDER_EMAIL : "löst aus"
     PARTNER ||--o{ COMMISSION_RECORD : "erhält"
     PARTNER ||--o| PARTNER_TRADE_PROOF : "reicht ein"
+    PARTNER ||--o{ PARTNER_LOGIN : "hat Logins"
 
     COMPANY_PROFILE {
         Long id PK
@@ -127,6 +129,16 @@ erDiagram
         BigDecimal unitPriceSnapshot "10.2, Preis zum Bestellzeitpunkt"
     }
 
+    ORDER_EMAIL {
+        Long id PK
+        Long order_id FK "UNIQUE mit type + recipientRole"
+        String type "ORDER_CONFIRMATION, ORDER_NOTICE_PARTNER, ORDER_NOTICE_COMPANY, SHIPPING_CONFIRMATION"
+        String recipientRole "CUSTOMER, PARTNER, COMPANY"
+        String recipientAddress "voll nur solange offen, danach maskiert/leer"
+        String status "PENDING, SENDING, SENT, FAILED, SKIPPED"
+        int attempts
+    }
+
     COMMISSION_RECORD {
         Long id PK
         Long order_id FK "UNIQUE (1:1 mit Order)"
@@ -147,15 +159,13 @@ Ein Vertriebspartner (Firma). `commissionPercent` ist ein einfaches numerisches
 Feld (kein `CommissionLevel`), von der Firma per Dropdown (5/10/15 % oder
 individueller Wert) gesetzt. `active` ist ein reines DB-Flag — Keycloak weiß
 nichts von Aktiv/Inaktiv; `CurrentPartner.resolve()` prüft es serverseitig bei
-jedem partnerbezogenen Request. Der Login-Link läuft über `partnerNumber`:
-Keycloak-Logins werden manuell mit Benutzername = Partnernummer angelegt.
-`partnerNumber` wird bei jedem Schreibzugriff (Anlage/Bearbeitung/Import) auf
-Großschreibung kanonisiert, damit der case-sensitive DB-Unique-Constraint
-Groß-/Kleinschreibungs-Duplikate wirklich verhindert; `resolve()` gleicht den
-(von Keycloak kleingeschriebenen) Login-Claim großgeschrieben exakt gegen
-`partnerNumber` ab. Ein Partner ohne passenden Keycloak-Login kann sich nicht
-anmelden. Eine Änderung der Partnernummer ändert damit auch den Login — die
-Firma wird im Bearbeiten-Formular entsprechend gewarnt.
+jedem partnerbezogenen Request. Der Login-Link läuft über `PartnerLogin`
+(siehe unten): `resolve()` sucht die Bindung zum verifizierten OIDC-Subject
+(`sub`, Keycloak-Benutzer-ID). `partnerNumber` wird bei jedem Schreibzugriff
+(Anlage/Bearbeitung/Import) auf Großschreibung kanonisiert, damit der
+case-sensitive DB-Unique-Constraint Groß-/Kleinschreibungs-Duplikate verhindert.
+Übergangsweise (Release A) dürfen Partner, die noch nie eine Bindung hatten, sich
+weiter mit Benutzername = Partnernummer anmelden; Release B entfernt das.
 `internalNote` ist eine optionale Plain-Text-Notiz mit maximal 4.000 Zeichen,
 die ausschließlich in Company-Partnerantworten enthalten ist. Partner-
 Self-Service, Importe, Exporte, Bestellungen und Provisionsantworten erhalten
@@ -167,6 +177,14 @@ Registerkennung und PDF/JPEG/PNG-Datei besitzen. Ein Ersatz überschreibt den
 aktuellen Datensatz ohne Historie; der Status wird durch die Firma geprüft und
 ändert `active` nicht automatisch. Binärdaten werden nicht in normalen
 Partner-DTOs ausgeliefert.
+
+### PartnerLogin (Tabelle `partner_login`)
+Bindet ein verifiziertes OIDC-Subject (`oidcSubject`, eindeutig) an einen Partner;
+mehrere Logins pro Partner sind möglich (heute geteilter Login, später persönliche
+Konten). `createdBy`/`revokedBy` speichern das Subject des handelnden Firmenbenutzers.
+Entfernen ist weich (`revokedAt`): ein entfernter Login löst nie mehr auf, und ein
+Partner mit irgendeiner (auch entfernten) Bindung bekommt keinen Benutzername-Fallback.
+Verwaltet nur von der Firma (`/api/company/partners/{id}/logins`, Dialog „Logins“).
 
 ### CompanyProfile
 Das `CompanyProfile` ist ein Singleton für die aktuell einzige Portal-Firma.
@@ -243,6 +261,14 @@ Berechnungsbasis (`orderValue`) als auch der verwendete Prozentsatz
 (`commissionPercentUsed`) werden auf dem Record selbst gespeichert
 (Snapshot) — eine spätere Änderung von `Partner.commissionPercent` verändert
 keine bereits existierenden Provisionsdatensätze rückwirkend.
+
+### OrderEmail (Tabelle `order_email`)
+Outbox für Bestell-E-Mails (B-04, `send-order-emails`): wird in derselben Transaktion wie
+die Bestellung bzw. der Wechsel auf `FULFILLED` angelegt und von einem Scheduler einzeln
+versendet (mit Wiederholungen). Pro Bestellung, Typ und Empfängerrolle höchstens ein
+Eintrag. Die volle Adresse steht nur, solange die Mail offen oder fehlgeschlagen ist; nach
+dem Versand bleibt nur die maskierte Adresse (`a***@example.at`), übersprungene Einträge
+speichern keine Adresse. Fehlgeschlagene Einträge verlieren die Adresse 90 Tage nach dem Anlegen (Entscheidung 15.10.2026, kein gesetzlicher Wert).
 
 ## Geld-Konvention
 Alle Geldbeträge (`price`, `unitPriceSnapshot`, `orderValue`,

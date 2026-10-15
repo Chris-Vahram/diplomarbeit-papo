@@ -3,6 +3,7 @@ package at.papo.partnerportal.partner;
 import at.papo.partnerportal.business.BusinessTaxIdentifierRequest;
 import at.papo.partnerportal.common.AddressRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -21,6 +22,7 @@ public class PartnerRequest {
     @NotNull(message = "Adresse ist erforderlich.")
     @Valid
     private AddressRequest address;
+    @Email(message = "E-Mail-Adresse ist ungültig.") @Size(max = 254, message = "E-Mail-Adresse ist zu lang.")
     private String email;
     private String phone;
     @NotNull(message = "Provision ist erforderlich.")

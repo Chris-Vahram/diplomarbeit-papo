@@ -40,13 +40,14 @@ die Reihenfolge und Fragen stehen in `PRODUCT_COMPLETION_PLAN.md`.
 **Open before build:** define the sales thresholds per level.
 **Trigger:** "implement B-03".
 
-## B-04 — Real email sending  `STUB`
+## B-04 — Real email sending  `IMPLEMENTED, DISABLED UNTIL SMTP (2026-10-15)`
 **What full version is:** Real SMTP/service sends an order confirmation to the Endkunde when an address is present, an order notice to the responsible partner users, and a new-order notice to the company. Shipping confirmation remains a later extension unless separately specified.
 **MVP state (STUB):** On-screen confirmation + simulated email rendered in-app (no real send).
 **Why stub:** Prototype-safe, no mail infra. Meeting wanted "automatisierte Bestellbestätigung + Versandbestätigung".
 **Decision 2026-08-25:** Chris confirmed the three order-related recipients above. The feature remains `STUB` until a separate OpenSpec change defines delivery status, retries, duplicate prevention, optional recipient addresses, privacy, and the SMTP integration.
 **Shop relation (2026-10-15):** B-04 is not a prerequisite for the end-customer shop; shop guest orders may go live with on-screen confirmation and print document, mails are added once B-04 exists.
 **Trigger:** "implement B-04".
+**Implemented 2026-10-15:** `send-order-emails` — outbox with retries, order confirmation/partner/company notices, optional completion mail on `fulfilled`, company status view with retry, disabled by default, redirect enforced while real recipients are not allowed, customer mails without prices; dev via Mailpit. Decided 2026-10-15: neutral completion mail on `fulfilled`, functional company mailbox, addresses of failed mails removed after 90 days, sender `no-reply@paportal.at`. Open: SMTP credentials (Vaultwarden links had expired) and a test inbox from Herr Bachl, then activation on the VM with redirect.
 
 ## B-05 — Shop inquiry auto-forward (Anfragen)  `PLANNED`
 **What full version is:** Inquiries coming from the external shop auto-forward to the responsible partner; other inquiries partner enters manually in portal (Prozess 1).
@@ -63,11 +64,12 @@ die Reihenfolge und Fragen stehen in `PRODUCT_COMPLETION_PLAN.md`.
 **Why cut from MVP:** The FSD only shows commission transparently (own record + dashboard sums).
 **Current direction (25.09.2026):** Chris confirmed the sequence: first implement an auditable periodic settlement with approval and export; then separately specify and plan real bank transfers, and implement them later. This is a product-direction decision, not company approval of the formula, period, approvers or bank interface. The settlement rules remain unconfirmed by the company. Transfers need payment-provider/bank access, authorization, reconciliation and legal review; neither stage is implementation-ready until its own rules and acceptance criteria are confirmed.
 
-## B-08 — Dashboard "ggü. Vorperiode" trend indicators  `STUB`
+## B-08 — Dashboard "ggü. Vorperiode" trend indicators  `DONE (2026-10-15)`
 **What full version is:** Metric cards across the relevant dashboards show a +/-x% delta vs the previous equal-length period (e.g. "+4.6% ggü. Vorperiode"), with a red/green trend arrow and sufficient historical data for meaningful comparison.
 **MVP state (STUB):** The partner dashboard already computes the previous equal-length period client-side from the loaded order list and displays trend indicators when an explicit date range is selected. The company dashboard and a broader cross-dashboard trend analysis remain deferred.
 **Why stub:** The small partner-side comparison is implemented and useful without a backend change; complete company-wide analytics would add marginal MVP value and needs representative historical data.
 **Trigger to complete:** "implement full B-08".
+**Done 2026-10-15:** `add-company-dashboard-trends` — the company dashboard shows the same trend arrows (Umsatz, Provision, Bestellungen, Ø Bestellwert; period vs. equal-length previous period, all-time view vs. trailing 30 days). Backend-side analytics remain out of scope.
 
 ---
 
