@@ -20,7 +20,7 @@ der Handoff trennt davon menschliche Thesis-/UI-Abnahme und die SSH-Negativmatri
 ## Aktueller Orchesterstatus — 25.09.2026
 
 Aktive OpenSpec-Changes (Stand 15.10.2026): `complete-thesis-documentation` 4/6,
-`bind-partner-login-to-oidc-subject` 0/8, `decouple-partner-number-from-login` 0/4 und `add-unique-bmd-article-number` 0/6.
+`bind-partner-login-to-oidc-subject` 0/8, `send-order-emails` 5/6, `decouple-partner-number-from-login` 0/4 und `add-unique-bmd-article-number` 0/6.
 `harden-tax-identifier-rollout` ist vollständig und archiviert. Die vollständige offene Liste, Protokollauswertung und der Startprompt stehen in
 `Specification/CONTINUATION_PROMPT.md`. Chris hat Push auf `main` samt Deploy für
 den geprüften Stand erlaubt. VM-Demo-Status ist geklärt; kein echter

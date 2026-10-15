@@ -19,6 +19,7 @@ erDiagram
     ORDER ||--|{ ORDER_ITEM : "enthält"
     PRODUCT ||--o{ ORDER_ITEM : "wird bestellt"
     ORDER ||--|| COMMISSION_RECORD : "erzeugt"
+    ORDER ||--o{ ORDER_EMAIL : "löst aus"
     PARTNER ||--o{ COMMISSION_RECORD : "erhält"
     PARTNER ||--o| PARTNER_TRADE_PROOF : "reicht ein"
 
@@ -125,6 +126,16 @@ erDiagram
         Long product_id FK
         int quantity
         BigDecimal unitPriceSnapshot "10.2, Preis zum Bestellzeitpunkt"
+    }
+
+    ORDER_EMAIL {
+        Long id PK
+        Long order_id FK "UNIQUE mit type + recipientRole"
+        String type "ORDER_CONFIRMATION, ORDER_NOTICE_PARTNER, ORDER_NOTICE_COMPANY, SHIPPING_CONFIRMATION"
+        String recipientRole "CUSTOMER, PARTNER, COMPANY"
+        String recipientAddress "voll nur solange offen, danach maskiert/leer"
+        String status "PENDING, SENDING, SENT, FAILED, SKIPPED"
+        int attempts
     }
 
     COMMISSION_RECORD {
@@ -243,6 +254,14 @@ Berechnungsbasis (`orderValue`) als auch der verwendete Prozentsatz
 (`commissionPercentUsed`) werden auf dem Record selbst gespeichert
 (Snapshot) — eine spätere Änderung von `Partner.commissionPercent` verändert
 keine bereits existierenden Provisionsdatensätze rückwirkend.
+
+### OrderEmail (Tabelle `order_email`)
+Outbox für Bestell-E-Mails (B-04, `send-order-emails`): wird in derselben Transaktion wie
+die Bestellung bzw. der Wechsel auf `FULFILLED` angelegt und von einem Scheduler einzeln
+versendet (mit Wiederholungen). Pro Bestellung, Typ und Empfängerrolle höchstens ein
+Eintrag. Die volle Adresse steht nur, solange die Mail offen oder fehlgeschlagen ist; nach
+dem Versand bleibt nur die maskierte Adresse (`a***@example.at`), übersprungene Einträge
+speichern keine Adresse. Fehlgeschlagene Einträge verlieren die Adresse 90 Tage nach dem Anlegen (Entscheidung 15.10.2026, kein gesetzlicher Wert).
 
 ## Geld-Konvention
 Alle Geldbeträge (`price`, `unitPriceSnapshot`, `orderValue`,

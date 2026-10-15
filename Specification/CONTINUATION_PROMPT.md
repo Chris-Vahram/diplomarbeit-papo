@@ -36,6 +36,23 @@ Neuestes Protokoll: `Documentation/Besprechungsprotokolle/Besprechungsprotokoll_
   enthält nur noch den BMD-Nummern-Teil und wartet auf BMD-Beispieldaten.
 - Nächster technischer Block für Chris: `bind-partner-login-to-oidc-subject`
   Release A umsetzen (Tasks 1–3), danach VM-Bindung und Release B.
+- 15.10.2026 umgesetzt (lokal, noch nicht committet): B-08 `add-company-dashboard-trends`
+  (archiviert) und B-04 `send-order-emails` 5/6 (Outbox, Retries, Firmen-Statusansicht,
+  Versand standardmäßig aus, Umleitung erzwungen; Mailpit im dev). Prüfung: 153/153
+  Backend-Tests, Package, Playwright Desktop/Mobil, Mailpit mit allen vier Mail-Typen,
+  zwei Codex-Reviews eingearbeitet. Offen (Task 4.2): SMTP-Daten von Herrn Bachl (per
+  Vaultwarden-Links an Chris, nicht im Repo) auf der VM eintragen, mit Testpostfach-
+  Umleitung prüfen; Chris entscheidet über Abschluss-Mail bei „Abgeschlossen“ und
+  Firmen-Empfängeradresse; Aufbewahrungsregel vor echten Kundendaten.
+  Update 15.10. nachmittags: Entscheidungen übernommen (neutrale Abschlussmail aktiv,
+  Funktionspostfach, 90-Tage-Adresslöschung bei fehlgeschlagenen Mails, Absender
+  no-reply@paportal.at; SPF/DMARC für paportal.at sind gesetzt). Die Vaultwarden-Links waren
+  abgelaufen → SMTP-Daten neu anfordern. VM: `docker-compose.prod.yml` aktualisiert
+  (Backup `.bak-20261015-1558`), Mail-Variablen in `.env.prod` mit `PAPO_MAIL_ENABLED=false`.
+- `bind-partner-login-to-oidc-subject` Release A umgesetzt (6/8) auf Branch
+  `feat/bind-partner-login-to-oidc-subject` im Worktree `../papo-oidc`: 144/144 Tests,
+  Upgrade-Check mit schema update, Browser-Check, Codex-Review eingearbeitet. Offen: Deploy,
+  VM-Bindung (docs/DEPLOYMENT.md „Partner-Login binden“), danach Release B.
 
 ## Aktiver Gesprächsfaden — Teamprovision für Partner-Mitarbeiter
 

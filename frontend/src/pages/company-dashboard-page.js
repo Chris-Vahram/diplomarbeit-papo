@@ -1,7 +1,7 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import { formatEuro, formatNumber } from "../lib/format.js";
-import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue, toLocalIsoDate, presetPeriod, PERIOD_PRESETS } from "../lib/dashboard-data.js";
+import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue, toLocalIsoDate, presetPeriod, PERIOD_PRESETS, previousPeriod, periodTrends, trailingWindowTrend } from "../lib/dashboard-data.js";
 import { escapeHtml } from "../lib/html.js";
 
 const eur = new Intl.NumberFormat("de-AT", { style: "currency", currency: "EUR" });
@@ -193,12 +193,16 @@ class CompanyDashboardPage extends HTMLElement {
   render() {
     if (!this.orders) return;
 
-    let inRange, revenue, commission, count;
+    let inRange, revenue, commission, count, trends;
     if (this.period) {
       const fromIso = toLocalIsoDate(this.period.from);
       const toIso = toLocalIsoDate(this.period.to);
       inRange = filterByPeriod(this.orders, fromIso, toIso);
-      ({ revenue, commission, count } = fulfilledTotals(inRange));
+      const current = fulfilledTotals(inRange);
+      ({ revenue, commission, count } = current);
+      // Same-length period immediately before, as on the partner dashboard (B-08).
+      const prev = previousPeriod(this.period.from, this.period.to);
+      trends = periodTrends(current, fulfilledTotals(filterByPeriod(this.orders, toLocalIsoDate(prev.from), toLocalIsoDate(prev.to))));
     } else {
       // No explicit range: headline totals are the backend's true all-time values
       // (BigDecimal-exact, no client-side recompute) - settlement/charts show all orders.
@@ -206,7 +210,10 @@ class CompanyDashboardPage extends HTMLElement {
       revenue = this.roster.totalRevenue;
       commission = this.roster.totalCommission;
       count = this.roster.fulfilledOrderCount;
+      // Arrows: last 30 days vs. the 30 before, decoupled from the all-time totals.
+      trends = trailingWindowTrend(this.orders);
     }
+    const trendAttrs = (t) => (t ? `trend="${t.trend}" trend-label="${t.label}"` : "");
     const avgOrderValue = count > 0 ? revenue / count : 0;
 
     // Monthly chart: trailing 6 months (stable trend), independent of the picker.
@@ -214,10 +221,10 @@ class CompanyDashboardPage extends HTMLElement {
     const monthly = monthlyRevenue(this.orders, keys);
 
     this.metricRow.innerHTML = `
-      <metric-card label="Umsatz (abgeschlossen)" value="${formatEuro(revenue)}" icon="trending-up" tone="positive"></metric-card>
-      <metric-card label="Provision (abgeschlossen)" value="${formatEuro(commission)}" icon="percent" tone="positive"></metric-card>
-      <metric-card label="Abgeschlossene Bestellungen" value="${count}" icon="check-circle" tone="positive"></metric-card>
-      <metric-card label="Ø Bestellwert" value="${formatEuro(avgOrderValue)}" icon="receipt" tone="positive"></metric-card>
+      <metric-card label="Umsatz (abgeschlossen)" value="${formatEuro(revenue)}" icon="trending-up" tone="positive" ${trendAttrs(trends.revenueTrend)}></metric-card>
+      <metric-card label="Provision (abgeschlossen)" value="${formatEuro(commission)}" icon="percent" tone="positive" ${trendAttrs(trends.commissionTrend)}></metric-card>
+      <metric-card label="Abgeschlossene Bestellungen" value="${count}" icon="check-circle" tone="positive" ${trendAttrs(trends.countTrend)}></metric-card>
+      <metric-card label="Ø Bestellwert" value="${formatEuro(avgOrderValue)}" icon="receipt" tone="positive" ${trendAttrs(trends.avgTrend)}></metric-card>
       ${renderMonthChart("Umsatz nach Monat", labels, monthly)}
     `;
 

@@ -96,10 +96,18 @@ export function trailingWindowTrend(orders, days = 30) {
   const current = fulfilledTotals(filterByPeriod(orders, toLocalIsoDate(from), toLocalIsoDate(to)));
   const previous = fulfilledTotals(filterByPeriod(orders, toLocalIsoDate(prev.from), toLocalIsoDate(prev.to)));
 
+  return periodTrends(current, previous);
+}
+
+// Trend infos for all metric cards from two fulfilledTotals() results.
+// avgOrderValue is revenue/count per window (0 without orders).
+export function periodTrends(current, previous) {
+  const avg = (t) => (t.count > 0 ? t.revenue / t.count : 0);
   return {
     revenueTrend: trendInfo(current.revenue, previous.revenue),
     commissionTrend: trendInfo(current.commission, previous.commission),
     countTrend: trendInfo(current.count, previous.count),
+    avgTrend: trendInfo(avg(current), avg(previous)),
   };
 }
 

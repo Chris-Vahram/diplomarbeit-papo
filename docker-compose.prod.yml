@@ -86,6 +86,21 @@ services:
       # Opt-in demo data seed (partners/products/enablements/orders) under LaunchMode.NORMAL -
       # off unless set true in .env.prod (docs/DEPLOYMENT.md); never bake true into the image.
       SEED_DEMO_DATA: ${SEED_DEMO_DATA:-false}
+      # Order e-mails (send-order-emails): off unless enabled in .env.prod. Without
+      # PAPO_MAIL_REDIRECT_TO the app refuses to start unless PAPO_MAIL_ALLOW_REAL_RECIPIENTS=true.
+      PAPO_MAIL_ENABLED: ${PAPO_MAIL_ENABLED:-false}
+      PAPO_MAIL_FROM: ${PAPO_MAIL_FROM:-}
+      PAPO_MAIL_COMPANY_RECIPIENT: ${PAPO_MAIL_COMPANY_RECIPIENT:-}
+      PAPO_MAIL_REDIRECT_TO: ${PAPO_MAIL_REDIRECT_TO:-}
+      PAPO_MAIL_ALLOW_REAL_RECIPIENTS: ${PAPO_MAIL_ALLOW_REAL_RECIPIENTS:-false}
+      PAPO_MAIL_SHIPPING_ENABLED: ${PAPO_MAIL_SHIPPING_ENABLED:-false}
+      # Never empty: an empty value would clear Quarkus' default and block startup even with mail off.
+      QUARKUS_MAILER_HOST: ${SMTP_HOST:-localhost}
+      QUARKUS_MAILER_PORT: ${SMTP_PORT:-587}
+      QUARKUS_MAILER_USERNAME: ${SMTP_USERNAME:-}
+      QUARKUS_MAILER_PASSWORD: ${SMTP_PASSWORD:-}
+      QUARKUS_MAILER_START_TLS: ${SMTP_START_TLS:-REQUIRED}
+      QUARKUS_MAILER_TLS: ${SMTP_TLS:-false}
 
   caddy:
     image: caddy:2-alpine

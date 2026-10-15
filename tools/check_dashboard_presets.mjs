@@ -1,6 +1,6 @@
 // Self-check for presetPeriod: `node tools/check_dashboard_presets.mjs`
 import assert from "node:assert/strict";
-import { presetPeriod, toLocalIsoDate } from "../frontend/src/lib/dashboard-data.js";
+import { presetPeriod, periodTrends, toLocalIsoDate } from "../frontend/src/lib/dashboard-data.js";
 
 const iso = (kind, y, m, d) => {
   const p = presetPeriod(kind, new Date(y, m - 1, d, 15, 30));
@@ -16,4 +16,9 @@ const p = presetPeriod("month", new Date(2026, 9, 14, 8));
 assert.equal(p.from.getHours(), 0);
 assert.equal(p.to.getHours() * 60 + p.to.getMinutes(), 23 * 60 + 59);
 assert.throws(() => presetPeriod("decade"));
-console.log("presetPeriod ok");
+
+const t = (revenue, count) => ({ revenue, commission: 0, count });
+assert.equal(periodTrends(t(0, 0), t(0, 0)).avgTrend, null); // nothing to compare
+assert.equal(periodTrends(t(100, 2), t(0, 0)).avgTrend.label, "ggü. Vorperiode (neu)");
+assert.equal(periodTrends(t(300, 2), t(100, 1)).avgTrend.label, "+50,0% ggü. Vorperiode"); // 150 vs 100
+console.log("presetPeriod + periodTrends ok");

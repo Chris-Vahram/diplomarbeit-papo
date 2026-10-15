@@ -565,7 +565,7 @@
 
 
 
-| AUSSTEHEND-288df2aa | 2026-10-12 | Chris | Claude Code | Meeting-12.10-Changes umsetzen, Doku-Sync, WorkAddict-Nachtrag | lokale Sitzung `288df2aa-f604-4b4f-99f9-dabbb3084eb7` | `EXAKT` | PR #37/#38 (Zeitraum-Presets, Navigation, Endkunden bearbeiten) und #39 (Spec-Sync) gemergt und deployt; 22 WorkAddict-Einträge nachgetragen; Prüfungen: presetPeriod-Self-Check, KundeResourceTest 10/10, mvnw package 134/134, Playwright Desktop/Mobil, openspec validate --strict, CI/Deploy-Run main erfolgreich |
+| AUSSTEHEND-288df2aa | 2026-10-12 | Chris | Claude Code | B-04 Entscheidungen und VM-Vorbereitung; OIDC-Subject-Bindung Release A implementieren | lokale Sitzung `288df2aa-f604-4b4f-99f9-dabbb3084eb7` | `EXAKT` | 90-Tage-Regel und neutrale Abschlussmail umgesetzt, VM-Mailkonfiguration deaktiviert vorbereitet; PartnerLogin mit Subject-Auflösung, Fallback und Firmen-Dialog umgesetzt (6/8); Prüfungen: OrderEmail-Tests 20/20, OIDC-Branch mvnw package 144/144, Upgrade-Check mit schema update, Playwright Desktop/Mobil, openspec validate --strict, Codex-Reviews |
 
 
 
@@ -579,6 +579,47 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+| AUSSTEHEND-01a13e8c | 2026-10-15 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a13e8c-7abe-7ff2-be7b-5989d75680b5` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-01a13ca2 | 2026-10-14 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a13ca2-6360-7772-970d-fa9f21929545` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a13c7c | 2026-10-14 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a13c7c-f929-7160-9cd2-0cab602d3813` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 
 ## Noch rückwirkend aufzunehmen

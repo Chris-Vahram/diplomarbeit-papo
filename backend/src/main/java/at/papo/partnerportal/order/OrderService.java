@@ -6,6 +6,7 @@ import at.papo.partnerportal.common.ApiException;
 import at.papo.partnerportal.customer.Kunde;
 import at.papo.partnerportal.customer.KundeService;
 import at.papo.partnerportal.enablement.EnablementService;
+import at.papo.partnerportal.mail.OrderEmailService;
 import at.papo.partnerportal.partner.Partner;
 import at.papo.partnerportal.product.Product;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -35,6 +36,9 @@ public class OrderService {
 
     @Inject
     CommissionService commissionService;
+
+    @Inject
+    OrderEmailService orderEmailService;
 
     // join fetch + distinct: one query instead of 1+N+N+N (items/partner/kunde each
     // loaded per order without it). distinct collapses the duplicate parent rows the
@@ -117,7 +121,9 @@ public class OrderService {
         // guard against here (commission spec's "missing" scenario is satisfied by
         // construction, not by a runtime check).
         CommissionRecord commission = commissionService.createForOrder(order, partner);
-        return OrderDto.from(order, commission);
+        // Outbox rows in the same transaction: a rolled-back order never mails (order-emails spec).
+        String notice = orderEmailService.queueForNewOrder(order);
+        return OrderDto.from(order, commission).withNotice(notice);
     }
 
     @Transactional
@@ -126,23 +132,31 @@ public class OrderService {
         if (order == null) {
             throw new ApiException(404, "Bestellung nicht gefunden.");
         }
-        if (!status.equals(NEXT_STATUS.get(order.status))) {
+        OrderStatus current = order.status;
+        if (!status.equals(NEXT_STATUS.get(current))) {
             throw new ApiException(400, "Status kann nur schrittweise vorwärts geändert werden "
                     + "(Eingereicht → Geprüft → Abgeschlossen).");
         }
-        order.status = status;
-        return OrderDto.from(order, commissionService.findForOrder(order));
+        // Conditional update instead of a full-row flush: of two concurrent transitions only one
+        // wins, and a concurrent markSeen cannot write back a stale status (send-order-emails design).
+        if (Order.update("status = ?1 where id = ?2 and status = ?3", status, orderId, current) == 0) {
+            throw new ApiException(409, "Die Bestellung wurde inzwischen geändert. Bitte die Liste neu laden.");
+        }
+        Order.getEntityManager().refresh(order);
+        String notice = status == OrderStatus.FULFILLED ? orderEmailService.queueShipping(order) : null;
+        return OrderDto.from(order, commissionService.findForOrder(order)).withNotice(notice);
     }
 
     // Flips the unseen flag when the company opens an order's details overlay
     // (order-notifications spec: "opening details" is the seen trigger).
     @Transactional
     public OrderDto markSeen(Long orderId) {
-        Order order = Order.findById(orderId);
-        if (order == null) {
+        // Targeted update of the flag only, so it never overwrites a concurrent status change.
+        if (Order.update("seenByCompany = true where id = ?1", orderId) == 0) {
             throw new ApiException(404, "Bestellung nicht gefunden.");
         }
-        order.seenByCompany = true;
+        Order order = Order.findById(orderId);
+        Order.getEntityManager().refresh(order);
         return OrderDto.from(order, commissionService.findForOrder(order));
     }
 

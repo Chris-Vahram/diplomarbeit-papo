@@ -440,12 +440,32 @@ export function renderOrderSummaryHtml({ items, totalCents, commissionPercent })
     </div>`;
 }
 
-// On-screen confirmation + simulated ("not really sent") e-mail shown right after an
-// order is placed — same pattern for the partner's own flow and the company's manual
-// creation flow. `actionsHtml` (e.g. a "Fertig"/"Neue Bestellung" button) is placed
-// inside the card, as its last child. `kind: "shipping"` renders the FR-17 simulated
-// shipping confirmation shown when the company sets an order to fulfilled — same
-// layout, distinct heading/e-mail text so it isn't mistaken for the order confirmation.
+// On-screen confirmation shown right after an order is placed — same pattern for the
+// partner's own flow and the company's manual creation flow. `actionsHtml` (e.g. a
+// "Fertig"/"Neue Bestellung" button) is placed inside the card, as its last child.
+// `kind: "shipping"` is the confirmation shown when the company sets an order to
+// fulfilled. The e-mail notice reflects what the backend queued for the customer
+// (order.customerEmailNotice, order-emails spec); no mail content is shown here.
+const EMAIL_NOTICES = {
+  QUEUED: (to, what) => `${what} wird an ${to} gesendet.`,
+  REDIRECTED: (to, what) => `Testbetrieb: ${what} geht an das Test-Postfach, nicht an ${to}.`,
+  NO_ADDRESS: (to, what) => `Keine E-Mail-Adresse hinterlegt – ${what} wird nicht gesendet.`,
+  INVALID_ADDRESS: (to, what) => `Die hinterlegte E-Mail-Adresse ist ungültig – ${what} wird nicht gesendet.`,
+  DISABLED: (to, what) => `Der E-Mail-Versand ist derzeit nicht aktiviert – ${what} wird nicht gesendet.`,
+};
+
+function emailNoticeHtml(order, isShipping) {
+  const notice = EMAIL_NOTICES[order.customerEmailNotice];
+  if (!notice) return "";
+  const what = isShipping ? "die Abschlussbestätigung" : "die Bestellbestätigung";
+  const text = notice(escapeHtml(order.kunde.email ?? ""), what);
+  return `
+      <section class="simulated-email">
+        <h3>E-Mail an den Endkunden</h3>
+        <p>${text.charAt(0).toUpperCase()}${text.slice(1)}</p>
+      </section>`;
+}
+
 export function renderOrderConfirmationHtml(order, { showPartner = false, actionsHtml = "", kind = "order" } = {}) {
   const isShipping = kind === "shipping";
   const items = order.items.map((item) => ({
@@ -458,7 +478,7 @@ export function renderOrderConfirmationHtml(order, { showPartner = false, action
 
   return `
     <section class="order-confirmation">
-      <h2>${isShipping ? `Versandbestätigung für Bestellung Nr. ${order.id}` : `Bestellung Nr. ${order.id} bestätigt`}</h2>
+      <h2>${isShipping ? `Bestellung Nr. ${order.id} abgeschlossen` : `Bestellung Nr. ${order.id} bestätigt`}</h2>
       <div class="print-document">
         <header class="print-letterhead print-only">
           <div class="print-letterhead__brand">PAPO</div>
@@ -475,16 +495,7 @@ export function renderOrderConfirmationHtml(order, { showPartner = false, action
         ${order.commissionValue != null ? `<p class="print-only">Provision (${percentFormat.format(order.commissionPercentUsed)} %): ${formatEuro(order.commissionValue)}</p>` : ""}
       </div>
       <button type="button" class="print-button" data-action="print">Beleg drucken</button>
-      <section class="simulated-email">
-        <h3>${isShipping ? "Simulierte Versandbestätigung (nicht wirklich versendet)" : "Simulierte Bestätigungs-E-Mail (nicht wirklich versendet)"}</h3>
-        <p>An: ${escapeHtml(order.kunde.email) || "keine E-Mail-Adresse hinterlegt"}</p>
-        <p>Betreff: ${isShipping ? `Ihre Bestellung Nr. ${order.id} wurde versendet` : `Ihre Bestellung Nr. ${order.id}`}</p>
-        <p>${
-          isShipping
-            ? `Sehr geehrte/r ${kundeName}, Ihre Bestellung über ${formatEuro(order.orderValue)} wurde versendet und ist auf dem Weg zu Ihnen.`
-            : `Sehr geehrte/r ${kundeName}, vielen Dank für Ihre Bestellung über ${formatEuro(order.orderValue)}. Wir bearbeiten sie umgehend.`
-        }</p>
-      </section>
+      ${emailNoticeHtml(order, isShipping)}
       ${actionsHtml}
     </section>`;
 }
