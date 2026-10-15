@@ -618,6 +618,16 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
 | AUSSTEHEND-01a13e8c | 2026-10-15 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a13e8c-7abe-7ff2-be7b-5989d75680b5` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a13ca2 | 2026-10-14 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a13ca2-6360-7772-970d-fa9f21929545` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a13c7c | 2026-10-14 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a13c7c-f929-7160-9cd2-0cab602d3813` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
