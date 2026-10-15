@@ -45,3 +45,12 @@ net: ca. −380…−440 Zeilen (davon #3 als eigener Change), −2 Dependencies
 
 Ein Branch `chore/ponytail-audit`, ein Commit je Befund (Regel aus CLAUDE.md), nach jedem
 Commit relevante Tests. #1 nur mit Tobias' OK, #3 nur als eigener OpenSpec-Change.
+
+## Umsetzung 16.10.2026 (Branch `chore/ponytail-audit`)
+
+Umgesetzt, je ein Commit: #1 CSS-Block (Tobias' OK), #2 ImageIO, #4 gemeinsames
+`lib/dashboard-ui.js`, #6 `tmp/` und `.scratch/` aus Git (lokal behalten, ignoriert),
+#7/#8/#9/#12 tote Helfer, #10 zwei Abhängigkeiten, #11 Schrift-Subsets.
+#3 läuft als eigener Change `derive-product-category-from-catalog`.
+Prüfung: `./mvnw package` 164/164, Bild-Tests 11/11, `node --check`, Dashboard-Selbstcheck,
+Playwright Partner/Firma (Werte unverändert, Schriften geladen, keine 404, mobil ohne Überlauf).
