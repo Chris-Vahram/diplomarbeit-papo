@@ -16,6 +16,7 @@ All existing endpoints are role-protected (`@RolesAllowed`), the frontend is one
 4. **Public resource `/api/shop/{kennung}` without `@RolesAllowed`, annotated `@PermitAll`** and covered by an explicit HTTP permission entry so the default stays deny for everything else. Unknown and offline shops return the same 404 body.
 5. **Rate limit as a JAX-RS `ContainerRequestFilter` bound to the shop namespace**, in-memory token bucket per IP (`X-Forwarded-For` from Caddy only), default 60 requests/min, configurable. No new dependency. IPs stay in memory only.
 6. **noindex via response filter and meta tag**, controlled by `papo.shop.indexing-enabled` (default false).
+7. **Kill switch `papo.shop.public-enabled` (default false).** Every merge into `main` deploys to the only public VM; there is no staging. While false, every public shop route and `/api/shop/*` call returns the neutral offline response, regardless of shop status. Company and partner management stay usable. The switch stays off on the VM until `add-shop-legal-consent` is merged, so no public shop runs without Impressum, Datenschutz and consent. Alternative: long-lived feature branch — rejected, it breaks the one-change-one-merge increment.
 
 ## Risks / Trade-offs
 
@@ -25,7 +26,7 @@ All existing endpoints are role-protected (`@RolesAllowed`), the frontend is one
 
 ## Migration Plan
 
-New table only; no data migration. Rollback: previous image ignores the table; remove the Caddy rule.
+New table only; no data migration. Rollback: previous image ignores the table; remove the Caddy rule. Deploy with `papo.shop.public-enabled=false`.
 
 ## Open Questions
 

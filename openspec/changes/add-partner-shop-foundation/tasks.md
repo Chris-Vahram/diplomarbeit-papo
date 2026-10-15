@@ -7,7 +7,8 @@
 - [ ] 1.5 Public `GET /api/shop/{kennung}` with minimal DTO and uniform 404
 - [ ] 1.6 Rate-limit filter for `/api/shop/*` with 429 message; tests
 - [ ] 1.7 noindex response filter and `papo.shop.indexing-enabled` config
-- [ ] 1.8 Tests: partner cannot change identifier, internal APIs still 401, inactive partner / no articles → offline
+- [ ] 1.8 Kill switch `papo.shop.public-enabled` (default false) on public route and `/api/shop/*`; partner hint; tests
+- [ ] 1.9 Tests: partner cannot change identifier, internal APIs still 401, inactive partner / no articles → offline
 
 ## 2. Frontend (essential)
 
@@ -18,7 +19,8 @@
 ## 3. Deployment
 
 - [ ] 3.1 Caddy rule `/shop/*` → `shop.html`; verify SPA routes unaffected
-- [ ] 3.2 Dev setup (`docs/SETUP.md`) describes how to open a local shop
+- [ ] 3.2 VM config keeps `papo.shop.public-enabled=false` until `add-shop-legal-consent` is merged
+- [ ] 3.3 Dev setup (`docs/SETUP.md`) describes how to open a local shop
 
 ## 4. Verification
 

@@ -35,3 +35,14 @@ All shop pages and public shop API responses SHALL carry `noindex` (`X-Robots-Ta
 #### Scenario: Staging shop
 - **WHEN** a shop is opened on a deployment without the indexing flag
 - **THEN** the page and API responses carry noindex
+
+### Requirement: Public shop kill switch
+The system SHALL provide the configuration `papo.shop.public-enabled`, defaulting to false. While false, all public shop routes and `/api/shop/*` endpoints SHALL respond as if the shop were offline, independent of release status. Company and partner shop management SHALL remain available. The switch SHALL NOT be enabled on a publicly reachable deployment before the legal texts and consent of `add-shop-legal-consent` are in place.
+
+#### Scenario: Switch off
+- **WHEN** `papo.shop.public-enabled` is false and a visitor opens a released, reachable shop
+- **THEN** the visitor sees the neutral page "Dieser Shop ist derzeit nicht erreichbar." and the API returns the uniform 404
+
+#### Scenario: Management unaffected
+- **WHEN** `papo.shop.public-enabled` is false and the company releases a shop
+- **THEN** the release is stored and the partner sees the status, with the hint "Öffentliche Shops sind auf dieser Umgebung noch deaktiviert."
