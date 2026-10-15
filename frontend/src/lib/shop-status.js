@@ -1,7 +1,7 @@
 import { escapeHtml } from "./html.js";
 
 // Shared by the partner page "Mein Webshop", the company "Webshop" dialog and the
-// "Webshop" column of the partner table.
+// "Webshop" row action of the partner table.
 const STATUS = {
   NOT_RELEASED: { badge: "Nicht freigegeben", tone: "neutral",
     hint: "Der Shop wurde vom Unternehmen noch nicht freigegeben." },
@@ -23,9 +23,19 @@ export function shopStatusHint(status) {
   return STATUS[status]?.hint ?? "";
 }
 
+export function shopStatusTone(status) {
+  return STATUS[status]?.tone ?? "neutral";
+}
+
 export function shopStatusBadge(status) {
-  const tone = STATUS[status]?.tone ?? "neutral";
-  return `<span class="shop-badge shop-badge--${tone}">${escapeHtml(shopStatusLabel(status))}</span>`;
+  return `<span class="shop-badge shop-signal--${shopStatusTone(status)}">${escapeHtml(shopStatusLabel(status))}</span>`;
+}
+
+// Partner table row action: a real button in the shop's signal colour.
+export function shopActionButton(partnerId, status) {
+  const label = escapeHtml(shopStatusLabel(status));
+  return `<button type="button" class="shop-action shop-signal--${shopStatusTone(status)}" data-shop-id="${escapeHtml(partnerId)}"
+    title="Webshop: ${label}" aria-label="Webshop verwalten (Status: ${label})">Webshop</button>`;
 }
 
 // Same URL locally and in production: tools/dev_frontend_server.py mirrors the Caddy rewrite.

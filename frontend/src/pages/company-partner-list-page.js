@@ -3,7 +3,7 @@ import { showToast } from "../components/toast-notice.js";
 import { formatNumber } from "../lib/format.js";
 import { addressFieldsHtml, readAddress, fillAddress } from "../lib/address-fields.js";
 import { taxIdentifierFieldsHtml, readTaxIdentifier, fillTaxIdentifier } from "../lib/tax-identifier-fields.js";
-import { shopStatusBadge, shopStatusHint, shopPublicUrl } from "../lib/shop-status.js";
+import { shopStatusBadge, shopStatusHint, shopPublicUrl, shopActionButton } from "../lib/shop-status.js";
 
 // Commission dropdown presets per FSD FR-19/partner-management spec: 5/10/15 or a custom value.
 const COMMISSION_PRESETS = ["5", "10", "15"];
@@ -132,7 +132,6 @@ class CompanyPartnerListPage extends HTMLElement {
       { key: "commissionLabel", label: "Provision" },
       { key: "statusBadge", label: "Status", html: true },
       { key: "proofStatus", label: "Nachweis" },
-      { key: "shopBadge", label: "Webshop", html: true },
       { key: "actions", label: "", html: true },
     ];
     this.table.emptyMessage = "Noch keine Partner angelegt.";
@@ -228,6 +227,7 @@ class CompanyPartnerListPage extends HTMLElement {
     try {
       const [partners, shops] = await Promise.all([apiFetch("/company/partners"), apiFetch("/company/shops")]);
       this.partners = partners;
+      // No shop record yet means the company has never released one.
       const shopStatusByPartner = new Map(shops.map((shop) => [shop.partnerId, shop.status]));
       this.table.rows = this.partners.map((p) => ({
         partnerNumber: p.partnerNumber,
@@ -237,12 +237,11 @@ class CompanyPartnerListPage extends HTMLElement {
         statusBadge: `<status-badge status="${p.active ? "active" : "inactive"}"></status-badge>`,
         proofStatus: this.proofStatusLabel(p.tradeProof),
         // No shop record yet means the company has never released one.
-        shopBadge: `<button type="button" class="shop-badge-button" data-shop-id="${p.id}" title="Webshop verwalten">${
-          shopStatusBadge(shopStatusByPartner.get(p.id) ?? "NOT_RELEASED")}</button>`,
         actions: `<div class="row-actions">
           <button type="button" data-edit-id="${p.id}">Partnerdaten Bearbeiten</button>
           <button type="button" class="row-actions__secondary" data-proof-id="${p.id}">Nachweis</button>
           <button type="button" class="row-actions__secondary" data-manage-id="${p.id}">Artikel</button>
+          ${shopActionButton(p.id, shopStatusByPartner.get(p.id) ?? "NOT_RELEASED")}
         </div>`,
       }));
       const requestedPartnerId = new URLSearchParams(location.hash.split("?")[1] ?? "").get("enablement");
