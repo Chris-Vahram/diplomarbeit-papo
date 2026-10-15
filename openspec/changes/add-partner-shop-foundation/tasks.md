@@ -11,9 +11,9 @@
 
 ## 2. Frontend (essential)
 
-- [ ] 2.1 `shop.html` entry and `src/shop/` bootstrap without portal imports; neutral offline page; noindex meta
-- [ ] 2.2 Partner page "Mein Webshop" (status, link, offline reason) and sidebar item
-- [ ] 2.3 Company partner detail section "Webshop" (identifier edit with link warning, release, takedown dialog)
+- [x] 2.1 `shop.html` entry and `src/shop/` bootstrap without portal imports; neutral offline page; noindex meta
+- [x] 2.2 Partner page "Mein Webshop" (status, link, offline reason) and sidebar item
+- [x] 2.3 Company partner detail section "Webshop" (identifier edit with link warning, release, takedown dialog)
 
 ## 3. Deployment
 

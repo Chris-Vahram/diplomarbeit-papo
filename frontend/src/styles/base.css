@@ -2231,6 +2231,18 @@ form-field {
 .trade-proof-card__error { color: var(--color-error-700); }
 #proof-review-form[hidden] { display: none !important; }
 
+/* Webshop status (partner "Mein Webshop", company "Webshop" dialog). */
+.shop-status-card { margin-top: var(--spacing-4); }
+.shop-status-card dd { overflow-wrap: anywhere; }
+.shop-status-card__reason {
+  padding: var(--spacing-3) var(--spacing-4);
+  border-left: 0.25rem solid var(--color-error-700);
+  background: var(--bg-page);
+  overflow-wrap: anywhere;
+}
+.shop-status-card [hidden],
+#shop-takedown-form[hidden] { display: none !important; }
+
 /* ============================================================
    Toasts
    ============================================================ */
