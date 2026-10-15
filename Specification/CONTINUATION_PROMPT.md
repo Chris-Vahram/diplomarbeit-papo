@@ -1,9 +1,35 @@
 # PAPO – Next-Session-Context
 
-**Stand:** 07.10.2026 (lokales Datum geprüft). Operative Übergabe; volatile Angaben beim Start prüfen.
+**Stand:** 14.10.2026 (lokales Datum geprüft). Operative Übergabe; volatile Angaben beim Start prüfen.
 Stabile Regeln stehen in `AGENTS.md` und `CLAUDE.md`. Der beschlossene/noch zu
 beschließende Ausbau ist in [PRODUCT_COMPLETION_PLAN.md](PRODUCT_COMPLETION_PLAN.md)
 geordnet. Dieses Dokument bleibt der einzige operative Session-Handoff.
+
+## Neuester Stand — Besprechung 12.10.2026 umgesetzt
+
+Neuestes Protokoll: `Documentation/Besprechungsprotokolle/Besprechungsprotokoll_12.10.md`
+(Prof. Hammer, Chris, Tobias). Präsentationen abgenommen. Daraus am 14.10.2026:
+
+- Umgesetzt und gemergt: PR #37 `apply-dashboard-navigation-feedback`
+  (Zeitraum-Presets Woche/Monat/Jahr, Standard Monat, „Gesamter Zeitraum“;
+  Partner-Dashboard mit „Letzte Bestellungen“ oben und größerem „Neue Bestellung“;
+  Sidebar „Meine Endkunden“/„Meine Artikel“) und PR #38 `edit-partner-end-customers`
+  (`PUT /api/partner/customers/{id}`, Bearbeiten-Dialog; Änderungen wirken live
+  auch in bestehenden Bestellungen). Beide Changes archiviert unter
+  `openspec/changes/archive/2026-10-14-*`. Prüfung: 134/134 Backend-Tests,
+  Package, Playwright Desktop/Mobil, `openspec validate --strict`.
+- Doku-Sync: `sync-specs-after-meeting-2026-10-12` (Full-Vision-FSD, MVP-FSD-Hinweis,
+  Backlog, Handoff, Agentendateien).
+- Shop: partnerseitiger Homepage-Baukasten „Mein Webshop“ (Pfad oder Subdomain
+  offen). Tobias erstellt Empfehlungen zu den offenen Shop-Fragen und danach die
+  Spezifikation; die Fragen gehen per Mail über Prof. Hammer an die Firma. Kein
+  Dummy-Shop.
+- Datenimport bleibt Dummy bis Firmendaten vorliegen. Firmentermin noch nicht
+  vereinbart. „KI einbauen?“ nur Idee ohne Scope. „Adressleiste sichtbar“ ist kein
+  Arbeitspunkt (Prof. Hammer wollte nur die URL sehen).
+- Zeiterfassung: WorkAddict (Daten im Repo `diplomarbeit-papo/time-data`);
+  Chris' Einträge bis 14.10.2026 nachgetragen, Uhrzeit des Meetings 12.10. geschätzt.
+- Nächster technischer Block für Chris: OIDC-Identity-Grundlage (siehe unten).
 
 ## Aktiver Gesprächsfaden — Teamprovision für Partner-Mitarbeiter
 
@@ -23,7 +49,7 @@ Empfänger, Stichtag, konkrete Rechte, Geldbasis und Abrechnung bleiben Firmenfr
 **Nächster Gesprächsschritt:** Am **07.10.2026** möchte Chris mit dem Lehrer einen
 Firmentermin vereinbaren, nicht bereits die Firmenbesprechung durchführen.
 Ein tatsächlich vereinbarter Termin oder ein neues Gesprächsprotokoll ist noch
-nicht bestätigt. Das neueste Protokoll bleibt vom 14.09.2026.
+nicht bestätigt (Stand 12.10.2026: Firmentermin weiterhin offen).
 [TEAM_COMMISSION_DISCOVERY.md](TEAM_COMMISSION_DISCOVERY.md) enthält bestätigte
 Nutzerentscheidungen, akzeptierte Planungsempfehlungen, acht verbleibende
 Firmenfragen, unverbindliches Rechenbeispiel und Risiken. Bereits beantwortete

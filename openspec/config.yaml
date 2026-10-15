@@ -13,7 +13,8 @@ context: |
     - Database: PostgreSQL
     - Auth: Keycloak (roles: company, partner)
 
-  Scale reference: ~200 partners, ~800 articles. Data enters via Excel/CSV import (no BMD interface).
+  Scale reference: about 100 partners per newer notes (older ~200 partners/~800 articles; verify with company data).
+  Data enters via Excel/CSV import (dummy until company data exists); direct BMD interface (B-06) reopened, not approved.
   Current MVP commission: field on Partner (Partner.commissionPercent), company sets via dropdown 5/10/15 +
   optional custom value; percentage of total order value; stored as own CommissionRecord. B-03 automatic
   Partner-company commission level-up remains deferred. B-09 employee team commissions, points, career
@@ -27,6 +28,8 @@ context: |
   Separate general/sprint decks and evidence: presentation/README.md. Eight B-09 company decision groups
   remain unanswered; no new company meeting or approval confirmed. Next independent planning candidate:
   OIDC identity foundation, separate from BMD-number rules; no automatic implementation authorization.
+  Newest meeting 12.10.2026: UI feedback implemented 14.10 (PR #37/#38); shop = partner homepage builder
+  "Mein Webshop" (Tobias specifies; open questions via Prof. Hammer).
   Active status: DB-only flag Partner.active, enforced server-side after login (Keycloak stays simple).
   Order status: submitted -> reviewed -> fulfilled (company-controlled). Confirmations simulated in-app (no real email).
   Team: Chris + Tobias only (Julian left).

@@ -1,7 +1,7 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import { formatAddress, formatDate } from "../lib/format.js";
-import { addressFieldsHtml, readAddress } from "../lib/address-fields.js";
+import { addressFieldsHtml, readAddress, fillAddress } from "../lib/address-fields.js";
 
 // Decided (Chris, 2026-07-13): 60 days for now, revisit with the client at the
 // next Termin (design.md, decision 5).
@@ -64,6 +64,7 @@ class PartnerCustomerListPage extends HTMLElement {
       { key: "name", label: "Name" },
       { key: "addressLabel", label: "Adresse" },
       { key: "lastOrderCell", label: "Letzte Bestellung", html: true },
+      { key: "actions", label: "", html: true },
     ];
     this.table.filters = [
       {
@@ -92,7 +93,13 @@ class PartnerCustomerListPage extends HTMLElement {
     this.createdCustomerId = null;
     this.refreshPending = false;
     this.loadGeneration = 0;
+    this.editingId = null;
+    this.dialogOpener = this.createButton;
     this.createButton.addEventListener("click", () => this.openCreateDialog());
+    this.table.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-edit-id]");
+      if (button) this.openEditDialog(button);
+    });
     this.createDialog.querySelectorAll("[data-customer-dialog-close]").forEach((button) => {
       button.addEventListener("click", () => this.closeCreateDialog());
     });
@@ -100,7 +107,8 @@ class PartnerCustomerListPage extends HTMLElement {
       event.preventDefault();
       this.closeCreateDialog();
     });
-    this.createDialog.addEventListener("close", () => this.createButton.focus());
+    this.createDialog.addEventListener("close", () =>
+      (this.dialogOpener.isConnected ? this.dialogOpener : this.createButton).focus());
     this.createForm.addEventListener("submit", (event) => this.createCustomer(event));
     this.querySelector("[data-customer-check-list]").addEventListener("click", () => {
       this.closeCreateDialog();
@@ -115,11 +123,36 @@ class PartnerCustomerListPage extends HTMLElement {
 
   openCreateDialog() {
     if (this.refreshPending) return;
+    this.editingId = null;
+    this.dialogOpener = this.createButton;
+    this.querySelector("#customer-create-title").textContent = "Neuer Endkunde";
     this.createForm.reset();
     this.unconfirmedActions.hidden = true;
     this.hideStatus();
     this.createDialog.showModal();
     this.createForm.elements.lastName.focus();
+  }
+
+  // Edit reuses the create dialog; PUT is idempotent, so a failed save simply
+  // keeps the dialog open for another attempt (no "unclear status" flow).
+  openEditDialog(button) {
+    if (this.refreshPending || this.createPending) return;
+    const kunde = this.kunden?.find((k) => String(k.id) === button.dataset.editId);
+    if (!kunde) return;
+    this.editingId = kunde.id;
+    this.dialogOpener = button;
+    this.querySelector("#customer-create-title").textContent = "Endkunde bearbeiten";
+    this.createForm.reset();
+    this.unconfirmedActions.hidden = true;
+    this.hideStatus();
+    const { elements } = this.createForm;
+    elements.lastName.value = kunde.lastName;
+    elements.firstName.value = kunde.firstName ?? "";
+    fillAddress(this.createForm, "customerAddress", kunde.address);
+    elements.email.value = kunde.email ?? "";
+    elements.phone.value = kunde.phone ?? "";
+    this.createDialog.showModal();
+    elements.lastName.focus();
   }
 
   resumeCreateDialog() {
@@ -163,6 +196,20 @@ class PartnerCustomerListPage extends HTMLElement {
     };
     this.setCreatePending(true);
 
+    if (this.editingId) {
+      try {
+        await apiFetch(`/partner/customers/${this.editingId}`, { method: "PUT", body: JSON.stringify(payload) });
+        this.setCreatePending(false);
+        this.closeCreateDialog();
+        showToast("Endkunde aktualisiert.", "success");
+        this.load();
+      } catch (error) {
+        this.setCreatePending(false);
+        showToast(error.message, "error");
+      }
+      return;
+    }
+
     try {
       const customer = await apiFetch("/partner/customers", {
         method: "POST",
@@ -189,6 +236,7 @@ class PartnerCustomerListPage extends HTMLElement {
     try {
       const kunden = await apiFetch("/partner/customers");
       if (!this.isConnected || generation !== this.loadGeneration) return;
+      this.kunden = kunden;
       const rows = kunden
         .map((k) => {
           const dormant = isDormant(k.lastOrderDate);
@@ -202,6 +250,7 @@ class PartnerCustomerListPage extends HTMLElement {
             lastOrderDate: k.lastOrderDate,
             aktivitaet: dormant ? "inaktiv" : "aktiv",
             rowClass: dormant ? "data-table__row--dormant" : "",
+            actions: `<button type="button" data-edit-id="${k.id}">Bearbeiten</button>`,
           };
         })
         // Oldest-first default: never-ordered (null) Endkunden first, then oldest

@@ -1,6 +1,6 @@
 # PAPO – Plan zur funktionalen Fertigstellung
 
-Stand: 07.10.2026. Dieser Plan ist eine Arbeitsgrundlage, keine Freigabe durch Schule
+Stand: 14.10.2026. Dieser Plan ist eine Arbeitsgrundlage, keine Freigabe durch Schule
 oder Referenzunternehmen. Die aktuelle FSD beschreibt das interne MVP; die gewünschte
 Erweiterung wird in kleinen OpenSpec-Changes spezifiziert und einzeln umgesetzt.
 `Specification/CONTINUATION_PROMPT.md` bleibt der einzige operative Session-Handoff.
@@ -11,6 +11,13 @@ ein Sprint-Update (8 Folien) geteilt; Einstieg und Inhaltsbelege stehen in
 06.10.2026. Noch kein neuer Firmentermin, kein neues Protokoll und keine neue
 Firmenfreigabe bestätigt. Veröffentlichungsauftrag vom 07.10.2026 betrifft
 Dokumentation/Präsentationen, nicht Implementierung oder neue OpenSpec-Artefakte.
+
+**Besprechung 12.10.2026:** Präsentationen abgenommen. Das UI-Feedback (Zeitraum-
+Presets, Partner-Dashboard, Navigationslabels, Endkunden bearbeiten) ist am
+14.10.2026 umgesetzt (PR #37/#38). Der Shop wird als partnerseitiger
+Homepage-Baukasten „Mein Webshop“ geplant (URL per Pfad oder Subdomain offen);
+Tobias übernimmt Empfehlungen und Spezifikation, offene Fragen gehen über
+Prof. Hammer an die Firma. Datenimport bleibt Dummy; Firmentermin offen.
 
 ## Bestätigte Zielrichtung durch Chris
 
@@ -100,6 +107,7 @@ Mitarbeiter-Karrierestufen gleichgesetzt.
 
 ## Nächster konkreter Arbeitsblock
 
+Das UI-Feedback vom 12.10.2026 ist erledigt; parallel spezifiziert Tobias den Shop.
 Beginne mit dem technischen Identity-Grundlagen-Teil aus
 `decouple-partner-number-from-login`: eine stabile OIDC-`sub`-Bindung statt der
 Kopplung von Loginname und Partnernummer. Dieser Teil darf laut aktivem Change

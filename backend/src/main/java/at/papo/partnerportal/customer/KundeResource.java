@@ -7,7 +7,9 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
@@ -36,5 +38,11 @@ public class KundeResource {
     @POST
     public KundeDto create(@Valid KundeRequest request) {
         return kundeService.create(currentPartner.resolve(), request);
+    }
+
+    @PUT
+    @Path("/{id}")
+    public KundeDto update(@PathParam("id") Long id, @Valid KundeRequest request) {
+        return kundeService.update(currentPartner.resolve(), id, request);
     }
 }
