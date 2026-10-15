@@ -21,6 +21,7 @@ erDiagram
     ORDER ||--|| COMMISSION_RECORD : "erzeugt"
     PARTNER ||--o{ COMMISSION_RECORD : "erhält"
     PARTNER ||--o| PARTNER_TRADE_PROOF : "reicht ein"
+    PARTNER ||--o| PARTNER_SHOP : "betreibt"
 
     COMPANY_PROFILE {
         Long id PK
@@ -64,6 +65,16 @@ erDiagram
         PartnerTradeProofStatus status "PENDING, ACCEPTED, REJECTED"
         Instant reviewedAt
         String rejectionReason "nullable"
+    }
+
+    PARTNER_SHOP {
+        Long id PK
+        Long partner_id FK UK
+        String kennung UK "3-40 Zeichen a-z, 0-9, einzelne Bindestriche"
+        Instant releasedAt "nullable = nie freigegeben"
+        boolean offlineByCompany
+        String offlineReason "nullable, max. 500 Zeichen"
+        Instant createdAt
     }
 
     PRODUCT {
@@ -183,6 +194,19 @@ ersetzen und den eigenen Status sehen. Die Firma darf Metadaten und das private
 Dokument abrufen sowie die aktuelle Version akzeptieren oder ablehnen. Uploads
 sind auf 10 MiB und verifizierte PDF/JPEG/PNG-Inhalte begrenzt; Downloads setzen
 `Cache-Control: private, no-store` und `X-Content-Type-Options: nosniff`.
+
+### PartnerShop
+Optionale 1:1-Beziehung zu `Partner` (Tabelle `partner_shop`) für den öffentlichen
+Endkundenshop (B-01, `add-partner-shop-foundation`). Der Datensatz entsteht beim
+ersten Aufruf durch Firma oder Partner. `kennung` ist plattformweit eindeutig,
+wird aus dem Partnernamen vorgeschlagen (Umlaute transliteriert, bei Kollision
+Zahlensuffix), nie aus der Partnernummer, und nur von der Firma geändert; der
+Shop ist unter `/shop/<kennung>` erreichbar. Der wirksame Status wird nicht
+gespeichert, sondern berechnet: `NOT_RELEASED` (kein `releasedAt`),
+`OFFLINE_COMPANY` (`offlineByCompany`, Grund für den Partner sichtbar),
+`OFFLINE_INACTIVE` (`Partner.active == false`), `OFFLINE_NO_ARTICLES` (keine
+freigeschaltete, verfügbare Artikel), sonst `ONLINE`. Erneute Freigabe löscht
+den Grund. Öffentlich ausgeliefert werden nur Kennung und Anzeigename.
 
 ### Product
 Zentral von der Firma verwaltete Artikel. `available` steuert Bestellbarkeit
