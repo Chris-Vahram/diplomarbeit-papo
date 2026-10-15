@@ -3,7 +3,7 @@ import { showToast } from "../components/toast-notice.js";
 import { formatNumber } from "../lib/format.js";
 import { addressFieldsHtml, readAddress, fillAddress } from "../lib/address-fields.js";
 import { taxIdentifierFieldsHtml, readTaxIdentifier, fillTaxIdentifier } from "../lib/tax-identifier-fields.js";
-import { shopStatusLabel, shopPublicUrl } from "../lib/shop-status.js";
+import { shopStatusBadge, shopStatusHint, shopPublicUrl } from "../lib/shop-status.js";
 
 // Commission dropdown presets per FSD FR-19/partner-management spec: 5/10/15 or a custom value.
 const COMMISSION_PRESETS = ["5", "10", "15"];
@@ -80,35 +80,47 @@ class CompanyPartnerListPage extends HTMLElement {
         </div>
       </modal-dialog>
       <modal-dialog id="shop-modal" title="Webshop">
-        <div class="shop-status-card">
-          <p id="shop-status" class="trade-proof-card__status" aria-live="polite">Webshop wird geladen …</p>
-          <p id="shop-error" class="trade-proof-card__error" role="alert" hidden></p>
-          <dl id="shop-details" class="profile-readonly" hidden>
-            <dt>Öffentlicher Link</dt><dd id="shop-link"></dd>
-          </dl>
-          <div id="shop-reason" class="shop-status-card__reason" hidden>
+        <div class="shop-panel shop-panel--dialog">
+          <div class="shop-panel__head">
+            <h3 id="shop-partner-name">Webshop</h3>
+            <span id="shop-badge" aria-live="polite"></span>
+          </div>
+          <p id="shop-loading">Webshop wird geladen …</p>
+          <p id="shop-hint" class="shop-panel__hint" hidden></p>
+          <div id="shop-reason" class="shop-panel__reason" hidden>
             <strong>Grund:</strong> <span id="shop-reason-text"></span>
           </div>
-          <form id="shop-kennung-form" class="entity-form" hidden>
-            <form-field label="Kennung" name="kennung" required></form-field>
+          <p id="shop-error" class="trade-proof-card__error" role="alert" hidden></p>
+          <dl id="shop-details" class="profile-readonly shop-panel__details" hidden>
+            <dt>Öffentlicher Link</dt><dd id="shop-link"></dd>
+          </dl>
+
+          <section id="shop-release-section" class="shop-panel__section" hidden>
+            <h4>Freigabe</h4>
+            <div class="shop-panel__actions">
+              <button type="button" id="shop-release" hidden>Freigeben</button>
+              <button type="button" id="shop-takedown-open" class="button-danger" hidden>Offline nehmen</button>
+            </div>
+            <form id="shop-takedown-form" class="entity-form" hidden>
+              <form-field label="Grund (für den Partner sichtbar)" name="reason" required>
+                <textarea name="reason" minlength="10" maxlength="500" rows="3"></textarea>
+              </form-field>
+              <div class="shop-panel__actions">
+                <button type="submit" class="button-danger">Shop offline nehmen</button>
+                <button type="button" id="shop-takedown-cancel" class="row-actions__secondary">Abbrechen</button>
+              </div>
+            </form>
+          </section>
+
+          <section id="shop-kennung-section" class="shop-panel__section" hidden>
+            <h4>Kennung</h4>
+            <form id="shop-kennung-form" class="shop-panel__kennung">
+              <input name="kennung" required maxlength="40" aria-label="Kennung" autocomplete="off" spellcheck="false" />
+              <button type="submit">Speichern</button>
+            </form>
             <p class="partner-form__hint">3–40 Zeichen: Kleinbuchstaben a–z, Ziffern und einzelne Bindestriche.</p>
-            <p class="partner-form__hint" id="shop-kennung-warning" hidden>Bisherige Links funktionieren dann nicht mehr.</p>
-            <div class="entity-form__actions">
-              <button type="submit">Kennung speichern</button>
-            </div>
-          </form>
-          <div class="entity-form__actions">
-            <button type="button" id="shop-release" hidden>Freigeben</button>
-            <button type="button" id="shop-takedown-open" class="row-actions__secondary" hidden>Offline nehmen</button>
-          </div>
-          <form id="shop-takedown-form" class="entity-form" hidden>
-            <form-field label="Grund (für den Partner sichtbar)" name="reason" required>
-              <textarea name="reason" minlength="10" maxlength="500" rows="4"></textarea>
-            </form-field>
-            <div class="entity-form__actions">
-              <button type="submit">Shop offline nehmen</button>
-            </div>
-          </form>
+            <p class="shop-panel__warning" id="shop-kennung-warning" hidden>Bisherige Links funktionieren dann nicht mehr.</p>
+          </section>
         </div>
       </modal-dialog>
     `;
@@ -120,6 +132,7 @@ class CompanyPartnerListPage extends HTMLElement {
       { key: "commissionLabel", label: "Provision" },
       { key: "statusBadge", label: "Status", html: true },
       { key: "proofStatus", label: "Nachweis" },
+      { key: "shopBadge", label: "Webshop", html: true },
       { key: "actions", label: "", html: true },
     ];
     this.table.emptyMessage = "Noch keine Partner angelegt.";
@@ -169,9 +182,11 @@ class CompanyPartnerListPage extends HTMLElement {
     this.shopTakedownForm.addEventListener("submit", (event) => this.takeShopOffline(event));
     this.querySelector("#shop-release").addEventListener("click", () => this.releaseShop());
     this.querySelector("#shop-takedown-open").addEventListener("click", () => {
+      this.querySelector("#shop-takedown-open").hidden = true;
       this.shopTakedownForm.hidden = false;
       this.shopTakedownForm.elements.reason.focus();
     });
+    this.querySelector("#shop-takedown-cancel").addEventListener("click", () => this.renderShop(this.shop));
     this.shopKennungForm.elements.kennung.addEventListener("input", () => {
       this.querySelector("#shop-kennung-warning").hidden =
         !this.shop?.releasedAt || this.shopKennungForm.elements.kennung.value === this.shop.kennung;
@@ -211,7 +226,9 @@ class CompanyPartnerListPage extends HTMLElement {
 
   async load() {
     try {
-      this.partners = await apiFetch("/company/partners");
+      const [partners, shops] = await Promise.all([apiFetch("/company/partners"), apiFetch("/company/shops")]);
+      this.partners = partners;
+      const shopStatusByPartner = new Map(shops.map((shop) => [shop.partnerId, shop.status]));
       this.table.rows = this.partners.map((p) => ({
         partnerNumber: p.partnerNumber,
         name: p.name,
@@ -219,11 +236,13 @@ class CompanyPartnerListPage extends HTMLElement {
         activeLabel: p.active ? "active" : "inactive",
         statusBadge: `<status-badge status="${p.active ? "active" : "inactive"}"></status-badge>`,
         proofStatus: this.proofStatusLabel(p.tradeProof),
+        // No shop record yet means the company has never released one.
+        shopBadge: `<button type="button" class="shop-badge-button" data-shop-id="${p.id}" title="Webshop verwalten">${
+          shopStatusBadge(shopStatusByPartner.get(p.id) ?? "NOT_RELEASED")}</button>`,
         actions: `<div class="row-actions">
           <button type="button" data-edit-id="${p.id}">Partnerdaten Bearbeiten</button>
           <button type="button" class="row-actions__secondary" data-proof-id="${p.id}">Nachweis</button>
           <button type="button" class="row-actions__secondary" data-manage-id="${p.id}">Artikel</button>
-          <button type="button" class="row-actions__secondary" data-shop-id="${p.id}">Webshop</button>
         </div>`,
       }));
       const requestedPartnerId = new URLSearchParams(location.hash.split("?")[1] ?? "").get("enablement");
@@ -313,13 +332,14 @@ class CompanyPartnerListPage extends HTMLElement {
   async openShop(partnerId) {
     this.shopPartnerId = partnerId;
     this.shop = null;
-    this.shopModal.open();
-    this.querySelector("#shop-status").textContent = "Webshop wird geladen …";
-    for (const id of ["#shop-details", "#shop-reason", "#shop-release", "#shop-takedown-open"]) {
+    const partner = this.partners?.find((p) => String(p.id) === String(partnerId));
+    this.querySelector("#shop-partner-name").textContent = partner?.name ?? "Webshop";
+    this.querySelector("#shop-badge").innerHTML = "";
+    this.querySelector("#shop-loading").hidden = false;
+    for (const id of ["#shop-hint", "#shop-details", "#shop-reason", "#shop-release-section", "#shop-kennung-section"]) {
       this.querySelector(id).hidden = true;
     }
-    this.shopKennungForm.hidden = true;
-    this.shopTakedownForm.hidden = true;
+    this.shopModal.open();
     await this.shopAction(() => apiFetch(`/company/partners/${partnerId}/shop`));
   }
 
@@ -331,7 +351,10 @@ class CompanyPartnerListPage extends HTMLElement {
     error.hidden = true;
     try {
       this.renderShop(await request());
-      if (successMessage) showToast(successMessage, "success");
+      if (successMessage) {
+        showToast(successMessage, "success");
+        this.load();
+      }
     } catch (requestError) {
       error.textContent = requestError.message;
       error.hidden = false;
@@ -342,7 +365,14 @@ class CompanyPartnerListPage extends HTMLElement {
 
   renderShop(shop) {
     this.shop = shop;
-    this.querySelector("#shop-status").textContent = `Status: ${shopStatusLabel(shop.status)}`;
+    this.querySelector("#shop-loading").hidden = true;
+    this.querySelector("#shop-badge").innerHTML = shopStatusBadge(shop.status);
+    const hint = this.querySelector("#shop-hint");
+    hint.textContent = shopStatusHint(shop.status);
+    hint.hidden = false;
+    this.querySelector("#shop-reason").hidden = shop.status !== "OFFLINE_COMPANY";
+    this.querySelector("#shop-reason-text").textContent = shop.offlineReason ?? "";
+
     const url = shopPublicUrl(shop);
     const linkCell = this.querySelector("#shop-link");
     linkCell.innerHTML = "";
@@ -357,12 +387,6 @@ class CompanyPartnerListPage extends HTMLElement {
       linkCell.textContent = url;
     }
     this.querySelector("#shop-details").hidden = false;
-    this.querySelector("#shop-reason").hidden = shop.status !== "OFFLINE_COMPANY";
-    this.querySelector("#shop-reason-text").textContent = shop.offlineReason ?? "";
-
-    this.shopKennungForm.hidden = false;
-    this.shopKennungForm.elements.kennung.value = shop.kennung;
-    this.querySelector("#shop-kennung-warning").hidden = true;
 
     const release = this.querySelector("#shop-release");
     release.hidden = shop.status !== "NOT_RELEASED" && shop.status !== "OFFLINE_COMPANY";
@@ -370,6 +394,11 @@ class CompanyPartnerListPage extends HTMLElement {
     this.querySelector("#shop-takedown-open").hidden = shop.status === "NOT_RELEASED" || shop.status === "OFFLINE_COMPANY";
     this.shopTakedownForm.hidden = true;
     this.shopTakedownForm.reset();
+    this.querySelector("#shop-release-section").hidden = false;
+
+    this.shopKennungForm.elements.kennung.value = shop.kennung;
+    this.querySelector("#shop-kennung-warning").hidden = true;
+    this.querySelector("#shop-kennung-section").hidden = false;
   }
 
   changeShopKennung(event) {
