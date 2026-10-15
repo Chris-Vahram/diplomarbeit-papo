@@ -20,7 +20,7 @@ der Handoff trennt davon menschliche Thesis-/UI-Abnahme und die SSH-Negativmatri
 ## Aktueller Orchesterstatus — 25.09.2026
 
 Aktive OpenSpec-Changes (Stand 15.10.2026): `complete-thesis-documentation` 4/6,
-`bind-partner-login-to-oidc-subject` 0/8, `decouple-partner-number-from-login` 0/4 und `add-unique-bmd-article-number` 0/6.
+`bind-partner-login-to-oidc-subject` 0/8, `send-order-emails` 5/6, `decouple-partner-number-from-login` 0/4 und `add-unique-bmd-article-number` 0/6.
 `harden-tax-identifier-rollout` ist vollständig und archiviert. Die vollständige offene Liste, Protokollauswertung und der Startprompt stehen in
 `Specification/CONTINUATION_PROMPT.md`. Chris hat Push auf `main` samt Deploy für
 den geprüften Stand erlaubt. VM-Demo-Status ist geklärt; kein echter
@@ -120,6 +120,21 @@ B-01 external end-customer shop (CUT in MVP) · B-02 shop design customization (
 
 ## Writing style
 Clear German for thesis documents, suitable for an HTL Diplomarbeit; precise, structured, no exaggerated corporate language. UI texts and validation messages in German, plain language.
+
+## Git workflow – commit often
+- Commit after every completed, self-contained step: a small feature, a bug fix,
+  a refactoring, added tests, a spec/doc update, or a finished OpenSpec task.
+  Do not batch several unrelated changes into one commit.
+- Rule of thumb: if the change can be described in one short commit message,
+  commit it now. Never end a work block with substantial uncommitted changes.
+- Before each commit, run the relevant checks (backend tests for backend changes,
+  `git diff --check`). Commit only a working state; if checks fail, fix first or ask.
+- Stage only the files belonging to that step (`git add <paths>`, no blind
+  `git add -A`). Never commit secrets, `.env` files, volumes or private KI evidence.
+- When an OpenSpec task is done, commit the code together with the updated `tasks.md`.
+- Local commits on the current working branch need no confirmation.
+  Pushing, merging into `main` and deploying still require Chris's explicit approval.
+- Work on a feature branch, not directly on `main`.
 
 ## Git commit attribution
 Do **not** add any Claude or Claude Code attribution to commits. Specifically:

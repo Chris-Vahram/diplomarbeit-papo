@@ -16,6 +16,12 @@ Wie man die Entwicklungs-/Demo-Umgebung startet. Konventionen siehe `docs/CONVEN
 | Keycloak | http://localhost:8081 (Admin: `admin` / `admin`) |
 | PostgreSQL | localhost:5432 (`partnerportal` / `partnerportal`, DB `partnerportal`) |
 | Frontend (statisch) | http://localhost:3000 (siehe unten) |
+| Mailpit (Bestell-E-Mails, nur dev) | http://localhost:8025 (SMTP `127.0.0.1:1025`) |
+
+Im Dev-Profil werden Bestell-E-Mails echt an Mailpit gesendet (Container `mailpit` aus
+`docker-compose.yml`); dort lassen sich alle Mails ansehen, nichts verlässt den Rechner.
+Tests nutzen den Quarkus-`MockMailbox`, auf der VM ist der Versand standardmäßig aus
+(`docs/DEPLOYMENT.md`, Abschnitt Bestell-E-Mails).
 
 ## 1. Container starten (Postgres + Keycloak)
 

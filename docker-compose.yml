@@ -23,5 +23,14 @@ services:
     volumes:
       - ./backend/src/main/resources/keycloak/partnerportal-realm.json:/opt/keycloak/data/import/partnerportal-realm.json
 
+  # Dev-only mail catcher for order e-mails (send-order-emails): SMTP 1025, web UI
+  # http://localhost:8025. Bound to loopback so it is not reachable from the network.
+  mailpit:
+    image: axllent/mailpit:v1.27
+    container_name: papo-mailpit
+    ports:
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:8025:8025"
+
 volumes:
   papo-postgres-data:

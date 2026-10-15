@@ -136,6 +136,23 @@ Nach dem Deploy von Release A einmalig auf der VM:
 Erst danach Release B (Fallback entfernt) deployen. Rollback B → A ist sicher; A → davor
 nur, solange kein Login entfernt, kein Keycloak-Benutzer umbenannt und keine
 Partnernummer geändert wurde.
+## Bestell-E-Mails (`PAPO_MAIL_*`, `SMTP_*`)
+
+Echter Versand von Bestellbestätigungen (B-04). Standard: **aus** (`PAPO_MAIL_ENABLED=false`),
+Bestellungen zeigen dann „E-Mail-Versand ist nicht aktiviert“. Einschalten auf der VM:
+
+1. SMTP-Daten der Firma in `.env.prod` eintragen (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`,
+   `SMTP_PASSWORD`, `SMTP_START_TLS` bzw. `SMTP_TLS`) — nie in Git, nie in Chat/Issues.
+2. `PAPO_MAIL_FROM`, `PAPO_MAIL_COMPANY_RECIPIENT` und **`PAPO_MAIL_REDIRECT_TO`** (Testpostfach)
+   setzen, dann `PAPO_MAIL_ENABLED=true`. Ohne Umleitung startet das Backend nur mit
+   `PAPO_MAIL_ALLOW_REAL_RECIPIENTS=true` — das bleibt aus, solange die VM Demo-Daten und
+   bekannte Demo-Logins hat.
+3. Backend neu starten (`docker compose -f docker-compose.prod.yml --env-file .env.prod up -d backend`)
+   und mit einer Testbestellung prüfen; der Status steht in den Bestelldetails der Firma.
+
+`PAPO_MAIL_SHIPPING_ENABLED=true` schaltet die neutral formulierte Abschlussmail bei
+„Abgeschlossen“ ein (Entscheidung 15.10.2026). Absender: `no-reply@paportal.at`. Änderungen an Umleitung/Aktivierung wirken auch auf wartende Mails:
+diese werden dann nicht mehr gesendet („Konfiguration geändert“).
 
 ## Demo-Daten (`SEED_DEMO_DATA`)
 

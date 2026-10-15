@@ -10,27 +10,28 @@ Status legend:
 - `REOPENED FOR DECISION` = Chris wants to revisit the previously excluded scope;
   business rules, school/company approval and implementation contract remain open.
 
-Last updated: 2026-10-14 (meeting 12.10.2026). Chris möchte Phase 2 und weitere Produktfunktionen bis zur
+Last updated: 2026-10-15 (meeting 12.10.2026; shop decisions 15.10.2026). Chris möchte Phase 2 und weitere Produktfunktionen bis zur
 Herbstferien-Staging-Version verfolgen. Das hebt die bisherigen MVP-Abgrenzungen nicht
 rückwirkend auf. Fachliche Regeln und Freigaben durch Firma/Schule sind teils noch offen;
 die Reihenfolge und Fragen stehen in `PRODUCT_COMPLETION_PLAN.md`.
 
 ---
 
-## B-01 — External end-customer partner shop  `CUT`
+## B-01 — External end-customer partner shop  `PLANNED`
 **What full version is:** Public shop per partner, partner-branded, shows enabled products, end customer orders directly. Order auto-assigned to partner.
 **Why cut:** Meeting 17.06 → #1 process is partner-places-order. Shop = "später, nicht MVP". User decision: fully out of MVP (no clickdummy either).
 **MVP replacement:** none. Partner enters orders internally on behalf of Endkunde.
 **Trigger to build:** "implement B-01".
-**Depends on:** B-02, B-05 (part of same shop).
-**Update 25.09/12.10.2026:** Requested target: guest order plus optional customer account, no confirmed online payment (25.09). Meeting 12.10: the shop becomes a partner-side homepage builder (sidebar "Mein Webshop", inspiration Jimdo), reachable via `paportal.at/<partner>` or `<partner>.paportal.at` (open). No dummy shop yet; Tobias drafts recommendations for the open shop questions, which go to the company by e-mail via Prof. Hammer. Still `CUT` until its own OpenSpec change exists.
+**Depends on:** B-02, B-05 (part of same shop). B-04 is not a technical prerequisite (decision 2026-10-15).
+**Update 25.09/12.10.2026:** Requested target: guest order plus optional customer account, no confirmed online payment (25.09). Meeting 12.10: the shop becomes a partner-side homepage builder (sidebar "Mein Webshop", inspiration Jimdo), reachable via `paportal.at/<partner>` or `<partner>.paportal.at` (open). Questions go to the company by e-mail via Prof. Hammer.
+**Planning (2026-10-15):** Guest checkout, seller = company, gross prices + VAT rate, provisional shop URL `paportal.at/shop/<kennung>`, separate customer realm. Status `PLANNED`: specified in OpenSpec changes `add-article-tax-rate` … `add-shop-customer-accounts`. Vorläufige Detailentscheidungen (15.10.2026, Vorbehalt Firmenmeeting): `ENDKUNDENSHOP_DECISIONS.md`.
 
-## B-02 — Shop design customization  `CUT`
+## B-02 — Shop design customization  `PLANNED`
 **What full version is:** Partner customizes logo, colors, shop name, + 2 layout variants. Central product data (price/description) stays locked.
 **Why cut:** Belongs to B-01. Meeting: layout variants "später, nicht MVP".
 **Was:** old FSD FR-08 / FR-09.
 **Trigger:** "implement B-02". Needs B-01 first.
-**Update 12.10.2026:** Design customization is part of the homepage builder "Mein Webshop"; builder scope, layouts and legal pages are open.
+**Superseded scope (2026-10-15, Protokoll 12.10.):** Instead of two fixed layouts, a block-based website builder („Mein Webshop“) with templates, free colours via theme, curated self-hosted fonts, max. 6 online pages and a rule-based design assistant. Tobias implements it. Vorläufige Detailentscheidungen (15.10.2026, Vorbehalt Firmenmeeting): `ENDKUNDENSHOP_DECISIONS.md`.
 
 ## B-03 — Automatic provision level-up  `STUB`
 **What full version is:** 3 provision levels each with fixed %. System auto-promotes partner when sales cross a threshold ("mehr Verkäufe -> LevelUp").
@@ -39,17 +40,20 @@ die Reihenfolge und Fragen stehen in `PRODUCT_COMPLETION_PLAN.md`.
 **Open before build:** define the sales thresholds per level.
 **Trigger:** "implement B-03".
 
-## B-04 — Real email sending  `STUB`
+## B-04 — Real email sending  `IMPLEMENTED, DISABLED UNTIL SMTP (2026-10-15)`
 **What full version is:** Real SMTP/service sends an order confirmation to the Endkunde when an address is present, an order notice to the responsible partner users, and a new-order notice to the company. Shipping confirmation remains a later extension unless separately specified.
 **MVP state (STUB):** On-screen confirmation + simulated email rendered in-app (no real send).
 **Why stub:** Prototype-safe, no mail infra. Meeting wanted "automatisierte Bestellbestätigung + Versandbestätigung".
 **Decision 2026-08-25:** Chris confirmed the three order-related recipients above. The feature remains `STUB` until a separate OpenSpec change defines delivery status, retries, duplicate prevention, optional recipient addresses, privacy, and the SMTP integration.
+**Shop relation (2026-10-15):** B-04 is not a prerequisite for the end-customer shop; shop guest orders may go live with on-screen confirmation and print document, mails are added once B-04 exists.
 **Trigger:** "implement B-04".
+**Implemented 2026-10-15:** `send-order-emails` — outbox with retries, order confirmation/partner/company notices, optional completion mail on `fulfilled`, company status view with retry, disabled by default, redirect enforced while real recipients are not allowed, customer mails without prices; dev via Mailpit. Decided 2026-10-15: neutral completion mail on `fulfilled`, functional company mailbox, addresses of failed mails removed after 90 days, sender `no-reply@paportal.at`. Open: SMTP credentials (Vaultwarden links had expired) and a test inbox from Herr Bachl, then activation on the VM with redirect.
 
-## B-05 — Shop inquiry auto-forward (Anfragen)  `CUT`
+## B-05 — Shop inquiry auto-forward (Anfragen)  `PLANNED`
 **What full version is:** Inquiries coming from the external shop auto-forward to the responsible partner; other inquiries partner enters manually in portal (Prozess 1).
 **Why cut:** Auto-forward half depends on B-01 (shop). Manual entry part = already covered by MVP core order flow.
 **Trigger:** "implement B-05". Needs B-01.
+**Planning (2026-10-15):** Fields name, e-mail or phone, message, consent; honeypot + rate limit, no external CAPTCHA; partner inbox only. Vorläufige Detailentscheidungen (15.10.2026, Vorbehalt Firmenmeeting): `ENDKUNDENSHOP_DECISIONS.md`.
 
 ## B-06 — BMD interface  `REOPENED FOR DECISION`
 **What:** Direct BMD accounting-system interface.
@@ -60,11 +64,12 @@ die Reihenfolge und Fragen stehen in `PRODUCT_COMPLETION_PLAN.md`.
 **Why cut from MVP:** The FSD only shows commission transparently (own record + dashboard sums).
 **Current direction (25.09.2026):** Chris confirmed the sequence: first implement an auditable periodic settlement with approval and export; then separately specify and plan real bank transfers, and implement them later. This is a product-direction decision, not company approval of the formula, period, approvers or bank interface. The settlement rules remain unconfirmed by the company. Transfers need payment-provider/bank access, authorization, reconciliation and legal review; neither stage is implementation-ready until its own rules and acceptance criteria are confirmed.
 
-## B-08 — Dashboard "ggü. Vorperiode" trend indicators  `STUB`
+## B-08 — Dashboard "ggü. Vorperiode" trend indicators  `DONE (2026-10-15)`
 **What full version is:** Metric cards across the relevant dashboards show a +/-x% delta vs the previous equal-length period (e.g. "+4.6% ggü. Vorperiode"), with a red/green trend arrow and sufficient historical data for meaningful comparison.
 **MVP state (STUB):** The partner dashboard already computes the previous equal-length period client-side from the loaded order list and displays trend indicators when an explicit date range is selected. The company dashboard and a broader cross-dashboard trend analysis remain deferred.
 **Why stub:** The small partner-side comparison is implemented and useful without a backend change; complete company-wide analytics would add marginal MVP value and needs representative historical data.
 **Trigger to complete:** "implement full B-08".
+**Done 2026-10-15:** `add-company-dashboard-trends` — the company dashboard shows the same trend arrows (Umsatz, Provision, Bestellungen, Ø Bestellwert; period vs. equal-length previous period, all-time view vs. trailing 30 days). Backend-side analytics remain out of scope.
 
 ---
 
@@ -90,6 +95,7 @@ die Reihenfolge und Fragen stehen in `PRODUCT_COMPLETION_PLAN.md`.
 - 2026-10-12: Meeting (Prof. Hammer, Chris, Tobias): presentations approved; dashboards get week/month/year presets with month as default; partner side shows latest orders first, a more prominent "Neue Bestellung", editable end customers and the labels "Meine Endkunden"/"Meine Artikel" (implemented 14.10, PR #37/#38). Data import stays a dummy until company data exists. Shop = partner homepage builder "Mein Webshop" (see B-01/B-02); open questions go to the company via Prof. Hammer. Company appointment is not yet arranged. "KI einbauen?" is only an idea without scope. Time recording: WorkAddict login must be fixed; Tobias should commit more regularly.
 - 2026-10-06: Chris confirms the single order-commission budget and internal allocation scope, accepts planning recommendations but not company rules, and authorizes publishing the reviewed documentation. Appointment scheduling with the teacher is planned for 2026-10-07; company approval is still absent. B-03 remains separate from B-09.
 - 2026-10-07: Context synchronized and publication of the two shortened presentations requested (13 general slides, 8 sprint slides, no time recording). B-09's eight company decision groups remain open; no meeting, implementation approval or new OpenSpec artifacts confirmed. Presentation sources: presentation/README.md and presentation/PROJEKTSTAND_2026-10-06.md. Operative handoff remains Specification/CONTINUATION_PROMPT.md.
+- 2026-10-15: Endkundenshop decisions recorded as provisional (company questions sent via Prof. Hammer; next meeting may change them): seller = company; company enters gross prices + VAT rate per article, commission on net; path URL `/shop/<kennung>` set by company; one-time company approval, partner publishes, company takedown with reason; B-02 becomes a block-based builder („Mein Webshop“, Protokoll 12.10.) built by Tobias; B-04 no longer a shop prerequisite; separate Keycloak realm for customer accounts; own cookieless statistics + real consent banner; new Kunde per shop order with origin „Shop“, `Order` origin field, e-mail mandatory in shop. Details and change slicing: `ENDKUNDENSHOP_DECISIONS.md`.
 - 2026-07-01: Meetings override FSD when they conflict (newer = authoritative).
 - 2026-07-01: MVP = internal B2B partner-ordering portal. External shop → B-01 (cut).
 - 2026-07-01: Julian left DA. Work split Chris + Tobias only.
