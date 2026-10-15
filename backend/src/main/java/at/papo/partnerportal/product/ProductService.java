@@ -95,7 +95,6 @@ public class ProductService {
         product.description = request.description();
         product.available = request.available() == null || request.available();
         product.articleCategory = category;
-        product.category = category == null ? null : category.name;
         applyImage(product, request.imageUrl());
     }
 

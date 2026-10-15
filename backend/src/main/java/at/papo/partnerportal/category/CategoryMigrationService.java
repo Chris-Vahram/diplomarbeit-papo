@@ -19,7 +19,9 @@ public class CategoryMigrationService {
     public void migrate() {
         List<Category> categories = Category.<Category>find("order by id")
                 .withLock(LockModeType.PESSIMISTIC_WRITE).list();
-        List<Product> products = Product.<Product>find("order by id")
+        // Only legacy rows still without a catalogue reference; linked rows are the source of
+        // truth and their old text is ignored (derive-product-category-from-catalog).
+        List<Product> products = Product.<Product>find("articleCategory is null order by id")
                 .withLock(LockModeType.PESSIMISTIC_WRITE).list();
 
         Map<String, Set<String>> legacyNames = collectLegacyNames(products);
@@ -42,16 +44,12 @@ public class CategoryMigrationService {
         }
 
         for (Product product : products) {
-            String legacyName = trimmedOrNull(product.category);
-            if (product.articleCategory != null) {
-                if (legacyName == null || !product.articleCategory.normalizedName.equals(CategoryNames.normalized(legacyName))) {
-                    throw migrationFailure("Inkonsistente Artikelkategorie-Zuordnung.");
-                }
-                product.category = product.articleCategory.name;
-            } else if (legacyName != null) {
-                Category category = categoriesByName.get(CategoryNames.normalized(legacyName));
-                product.articleCategory = category;
-                product.category = category.name;
+            String legacyName = trimmedOrNull(product.legacyCategory);
+            if (legacyName != null) {
+                product.articleCategory = categoriesByName.get(CategoryNames.normalized(legacyName));
+                // Consumed once: otherwise a category the company later removes would be
+                // re-linked on the next start.
+                product.legacyCategory = null;
             }
         }
     }
@@ -59,11 +57,8 @@ public class CategoryMigrationService {
     private Map<String, Set<String>> collectLegacyNames(List<Product> products) {
         Map<String, Set<String>> names = new LinkedHashMap<>();
         for (Product product : products) {
-            String legacyName = trimmedOrNull(product.category);
+            String legacyName = trimmedOrNull(product.legacyCategory);
             if (legacyName == null) {
-                if (product.articleCategory != null) {
-                    throw migrationFailure("Inkonsistente Artikelkategorie-Zuordnung.");
-                }
                 continue;
             }
             String normalizedName;

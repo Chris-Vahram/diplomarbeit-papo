@@ -119,14 +119,8 @@ public class ProductImportDefinition implements ImportDefinition {
         Boolean available = parseBoolean(mappedValues.get("available"));
         product.available = available == null || available;
         String categoryName = blankToNull(mappedValues.get("category"));
-        if (categoryName == null) {
-            product.articleCategory = null;
-            product.category = null;
-        } else {
-            Category category = Category.find("normalizedName", CategoryNames.normalized(categoryName)).firstResult();
-            product.articleCategory = category;
-            product.category = category.name;
-        }
+        product.articleCategory = categoryName == null ? null
+                : Category.find("normalizedName", CategoryNames.normalized(categoryName)).firstResult();
         product.imageUrl = blankToNull(mappedValues.get("imageUrl"));
         product.persist();
     }

@@ -74,7 +74,7 @@ erDiagram
         BigDecimal price "10.2"
         String description
         boolean available
-        String category "Legacywert, synchron zum FK"
+        String category "Altbestand (legacyCategory), wird nicht mehr geschrieben"
         Long article_category_id FK "optional"
         String imageUrl
         Long image_id FK "optional; gespeichertes Galeriebild"
@@ -207,9 +207,10 @@ unabhängig von der partnerspezifischen Freischaltung (`ProductEnablement`) —
 ein Produkt kann für einen Partner freigeschaltet, aber gerade nicht
 verfügbar sein (z. B. ausverkauft); beides muss zutreffen, damit ein Partner
 es bestellen kann. `articleCategory` ist eine optionale Zuordnung zu einer von
-der Firma verwalteten Artikelkategorie. `category` bleibt als synchroner
-Legacy-String für Import-/Bestandskompatibilität erhalten; neue Zuordnungen
-verwenden eine Kategorie-ID oder den eindeutigen Legacy-Namen, niemals beides.
+der Firma verwalteten Artikelkategorie und die **einzige** Quelle des Kategorienamens
+(derive-product-category-from-catalog, 16.10.2026). Anfragen und Importe dürfen einen
+Kategorienamen nennen; er wird über den Katalog aufgelöst. Die alte Textspalte `category`
+(Feld `legacyCategory`) schreibt die App nicht mehr.
 `imageUrl` bleibt für externe Bild-URLs erhalten; bei einem
 hochgeladenen oder aus der Galerie gewählten Bild verweist `image` optional auf
 einen gespeicherten `ProductImage`-Datensatz.
@@ -220,8 +221,9 @@ Unicode-validierter Längenprüfung gespeichert; `normalized_name` ist
 case-insensitive eindeutig. `active=false` verhindert neue Artikelzuordnungen
 und Importzeilen, lässt bestehende Artikelzuordnungen aber unverändert. Es
 gibt keinen DELETE-Endpunkt. Die additive ORM-Übernahme liest vorhandene
-Legacy-Strings nach dem Seed, erstellt nur eindeutig belegte Kategorien und
-bricht bei Kollisionen oder inkonsistentem FK ohne Teilübernahme ab.
+Alttext nur bei Artikeln ohne Zuordnung, erstellt nur eindeutig belegte Kategorien,
+leert den Alttext danach und bricht bei Kollisionen ohne Teilübernahme ab. Bereits
+verknüpfte Artikel bleiben unberührt. Der Seeder verknüpft Kategorien direkt.
 
 ### ProductImage
 Ein serverseitig gespeichertes Artikelbild. Die binären Daten liegen direkt in

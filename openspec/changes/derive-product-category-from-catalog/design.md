@@ -11,10 +11,10 @@
 ## Decisions
 
 - **Read model:** `ProductDto.category` = `articleCategory == null ? null : articleCategory.name`. Lists that need names fetch-join `articleCategory` to avoid N+1 (verify with the existing statistics-based tests).
-- **Write model:** remove the text field from the entity (`category` attribute deleted), so nothing can write it by accident; the orphaned column remains in existing databases.
+- **Write model:** the text field is renamed to `legacyCategory` (same column `category`) and written by nobody except `CategoryMigrationService`, which reads it for still unlinked rows, links them and then clears it. Keeping the mapping lets the migration run on fresh schemas too; without clearing, a category the company later removes would be re-linked on the next start.
 - **Seeder:** create the demo categories first, then assign them; no text-only products.
 - **Rename:** only `Category.name`/`normalizedName` change; no article lock or rewrite.
-- **Migration service:** kept; it only acts on rows with text but no FK, so it is a no-op on new data.
+- **Migration service:** kept; it only acts on rows with text but no FK (its old FK/text consistency checks are dropped because the FK is the source of truth), so it is a no-op on new data. VM check 16.10.2026: 8 products, all linked, 0 unlinked.
 
 ## Risks / Trade-offs
 
