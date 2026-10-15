@@ -10,7 +10,7 @@ Status legend:
 - `REOPENED FOR DECISION` = Chris wants to revisit the previously excluded scope;
   business rules, school/company approval and implementation contract remain open.
 
-Last updated: 2026-10-06. Chris möchte Phase 2 und weitere Produktfunktionen bis zur
+Last updated: 2026-10-15. Chris möchte Phase 2 und weitere Produktfunktionen bis zur
 Herbstferien-Staging-Version verfolgen. Das hebt die bisherigen MVP-Abgrenzungen nicht
 rückwirkend auf. Fachliche Regeln und Freigaben durch Firma/Schule sind teils noch offen;
 die Reihenfolge und Fragen stehen in `PRODUCT_COMPLETION_PLAN.md`.
@@ -22,13 +22,15 @@ die Reihenfolge und Fragen stehen in `PRODUCT_COMPLETION_PLAN.md`.
 **Why cut:** Meeting 17.06 → #1 process is partner-places-order. Shop = "später, nicht MVP". User decision: fully out of MVP (no clickdummy either).
 **MVP replacement:** none. Partner enters orders internally on behalf of Endkunde.
 **Trigger to build:** "implement B-01".
-**Depends on:** B-02, B-05 (part of same shop).
+**Depends on:** B-02, B-05 (part of same shop). B-04 is not a technical prerequisite (decision 2026-10-15).
+**Planning (2026-10-15):** Guest checkout, seller = company, gross prices + VAT rate, shop URL `/shop/<kennung>`, separate customer realm. Vorläufige Detailentscheidungen (15.10.2026, Vorbehalt Firmenmeeting): `ENDKUNDENSHOP_DECISIONS.md`.
 
 ## B-02 — Shop design customization  `CUT`
 **What full version is:** Partner customizes logo, colors, shop name, + 2 layout variants. Central product data (price/description) stays locked.
 **Why cut:** Belongs to B-01. Meeting: layout variants "später, nicht MVP".
 **Was:** old FSD FR-08 / FR-09.
 **Trigger:** "implement B-02". Needs B-01 first.
+**Superseded scope (2026-10-15, Protokoll 12.10.):** Instead of two fixed layouts, a block-based website builder („Mein Webshop“) with templates, free colours via theme, curated self-hosted fonts, max. 6 online pages and a rule-based design assistant. Tobias implements it. Vorläufige Detailentscheidungen (15.10.2026, Vorbehalt Firmenmeeting): `ENDKUNDENSHOP_DECISIONS.md`.
 
 ## B-03 — Automatic provision level-up  `STUB`
 **What full version is:** 3 provision levels each with fixed %. System auto-promotes partner when sales cross a threshold ("mehr Verkäufe -> LevelUp").
@@ -42,12 +44,14 @@ die Reihenfolge und Fragen stehen in `PRODUCT_COMPLETION_PLAN.md`.
 **MVP state (STUB):** On-screen confirmation + simulated email rendered in-app (no real send).
 **Why stub:** Prototype-safe, no mail infra. Meeting wanted "automatisierte Bestellbestätigung + Versandbestätigung".
 **Decision 2026-08-25:** Chris confirmed the three order-related recipients above. The feature remains `STUB` until a separate OpenSpec change defines delivery status, retries, duplicate prevention, optional recipient addresses, privacy, and the SMTP integration.
+**Shop relation (2026-10-15):** B-04 is not a prerequisite for the end-customer shop; shop guest orders may go live with on-screen confirmation and print document, mails are added once B-04 exists.
 **Trigger:** "implement B-04".
 
 ## B-05 — Shop inquiry auto-forward (Anfragen)  `CUT`
 **What full version is:** Inquiries coming from the external shop auto-forward to the responsible partner; other inquiries partner enters manually in portal (Prozess 1).
 **Why cut:** Auto-forward half depends on B-01 (shop). Manual entry part = already covered by MVP core order flow.
 **Trigger:** "implement B-05". Needs B-01.
+**Planning (2026-10-15):** Fields name, e-mail or phone, message, consent; honeypot + rate limit, no external CAPTCHA; partner inbox only. Vorläufige Detailentscheidungen (15.10.2026, Vorbehalt Firmenmeeting): `ENDKUNDENSHOP_DECISIONS.md`.
 
 ## B-06 — BMD interface  `REOPENED FOR DECISION`
 **What:** Direct BMD accounting-system interface.
@@ -87,6 +91,7 @@ die Reihenfolge und Fragen stehen in `PRODUCT_COMPLETION_PLAN.md`.
 ## Decisions log (so we don't re-litigate)
 - 2026-10-06: Chris confirms the single order-commission budget and internal allocation scope, accepts planning recommendations but not company rules, and authorizes publishing the reviewed documentation. Appointment scheduling with the teacher is planned for 2026-10-07; company approval is still absent. B-03 remains separate from B-09.
 - 2026-10-07: Context synchronized and publication of the two shortened presentations requested (13 general slides, 8 sprint slides, no time recording). B-09's eight company decision groups remain open; no meeting, implementation approval or new OpenSpec artifacts confirmed. Presentation sources: presentation/README.md and presentation/PROJEKTSTAND_2026-10-06.md. Operative handoff remains Specification/CONTINUATION_PROMPT.md.
+- 2026-10-15: Endkundenshop decisions recorded as provisional (company questions sent via Prof. Hammer; next meeting may change them): seller = company; company enters gross prices + VAT rate per article, commission on net; path URL `/shop/<kennung>` set by company; one-time company approval, partner publishes, company takedown with reason; B-02 becomes a block-based builder („Mein Webshop“, Protokoll 12.10.) built by Tobias; B-04 no longer a shop prerequisite; separate Keycloak realm for customer accounts; own cookieless statistics + real consent banner; new Kunde per shop order with origin „Shop“, `Order` origin field, e-mail mandatory in shop. Details and change slicing: `ENDKUNDENSHOP_DECISIONS.md`.
 - 2026-07-01: Meetings override FSD when they conflict (newer = authoritative).
 - 2026-07-01: MVP = internal B2B partner-ordering portal. External shop → B-01 (cut).
 - 2026-07-01: Julian left DA. Work split Chris + Tobias only.

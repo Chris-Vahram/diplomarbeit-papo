@@ -28,7 +28,10 @@ Dokumentation/Präsentationen, nicht Implementierung oder neue OpenSpec-Artefakt
   Person und Zeitpunkt in einem Audit-Log; keine Leistungsbewertung.
 - Öffentlicher Partnershop: einmalige Gastbestellung oder optionales Kundenkonto zum
   Speichern eigener Daten. Bestellung ist kostenpflichtig, Zahlung/Erfüllung erfolgen
-  später; kein Online-Bezahlvorgang bestätigt.
+  später; kein Online-Bezahlvorgang bestätigt. Vorläufige Detailentscheidungen vom
+  15.10.2026 (Verkäufer Unternehmen, Bruttopreise + USt-Satz, Baukasten „Mein
+  Webshop“, Changes-Schnitt) stehen in [ENDKUNDENSHOP_DECISIONS.md](ENDKUNDENSHOP_DECISIONS.md);
+  Vorbehalt nächstes Firmenmeeting.
 - Der Deploy-Gateway, Health-Check und automatische Anwendungs-Rollback sind
   implementiert, auf der Demo-VM verifiziert und archiviert. Letzter geprüfter
   Main-Workflow am 07.10.2026: `37385508517`, SHA `7eddc12`, erfolgreich;
@@ -162,20 +165,20 @@ menschliche Aufgaben; sie erfordern keine zusätzliche Architekturplanung.
    und datensparsame Logs spezifizieren. SMTP-Zugang über die vorhandenen
    Deployment-Secrets, nie aus Chat oder Git. Versandbestätigung nur nach expliziter
    fachlicher Freigabe ergänzen.
-5. **B-01-Shop in aufeinander aufbauenden Changes.** Zuerst öffentlicher,
-   partnergebundener, nur lesender Katalog freigeschalteter Artikel. Danach
-   Gastbestellung mit Preis-Snapshot und serverseitiger Partnerzuordnung. Danach
-   optionales Endkundenkonto (Registrierung, Verifizierung, Login, Reset,
-   Datenzugriff/-löschung). Ob Katalog, Bestellung und Konto je eigene Herbstferien-
-   Abnahmeschritte sind, muss Chris priorisieren. Der Shop darf keine interne
-   Firmen-/Partner-API öffnen.
-   Negative Tests für fremde Partner, manipulierte Preise/Mengen und doppelte
-   Übermittlung; Desktop- und Mobile-Browserabnahme.
-6. **B-02 und B-05 separat.** B-02: Tobias entwirft zwei konkrete Layoutvarianten,
-   Chris bestätigt. Änderbar sind nur Shopname, Logo und definierte Farben/Layout;
-   zentrale Artikelpreise/-texte bleiben gesperrt. B-05: Anfrage aus dem Shop wird
-   dem aus der Shoproute ermittelten Partner zugeordnet; Spam-, Datenschutz- und
-   Benachrichtigungsregeln vor Implementierung festlegen.
+5. **B-01-Shop in aufeinander aufbauenden Changes.** Vorläufig entschieden am
+   15.10.2026; Reihenfolge und Inhalt der Changes 0–10 stehen in
+   [ENDKUNDENSHOP_DECISIONS.md](ENDKUNDENSHOP_DECISIONS.md) §7: USt-Satz,
+   Shop-Grundlage, Seiten-Renderer, Baukasten-Editor, Assistent, Vorlagen,
+   Gastbestellung, Rechtliches/Consent, Statistik, Anfragen, Endkundenkonten.
+   B-04 ist keine Voraussetzung; die Mandantenfähigkeit blockiert den Shop nicht,
+   weil der Shop am Partner hängt. Der Shop darf keine interne Firmen-/Partner-API
+   öffnen. Negative Tests für fremde Partner, manipulierte Preise/Mengen und
+   doppelte Übermittlung; Desktop- und Mobile-Browserabnahme.
+6. **B-02 und B-05 separat.** B-02 ist seit 15.10.2026 (Protokoll 12.10.) ein
+   Baukasten „Mein Webshop“ statt zweier fester Layouts; Tobias implementiert ihn.
+   Zentrale Artikelpreise/-texte bleiben gesperrt. B-05: Anfrage aus dem Shop wird
+   dem aus der Shoproute ermittelten Partner zugeordnet; Felder, Spamschutz und
+   Posteingang sind in `ENDKUNDENSHOP_DECISIONS.md` §6 vorläufig festgelegt.
 7. **B-03 erst nach Schwellenentscheidung.** Definieren, welcher Umsatz in welchem
    Zeitraum zählt, wie Rückgaben/Stornos behandelt werden, wann Aufstieg greift und
    ob Abstieg möglich ist. Bestehende manuelle Provisionssätze dürfen nicht
@@ -200,9 +203,9 @@ Die Firmenmail beschreibt künftige Möglichkeiten, nicht vollständige Regeln.
 1. **Staging:** Kann Bachl eine getrennte VM/DB/Keycloak/Domain bereitstellen?
    Empfehlung: ja; bei fehlender Ressource nur lokale Docker-Tests und PR-Checks,
    kein echter Kundentest auf der Produktions-VM.
-2. **Shop B-02/B-05:** Welche zwei Layouts und welche Anfragefelder sind gewünscht?
-   Empfehlung: Kachel- und kompakte Listenansicht; Anfrage mit Name,
-   Rückkontakt, Nachricht und Einwilligung, Partner aus Shoproute.
+2. **Shop B-01/B-02/B-05:** Vorläufig entschieden am 15.10.2026, siehe
+   [ENDKUNDENSHOP_DECISIONS.md](ENDKUNDENSHOP_DECISIONS.md). Offen ist die
+   Bestätigung durch die Firma (Verkäufer, Rechtstexte, Zahlungsart, Brutto/USt).
 3. **B-03:** Umsatzschwellen, Zeitraum, Storno- und manuelle Override-Regel?
    Empfehlung: Firma bestätigt eine schriftliche Beispieltabelle vor dem Change.
 4. **B-04:** Die Empfängergruppen für Bestellmails stehen fest: Kunde (falls Mail),
