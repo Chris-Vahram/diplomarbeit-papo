@@ -186,5 +186,5 @@ Preise/Mengen und doppelte Übermittlung.
   Zahlungsart, Brutto/USt).
 - Konkrete Blocktypen und ihre Felder (im Change `add-shop-page-renderer`).
 - Konkrete Vorlagen (Tobias, im Change `add-shop-templates`).
-- Synchronisation der Full-Vision-FSD (B-06 dort noch „permanently excluded“, Shop
-  dort noch ohne Login, B-04 als Voraussetzung, B-02 als Zwei-Layout-Lösung).
+- ~~Synchronisation der Full-Vision-FSD~~: erledigt mit PR #39 (B-06 wieder offen, Gast +
+  optionales Konto, Baukasten statt Zwei-Layout); B-04-Zeile in UC-A am 15.10. angepasst.
