@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-16T12:00:00Z",
+  "title": "Design System: PAPO Partnerportal",
+  "extensions": {
+    "colorMeta": {
+      "company-green": { "role": "primary", "displayName": "Company Green", "canonical": "#689c6d", "tonalRamp": ["#111a14", "#223529", "#344e3d", "#456851", "#578462", "#689c6d", "#8dc492", "#f0f7f1"] },
+      "partner-blue": { "role": "secondary", "displayName": "Partner Blue", "canonical": "#5e838d", "tonalRamp": ["#243438", "#374e54", "#4a6870", "#5e838d", "#7597a0", "#9ac2c9", "#d4e8eb", "#eff5f6"] },
+      "calm-teal": { "role": "tertiary", "displayName": "Calm Teal", "canonical": "#abc7c4", "tonalRamp": ["#223534", "#345250", "#456f6d", "#598c89", "#729f9b", "#abc7c4", "#d8eae8", "#f0f5f5"] },
+      "page-mist": { "role": "neutral", "displayName": "Page Mist", "canonical": "#f6f9f7", "tonalRamp": ["#0b110c", "#182019", "#2a362e", "#3d4f43", "#52675a", "#8ca594", "#d6e1d8", "#f6f9f7"] }
+    },
+    "typographyMeta": {
+      "headline": { "displayName": "Headline", "purpose": "Page titles." },
+      "title": { "displayName": "Title", "purpose": "Card, dialog and section headings." },
+      "metric": { "displayName": "Metric", "purpose": "Dashboard values, tabular figures." },
+      "body": { "displayName": "Body", "purpose": "Tables, forms, most UI text." },
+      "label": { "displayName": "Label", "purpose": "Uppercase table headers and status badges." },
+      "mono": { "displayName": "Mono", "purpose": "Order numbers, IDs, import row numbers." }
+    },
+    "shadows": [
+      { "name": "resting", "value": "0 1px 3px 0 rgba(11,17,12,0.09), 0 1px 2px -1px rgba(11,17,12,0.09)", "purpose": "Cards, metric cards, tables." },
+      { "name": "floating", "value": "0 4px 6px -1px rgba(11,17,12,0.09), 0 2px 4px -2px rgba(11,17,12,0.09)", "purpose": "Menus and pickers." },
+      { "name": "overlay", "value": "0 20px 25px -5px rgba(11,17,12,0.09), 0 8px 10px -6px rgba(11,17,12,0.09)", "purpose": "Dialogs, mobile drawer." },
+      { "name": "focus-company", "value": "0 0 0 3px rgba(104,156,109,0.35)", "purpose": "Keyboard focus, company area." },
+      { "name": "focus-partner", "value": "0 0 0 3px rgba(140,172,179,0.40)", "purpose": "Keyboard focus, partner area." }
+    ],
+    "motion": [
+      { "name": "fast", "value": "100ms cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Hover and colour transitions." },
+      { "name": "slow", "value": "250ms cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Drawer and backdrop." }
+    ],
+    "breakpoints": [
+      { "name": "cards", "value": "640px" },
+      { "name": "single-column", "value": "48em" },
+      { "name": "drawer", "value": "62em" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary-company",
+      "description": "Role-accent main action; green in company area, blue in partner area.",
+      "html": "<button class=\"ds-button-primary\">Speichern</button>",
+      "css": ".ds-button-primary { padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; background: #689c6d; color: #fff; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: background 100ms cubic-bezier(0.4,0,0.2,1); } .ds-button-primary:hover { background: #578462; } .ds-button-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(104,156,109,0.35); }"
+    },
+    {
+      "name": "Hero Button",
+      "kind": "button",
+      "refersTo": "button-primary-hero",
+      "description": "The single main page action, e.g. partner 'Neue Bestellung'.",
+      "html": "<button class=\"ds-button-hero\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"><path d=\"M12 5v14M5 12h14\"/></svg>Neue Bestellung</button>",
+      "css": ".ds-button-hero { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border: none; border-radius: 0.375rem; background: #5e838d; color: #fff; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 100ms; } .ds-button-hero:hover { background: #4a6870; } .ds-button-hero:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(140,172,179,0.40); }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Cancel, back and supporting actions.",
+      "html": "<button class=\"ds-button-secondary\">Abbrechen</button>",
+      "css": ".ds-button-secondary { padding: 0.5rem 1rem; border: 1px solid #b5c8b9; border-radius: 0.375rem; background: #fff; color: #0b110c; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 0.875rem; font-weight: 600; cursor: pointer; } .ds-button-secondary:hover { background: #edf2ee; border-color: #8ca594; } .ds-button-secondary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(104,156,109,0.35); }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Labelled form input with accent focus.",
+      "html": "<label class=\"ds-field\"><span>Nachname</span><input placeholder=\"z. B. Müller\"></label>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 0.25rem; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 0.875rem; } .ds-field span { font-weight: 600; color: #3d4f43; } .ds-field input { height: 2.5rem; padding: 0.5rem 0.75rem; border: 1px solid #b5c8b9; border-radius: 0.375rem; font: inherit; } .ds-field input:focus { outline: none; border-color: #689c6d; box-shadow: 0 0 0 3px rgba(104,156,109,0.35); }"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "refersTo": "status-badge",
+      "description": "Order/partner status: tinted pill with mandatory text.",
+      "html": "<span class=\"ds-badge ds-badge--submitted\">Eingereicht</span> <span class=\"ds-badge ds-badge--fulfilled\">Abgeschlossen</span>",
+      "css": ".ds-badge { display: inline-flex; padding: 0.125rem 0.75rem; border-radius: 9999px; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; } .ds-badge--submitted { background: #fef3c7; color: #92400e; } .ds-badge--fulfilled { background: #d0fae5; color: #166534; }"
+    },
+    {
+      "name": "Sidebar Nav",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Light sidebar items; active item on accent tint.",
+      "html": "<nav class=\"ds-nav\"><a class=\"is-active\">Dashboard</a><a>Meine Endkunden</a><a>Meine Artikel</a></nav>",
+      "css": ".ds-nav { display: flex; flex-direction: column; gap: 2px; width: 15rem; padding: 0.75rem; background: #fff; border-right: 1px solid #d6e1d8; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; } .ds-nav a { display: flex; align-items: center; height: 2.75rem; padding: 0 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 500; color: #3d4f43; cursor: pointer; } .ds-nav a:hover { background: #edf2ee; color: #0b110c; } .ds-nav a.is-active { background: #eff5f6; color: #5e838d; font-weight: 600; }"
+    },
+    {
+      "name": "Metric Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Dashboard value with label and role-tinted icon.",
+      "html": "<div class=\"ds-metric\"><span class=\"ds-metric__icon\">€</span><div><div class=\"ds-metric__value\">1.240,00 €</div><div class=\"ds-metric__label\">Provision</div></div></div>",
+      "css": ".ds-metric { display: flex; align-items: center; gap: 1rem; padding: 1.5rem; background: #fff; border: 1px solid #d6e1d8; border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgba(11,17,12,0.09); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; } .ds-metric__icon { display: flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; border-radius: 9999px; background: #f0f7f1; color: #578462; font-weight: 700; } .ds-metric__value { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.025em; color: #578462; font-variant-numeric: tabular-nums; } .ds-metric__label { font-size: 0.875rem; font-weight: 500; color: #52675a; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Der verlässliche Partner",
+    "overview": "PAPO is the tool a sales partner opens to get an order for their customer done, and the tool the company uses to process it. The interface behaves like a dependable colleague: calm, tidy, always clear about what happens next, and quietly encouraging. Density serves data; colour is a signal, never decoration. This is a refinement system that preserves Tobias' tokens and look.",
+    "keyCharacteristics": [
+      "One role accent per area, switched once on the shell (.area--company / .area--partner).",
+      "Light sidebar, white content cards, subtle green-tinted shadows.",
+      "Status always shown as text badge plus colour.",
+      "One main action per page, visibly larger (\"Neue Bestellung\").",
+      "Money and counts in tabular figures; amounts never ambiguous."
+    ],
+    "rules": [
+      { "name": "The One Accent Rule", "body": "Every role-aware element reads --color-accent* / --text-brand; naming a role palette step directly is a bug.", "section": "colors" },
+      { "name": "The Signal Not Paint Rule", "body": "Green and blue never appear together as decoration; semantic colours only for their status.", "section": "colors" },
+      { "name": "The Contrast Debt Rule", "body": "Resting primary button and active nav text fail AA; proposal: step 700 resting, 800 hover, nav text 700.", "section": "colors" },
+      { "name": "The Tabular Money Rule", "body": "Amounts, counts and percentages use tabular figures and German formatting.", "section": "typography" },
+      { "name": "The Border First Rule", "body": "Separate with a 1px border before a stronger shadow; no coloured accent stripes.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do read role colours only through --color-accent* / --text-brand.",
+      "Do give each page at most one hero action; everything else regular or secondary.",
+      "Do pair every status colour with a German text label.",
+      "Do keep visible focus (accent ring) on every interactive element and 44px touch targets on mobile.",
+      "Do use tabular figures and German formatting for money.",
+      "Do respect prefers-reduced-motion; transitions stay at 100–250ms."
+    ],
+    "donts": [
+      "Don't introduce new colours, fonts, dark mode or a CSS framework.",
+      "Don't hardcode --color-primary-* / --color-accent-* or hex values for role colour in components.",
+      "Don't use the teal secondary ramp as partner colour.",
+      "Don't use Text Disabled (#8ca594) or 300/400 accent steps for readable text.",
+      "Don't add coloured side stripes or decorative gradients to containers."
+    ]
+  }
+}
