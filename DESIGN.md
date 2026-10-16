@@ -5,6 +5,7 @@ colors:
   company-green: "#689c6d"
   company-green-hover: "#578462"
   company-green-deep: "#456851"
+  company-green-deeper: "#344e3d"
   company-green-tint: "#f0f7f1"
   partner-blue: "#5e838d"
   partner-blue-hover: "#4a6870"
@@ -78,19 +79,19 @@ spacing:
   "10": "2.5rem"
 components:
   button-primary-company:
-    backgroundColor: "{colors.company-green}"
+    backgroundColor: "{colors.company-green-deep}"
     textColor: "{colors.surface-white}"
     rounded: "{rounded.md}"
     padding: "0.5rem 1rem"
   button-primary-company-hover:
-    backgroundColor: "{colors.company-green-hover}"
+    backgroundColor: "{colors.company-green-deeper}"
   button-primary-partner:
-    backgroundColor: "{colors.partner-blue}"
+    backgroundColor: "{colors.partner-blue-hover}"
     textColor: "{colors.surface-white}"
     rounded: "{rounded.md}"
     padding: "0.5rem 1rem"
   button-primary-partner-hover:
-    backgroundColor: "{colors.partner-blue-hover}"
+    backgroundColor: "{colors.partner-blue-deep}"
   button-primary-hero:
     rounded: "{rounded.md}"
     padding: "0.75rem 1.5rem"
@@ -122,11 +123,11 @@ components:
     height: "2.75rem"
     padding: "0 0.75rem"
   nav-item-active-company:
-    backgroundColor: "{colors.company-green-tint}"
-    textColor: "{colors.company-green-hover}"
+    backgroundColor: "{colors.company-green-deep}"
+    textColor: "{colors.surface-white}"
   nav-item-active-partner:
-    backgroundColor: "{colors.partner-blue-tint}"
-    textColor: "{colors.partner-blue}"
+    backgroundColor: "{colors.partner-blue-hover}"
+    textColor: "{colors.surface-white}"
 ---
 
 # Design System: PAPO Partnerportal
@@ -178,7 +179,7 @@ A muted, green-tinted palette: two calm role accents over sage neutrals, with st
 
 **The Signal Not Paint Rule.** Green and blue never appear together as decoration on one screen; semantic colours appear only for their status.
 
-**The Contrast Debt Rule.** White text on the resting primary button fails WCAG AA (company 3.2:1, partner 4.1:1), and so does accent text on the active nav tint (company #578462 on #f0f7f1 = 3.9:1, partner #5e838d on #eff5f6 = 3.7:1). Proposal for Tobias (task 2.3): resting primary button uses step 700 in both areas (company #456851 = 6.3:1, partner #4a6870 = 6.0:1), hover step 800; active nav text uses step 700. Step 600 alone is not enough for green (4.3:1).
+**The Strong Accent Rule.** Text and fills that carry white text use the strong accent step 700 (`--color-accent-strong`: company #456851 = 6.3:1, partner #4a6870 = 6.0:1), hover step 800. The core steps (company 500, partner 600) stay for tints, rings, lines and icons, never behind white text: they fail AA (3.2:1 / 4.1:1), and green 600 still fails (4.3:1). Decided by Chris 16.10.2026 (variant comparison 1B/2C), Tobias to confirm.
 
 ## Typography
 
@@ -200,7 +201,7 @@ A muted, green-tinted palette: two calm role accents over sage neutrals, with st
 
 ## Layout
 
-App shell: fixed light sidebar (15rem) + topbar (4rem) + content (`max-width: 80rem`, padding 2rem; 1rem below 62em). Below 62em (≈992px) the sidebar becomes an off-canvas drawer with backdrop; below 48em forms and metric rows collapse to one column. Spacing scale is 0.25rem-based (`--spacing-1` … `--spacing-20`); sections are separated by 2.5rem, cards by 1.25rem. Metric rows use a 3-column grid. Desktop is the primary context (PRODUCT.md); mobile must work without horizontal page scroll. Planned (task 3.1): main lists become stacked cards below 640px.
+App shell: fixed light sidebar (15rem) + topbar (4rem) + content (`max-width: 80rem`, padding 2rem; 1rem below 62em). Below 62em (≈992px) the sidebar becomes an off-canvas drawer with backdrop; below 48em forms and metric rows collapse to one column. Spacing scale is 0.25rem-based (`--spacing-1` … `--spacing-20`); sections are separated by 2.5rem, cards by 1.25rem. Metric rows use a 3-column grid. Desktop is the primary context (PRODUCT.md); mobile must work without horizontal page scroll. Planned (task 3.1): below 640px main lists become compact two-line cards (primary field + amount on top, date/secondary + status below; decision 5C).
 
 ## Elevation & Depth
 
@@ -223,7 +224,7 @@ Gently rounded, firm rectangles: controls 0.375rem, cards and tables 0.5rem, dia
 
 ### Buttons
 - **Shape:** gently rounded (0.375rem), semibold 0.875rem, padding 0.5rem 1rem.
-- **Primary (`.button-primary`):** role accent background, white text; hover one step darker.
+- **Primary (`.button-primary`):** strong accent background (step 700), white text; hover step 800.
 - **Hero (`.button-primary--hero`):** the single main action of a page (partner dashboard "Neue Bestellung"): padding 0.75rem 1.5rem, 1rem text, leading icon.
 - **Secondary (`.button-secondary`):** white, Border Strong outline, primary text; hover Subtle Sage.
 - **Planned (task 2.2):** `.button-ghost` (transparent, toolbar/row actions) and `.button-danger` (error-600, destructive). Class names stay `button-*` instead of Design/'s `.btn-*`.
@@ -234,7 +235,7 @@ Gently rounded, firm rectangles: controls 0.375rem, cards and tables 0.5rem, dia
 
 ### Cards / Containers
 - **Corner Style:** 0.5rem. **Background:** Surface White. **Border:** 1px Border Sage. **Shadow:** Resting. **Padding:** 1.5rem.
-- **Metric card:** value above label, role-tinted round icon (2.75rem), faint watermark icon; trend arrows green/red when a comparison exists. Planned: neutral icon without trend (3.3), one lead metric per dashboard (4.1).
+- **Metric card:** value above label, role-tinted round icon (2.75rem), faint watermark icon; trend arrows green/red when a comparison exists. Planned (decision 3C): neutral icon without trend (3.3); the lead metric (partner: Provision) spans the full row on the accent tint with a larger value and trend as text, the other metrics sit below as compact cards (4.1).
 
 ### Inputs / Fields
 - **Style:** 2.5rem high, Border Strong, 0.375rem radius, white; label semibold Text Label above.
@@ -242,10 +243,13 @@ Gently rounded, firm rectangles: controls 0.375rem, cards and tables 0.5rem, dia
 - **Error:** error-500 border, error-600 message below in 0.75rem.
 
 ### Navigation
-- **Sidebar:** white surface with right border; items 2.75rem high, 20px icon, Text Label colour; hover Subtle Sage; active item uses the accent tint background with brand-coloured semibold text. Unread count as small red pill. Mobile: off-canvas drawer via topbar toggle.
+- **Sidebar:** white surface with right border; items 2.75rem high, 20px icon, Text Label colour; hover Subtle Sage; active item is a solid strong-accent fill (step 700) with white semibold text (decision 2C, matches Design/'s solid style). Unread count as small red pill. Mobile: off-canvas drawer via topbar toggle.
 
 ### Data Table (`<data-table>`)
-- Search, filters, sorting and pager above/below; header row on accent tint with uppercase labels; rows separated by Border Sage; clickable rows, "neu" badge for unseen orders, dormant marker. Empty state centred secondary text. Planned: stacked cards below 640px (3.1), shared loading/empty/error states with "Erneut laden" (3.2).
+- Search, filters, sorting and pager above/below; header row on accent tint with uppercase labels; rows separated by Border Sage; clickable rows, "neu" badge for unseen orders, dormant marker. Empty state centred secondary text. Planned: compact two-line cards below 640px (3.1); shared states (3.2, decision 6C): icon + title + hint, empty state offers the page's main action where one exists, error state offers "Erneut laden".
+
+### Order Wizard Steps
+- Checkpoints in a row joined by a line. Done: filled strong accent with ✓. Current (decision 4B): white circle with strong-accent border and soft accent ring, bold label, plus the text "Schritt N von M". Upcoming: outlined number. Never colour alone.
 
 ### Dialog (`<modal-dialog>`)
 - Overlay backdrop, white panel 0.75rem radius, Overlay shadow, header with title and close button, roomy body (42.5rem wide, max 94vw/96vh).
@@ -274,7 +278,7 @@ Recorded as implemented; Chris chose to keep the current app state (16.10.2026).
 | Topic | `Design/` | Implemented |
 |---|---|---|
 | Sidebar | dark (`neutral-950`), light text | white surface, dark text |
-| Active nav item | full accent background, white text | accent tint background, brand text |
+| Active nav item | full accent background, white text | planned: solid strong accent (700), white text |
 | Class names | `.btn-*`, `.context-company/-partner` | `.button-*`, `.area--company/-partner` (both context selectors defined) |
-| Button contrast | known AA failure, fix open | same; proposal in The Contrast Debt Rule |
+| Button contrast | known AA failure, fix open | planned: strong accent 700 (The Strong Accent Rule) |
 | Fonts | Google Fonts import | self-hosted woff2 (no CDN) |
