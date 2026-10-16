@@ -1,6 +1,6 @@
 ## 1. Context and baseline — essential
 
-- [ ] 1.1 Run impeccable `init` (PRODUCT.md) and `document` (DESIGN.md from `Design/` and `base.css`); Tobias reviews both.
+- [x] 1.1 Run impeccable `init` (PRODUCT.md) and `document` (DESIGN.md from `Design/` and `base.css`); Tobias reviews both.
 - [ ] 1.2 Baseline: impeccable `audit` + `critique` on all portal pages, Playwright screenshots desktop 1280 / mobile 390 to `output/playwright/refine-*-before.png`.
 
 ## 2. Foundation — essential

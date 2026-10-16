@@ -179,7 +179,7 @@ A muted, green-tinted palette: two calm role accents over sage neutrals, with st
 
 **The Signal Not Paint Rule.** Green and blue never appear together as decoration on one screen; semantic colours appear only for their status.
 
-**The Strong Accent Rule.** Text and fills that carry white text use the strong accent step 700 (`--color-accent-strong`: company #456851 = 6.3:1, partner #4a6870 = 6.0:1), hover step 800. The core steps (company 500, partner 600) stay for tints, rings, lines and icons, never behind white text: they fail AA (3.2:1 / 4.1:1), and green 600 still fails (4.3:1). Decided by Chris 16.10.2026 (variant comparison 1B/2C), Tobias to confirm.
+**The Strong Accent Rule.** Text and fills that carry white text use the strong accent step 700 (`--color-accent-strong`: company #456851 = 6.3:1, partner #4a6870 = 6.0:1), hover step 800. The core steps (company 500, partner 600) stay for tints, rings, lines and icons, never behind white text: they fail AA (3.2:1 / 4.1:1), and green 600 still fails (4.3:1). Decided by Chris 16.10.2026 (variant comparison 1B/2C), confirmed by Tobias.
 
 ## Typography
 
