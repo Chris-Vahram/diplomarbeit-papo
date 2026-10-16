@@ -73,6 +73,9 @@ class EvidenceLogTest(unittest.TestCase):
             self.assertNotIn("`old`", result)
             self.assertIn("`keep`", result)
             self.assertIn("`new`", result)
+            # A placeholder whose session is still in the private archive survives source pruning.
+            kept = log.register_rows([session], register, archived_ids={"old"})
+            self.assertIn("`old`", kept)
 
     def test_enrich_updates_only_metadata_and_rejects_secrets(self):
         with tempfile.TemporaryDirectory() as tmp:
