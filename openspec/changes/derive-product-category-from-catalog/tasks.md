@@ -6,4 +6,4 @@
 ## 2. Completion — essential
 
 - [x] 2.1 Full `./mvnw test`, `./mvnw package`, upgrade check against a database from the previous release (schema `update`), Playwright article list/filter/category rename, `openspec validate derive-product-category-from-catalog --strict`, `git diff --check`; document rollback SQL in `docs/DEPLOYMENT.md`.
-- [ ] 2.2 (VM check done 16.10.: 0 unlinked rows) Follow-up after deploy: SQL check on the VM (no text-only rows), then remove `CategoryMigrationService` and its tests in a separate commit.
+- [x] 2.2 (VM check 16.10.: 8/8 linked, 0 legacy text; migration and legacy field removed) Follow-up after deploy: SQL check on the VM (no text-only rows), then remove `CategoryMigrationService` and its tests in a separate commit.

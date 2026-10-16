@@ -74,7 +74,6 @@ erDiagram
         BigDecimal price "10.2"
         String description
         boolean available
-        String category "Altbestand (legacyCategory), wird nicht mehr geschrieben"
         Long article_category_id FK "optional"
         String imageUrl
         Long image_id FK "optional; gespeichertes Galeriebild"
@@ -210,7 +209,7 @@ es bestellen kann. `articleCategory` ist eine optionale Zuordnung zu einer von
 der Firma verwalteten Artikelkategorie und die **einzige** Quelle des Kategorienamens
 (derive-product-category-from-catalog, 16.10.2026). Anfragen und Importe dürfen einen
 Kategorienamen nennen; er wird über den Katalog aufgelöst. Die alte Textspalte `category`
-(Feld `legacyCategory`) schreibt die App nicht mehr.
+ist nicht mehr gemappt (bestehende Datenbanken behalten sie ungenutzt, auf der VM leer).
 `imageUrl` bleibt für externe Bild-URLs erhalten; bei einem
 hochgeladenen oder aus der Galerie gewählten Bild verweist `image` optional auf
 einen gespeicherten `ProductImage`-Datensatz.
@@ -220,10 +219,8 @@ Eine von der Firma verwaltete Artikelkategorie. `name` wird nach Trim und
 Unicode-validierter Längenprüfung gespeichert; `normalized_name` ist
 case-insensitive eindeutig. `active=false` verhindert neue Artikelzuordnungen
 und Importzeilen, lässt bestehende Artikelzuordnungen aber unverändert. Es
-gibt keinen DELETE-Endpunkt. Die additive ORM-Übernahme liest vorhandene
-Alttext und verknüpft nur Artikel ohne Zuordnung (eindeutig belegte Kategorien,
-Abbruch bei Kollisionen ohne Teilübernahme). Danach leert sie den Alttext bei allen
-Artikeln, damit entfernte Kategorien nie wieder auftauchen. Der Seeder verknüpft Kategorien direkt.
+gibt keinen DELETE-Endpunkt. Der Seeder verknüpft Kategorien direkt; die frühere
+Start-Migration wurde nach dem VM-Check vom 16.10.2026 entfernt.
 
 ### ProductImage
 Ein serverseitig gespeichertes Artikelbild. Die binären Daten liegen direkt in
