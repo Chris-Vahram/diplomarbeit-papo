@@ -15,7 +15,6 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 // derive-product-category-from-catalog: the catalogue reference is the only category source.
 @QuarkusTest
@@ -62,7 +61,6 @@ class ProductCategorySourceTest {
             Product drill = Product.find("name", "Akkuschrauber 18V Set").firstResult();
             assertNotNull(drill.articleCategory);
             assertEquals("Werkzeug", drill.articleCategory.name);
-            assertNull(drill.legacyCategory, "new data never writes the legacy text column");
         });
     }
 
@@ -73,6 +71,6 @@ class ProductCategorySourceTest {
                 .body("{\"name\":\"Nur Referenz\",\"price\":2.5,\"available\":true,\"category\":\"Werkzeug\"}")
                 .when().post("/api/company/products")
                 .then().statusCode(200).body("category", is("Werkzeug")).extract().jsonPath().getLong("id");
-        QuarkusTransaction.requiringNew().run(() -> assertNull(Product.<Product>findById(id).legacyCategory));
+        QuarkusTransaction.requiringNew().run(() -> assertEquals("Werkzeug", Product.<Product>findById(id).articleCategory.name));
     }
 }

@@ -1,11 +1,52 @@
 # PAPO – Next-Session-Context
 
-**Stand:** 14.10.2026 (lokales Datum geprüft). Operative Übergabe; volatile Angaben beim Start prüfen.
+**Stand:** 16.10.2026 (lokales Datum geprüft). Operative Übergabe; volatile Angaben beim Start prüfen.
 Stabile Regeln stehen in `AGENTS.md` und `CLAUDE.md`. Der beschlossene/noch zu
 beschließende Ausbau ist in [PRODUCT_COMPLETION_PLAN.md](PRODUCT_COMPLETION_PLAN.md)
 geordnet. Dieses Dokument bleibt der einzige operative Session-Handoff.
 
-## Neuester Stand — Besprechung 12.10.2026 umgesetzt
+## Stand 16.10.2026 — hier einsteigen
+
+**Live auf paportal.at (main, alle Deploys grün, live geprüft):**
+- B-08 Firmen-Trendpfeile (archiviert), Zeitraum-Presets/Partner-Navigation/Endkunden bearbeiten (12.10.-Feedback).
+- B-04 `send-order-emails` 5/6: Outbox, Retries, Firmen-Statusansicht. Auf der VM **aus**
+  (`PAPO_MAIL_ENABLED=false` in `~/papo-deploy/.env.prod`, Compose schon aktualisiert).
+  Offen Task 4.2: SMTP-Daten neu von Herrn Bachl (Vaultwarden-Links waren abgelaufen) +
+  Testpostfach (z. B. test@paportal.at) → Schritte in `docs/DEPLOYMENT.md` „Bestell-E-Mails“;
+  immer mit `PAPO_MAIL_REDIRECT_TO`, Absender `no-reply@paportal.at` (SPF/DMARC gesetzt).
+- OIDC-Login-Bindung Release A+B (archiviert): Partner nur noch über `PartnerLogin`
+  (Firmen-Dialog „Logins“); `partner-demo` ist auf der VM verknüpft.
+- Kategorie nur noch als Katalog-Referenz (archiviert, Migration und Alttext entfernt).
+- Ponytail-Audit (−770 Zeilen, Plan: `openspec/PONYTAIL_AUDIT_2026-10-15.md`).
+- KI-Register repariert (PR #48): 74 Zeilen; Tool behält archivierte Sitzungen.
+
+**Nächster Arbeitsblock (Chris):** `refine-portal-frontend` (impeccable, „Verfeinerung +
+Akzente“, Tobias hat zugestimmt). Start: impeccable `init` → PRODUCT.md, `document` → DESIGN.md
+aus `Design/` (Tobias' System), beides Tobias zeigen, dann Tasks top-down; Shop-Dateien nicht anfassen.
+
+**Tobias' Changes (nicht anfassen):** add-partner-shop-foundation, add-shop-page-renderer,
+add-shop-builder-editor, add-shop-templates, add-shop-design-assistant, add-shop-inquiries,
+add-article-tax-rate, add-shop-guest-checkout, add-shop-legal-consent, add-shop-statistics,
+add-shop-customer-accounts. Entscheidungen: `Specification/ENDKUNDENSHOP_DECISIONS.md`.
+
+**Wartet auf Externe:** `decouple-partner-number-from-login` 0/4 und
+`add-unique-bmd-article-number` (BMD-Beispieldaten), `complete-thesis-documentation` 4/6
+(Abnahme Tobias/gemeinsam), B-07/B-09/B-03 (Firmenregeln).
+
+**Offene Hinweise für Chris:**
+- Drei GitHub-Tokens stehen in lokalen Sitzungsprotokollen des privaten KI-Roharchivs →
+  widerrufen. Roharchiv **nicht** in Git (README-Regel, Secrets, 396 MB); Alternative
+  verschlüsseltes Backup ist angeboten, Entscheidung offen.
+- Tobias soll das KI-Tool selbst einrichten (`PAPO_KI_PERSON=Tobias`, `install`, `sync`).
+- Lokal: `my_postgres` (anderes Projekt) belegt 5432, Case-Claused belegt 8080 → Tests mit
+  `-Dquarkus.http.test-port=8091`, Dev-Backend z. B. auf 8090 + Wegwerf-DB 5433.
+
+**Arbeitsregeln (CLAUDE.md „Git workflow“):** Feature-Branch, lokale Commits je Schritt ohne
+Rückfrage; Push/Merge/Deploy nur mit Chris' OK. Keine Worktrees ohne guten Grund. Nach jeder
+Arbeit WorkAddict-Einträge (Repo `diplomarbeit-papo/time-data`) und KI-Nachweis
+(`tools/ai_evidence_log.py sync` + `enrich`). Ponytail-Stil.
+
+## Stand 14.10.2026 — Besprechung 12.10.2026 umgesetzt
 
 Neuestes Protokoll: `Documentation/Besprechungsprotokolle/Besprechungsprotokoll_12.10.md`
 (Prof. Hammer, Chris, Tobias). Präsentationen abgenommen. Daraus am 14.10.2026:

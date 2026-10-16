@@ -1,7 +1,6 @@
 package at.papo.partnerportal.seed;
 
 import at.papo.partnerportal.category.Category;
-import at.papo.partnerportal.category.CategoryMigrationService;
 import at.papo.partnerportal.category.CategoryNames;
 import at.papo.partnerportal.commission.CommissionService;
 import at.papo.partnerportal.business.BusinessTaxIdentifier;
@@ -53,8 +52,6 @@ public class DemoDataSeeder {
     @Inject
     ProductImageService productImageService;
 
-    @Inject
-    CategoryMigrationService categoryMigrationService;
 
     @Inject
     BusinessTaxIdentifierMigrationService businessTaxIdentifierMigrationService;
@@ -85,7 +82,6 @@ public class DemoDataSeeder {
             }
         }
         businessTaxIdentifierMigrationService.migrate(launchMode != LaunchMode.NORMAL || seedDemoData);
-        categoryMigrationService.migrate();
     }
 
     static boolean shouldSeed(LaunchMode launchMode, long partnerCount) {
