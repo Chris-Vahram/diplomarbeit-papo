@@ -61,6 +61,31 @@ Der `deploy`-Job erwartet `docker-compose.prod.yml`, `deploy/` (Caddyfile, Postg
 Skript, Keycloak-Realm-Template, Backup-Skript) und `.env.prod` unter `~/papo-deploy` auf
 der VM (einmalig kopiert/geklont, nicht Teil der Pipeline selbst).
 
+> **Achtung – manuell nachziehen:** Die Pipeline aktualisiert nur das Backend-Image und
+> `frontend-live/`. Ändert ein Merge `docker-compose.prod.yml` oder etwas unter `deploy/`
+> (z. B. `deploy/caddy/Caddyfile`), wirkt das auf der VM **erst nach manuellem Kopieren**.
+> Ein grüner Deploy-Job beweist das nicht. Vorfall 19.10.2026: Nach PR #50 lieferte
+> `/shop/<kennung>` das Portal statt `shop.html`, bis das neue Caddyfile auf der VM lag.
+>
+> Ablauf mit Admin-Zugang (nicht `papo-deploy`), vom aktuellen `main` aus:
+>
+> ```bash
+> scp deploy/caddy/Caddyfile <vm>:~/papo-deploy/deploy/caddy/Caddyfile
+> scp docker-compose.prod.yml <vm>:~/papo-deploy/docker-compose.prod.yml
+>
+> # auf der VM
+> cd ~/papo-deploy
+> docker exec papo-prod-caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+> docker exec papo-prod-caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile
+> ```
+>
+> `caddy reload` übernimmt das Caddyfile ohne Unterbrechung. Geänderte Umgebungsvariablen
+> in `docker-compose.prod.yml` greifen erst, wenn der jeweilige Container neu erstellt wird
+> (nächster Deploy bzw. `docker compose -f docker-compose.prod.yml --env-file .env.prod up -d <dienst>`).
+> Danach live prüfen, z. B. `curl -sI https://<domain>/shop/test` → `X-Robots-Tag: noindex`.
+> Andere Dateien unter `deploy/` (Postgres-Init, Keycloak-Template, Backup) gelten ebenso;
+> deren Wirkung hängt vom jeweiligen Dienst ab.
+
 Frontend-Dateien werden vom `deploy`-Job selbst nach `~/papo-deploy/frontend-live/releases/<sha>`
 synchronisiert; `frontend-live/current` ist ein Symlink auf die jeweils aktive Release. Caddy
 bindet `frontend-live/` (nicht die einzelne Release) - der Symlink wird pro Deploy atomar
