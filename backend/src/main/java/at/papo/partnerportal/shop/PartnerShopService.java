@@ -6,6 +6,7 @@ import at.papo.partnerportal.partner.Partner;
 import io.quarkus.narayana.jta.QuarkusTransaction;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.hibernate.exception.ConstraintViolationException;
 import org.jboss.logging.Logger;
 
@@ -20,6 +21,10 @@ public class PartnerShopService {
 
     private static final Logger LOG = Logger.getLogger(PartnerShopService.class);
     private static final int CREATE_ATTEMPTS = 3;
+
+    // papo.shop.public-enabled: when false, no shop is publicly reachable on this deployment.
+    @ConfigProperty(name = "papo.shop.public-enabled")
+    boolean publicEnabled;
 
     // Same text for unknown and unreachable shops, so the public API does not reveal existence.
     public static final String NOT_REACHABLE = "Dieser Shop ist derzeit nicht erreichbar.";
@@ -89,7 +94,7 @@ public class PartnerShopService {
     }
 
     public PartnerShopDto toDto(PartnerShop shop) {
-        return PartnerShopDto.from(shop, status(shop));
+        return PartnerShopDto.from(shop, status(shop), publicEnabled);
     }
 
     @Transactional
@@ -140,9 +145,10 @@ public class PartnerShopService {
                 .toList();
     }
 
-    // Public lookup: present only for released shops that are currently online.
+    // Public lookup: present only for released shops that are currently online, and only
+    // while public shops are enabled on this deployment (same 404 otherwise).
     public Optional<PartnerShop> findOnline(String kennung) {
-        if (!ShopKennung.isValid(kennung)) {
+        if (!publicEnabled || !ShopKennung.isValid(kennung)) {
             return Optional.empty();
         }
         return PartnerShop.<PartnerShop>find("kennung", kennung).firstResultOptional()

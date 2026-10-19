@@ -77,7 +77,8 @@ class PartnerShopResourceTest {
                 .then().statusCode(200)
                 .body("kennung", is("huemer-elektro-gmbh"))
                 .body("publicPath", is("/shop/huemer-elektro-gmbh"))
-                .body("status", is("NOT_RELEASED"));
+                .body("status", is("NOT_RELEASED"))
+                .body("publicEnabled", is(true));
 
         given().when().get("/api/shop/huemer-elektro-gmbh")
                 .then().statusCode(404)

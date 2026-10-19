@@ -95,6 +95,12 @@ offline geschaltete Shops zeigen „Dieser Shop ist derzeit nicht erreichbar.“
 Das Rate-Limit der öffentlichen Shop-API (Standard 60 Anfragen/Minute je IP) ist über
 `SHOP_RATE_LIMIT_PER_MINUTE` einstellbar.
 
+Öffentliche Shops sind lokal (dev) eingeschaltet, in Produktion standardmäßig aus
+(`SHOP_PUBLIC_ENABLED`, siehe `docs/DEPLOYMENT.md`). Zum Testen des ausgeschalteten
+Zustands lokal: `SHOP_PUBLIC_ENABLED=false ./mvnw quarkus:dev` – Shopseiten zeigen dann
+immer „nicht erreichbar“, Portal und Partner sehen „Öffentliche Shops sind auf dieser
+Umgebung noch deaktiviert.“
+
 ## 4. Tests
 
 ```bash
