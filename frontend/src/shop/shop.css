@@ -154,6 +154,7 @@ a { color: inherit; }
 
 /* Blocks: stacked sections with spacing and background options */
 .shop-block { display: block; color: var(--shop-text); }
+.shop-block[hidden] { display: none; }
 .shop-block--spacing-small { padding-block: 1rem; }
 .shop-block--spacing-medium { padding-block: 2rem; }
 .shop-block--spacing-large { padding-block: 3.5rem; }

@@ -172,7 +172,7 @@ class PublicShopContentTest {
         visitor().when().get("/api/shop/" + withImage + "/images/" + imageId)
                 .then().statusCode(200)
                 .contentType("image/png")
-                .header("Cache-Control", startsWith("public"))
+                .header("Cache-Control", startsWith("private"))
                 .header("X-Content-Type-Options", "nosniff");
 
         // Same image id through a shop whose partner does not have the article enabled.

@@ -24,7 +24,7 @@ record ShopBlockField(String name, Kind kind, int maxLength, boolean required, S
         CATEGORY,
         // List of article ids enabled for the shop's partner; maxLength = max. entries.
         ARTICLES,
-        // URL segment of a page of the same shop (link target).
+        // URL segment of a linkable page of the same shop (link target).
         SEGMENT,
         // Partial colour override, see ShopColors.
         COLORS

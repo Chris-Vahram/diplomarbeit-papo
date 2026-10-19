@@ -1,5 +1,6 @@
 package at.papo.partnerportal.shop;
 
+import at.papo.partnerportal.category.Category;
 import at.papo.partnerportal.enablement.ProductEnablement;
 import at.papo.partnerportal.partner.Partner;
 import at.papo.partnerportal.product.Product;
@@ -7,7 +8,6 @@ import at.papo.partnerportal.product.ProductImage;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 // The shop's public catalogue: articles enabled for the shop's partner and available
@@ -16,8 +16,10 @@ import java.util.Optional;
 @ApplicationScoped
 public class ShopCatalogService {
 
+    // p.image is deliberately not fetched: the DTO only needs its id, which the lazy proxy
+    // carries without loading the image bytes.
     private static final String CATALOGUE = "select p from ProductEnablement e join e.product p "
-            + "left join fetch p.articleCategory left join fetch p.image "
+            + "left join fetch p.articleCategory "
             + "where e.partner = ?1 and p.available = true";
 
     public List<Product> articles(Partner partner) {
@@ -35,13 +37,12 @@ public class ShopCatalogService {
 
     // Categories that have at least one catalogue article.
     public List<PublicCategoryDto> categories(Partner partner) {
-        return articles(partner).stream()
-                .map(product -> product.articleCategory)
-                .filter(Objects::nonNull)
-                .distinct()
-                .map(category -> new PublicCategoryDto(category.id, category.name))
-                .sorted((a, b) -> a.name().compareToIgnoreCase(b.name()))
-                .toList();
+        return Category.getEntityManager().createQuery(
+                        "select distinct new at.papo.partnerportal.shop.PublicCategoryDto(c.id, c.name) "
+                                + "from ProductEnablement e join e.product p join p.articleCategory c "
+                                + "where e.partner = ?1 and p.available = true order by c.name", PublicCategoryDto.class)
+                .setParameter(1, partner)
+                .getResultList();
     }
 
     // Images are public only as the image of a catalogue article. Shop-owned uploads join

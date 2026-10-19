@@ -101,7 +101,9 @@ public class PublicShopResource {
                 .orElseThrow(() -> new ApiException(404, "Bild nicht gefunden."));
         return Response.ok(image.data)
                 .type(image.contentType)
-                .header("Cache-Control", "public, max-age=3600")
+                // private + short: an image stops being public when the shop goes offline or the
+                // article is disabled, so shared caches must not keep serving it.
+                .header("Cache-Control", "private, max-age=300")
                 .header("X-Content-Type-Options", "nosniff")
                 .build();
     }

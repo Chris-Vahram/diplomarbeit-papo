@@ -29,12 +29,16 @@ public record PublicArticleDto(
                 imageUrl(product, kennung), product.price, DEFAULT_TAX_RATE_PERCENT);
     }
 
-    private static String imageUrl(Product product, String kennung) {
+    static String imageUrl(Product product, String kennung) {
         if (product.image != null) {
             return "/api/shop/" + kennung + "/images/" + product.image.id;
         }
         String url = product.imageUrl;
-        return url != null && url.startsWith("/") && !url.startsWith("//")
-                && !url.startsWith("/\\") && !url.startsWith("/api/") ? url : null;
+        // Browsers drop tabs/newlines and treat "\" like "/", so "/<TAB>/host" or "/\host" would
+        // become a protocol-relative third-party URL; such characters are rejected outright.
+        if (url == null || url.chars().anyMatch(c -> c <= 0x20 || c == 0x7f || c == '\\')) {
+            return null;
+        }
+        return url.startsWith("/") && !url.startsWith("//") && !url.startsWith("/api/") ? url : null;
     }
 }

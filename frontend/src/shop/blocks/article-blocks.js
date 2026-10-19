@@ -12,15 +12,18 @@ class ArticleListBlock extends ShopBlock {
 
   render(config) {
     const renderId = ++this.#renderId;
+    this.hidden = false;
     this.innerHTML = `<div class="shop-inner">${headingHtml(config.heading)}<p class="shop-muted">Artikel werden geladen …</p></div>`;
     this.context.api
       .articles()
       .then((articles) => {
         if (renderId !== this.#renderId) return;
         const selected = this.select(articles, config);
-        // A featured block whose articles all disappeared renders nothing instead of an error.
+        // A featured block whose articles all disappeared renders nothing instead of an error;
+        // the host is hidden too, so its spacing and background do not leave an empty band.
         if (selected === null) {
           this.replaceChildren();
+          this.hidden = true;
           return;
         }
         this.innerHTML = `<div class="shop-inner">${headingHtml(config.heading)}${articleCardsHtml(this.context.api, selected, config.columns)}</div>`;

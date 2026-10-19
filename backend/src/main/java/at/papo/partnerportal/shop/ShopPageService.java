@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -51,7 +52,7 @@ public class ShopPageService {
             entity.updatedAt = now;
             entity.persist();
         }
-        boolean created = false;
+        List<ShopPage> createdMandatory = new ArrayList<>();
         for (ShopPageSlot slot : ShopPageSlot.values()) {
             if (ShopPage.count("shop = ?1 and slot = ?2", shop, slot) > 0) {
                 continue;
@@ -70,15 +71,14 @@ public class ShopPageService {
                 page.publishedContent = content;
                 page.publishedAt = now;
                 page.online = true;
+                createdMandatory.add(page);
             }
             page.persist();
-            created = true;
         }
-        if (created) {
-            // Templates link between pages, so they are checked once all slots exist.
-            ShopPage.<ShopPage>list("shop = ?1 and kind = ?2", shop, ShopPageKind.MANDATORY)
-                    .forEach(page -> validateContent(page, page.draftContent));
-        }
+        // Templates link between pages, so they are checked once all slots exist. Existing
+        // pages are left alone: a partner's draft may reference an article disabled since,
+        // and that must never break startup or shop creation.
+        createdMandatory.forEach(page -> validateContent(page, page.draftContent));
     }
 
     // Free page as an empty draft; the segment is checked like any page URL.
@@ -200,9 +200,12 @@ public class ShopPageService {
                 return catalogService.isCatalogueArticle(shop.partner, articleId);
             }
 
+            // Only online designable pages with their own URL; checked again on every publish.
             @Override
-            public boolean pageExists(String segment) {
-                return ShopPage.count("shop = ?1 and segment = ?2", shop, segment) > 0;
+            public boolean isLinkablePage(String segment) {
+                return ShopPage.count("shop = ?1 and segment = ?2 and online = true and kind <> ?3 "
+                        + "and (slot is null or slot <> ?4)", shop, segment, ShopPageKind.SYSTEM,
+                        ShopPageSlot.ARTICLE_DETAIL) > 0;
             }
         };
     }

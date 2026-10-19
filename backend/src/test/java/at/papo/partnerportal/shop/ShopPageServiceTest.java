@@ -200,4 +200,34 @@ class ShopPageServiceTest {
         });
         rejection(() -> pageService.publishTheme(shop(partnerId)));
     }
+
+    private static String heroLinkingTo(String segment) {
+        return "{\"blocks\":[{\"id\":\"" + UUID.randomUUID() + "\",\"type\":\"hero\","
+                + "\"config\":{\"title\":\"x\",\"buttonLabel\":\"Los\",\"buttonPage\":\"" + segment + "\"}}]}";
+    }
+
+    @Test
+    void buttonLinksOnlyToOnlineDesignablePages() {
+        long partnerId = createShop();
+        tx(() -> pageService.createFreePage(shop(partnerId), "Entwurf", "entwurf"));
+        for (String target : List.of("kasse", "warenkorb", "artikeldetail", "entwurf", "gibt-es-nicht")) {
+            tx(() -> page(partnerId, ShopPageSlot.HOME).draftContent = heroLinkingTo(target));
+            assertTrue(rejection(() -> pageService.publish(page(partnerId, ShopPageSlot.HOME)))
+                    .contains("verlinkte Seite"), target);
+        }
+        tx(() -> page(partnerId, ShopPageSlot.HOME).draftContent = heroLinkingTo("artikel"));
+        tx(() -> pageService.publish(page(partnerId, ShopPageSlot.HOME)));
+    }
+
+    @Test
+    void ensureDefaultsDoesNotRevalidateExistingPages() {
+        long partnerId = createShop();
+        tx(() -> {
+            // Existing draft now invalid (e.g. article disabled since) and one slot missing.
+            page(partnerId, ShopPageSlot.HOME).draftContent = heroLinkingTo("gibt-es-nicht");
+            page(partnerId, ShopPageSlot.WIDERRUF).delete();
+        });
+        tx(() -> pageService.ensureDefaults(shop(partnerId)));
+        tx(() -> assertNotNull(page(partnerId, ShopPageSlot.WIDERRUF)));
+    }
 }

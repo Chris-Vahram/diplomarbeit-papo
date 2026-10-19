@@ -9,5 +9,6 @@ public interface ShopBlockReferences {
 
     boolean isCatalogueArticle(long articleId);
 
-    boolean pageExists(String segment);
+    // Link target: an online designable page other than the article-detail template.
+    boolean isLinkablePage(String segment);
 }

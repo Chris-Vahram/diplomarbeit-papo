@@ -19,7 +19,8 @@ function readRoute() {
   if (!match) return null;
   try {
     const [kennung, segment, articleId] = match.slice(1).map((part) => (part ? decodeURIComponent(part) : ""));
-    return { kennung, segment, articleId };
+    // /shop/<k>/startseite is the same page as the shop root.
+    return { kennung, segment: segment === "startseite" ? "" : segment, articleId };
   } catch {
     return null; // malformed escape such as /shop/%E0 -> neutral "nicht erreichbar" page
   }
@@ -93,8 +94,11 @@ async function start() {
   }
 
   try {
+    // The article-detail template only exists under /artikel/<id>, never by its own segment.
+    if ((route.articleId && !isDetail) || route.segment === "artikeldetail") {
+      throw Object.assign(new Error("not found"), { status: 404 });
+    }
     const segment = isDetail ? "artikeldetail" : route.segment || "startseite";
-    if (route.articleId && !isDetail) throw Object.assign(new Error("not found"), { status: 404 });
     const [page, article] = await Promise.all([
       api.page(segment),
       isDetail ? api.article(route.articleId).catch(() => null) : null,

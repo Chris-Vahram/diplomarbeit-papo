@@ -92,7 +92,7 @@ Caddy (Produktion) und `tools/dev_frontend_server.py` (lokal) beantworten jeden 
 
 Als Partner zeigt **Mein Webshop** denselben Link und den Status. Unbekannte oder
 offline geschaltete Shops zeigen „Dieser Shop ist derzeit nicht erreichbar.“
-Das Rate-Limit der öffentlichen Shop-API (Standard 60 Anfragen/Minute je IP) ist über
+Das Rate-Limit der öffentlichen Shop-API (Standard 300 Anfragen/Minute je IP; eine Shopseite braucht etwa fünf Aufrufe plus einen je Artikelbild) ist über
 `SHOP_RATE_LIMIT_PER_MINUTE` einstellbar.
 
 Öffentliche Shops sind lokal (dev) eingeschaltet, in Produktion standardmäßig aus

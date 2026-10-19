@@ -132,8 +132,8 @@ public final class ShopBlockValidator {
                 }
             }
             case SEGMENT -> {
-                if (!value.isTextual() || !references.pageExists(value.asText())) {
-                    throw new ApiException(400, "Die verlinkte Seite in " + where + " gibt es nicht.");
+                if (!value.isTextual() || !references.isLinkablePage(value.asText())) {
+                    throw new ApiException(400, "Die verlinkte Seite in " + where + " gibt es nicht oder ist nicht online.");
                 }
             }
             case COLORS -> ShopColors.validate(value, false, " im Block „" + type.label + "“");

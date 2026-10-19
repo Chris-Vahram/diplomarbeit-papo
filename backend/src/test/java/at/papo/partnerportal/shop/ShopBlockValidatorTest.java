@@ -35,7 +35,7 @@ class ShopBlockValidatorTest {
         }
 
         @Override
-        public boolean pageExists(String segment) {
+        public boolean isLinkablePage(String segment) {
             return segment.equals("artikel");
         }
     };
