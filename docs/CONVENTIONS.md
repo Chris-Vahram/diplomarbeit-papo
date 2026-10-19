@@ -61,7 +61,8 @@ frontend/
 
 The public shop (`shop.html` + `src/shop/`) is a separate entry: it must not import
 portal modules (`lib/auth.js`, `lib/api.js`, `router.js`, `pages/*`) or `base.css`,
-reads no stored tokens and calls only `/api/shop/*`. Caddy (prod) and
+reads no stored tokens and calls only `/api/shop/*`. `lib/config.js` (base URLs only,
+no imports) is the one shared module. Caddy (prod) and
 `tools/dev_frontend_server.py` (dev) both rewrite `/shop/*` to `shop.html`.
 
 ### Routing

@@ -2258,6 +2258,8 @@ form-field {
 .shop-signal--offline { background: var(--color-error-100); color: var(--color-error-800); }
 /* Same yellow as the order status "Eingereicht". */
 .shop-signal--warning { background: var(--status-submitted-bg); color: var(--status-submitted-text); }
+/* Status could not be loaded: neutral, like the secondary row buttons. */
+.shop-signal--unknown { background: var(--bg-surface); color: var(--text-primary); box-shadow: inset 0 0 0 0.0625rem var(--border-strong); }
 
 /* Partner table row action "Webshop": same size as the neighbouring row buttons. */
 .shop-action {

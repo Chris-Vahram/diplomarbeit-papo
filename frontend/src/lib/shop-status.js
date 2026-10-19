@@ -16,15 +16,16 @@ const STATUS = {
 };
 
 export function shopStatusLabel(status) {
-  return STATUS[status]?.badge ?? "Unbekannt";
+  return STATUS[status]?.badge ?? "Status unbekannt";
 }
 
 export function shopStatusHint(status) {
   return STATUS[status]?.hint ?? "";
 }
 
+// "unknown" when the status could not be loaded - shown neutrally, never as a signal colour.
 export function shopStatusTone(status) {
-  return STATUS[status]?.tone ?? "warning";
+  return STATUS[status]?.tone ?? "unknown";
 }
 
 export function shopStatusBadge(status) {
@@ -41,4 +42,31 @@ export function shopActionButton(partnerId, status) {
 // Same URL locally and in production: tools/dev_frontend_server.py mirrors the Caddy rewrite.
 export function shopPublicUrl(shop) {
   return `${location.origin}${shop.publicPath}`;
+}
+
+// Fills the shared status block (#shop-badge, #shop-hint, #shop-reason[-text],
+// #shop-link, #shop-details) inside `root` - same markup on partner page and company dialog.
+export function renderShopStatus(root, shop) {
+  root.querySelector("#shop-badge").innerHTML = shopStatusBadge(shop.status);
+  const hint = root.querySelector("#shop-hint");
+  hint.textContent = shopStatusHint(shop.status);
+  hint.hidden = false;
+
+  root.querySelector("#shop-reason").hidden = shop.status !== "OFFLINE_COMPANY" || !shop.offlineReason;
+  root.querySelector("#shop-reason-text").textContent = shop.offlineReason ?? "";
+
+  const url = shopPublicUrl(shop);
+  const linkCell = root.querySelector("#shop-link");
+  linkCell.innerHTML = "";
+  if (shop.status === "ONLINE") {
+    const link = document.createElement("a");
+    link.href = url;
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.textContent = url;
+    linkCell.append(link);
+  } else {
+    linkCell.textContent = `${url} (derzeit nicht erreichbar)`;
+  }
+  root.querySelector("#shop-details").hidden = false;
 }

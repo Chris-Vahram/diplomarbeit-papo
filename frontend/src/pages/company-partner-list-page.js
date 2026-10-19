@@ -3,7 +3,7 @@ import { showToast } from "../components/toast-notice.js";
 import { formatNumber } from "../lib/format.js";
 import { addressFieldsHtml, readAddress, fillAddress } from "../lib/address-fields.js";
 import { taxIdentifierFieldsHtml, readTaxIdentifier, fillTaxIdentifier } from "../lib/tax-identifier-fields.js";
-import { shopStatusBadge, shopStatusHint, shopPublicUrl, shopActionButton } from "../lib/shop-status.js";
+import { renderShopStatus, shopActionButton } from "../lib/shop-status.js";
 
 // Commission dropdown presets per FSD FR-19/partner-management spec: 5/10/15 or a custom value.
 const COMMISSION_PRESETS = ["5", "10", "15"];
@@ -225,10 +225,16 @@ class CompanyPartnerListPage extends HTMLElement {
 
   async load() {
     try {
-      const [partners, shops] = await Promise.all([apiFetch("/company/partners"), apiFetch("/company/shops")]);
+      // The shop overview is an add-on: if it fails, the partner list still loads and the
+      // "Webshop" buttons show a neutral "Status unbekannt".
+      const [partners, shops] = await Promise.all([
+        apiFetch("/company/partners"),
+        apiFetch("/company/shops").catch(() => null),
+      ]);
       this.partners = partners;
+      const shopStatusByPartner = new Map((shops ?? []).map((shop) => [shop.partnerId, shop.status]));
       // No shop record yet means the company has never released one.
-      const shopStatusByPartner = new Map(shops.map((shop) => [shop.partnerId, shop.status]));
+      const shopStatusOf = (partnerId) => (shops ? shopStatusByPartner.get(partnerId) ?? "NOT_RELEASED" : null);
       this.table.rows = this.partners.map((p) => ({
         partnerNumber: p.partnerNumber,
         name: p.name,
@@ -236,12 +242,11 @@ class CompanyPartnerListPage extends HTMLElement {
         activeLabel: p.active ? "active" : "inactive",
         statusBadge: `<status-badge status="${p.active ? "active" : "inactive"}"></status-badge>`,
         proofStatus: this.proofStatusLabel(p.tradeProof),
-        // No shop record yet means the company has never released one.
         actions: `<div class="row-actions">
           <button type="button" data-edit-id="${p.id}">Partnerdaten Bearbeiten</button>
           <button type="button" class="row-actions__secondary" data-proof-id="${p.id}">Nachweis</button>
           <button type="button" class="row-actions__secondary" data-manage-id="${p.id}">Artikel</button>
-          ${shopActionButton(p.id, shopStatusByPartner.get(p.id) ?? "NOT_RELEASED")}
+          ${shopActionButton(p.id, shopStatusOf(p.id))}
         </div>`,
       }));
       const requestedPartnerId = new URLSearchParams(location.hash.split("?")[1] ?? "").get("enablement");
@@ -329,6 +334,10 @@ class CompanyPartnerListPage extends HTMLElement {
   }
 
   async openShop(partnerId) {
+    // A new dialog session: responses still in flight for a previously opened partner
+    // are ignored (shopAction), so they can never fill or act on this partner's dialog.
+    this.shopSession = (this.shopSession ?? 0) + 1;
+    this.shopBusy = false;
     this.shopPartnerId = partnerId;
     this.shop = null;
     const partner = this.partners?.find((p) => String(p.id) === String(partnerId));
@@ -342,50 +351,35 @@ class CompanyPartnerListPage extends HTMLElement {
     await this.shopAction(() => apiFetch(`/company/partners/${partnerId}/shop`));
   }
 
-  // Runs one shop request, then re-renders the dialog or shows the German error inline.
+  // Runs one shop request for the current dialog session, then re-renders the dialog or
+  // shows the German error inline. One request at a time per session (double-submit guard).
   async shopAction(request, successMessage) {
     if (this.shopBusy) return;
+    const session = this.shopSession;
     this.shopBusy = true;
     const error = this.querySelector("#shop-error");
     error.hidden = true;
     try {
-      this.renderShop(await request());
+      const shop = await request();
       if (successMessage) {
         showToast(successMessage, "success");
         this.load();
       }
+      if (session === this.shopSession) this.renderShop(shop);
     } catch (requestError) {
-      error.textContent = requestError.message;
-      error.hidden = false;
+      if (session === this.shopSession) {
+        error.textContent = requestError.message;
+        error.hidden = false;
+      }
     } finally {
-      this.shopBusy = false;
+      if (session === this.shopSession) this.shopBusy = false;
     }
   }
 
   renderShop(shop) {
     this.shop = shop;
     this.querySelector("#shop-loading").hidden = true;
-    this.querySelector("#shop-badge").innerHTML = shopStatusBadge(shop.status);
-    const hint = this.querySelector("#shop-hint");
-    hint.textContent = shopStatusHint(shop.status);
-    hint.hidden = false;
-    this.querySelector("#shop-reason").hidden = shop.status !== "OFFLINE_COMPANY";
-    this.querySelector("#shop-reason-text").textContent = shop.offlineReason ?? "";
-
-    const url = shopPublicUrl(shop);
-    const linkCell = this.querySelector("#shop-link");
-    linkCell.innerHTML = "";
-    if (shop.status === "ONLINE") {
-      const link = document.createElement("a");
-      link.href = url;
-      link.target = "_blank";
-      link.rel = "noopener";
-      link.textContent = url;
-      linkCell.append(link);
-    } else {
-      linkCell.textContent = url;
-    }
-    this.querySelector("#shop-details").hidden = false;
+    renderShopStatus(this.shopModal, shop);
 
     const release = this.querySelector("#shop-release");
     release.hidden = shop.status !== "NOT_RELEASED" && shop.status !== "OFFLINE_COMPANY";

@@ -1,5 +1,5 @@
 import { apiFetch } from "../lib/api.js";
-import { shopStatusBadge, shopStatusHint, shopPublicUrl } from "../lib/shop-status.js";
+import { renderShopStatus } from "../lib/shop-status.js";
 
 // "Mein Webshop" (partner-shop spec): status, public link and the company's offline
 // reason. Read-only - identifier and release are company decisions.
@@ -51,30 +51,8 @@ class PartnerShopPage extends HTMLElement {
   }
 
   render(shop) {
-    this.querySelector("#shop-badge").innerHTML = shopStatusBadge(shop.status);
-    const hint = this.querySelector("#shop-hint");
-    hint.textContent = shopStatusHint(shop.status);
-    hint.hidden = false;
-
-    const reason = this.querySelector("#shop-reason");
-    reason.hidden = shop.status !== "OFFLINE_COMPANY" || !shop.offlineReason;
-    this.querySelector("#shop-reason-text").textContent = shop.offlineReason ?? "";
-
     this.querySelector("#shop-kennung").textContent = shop.kennung;
-    const url = shopPublicUrl(shop);
-    const linkCell = this.querySelector("#shop-link");
-    linkCell.innerHTML = "";
-    if (shop.status === "ONLINE") {
-      const link = document.createElement("a");
-      link.href = url;
-      link.target = "_blank";
-      link.rel = "noopener";
-      link.textContent = url;
-      linkCell.append(link);
-    } else {
-      linkCell.textContent = `${url} (derzeit nicht erreichbar)`;
-    }
-    this.querySelector("#shop-details").hidden = false;
+    renderShopStatus(this, shop);
   }
 }
 

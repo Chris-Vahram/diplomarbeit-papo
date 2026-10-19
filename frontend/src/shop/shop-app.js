@@ -1,17 +1,20 @@
 // Public shop bootstrap. Must never import portal modules (src/lib/auth.js, api.js,
 // router.js, pages/*): the shop runs unauthenticated and only calls /api/shop/<kennung>.
+// config.js is allowed: it only derives base URLs and has no imports.
+import { API_BASE } from "../lib/config.js";
 
 const NOT_REACHABLE = "Dieser Shop ist derzeit nicht erreichbar.";
-
-// Same environment split as the portal's config.js, kept separate on purpose.
-const isLocalDev = location.hostname === "localhost" && location.port === "3000";
-const API_BASE = isLocalDev ? "http://localhost:8080/api" : `${location.origin}/api`;
 
 // Every shop lives at /shop/<kennung>; Caddy (prod) and tools/dev_frontend_server.py (dev)
 // both answer that path with shop.html.
 function readKennung() {
   const match = location.pathname.match(/^\/shop\/([^/]+)\/?$/);
-  return match ? decodeURIComponent(match[1]) : "";
+  if (!match) return "";
+  try {
+    return decodeURIComponent(match[1]);
+  } catch {
+    return ""; // malformed escape such as /shop/%E0 -> neutral "nicht erreichbar" page
+  }
 }
 
 const root = document.getElementById("shop-root");
