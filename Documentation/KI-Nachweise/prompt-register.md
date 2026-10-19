@@ -97,6 +97,12 @@
 | AUSSTEHEND-438af9ec | 2026-07-04 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `438af9ec-64d8-4f0f-a077-980165157ec0` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-1798d34e | 2026-07-01 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `1798d34e-c42d-4563-9b77-f50fe6084679` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 
+| AUSSTEHEND-34fd2817 | 2026-10-15 | Tobias | Claude Code | Fachliche Einordnung offen | lokale Sitzung `34fd2817-f55e-44f6-a490-0b03d44d8cf5` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-5160bdfc | 2026-10-15 | Tobias | Claude Code | Endkundenshop-Grundlage add-partner-shop-foundation umsetzen, Feedback und Reviews einarbeiten, archivieren, PR #50; ai_evidence_log-Sessionsuche reparieren | lokale Sitzung `5160bdfc-595d-4340-8727-276f150d8a39` | `EXAKT` | PartnerShop, öffentliche Shop-API, shop.html, Mein Webshop, Firmen-Dialog mit Signalfarben, Caddy/Dev-Server-Routing; Change archiviert, main gemergt, PR #50 offen; Evidenz-Tool findet Sessions bei Pfaden mit Punkt und löscht keine fremden Zeilen mehr; Prüfungen: mvnw clean package 185/185; openspec validate --specs --strict 34/34; caddy validate; Playwright Desktop/Mobil; unittest ai_evidence_log 14/14 |
+| AUSSTEHEND-a3702550 | 2026-10-12 | Tobias | Claude Code | Fachliche Einordnung offen | lokale Sitzung `a3702550-bb6a-40ba-9013-6fbb2baac1d8` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-68b929d3 | 2026-10-13 | Tobias | Claude Code | Fachliche Einordnung offen | lokale Sitzung `68b929d3-ea0a-4a96-9aea-ba4245b240ba` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-2f5375fe | 2026-09-28 | Tobias | Claude Code | Fachliche Einordnung offen | lokale Sitzung `2f5375fe-a7ab-4400-a9da-f29fa6b7b20f` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+
 ## Noch rückwirkend aufzunehmen
 
 - 23 primäre Claude-Code-Sitzungen vom 01.07. bis 17.07.2026;
