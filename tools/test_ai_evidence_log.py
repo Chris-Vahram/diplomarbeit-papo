@@ -69,13 +69,28 @@ class EvidenceLogTest(unittest.TestCase):
                 encoding="utf-8",
             )
             session = log.session_record("Codex", "new", "2026", [], [])
-            result = log.register_rows([session], register)
+            with patch.object(log, "PERSON", "Chris"):
+                result = log.register_rows([session], register)
+                # A placeholder whose session is still in the private archive survives source pruning.
+                kept = log.register_rows([session], register, archived_ids={"old"})
             self.assertNotIn("`old`", result)
             self.assertIn("`keep`", result)
             self.assertIn("`new`", result)
-            # A placeholder whose session is still in the private archive survives source pruning.
-            kept = log.register_rows([session], register, archived_ids={"old"})
             self.assertIn("`old`", kept)
+
+    def test_register_keeps_other_persons_placeholders(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            register = Path(tmp) / "register.md"
+            register.write_text(
+                f"{log.TABLE_HEADER}\n|---|---|---|---|---|---|---|---|\n"
+                "| AUSSTEHEND-chris | 2026 | Chris | Codex | offen | lokale Sitzung `chris` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |\n"
+                "| AUSSTEHEND-tobi | 2026 | Tobias | Claude Code | offen | lokale Sitzung `tobi` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |\n",
+                encoding="utf-8",
+            )
+            with patch.object(log, "PERSON", "Tobias"):
+                result = log.register_rows([], register)
+            self.assertIn("`chris`", result)
+            self.assertNotIn("`tobi`", result)
 
     def test_enrich_updates_only_metadata_and_rejects_secrets(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -111,6 +126,12 @@ class EvidenceLogTest(unittest.TestCase):
             with redirect_stdout(output):
                 log.status(args)
             self.assertIn("ChatGPT-Webexport: nicht bereitgestellt", output.getvalue())
+
+    def test_claude_project_dir_matches_claude_code_naming(self):
+        self.assertEqual(log.claude_project_dir(Path("/repo/papo")), "-repo-papo")
+        self.assertEqual(
+            log.claude_project_dir(Path("/Users/tobi/Desktop/4.Klasse/DA/diplomarbeit-papo")),
+            "-Users-tobi-Desktop-4-Klasse-DA-diplomarbeit-papo")
 
     def test_full_sync_with_temporary_archive_is_data_minimal(self):
         with tempfile.TemporaryDirectory() as tmp:
