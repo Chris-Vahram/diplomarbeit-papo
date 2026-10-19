@@ -44,13 +44,18 @@ export function shopPublicUrl(shop) {
   return `${location.origin}${shop.publicPath}`;
 }
 
-// Fills the shared status block (#shop-badge, #shop-hint, #shop-reason[-text],
-// #shop-link, #shop-details) inside `root` - same markup on partner page and company dialog.
+// Fills the shared status block (#shop-badge, #shop-hint, #shop-env-notice,
+// #shop-reason[-text], #shop-link, #shop-details) inside `root` - same markup on partner
+// page and company dialog. `publicEnabled` false = deployment-wide switch off: the shop
+// status stays as stored, but nothing is publicly reachable on this environment.
 export function renderShopStatus(root, shop) {
   root.querySelector("#shop-badge").innerHTML = shopStatusBadge(shop.status);
   const hint = root.querySelector("#shop-hint");
-  hint.textContent = shopStatusHint(shop.status);
+  hint.textContent = shop.status === "ONLINE" && shop.publicEnabled === false
+    ? "Der Shop ist freigegeben und bereit; er wird erreichbar, sobald öffentliche Shops aktiviert sind."
+    : shopStatusHint(shop.status);
   hint.hidden = false;
+  root.querySelector("#shop-env-notice").hidden = shop.publicEnabled !== false;
 
   root.querySelector("#shop-reason").hidden = shop.status !== "OFFLINE_COMPANY" || !shop.offlineReason;
   root.querySelector("#shop-reason-text").textContent = shop.offlineReason ?? "";
@@ -58,7 +63,7 @@ export function renderShopStatus(root, shop) {
   const url = shopPublicUrl(shop);
   const linkCell = root.querySelector("#shop-link");
   linkCell.innerHTML = "";
-  if (shop.status === "ONLINE") {
+  if (shop.status === "ONLINE" && shop.publicEnabled !== false) {
     const link = document.createElement("a");
     link.href = url;
     link.target = "_blank";

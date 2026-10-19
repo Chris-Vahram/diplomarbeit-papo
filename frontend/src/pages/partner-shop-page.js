@@ -16,6 +16,7 @@ class PartnerShopPage extends HTMLElement {
         </div>
         <p id="shop-loading">Status wird geladen …</p>
         <p id="shop-hint" class="shop-panel__hint" hidden></p>
+        <p id="shop-env-notice" class="shop-panel__env" hidden>Öffentliche Shops sind auf dieser Umgebung noch deaktiviert.</p>
         <div id="shop-reason" class="shop-panel__reason" hidden>
           <strong>Grund:</strong> <span id="shop-reason-text"></span>
         </div>
