@@ -1,45 +1,11 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import { formatEuro, formatNumber } from "../lib/format.js";
-import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue, toLocalIsoDate, presetPeriod, PERIOD_PRESETS } from "../lib/dashboard-data.js";
+import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue, toLocalIsoDate, presetPeriod, previousPeriod, periodTrends, trailingWindowTrend } from "../lib/dashboard-data.js";
 import { escapeHtml } from "../lib/html.js";
+import { renderMonthChart, periodPickerHtml, wirePeriodPicker } from "../lib/dashboard-ui.js";
 
 const eur = new Intl.NumberFormat("de-AT", { style: "currency", currency: "EUR" });
-const dateLabel = new Intl.DateTimeFormat("de-AT", { day: "2-digit", month: "2-digit", year: "numeric" });
-
-function formatCompactEur(value) {
-  return value >= 1000 ? `${(value / 1000).toFixed(1).replace(".", ",")} T€` : eur.format(value);
-}
-
-function renderMonthChart(title, monthLabels, monthlyValues) {
-  const max = Math.max(1, ...monthlyValues);
-  const lastIndex = monthlyValues.length - 1;
-  const bars = monthlyValues
-    .map((value, i) => {
-      const pct = Math.max(2, Math.round((value / max) * 100));
-      return `
-        <div class="month-chart__bar-wrap">
-          <div class="month-chart__bar${i === lastIndex ? " month-chart__bar--current" : ""}" style="height:${pct}%" title="${monthLabels[i] ?? ""}: ${eur.format(value)}"></div>
-        </div>`;
-    })
-    .join("");
-  const xlabels = monthLabels.map((m) => `<span class="month-chart__xlabel">${m}</span>`).join("");
-
-  return `
-    <div class="metric-card metric-card--chart month-chart-card">
-      <div class="metric-card__watermark"><i data-lucide="line-chart"></i></div>
-      <div class="metric-card__chart-label">${title}</div>
-      <div class="month-chart">
-        <div class="month-chart__bars">${bars}</div>
-        <div class="month-chart__yaxis">
-          <span>${formatCompactEur(max)}</span>
-          <span>${formatCompactEur(max / 2)}</span>
-          <span>0€</span>
-        </div>
-        <div class="month-chart__xaxis">${xlabels}</div>
-      </div>
-    </div>`;
-}
 
 class CompanyDashboardPage extends HTMLElement {
   connectedCallback() {
@@ -57,30 +23,7 @@ class CompanyDashboardPage extends HTMLElement {
           <p class="page-heading__greeting">${greeting}</p>
           <h1>Firmen-Dashboard</h1>
         </div>
-        <div class="period-picker">
-          <button type="button" class="period-picker__button" id="period-button">
-            <i data-lucide="calendar"></i>
-            <span id="period-label"></span>
-            <i data-lucide="chevron-down" class="period-picker__caret"></i>
-          </button>
-          <div class="period-picker__panel is-closed" id="period-panel">
-            <div class="period-picker__presets">
-              ${Object.entries(PERIOD_PRESETS).map(([kind, label]) => `<button type="button" data-preset="${kind}">${label}</button>`).join("")}
-            </div>
-            <div class="period-picker__field">
-              <label for="period-from">Von</label>
-              <input type="date" id="period-from" />
-            </div>
-            <div class="period-picker__field">
-              <label for="period-to">Bis</label>
-              <input type="date" id="period-to" />
-            </div>
-            <div class="period-picker__actions">
-              <button type="button" class="period-picker__reset" id="period-reset">Gesamter Zeitraum</button>
-              <button type="button" class="period-picker__apply" id="period-apply">Anwenden</button>
-            </div>
-          </div>
-        </div>
+        ${periodPickerHtml()}
       </div>
       <div class="metric-row" id="metric-row"></div>
       <div class="chart-row" id="chart-row"></div>
@@ -101,77 +44,8 @@ class CompanyDashboardPage extends HTMLElement {
     this.table.searchKeys = ["partnerName"];
     this.table.pageSize = 20;
 
-    this.wirePeriodPicker();
+    wirePeriodPicker(this);
     this.load();
-  }
-
-  wirePeriodPicker() {
-    this.periodButton = this.querySelector("#period-button");
-    this.periodPanel = this.querySelector("#period-panel");
-    this.periodFromInput = this.querySelector("#period-from");
-    this.periodToInput = this.querySelector("#period-to");
-
-    this.updatePeriodUi();
-
-    this.periodButton.addEventListener("click", (event) => {
-      event.stopPropagation();
-      this.periodPanel.classList.toggle("is-closed");
-    });
-    document.addEventListener("click", (event) => {
-      if (!this.contains(event.target)) this.periodPanel.classList.add("is-closed");
-    });
-    this.periodPanel.addEventListener("click", (event) => event.stopPropagation());
-
-    for (const button of this.periodPanel.querySelectorAll("[data-preset]")) {
-      button.addEventListener("click", () => {
-        this.periodPreset = button.dataset.preset;
-        this.period = presetPeriod(this.periodPreset);
-        this.periodPanel.classList.add("is-closed");
-        this.updatePeriodUi();
-        this.render();
-      });
-    }
-
-    this.querySelector("#period-apply").addEventListener("click", () => {
-      const [fy, fm, fd] = this.periodFromInput.value.split("-").map(Number);
-      const [ty, tm, td] = this.periodToInput.value.split("-").map(Number);
-      const from = new Date(fy, fm - 1, fd, 0, 0, 0, 0);
-      const to = new Date(ty, tm - 1, td, 23, 59, 59, 999);
-      if (isNaN(from) || isNaN(to) || from > to) {
-        showToast("Bitte einen gültigen Zeitraum wählen.", "error");
-        return;
-      }
-      this.period = { from, to };
-      this.periodPreset = null;
-      this.periodPanel.classList.add("is-closed");
-      this.updatePeriodUi();
-      this.render();
-    });
-
-    this.querySelector("#period-reset").addEventListener("click", () => {
-      this.period = null;
-      this.periodPreset = null;
-      this.periodPanel.classList.add("is-closed");
-      this.updatePeriodUi();
-      this.render();
-    });
-  }
-
-  updatePeriodUi() {
-    for (const button of this.periodPanel.querySelectorAll("[data-preset]")) {
-      button.setAttribute("aria-pressed", String(button.dataset.preset === this.periodPreset));
-    }
-    if (this.period) {
-      this.periodFromInput.value = toLocalIsoDate(this.period.from);
-      this.periodToInput.value = toLocalIsoDate(this.period.to);
-      this.querySelector("#period-label").textContent = this.periodPreset
-        ? PERIOD_PRESETS[this.periodPreset]
-        : `${dateLabel.format(this.period.from)} – ${dateLabel.format(this.period.to)}`;
-    } else {
-      this.periodFromInput.value = "";
-      this.periodToInput.value = "";
-      this.querySelector("#period-label").textContent = "Gesamter Zeitraum";
-    }
   }
 
   async load() {
@@ -193,12 +67,16 @@ class CompanyDashboardPage extends HTMLElement {
   render() {
     if (!this.orders) return;
 
-    let inRange, revenue, commission, count;
+    let inRange, revenue, commission, count, trends;
     if (this.period) {
       const fromIso = toLocalIsoDate(this.period.from);
       const toIso = toLocalIsoDate(this.period.to);
       inRange = filterByPeriod(this.orders, fromIso, toIso);
-      ({ revenue, commission, count } = fulfilledTotals(inRange));
+      const current = fulfilledTotals(inRange);
+      ({ revenue, commission, count } = current);
+      // Same-length period immediately before, as on the partner dashboard (B-08).
+      const prev = previousPeriod(this.period.from, this.period.to);
+      trends = periodTrends(current, fulfilledTotals(filterByPeriod(this.orders, toLocalIsoDate(prev.from), toLocalIsoDate(prev.to))));
     } else {
       // No explicit range: headline totals are the backend's true all-time values
       // (BigDecimal-exact, no client-side recompute) - settlement/charts show all orders.
@@ -206,7 +84,10 @@ class CompanyDashboardPage extends HTMLElement {
       revenue = this.roster.totalRevenue;
       commission = this.roster.totalCommission;
       count = this.roster.fulfilledOrderCount;
+      // Arrows: last 30 days vs. the 30 before, decoupled from the all-time totals.
+      trends = trailingWindowTrend(this.orders);
     }
+    const trendAttrs = (t) => (t ? `trend="${t.trend}" trend-label="${t.label}"` : "");
     const avgOrderValue = count > 0 ? revenue / count : 0;
 
     // Monthly chart: trailing 6 months (stable trend), independent of the picker.
@@ -214,10 +95,10 @@ class CompanyDashboardPage extends HTMLElement {
     const monthly = monthlyRevenue(this.orders, keys);
 
     this.metricRow.innerHTML = `
-      <metric-card label="Umsatz (abgeschlossen)" value="${formatEuro(revenue)}" icon="trending-up" tone="positive"></metric-card>
-      <metric-card label="Provision (abgeschlossen)" value="${formatEuro(commission)}" icon="percent" tone="positive"></metric-card>
-      <metric-card label="Abgeschlossene Bestellungen" value="${count}" icon="check-circle" tone="positive"></metric-card>
-      <metric-card label="Ø Bestellwert" value="${formatEuro(avgOrderValue)}" icon="receipt" tone="positive"></metric-card>
+      <metric-card label="Umsatz (abgeschlossen)" value="${formatEuro(revenue)}" icon="trending-up" tone="positive" ${trendAttrs(trends.revenueTrend)}></metric-card>
+      <metric-card label="Provision (abgeschlossen)" value="${formatEuro(commission)}" icon="percent" tone="positive" ${trendAttrs(trends.commissionTrend)}></metric-card>
+      <metric-card label="Abgeschlossene Bestellungen" value="${count}" icon="check-circle" tone="positive" ${trendAttrs(trends.countTrend)}></metric-card>
+      <metric-card label="Ø Bestellwert" value="${formatEuro(avgOrderValue)}" icon="receipt" tone="positive" ${trendAttrs(trends.avgTrend)}></metric-card>
       ${renderMonthChart("Umsatz nach Monat", labels, monthly)}
     `;
 

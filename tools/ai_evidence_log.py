@@ -16,6 +16,8 @@ import sys
 import tempfile
 
 
+# Person column of new register rows; Tobias sets PAPO_KI_PERSON=Tobias on his machine.
+PERSON = os.environ.get("PAPO_KI_PERSON", "Chris")
 REPO = Path(__file__).resolve().parents[1]
 REGISTER = REPO / "Documentation/KI-Nachweise/prompt-register.md"
 DEFAULT_ARCHIVE = Path.home() / "Documents/PAPO-KI-Roharchiv"
@@ -163,14 +165,15 @@ def collect(project, codex_root, claude_root):
                 yield session, path
 
 
-def register_rows(sessions, register=REGISTER):
+def register_rows(sessions, register=REGISTER, archived_ids=()):
     text = register.read_text(encoding="utf-8")
     if TABLE_HEADER not in text:
         raise ValueError("Prompt-Register hat kein erwartetes Tabellenformat")
     lines = []
     for line in text.splitlines():
         generated = line.startswith("| AUSSTEHEND-") and "Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen" in line
-        if generated:
+        # Keep placeholders of archived sessions even after Codex/Claude pruned the local source.
+        if generated and not any(f"`{session_id}`" in line for session_id in archived_ids):
             continue
         lines.append(line)
     insertion = next((index for index, line in enumerate(lines) if line.startswith("## Noch rückwirkend")), len(lines))
@@ -180,8 +183,9 @@ def register_rows(sessions, register=REGISTER):
         if any(marker in line for line in lines):
             continue
         date = (session["date"] or "unbekannt")[:10]
-        rows.append(f"| AUSSTEHEND-{session['id'][:8]} | {date} | Chris | {session['tool']} | Fachliche Einordnung offen | lokale Sitzung `{session['id']}` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |")
-    lines[insertion:insertion] = rows + ([""] if rows and insertion < len(lines) else [])
+        rows.append(f"| AUSSTEHEND-{session['id'][:8]} | {date} | {PERSON} | {session['tool']} | Fachliche Einordnung offen | lokale Sitzung `{session['id']}` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |")
+    needs_gap = rows and insertion < len(lines) and lines[insertion] != ""
+    lines[insertion:insertion] = rows + ([""] if needs_gap else [])
     text = "\n".join(lines)
     return text if text.endswith("\n") else text + "\n"
 
@@ -204,10 +208,13 @@ def sync(args):
         found = list(found_by_key.values())
         old = {(item["tool"], item["id"]): item for item in load_json(archive_root / "manifest.json", [])}
         manifest = [archive_session(session, source, archive_root, old.get((session["tool"], session["id"]))) for session, source in found]
+        # Codex/Claude prune old local sessions; their private archive copy stays, so keep the entry.
+        manifest += [item for key, item in old.items() if key not in found_by_key]
         manifest_text = json.dumps(sorted(manifest, key=lambda item: (item["tool"], item["id"])), ensure_ascii=False, indent=2) + "\n"
         atomic_write(archive_root / "manifest.json", manifest_text)
         try:
-            atomic_write(Path(args.register), register_rows([session for session, _ in found], Path(args.register)), 0o644)
+            archived_ids = {item["id"] for item in manifest}
+            atomic_write(Path(args.register), register_rows([session for session, _ in found], Path(args.register), archived_ids), 0o644)
             pending = archive_root / "pending-register.json"
             if pending.exists():
                 pending.unlink()

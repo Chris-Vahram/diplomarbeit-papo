@@ -8,41 +8,21 @@
 | KI-2026-08-25-02 | 25.08.2026 | Chris | Codex | Mehr-Unternehmen-Zielbild, Keycloak Organizations, Partnernummern, gemeinsamer Partnerzugang gegenüber persönlichen Mitarbeiterzugängen und Subdomains bewerten | lokale Codex-Sitzung `01a0345a-4164-7941-bbb5-282970d96fe7` | `EXAKT` | Quellprüfung gegen aktuellen Code, Keycloak-/Quarkus-Dokumentation und Datenmodell; Zugangsmodell bleibt bis zur Empfehlung des Betreuers offen; noch keine Implementierung |
 | KI-2026-08-25-03 | 25.08.2026 | Chris | Codex | BMBWF-Handreichung und Vergleichsdokument zur KI-Nutzung analysieren und ein zweistufiges Nachweiskonzept planen | lokale Codex-Sitzung `01a0345a-4164-7941-bbb5-282970d96fe7` | `EXAKT` | Beide PDFs textuell und visuell geprüft; Nachweisstruktur und ehrlicher Hinweistext erstellt |
 
-
-
-
 | AUSSTEHEND-01a08640 | 2026-09-09 | Chris | Codex | Astra-Handoff korrigieren | lokale Sitzung `01a08640-2b93-7ac1-9cc4-e82d5b782de9` | `EXAKT` | Vorzeitigen OpenSpec-Entwurf als unreviewt markiert; Astra muss ihn zuerst unabhängig prüfen und erst danach weitere Changes planen.; Prüfungen: git diff --check |
-
-
-
-
 
 | AUSSTEHEND-01a0897e | 2026-09-10 | Chris | Codex | PAPO-OpenSpec-Planung abschließen und Kontext-Handoff aktualisieren | lokale Sitzung `01a0897e-af71-7b53-9ffd-949fa51204bf` | `EXAKT` | Drei kleine Changes vollständig geplant; Endkundenentwurf korrigiert; MVP-/CI-CD-Status und Kontextdateien synchronisiert.; Prüfungen: Fünf aktive Changes mit openspec validate --strict geprüft; git diff --check erfolgreich. |
 
 | AUSSTEHEND-01a090bb | 2026-09-11 | Chris | Codex | OpenSpec-Changes archivieren und Handoffs aktualisieren | lokale Sitzung `01a090bb-36cf-7863-abd7-8124845fc62f` | `EXAKT` | Drei abgeschlossene Changes archiviert, Spezifikationen synchronisiert und Next-Session-Goal aktualisiert; Prüfungen: openspec validate --changes --strict: 8/8 gültig; git diff --check erfolgreich |
 
-
-
-
 | AUSSTEHEND-01a09252 | 2026-09-11 | Chris | Codex | search-order-customers finalen Reviewstand dokumentiert | lokale Sitzung `01a09252-c148-7fc2-946c-7757df61684e` | `EXAKT` | Gate-Fix geprüft; Such-, Draft-, Partner- und Company-Flows erneut verifiziert; 3 Tasks fertig; Prüfungen: node --check frontend/src/pages/partner-order-new-page.js; cd backend && ./mvnw package; openspec validate search-order-customers --strict; git diff --check |
 
-
-
 | AUSSTEHEND-01a0953c | 2026-09-12 | Chris | Codex | define-mvp-traceability-format implementieren und abschließend prüfen | lokale Sitzung `01a0953c-57b0-7ae1-8ed1-313137c1ffdc` | `EXAKT` | 3 von 3 Tasks fertig; 33-zeilige Requirements-Matrix und Dokumentationsverantwortlichkeiten erstellt; Prüfungen: Quellen-/ID-/Link-/Tabellenstrukturabgleich, Strict-Validate, git diff --check sowie Funktions-/Evidenz-/Securityreview |
-
-
-
-
-
 
 | AUSSTEHEND-01a0959b | 2026-09-12 | Chris | Codex | Abschlussprüfung und Archivierung von define-mvp-traceability-format und manage-article-categories; Readinessbewertung der zwei verbleibenden OpenSpec-Changes | lokale Sitzung `01a0959b-2b41-7692-9f86-58cf2190a737` | `EXAKT` | Beide Changes geprüft, strict validiert und archiviert; verbleibende build/CI-CD-Changes nicht implementiert und auf offene Tasks/Blocker bewertet.; Prüfungen: openspec validate manage-article-categories --strict; Java-21 fokussierte Tests 27/27; ./mvnw test 100/100; ./mvnw package 100/100; node --check der geänderten Kategorie-Seiten; git diff --check; Playwright Desktop/Mobile-Kategorie-CRUD, Deaktivierung/Reaktivierung, deaktivierte Bestandszuordnung und Partnerisolation |
 
 | AUSSTEHEND-01a09ba6 | 2026-09-13 | Chris | Codex | Orchester-Handoff aktualisiert: Archivierung, P0-Recovery und Remote-Diff-Status dokumentiert | lokale Sitzung `01a09ba6-7972-7e13-936f-38b9c7f96624` | `EXAKT` | Neue Session kann mit selektiver Git-/Gateway-Prüfung fortsetzen; Prüfungen: openspec archive erfolgreich; git fetch origin und Statusprüfung bereits ausgeführt |
 
-
-
 | AUSSTEHEND-01a09db0 | 2026-09-14 | Chris | Codex | Kontext-Handoff für nächste Session aktualisieren | lokale Sitzung `01a09db0-547d-70a3-80c3-279b68f996e0` | `EXAKT` | CONTINUATION_PROMPT, NEXT_SESSION_PLAN, CLAUDE, PLANNING_REVIEW und RESTARBEITSPLAN auf Commit eacb8cd, sauberen Worktree und den belegten Gateway-Blocker synchronisiert.; Prüfungen: git diff --check; openspec validate --changes --strict --json --no-interactive: 2/2 gültig |
-
 
 | AUSSTEHEND-01a09f17 | 2026-09-14 | Chris | Codex | Next-Session-Handoff mit Deployment-, VM-Security-, BMD-Stammdaten- und Clockify-Auftrag aktualisieren | lokale Sitzung `01a09f17-f9eb-79a2-b1a7-d5250bcd1508` | `EXAKT` | Nur Context-/Handoff-Dateien aktualisiert; verbindliche Reihenfolge, Nutzerentscheidungen, Subagent-Nachweise, Aufwandsschätzungen und retrospektiv geschätzte Clockify-Einträge für die nächste Session dokumentiert; keine Implementierung, kein Deployment; Prüfungen: git diff --check |
 
@@ -50,101 +30,27 @@
 
 | AUSSTEHEND-01a09fc5 | 2026-09-14 | Chris | Codex | Besprechungsprotokoll 14.9 übernehmen, fertigen Company-Notiz-Change archivieren und Präsentations-Next-Session vorbereiten | lokale Sitzung `01a09fc5-2281-7373-a172-59cff23873c5` | `EXAKT` | Protokoll vollständig gelesen; add-company-internal-partner-note archiviert und Partner-Spec synchronisiert; Handoff-Dateien, Präsentationsplan und Next-Session-Prompt aktualisiert.; Prüfungen: openspec archive add-company-internal-partner-note -y --json; openspec validate --changes --strict --json --no-interactive; git diff --check. |
 
-
-
 | AUSSTEHEND-01a0a15e | 2026-09-14 | Chris | Codex | OpenSpec Apply add-business-tax-identifiers implementieren und technisch abschließen | lokale Sitzung `01a0a15e-c030-7c70-b8b9-b51ea07d0595` | `EXAKT` | CompanyProfile-Singleton, gemeinsame Steuer-ID-Validierung, Partner-REST/Import/UI und BMF-/Datenmodelldoku umgesetzt; Partner-Self-Service bleibt ohne Steuerkennung.; Prüfungen: BusinessTaxIdentifierValidatorTest und CompanyProfileResourceTest; ./mvnw test; ./mvnw package; node --check frontend/src; openspec validate add-business-tax-identifiers --strict; git diff --check; statischer Browser-Shellcheck mit Loginroute/Desktop-Mobile-Resize. |
-
-
 
 | AUSSTEHEND-01a0a41f | 2026-09-15 | Chris | Codex | PAPO-Context- und Planungsdokumente konsolidieren | lokale Sitzung `01a0a41f-8191-7e50-934e-5e18303f648a` | `EXAKT` | CONTINUATION_PROMPT als einzige operative Source of Truth gekürzt; vier redundante Planungsdateien entfernt; AGENTS und Präsentations-README synchronisiert; keine Produktdatei geändert; Prüfungen: git diff --check; git diff --name-status; git status --short --branch; openspec list --json |
 
 | AUSSTEHEND-01a0a51d | 2026-09-15 | Chris | Codex | Next-Session-Kontext für add-partner-trade-proof synchronisieren | lokale Sitzung `01a0a51d-60d0-7461-9df7-0f2f9404192b` | `EXAKT` | CONTINUATION_PROMPT.md und die aktuellen Statusblöcke in CLAUDE.md auf Branch, OpenSpec-Status, abgeschlossenen Tax-Rollout und Trade-Proof-Startreihenfolge aktualisiert.; Prüfungen: openspec status/instructions/list geprüft; git diff --check erfolgreich. |
 
-
 | AUSSTEHEND-01a0a89c | 2026-09-16 | Chris | Codex | Spec-Sync und Archivierung des abgeschlossenen Tax-Identifier-Rollouts | lokale Sitzung `01a0a89c-8f5f-7db0-acb3-0fd15ca41bd2` | `EXAKT` | harden-tax-identifier-rollout synchronisiert und archiviert; Next-Session-Startprompt aktualisiert; Prüfungen: openspec validate harden-tax-identifier-rollout --strict; git diff --check; openspec list --json und Archivpfad geprüft |
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 | AUSSTEHEND-01a0cf11 | 2026-09-23 | Chris | Codex | Trade-Proof-Review, Dublettenbereinigung, Thesis-Prüfung, Phase-2-Handoff und sichere Demo-VM-Migration | lokale Sitzung `01a0cf11-c556-7f51-8066-421ae5875b69` | `EXAKT` | 122 Suffix-2-Duplikate geprüft und entfernt; Trade Proof inklusive Review-Fix und Thesis-/Produktplanung über PR 27 gemergt; ersten Deploy nach Backend-Absturz ohne Datenverlust zurückgestellt; historische Demo-Namenserkennung mit Regressionstest korrigiert und über PR 28 gemergt; VM-Backend und öffentliche Endpunkte geprüft; Übergabedateien aktualisiert; Prüfungen: ./mvnw package: vor Migration 129/129 Tests, nach Fix 130/130 Tests und Build erfolgreich; ./mvnw test: 130/130; node --check frontend/src bestanden; openspec validate complete-thesis-documentation --strict bestanden; 62 Markdown-Links ohne fehlendes Ziel; git diff --check bestanden; GitHub main Run 36115368910 success; VM backend running RestartCount 0, Frontend 200, geschützte API ohne Login 401, OIDC 200 |
 
 | AUSSTEHEND-01a0e778 | 2026-09-28 | Chris | Codex | Gateway-Change abschließen und nächsten Arbeitsblock festlegen | lokale Sitzung `01a0e778-36b4-7701-be83-0cfcb9ea9503` | `EXAKT` | Gateway-Hardening ohne separate SSH-Negativmatrix abgeschlossen und archiviert; Deployment-Capability synchronisiert; CONTINUATION_PROMPT und PRODUCT_COMPLETION_PLAN enthalten offene Aufgaben und nächsten Identity-Change; Prüfungen: openspec validate harden-deployment-gateway --strict (vor Archivierung); openspec validate deployment-pipeline --type spec --strict (nach Archivierung); openspec archive harden-deployment-gateway --yes --json; gh run view 36426325791 --json status,conclusion; git diff --check |
 
+| AUSSTEHEND-01a0f9fb | 2026-10-02 | Chris | Codex | Kontextübergabe und Veröffentlichung der getrennten Lehrerpräsentationen | lokale Sitzung `01a0f9fb-9342-7c70-9331-3f64f0ff53c9` | `EXAKT` | Kontextdateien auf 07.10.2026 synchronisiert; 13 allgemeine und 8 Sprintfolien, acht Firmenfragegruppen, keine Zeiterfassung. Nutzerentscheidungen und Firmenfreigaben getrennt; kein neuer Firmenbeschluss angenommen. Inhaltscommit 67a5acf auf bestehendem Dokumentationsbranch gepusht; Veröffentlichung über PR #35, Merge und neuesten Main-Workflow beim Wiedereinstieg prüfen. Kein Anwendungscode oder neue OpenSpec-Artefakte; Claude-Dateien, Design und fremde Graphify-Vorarbeiten erhalten.; Prüfungen: git diff --check und Staging-Prüfung erfolgreich; drei aktive Changes jeweils openspec validate --strict gültig. HTML 13+8, acht Fragegruppen, node --check beider Skripte, 7+3 lokale und getrackte Ressourcen sowie 31 Markdown-Ziele gültig. Unverbindliches Rechenbeispiel: Budget und Empfängersumme jeweils 100,03 EUR. Anfänglicher Prüfparser behandelte selbstschließende meta-Tags falsch; Prüfer korrigiert und erneuter Lauf erfolgreich, kein Deckfehler. Desktop/Mobil-Browserprüfung am 06.10. bereits erfolgt; keine neue Live-Anwendungsabnahme. Historischer Main-Run 37385508517 erfolgreich; aktuelle PR-/Main-CI gesondert in GitHub prüfen. Globale OpenSpec-Prüfung vom 06.10. mit 24 bestehenden Purpose-Platzhalterfehlern bleibt separate Arbeit. |
 
-
+| AUSSTEHEND-01a141b8 | 2026-10-15 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a141b8-35b3-7131-9539-0ef76803de7e` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-01a13e8c | 2026-10-15 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a13e8c-7abe-7ff2-be7b-5989d75680b5` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-01a13ca2 | 2026-10-14 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a13ca2-6360-7772-970d-fa9f21929545` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-01a13c7c | 2026-10-14 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a13c7c-f929-7160-9cd2-0cab602d3813` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-68dee11c | 2026-10-06 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `68dee11c-0cda-4d8b-aacd-a0fc136aa5e6` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-288df2aa | 2026-10-12 | Chris | Claude Code | Kategorie-Migration entfernen, KI-Register reparieren, Kontextdateien für neue Session aktualisieren | lokale Sitzung `288df2aa-f604-4b4f-99f9-dabbb3084eb7` | `EXAKT` | Migration/Altfeld entfernt und archiviert, Register auf 74 Zeilen wiederhergestellt, Handoff/CLAUDE.md auf Stand 16.10.; Prüfungen: mvnw clean package 163/163, ai_evidence_log unittest, VM-SQL-Check 8/8 verknüpft, openspec validate |
+| AUSSTEHEND-01a0e882 | 2026-09-28 | Chris | Codex | B-09 Teamprovision erkunden und Session-Handoff sichern | lokale Sitzung `01a0e882-d7eb-7f03-a6d1-a04111e43270` | `EXAKT` | Nutzerentscheidungen, offene Fragen, Empfehlungen, technische Abhängigkeiten und Wiedereinstiegsprompt in Projektkontexten dokumentiert; Prüfungen: git diff --check; openspec list --json; Dokumentdateien geprüft |
 | AUSSTEHEND-01a06809 | 2026-09-03 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a06809-6bda-70c3-922a-59e5eeeeff28` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a0676e | 2026-09-03 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a0676e-bfa1-7241-89c0-43de935e78ee` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-01a06ab1 | 2026-09-04 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `01a06ab1-5040-7761-b84f-b202b6db6cc8` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
@@ -168,7 +74,6 @@
 | AUSSTEHEND-019f5c64 | 2026-07-13 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f5c64-3a08-77e1-9a96-81c80e769413` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-019f5c5c | 2026-07-13 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f5c5c-804f-7ac0-91ee-f052631f8eea` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-019f5e49 | 2026-07-14 | Chris | Codex | Fachliche Einordnung offen | lokale Sitzung `019f5e49-da41-7ba3-bab4-8ee924dc7cb7` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
-| AUSSTEHEND-01a0f9fb | 2026-10-02 | Chris | Codex | Kontextübergabe und Veröffentlichung der getrennten Lehrerpräsentationen | lokale Sitzung `01a0f9fb-9342-7c70-9331-3f64f0ff53c9` | `EXAKT` | Kontextdateien auf 07.10.2026 synchronisiert; 13 allgemeine und 8 Sprintfolien, acht Firmenfragegruppen, keine Zeiterfassung. Nutzerentscheidungen und Firmenfreigaben getrennt; kein neuer Firmenbeschluss angenommen. Inhaltscommit 67a5acf auf bestehendem Dokumentationsbranch gepusht; Veröffentlichung über PR #35, Merge und neuesten Main-Workflow beim Wiedereinstieg prüfen. Kein Anwendungscode oder neue OpenSpec-Artefakte; Claude-Dateien, Design und fremde Graphify-Vorarbeiten erhalten.; Prüfungen: git diff --check und Staging-Prüfung erfolgreich; drei aktive Changes jeweils openspec validate --strict gültig. HTML 13+8, acht Fragegruppen, node --check beider Skripte, 7+3 lokale und getrackte Ressourcen sowie 31 Markdown-Ziele gültig. Unverbindliches Rechenbeispiel: Budget und Empfängersumme jeweils 100,03 EUR. Anfänglicher Prüfparser behandelte selbstschließende meta-Tags falsch; Prüfer korrigiert und erneuter Lauf erfolgreich, kein Deckfehler. Desktop/Mobil-Browserprüfung am 06.10. bereits erfolgt; keine neue Live-Anwendungsabnahme. Historischer Main-Run 37385508517 erfolgreich; aktuelle PR-/Main-CI gesondert in GitHub prüfen. Globale OpenSpec-Prüfung vom 06.10. mit 24 bestehenden Purpose-Platzhalterfehlern bleibt separate Arbeit. |
 | AUSSTEHEND-5a3d5cc8 | 2026-07-14 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `5a3d5cc8-1c89-4ac6-8780-ac9b53b8075f` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-8e6421f3 | 2026-07-15 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `8e6421f3-d7cf-488c-b709-9f5a9da34ee8` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-0a6f9df2 | 2026-07-06 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `0a6f9df2-8b6d-4396-bd90-0dc35d18a5d3` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |

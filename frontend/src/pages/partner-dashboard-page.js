@@ -2,11 +2,11 @@ import { apiFetch } from "../lib/api.js";
 import { ensureValidSession, getSession } from "../lib/auth.js";
 import { showToast } from "../components/toast-notice.js";
 import { formatEuro, formatNumber, formatDate } from "../lib/format.js";
-import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue, previousPeriod, trendInfo, trailingWindowTrend, toLocalIsoDate, presetPeriod, PERIOD_PRESETS } from "../lib/dashboard-data.js";
+import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue, previousPeriod, trendInfo, trailingWindowTrend, toLocalIsoDate, presetPeriod } from "../lib/dashboard-data.js";
 import { escapeHtml } from "../lib/html.js";
+import { renderMonthChart, periodPickerHtml, wirePeriodPicker } from "../lib/dashboard-ui.js";
 
 const eur = new Intl.NumberFormat("de-AT", { style: "currency", currency: "EUR" });
-const dateLabel = new Intl.DateTimeFormat("de-AT", { day: "2-digit", month: "2-digit", year: "numeric" });
 
 const STATUS_META = {
   submitted: { label: "Eingereicht", bg: "--status-submitted-bg" },
@@ -14,42 +14,8 @@ const STATUS_META = {
   fulfilled: { label: "Abgeschlossen", bg: "--status-fulfilled-bg" },
 };
 
-function formatCompactEur(value) {
-  return value >= 1000 ? `${(value / 1000).toFixed(1).replace(".", ",")} T€` : eur.format(value);
-}
-
 function kundeName(kunde) {
   return `${kunde.firstName ? kunde.firstName + " " : ""}${kunde.lastName}`;
-}
-
-function renderMonthChart(title, monthLabels, monthlyValues) {
-  const max = Math.max(1, ...monthlyValues);
-  const lastIndex = monthlyValues.length - 1;
-  const bars = monthlyValues
-    .map((value, i) => {
-      const pct = Math.max(2, Math.round((value / max) * 100));
-      return `
-        <div class="month-chart__bar-wrap">
-          <div class="month-chart__bar${i === lastIndex ? " month-chart__bar--current" : ""}" style="height:${pct}%" title="${monthLabels[i] ?? ""}: ${eur.format(value)}"></div>
-        </div>`;
-    })
-    .join("");
-  const xlabels = monthLabels.map((m) => `<span class="month-chart__xlabel">${m}</span>`).join("");
-
-  return `
-    <div class="metric-card metric-card--chart month-chart-card">
-      <div class="metric-card__watermark"><i data-lucide="line-chart"></i></div>
-      <div class="metric-card__chart-label">${title}</div>
-      <div class="month-chart">
-        <div class="month-chart__bars">${bars}</div>
-        <div class="month-chart__yaxis">
-          <span>${formatCompactEur(max)}</span>
-          <span>${formatCompactEur(max / 2)}</span>
-          <span>0€</span>
-        </div>
-        <div class="month-chart__xaxis">${xlabels}</div>
-      </div>
-    </div>`;
 }
 
 class PartnerDashboardPage extends HTMLElement {
@@ -71,30 +37,7 @@ class PartnerDashboardPage extends HTMLElement {
         </div>
         <div class="dashboard-header__actions">
           <button type="button" class="button-primary button-primary--hero" id="new-order-btn"><i data-lucide="plus"></i>Neue Bestellung</button>
-          <div class="period-picker">
-            <button type="button" class="period-picker__button" id="period-button">
-              <i data-lucide="calendar"></i>
-              <span id="period-label"></span>
-              <i data-lucide="chevron-down" class="period-picker__caret"></i>
-            </button>
-            <div class="period-picker__panel is-closed" id="period-panel">
-              <div class="period-picker__presets">
-                ${Object.entries(PERIOD_PRESETS).map(([kind, label]) => `<button type="button" data-preset="${kind}">${label}</button>`).join("")}
-              </div>
-              <div class="period-picker__field">
-                <label for="period-from">Von</label>
-                <input type="date" id="period-from" />
-              </div>
-              <div class="period-picker__field">
-                <label for="period-to">Bis</label>
-                <input type="date" id="period-to" />
-              </div>
-              <div class="period-picker__actions">
-                <button type="button" class="period-picker__reset" id="period-reset">Gesamter Zeitraum</button>
-                <button type="button" class="period-picker__apply" id="period-apply">Anwenden</button>
-              </div>
-            </div>
-          </div>
+          ${periodPickerHtml()}
         </div>
       </div>
       <h2>Letzte Bestellungen</h2>
@@ -118,7 +61,7 @@ class PartnerDashboardPage extends HTMLElement {
       location.hash = "#/partner/orders/new";
     });
 
-    this.wirePeriodPicker();
+    wirePeriodPicker(this);
     this.load();
     this.loadProfileName();
   }
@@ -145,75 +88,6 @@ class PartnerDashboardPage extends HTMLElement {
       retry.textContent = "Erneut laden";
       retry.addEventListener("click", () => this.loadProfileName(), { once: true });
       status.append(" ", retry);
-    }
-  }
-
-  wirePeriodPicker() {
-    this.periodButton = this.querySelector("#period-button");
-    this.periodPanel = this.querySelector("#period-panel");
-    this.periodFromInput = this.querySelector("#period-from");
-    this.periodToInput = this.querySelector("#period-to");
-
-    this.updatePeriodUi();
-
-    this.periodButton.addEventListener("click", (event) => {
-      event.stopPropagation();
-      this.periodPanel.classList.toggle("is-closed");
-    });
-    document.addEventListener("click", (event) => {
-      if (!this.contains(event.target)) this.periodPanel.classList.add("is-closed");
-    });
-    this.periodPanel.addEventListener("click", (event) => event.stopPropagation());
-
-    for (const button of this.periodPanel.querySelectorAll("[data-preset]")) {
-      button.addEventListener("click", () => {
-        this.periodPreset = button.dataset.preset;
-        this.period = presetPeriod(this.periodPreset);
-        this.periodPanel.classList.add("is-closed");
-        this.updatePeriodUi();
-        this.render();
-      });
-    }
-
-    this.querySelector("#period-apply").addEventListener("click", () => {
-      const [fy, fm, fd] = this.periodFromInput.value.split("-").map(Number);
-      const [ty, tm, td] = this.periodToInput.value.split("-").map(Number);
-      const from = new Date(fy, fm - 1, fd, 0, 0, 0, 0);
-      const to = new Date(ty, tm - 1, td, 23, 59, 59, 999);
-      if (isNaN(from) || isNaN(to) || from > to) {
-        showToast("Bitte einen gültigen Zeitraum wählen.", "error");
-        return;
-      }
-      this.period = { from, to };
-      this.periodPreset = null;
-      this.periodPanel.classList.add("is-closed");
-      this.updatePeriodUi();
-      this.render();
-    });
-
-    this.querySelector("#period-reset").addEventListener("click", () => {
-      this.period = null;
-      this.periodPreset = null;
-      this.periodPanel.classList.add("is-closed");
-      this.updatePeriodUi();
-      this.render();
-    });
-  }
-
-  updatePeriodUi() {
-    for (const button of this.periodPanel.querySelectorAll("[data-preset]")) {
-      button.setAttribute("aria-pressed", String(button.dataset.preset === this.periodPreset));
-    }
-    if (this.period) {
-      this.periodFromInput.value = toLocalIsoDate(this.period.from);
-      this.periodToInput.value = toLocalIsoDate(this.period.to);
-      this.querySelector("#period-label").textContent = this.periodPreset
-        ? PERIOD_PRESETS[this.periodPreset]
-        : `${dateLabel.format(this.period.from)} – ${dateLabel.format(this.period.to)}`;
-    } else {
-      this.periodFromInput.value = "";
-      this.periodToInput.value = "";
-      this.querySelector("#period-label").textContent = "Gesamter Zeitraum";
     }
   }
 

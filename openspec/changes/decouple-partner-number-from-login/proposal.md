@@ -1,14 +1,12 @@
 ## Why
 
-`Partner.partnerNumber` is currently both the visible business identifier and the Keycloak username lookup key. BMD shall provide the business partner number, so login identity must be stable when that number changes.
+BMD shall provide the visible business partner number. Today partner numbers are free text set at creation, and import dedupe does not follow BMD rules. Login identity no longer depends on the partner number once `bind-partner-login-to-oidc-subject` is done, so the number can be changed safely.
 
 ## What Changes
 
-- Treat the BMD partner number as the visible, unique business identifier.
-- Bind each partner login to the verified OIDC subject (`sub`) instead of the mutable username or partner number.
-- Migrate only the synthetic demo account; no real production partner data exists.
-- Keep manual Keycloak provisioning and one shared organizational login per partner company.
-- Do not add automatic Keycloak provisioning, employee accounts, tenant infrastructure or a direct BMD connector.
+- Treat the BMD partner number as the visible, unique business identifier (text, leading zeros kept, canonical comparison from the BMD sample).
+- Allow the company to replace demo/legacy numbers with BMD numbers; manual and imported numbers follow the same rules.
+- No login, provisioning, tenancy or direct BMD connector changes.
 
 ## Capabilities
 
@@ -18,9 +16,8 @@ None.
 
 ### Modified Capabilities
 
-- `partner-management`: Partner numbers originate from BMD/import and remain independent of login identity.
-- `auth-access-control`: Partner resolution uses an explicitly stored OIDC subject and rejects unknown or duplicate bindings.
+- `partner-management`: BMD partner number integrity.
 
 ## Impact
 
-Affected areas are the Partner entity and DTOs, `CurrentPartner`, demo seeding, partner import, company partner management, auth tests, data documentation and canonical specifications. Existing technical IDs, orders, customers, enablements and commission records remain unchanged.
+Partner validation, partner import mapping/dedupe, company partner form and docs. Depends on `bind-partner-login-to-oidc-subject` (Release B deployed) and on an anonymized BMD sample or rule sheet. Technical IDs and relations stay unchanged.

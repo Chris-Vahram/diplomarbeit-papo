@@ -1,6 +1,7 @@
 package at.papo.partnerportal.seed;
 
-import at.papo.partnerportal.category.CategoryMigrationService;
+import at.papo.partnerportal.category.Category;
+import at.papo.partnerportal.category.CategoryNames;
 import at.papo.partnerportal.commission.CommissionService;
 import at.papo.partnerportal.business.BusinessTaxIdentifier;
 import at.papo.partnerportal.business.BusinessTaxIdentifierMigrationService;
@@ -15,6 +16,7 @@ import at.papo.partnerportal.order.Order;
 import at.papo.partnerportal.order.OrderItem;
 import at.papo.partnerportal.order.OrderStatus;
 import at.papo.partnerportal.partner.Partner;
+import at.papo.partnerportal.partner.PartnerLogin;
 import at.papo.partnerportal.product.DemoPngGenerator;
 import at.papo.partnerportal.product.Product;
 import at.papo.partnerportal.product.ProductImage;
@@ -50,8 +52,6 @@ public class DemoDataSeeder {
     @Inject
     ProductImageService productImageService;
 
-    @Inject
-    CategoryMigrationService categoryMigrationService;
 
     @Inject
     BusinessTaxIdentifierMigrationService businessTaxIdentifierMigrationService;
@@ -66,6 +66,12 @@ public class DemoDataSeeder {
         if (shouldSeed(launchMode, Partner.count(), seedDemoData)) {
             seedCompanyProfile();
             seedPartners();
+            // Fixed Keycloak user id of partner-demo exists only in the committed dev/test realms;
+            // a deployed Keycloak generates its own id, so NORMAL mode never seeds a binding
+            // (bind-partner-login-to-oidc-subject design "Dev/test identity").
+            if (launchMode != LaunchMode.NORMAL) {
+                seedPartnerDemoLogin();
+            }
             seedProducts();
             seedProductImages();
             seedEnablements();
@@ -76,7 +82,6 @@ public class DemoDataSeeder {
             }
         }
         businessTaxIdentifierMigrationService.migrate(launchMode != LaunchMode.NORMAL || seedDemoData);
-        categoryMigrationService.migrate();
     }
 
     static boolean shouldSeed(LaunchMode launchMode, long partnerCount) {
@@ -85,6 +90,17 @@ public class DemoDataSeeder {
 
     static boolean shouldSeed(LaunchMode launchMode, long partnerCount, boolean seedDemoData) {
         return partnerCount == 0 && (launchMode != LaunchMode.NORMAL || seedDemoData);
+    }
+
+    // Must match the "id" of partner-demo in keycloak/partnerportal-realm.json and the test realm.
+    public static final String PARTNER_DEMO_SUBJECT = "7c1d9a2e-4b3f-4e5a-9d6c-2f8b1a0e5c01";
+
+    private void seedPartnerDemoLogin() {
+        PartnerLogin login = new PartnerLogin();
+        login.oidcSubject = PARTNER_DEMO_SUBJECT;
+        login.partner = Partner.find("partnerNumber", "PARTNER-DEMO").firstResult();
+        login.createdBy = "demo-seed";
+        login.persist();
     }
 
     private void seedPartners() {
@@ -170,7 +186,18 @@ public class DemoDataSeeder {
         product.price = new BigDecimal(price);
         product.description = description;
         product.available = available;
-        product.category = category;
+        if (category != null) {
+            String normalized = CategoryNames.normalized(category);
+            Category existing = Category.find("normalizedName", normalized).firstResult();
+            if (existing == null) {
+                existing = new Category();
+                existing.name = category;
+                existing.normalizedName = normalized;
+                existing.active = true;
+                existing.persist();
+            }
+            product.articleCategory = existing;
+        }
         product.imageUrl = imageUrl;
         product.persist();
     }

@@ -55,22 +55,10 @@ public class CategoryService {
         if (Category.count("normalizedName = ?1 and id <> ?2", normalizedName, id) > 0) {
             throw new ApiException(409, "Artikelkategorie bereits vorhanden.");
         }
-        List<at.papo.partnerportal.product.Product> products = at.papo.partnerportal.product.Product
-                .<at.papo.partnerportal.product.Product>find("articleCategory = ?1 order by id", category)
-                .withLock(LockModeType.PESSIMISTIC_WRITE).list();
         category.name = name;
         category.normalizedName = normalizedName;
         category.active = request.active();
-        products.forEach(product -> product.category = category.name);
         return CategoryDto.from(category);
-    }
-
-    public Category resolveForProduct(Long categoryId, String legacyName) {
-        Category category = findForProductInput(categoryId, legacyName);
-        if (category != null && !category.active) {
-            throw new ApiException(400, "Artikelkategorie ist deaktiviert.");
-        }
-        return category;
     }
 
     public Category findForProductInput(Long categoryId, String legacyName) {

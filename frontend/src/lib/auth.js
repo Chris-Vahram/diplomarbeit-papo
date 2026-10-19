@@ -76,10 +76,6 @@ export function isAuthenticated() {
   return getSession() !== null;
 }
 
-export function hasRole(role) {
-  return getSession()?.roles.includes(role) ?? false;
-}
-
 const NEAR_EXPIRY_MS = 30_000;
 
 // Concurrent apiFetch* calls on one page render must not each fire their own

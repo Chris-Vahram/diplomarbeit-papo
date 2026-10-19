@@ -25,8 +25,6 @@ public class Product extends PanacheEntity {
     @Column(nullable = false)
     public boolean available = true;
 
-    public String category;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_category_id")
     public Category articleCategory;
