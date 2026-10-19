@@ -5,6 +5,7 @@ import at.papo.partnerportal.enablement.ProductEnablement;
 import at.papo.partnerportal.partner.Partner;
 import io.quarkus.narayana.jta.QuarkusTransaction;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.hibernate.exception.ConstraintViolationException;
@@ -25,6 +26,9 @@ public class PartnerShopService {
     // papo.shop.public-enabled: when false, no shop is publicly reachable on this deployment.
     @ConfigProperty(name = "papo.shop.public-enabled")
     boolean publicEnabled;
+
+    @Inject
+    ShopPageService pageService;
 
     // Same text for unknown and unreachable shops, so the public API does not reveal existence.
     public static final String NOT_REACHABLE = "Dieser Shop ist derzeit nicht erreichbar.";
@@ -62,6 +66,7 @@ public class PartnerShopService {
         shop.kennung = ShopKennung.suggest(partner.name, this::isTaken);
         shop.createdAt = Instant.now();
         shop.persist();
+        pageService.ensureDefaults(shop);
     }
 
     private static boolean isUniqueViolation(Throwable exception) {

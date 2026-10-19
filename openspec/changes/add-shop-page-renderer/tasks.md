@@ -1,9 +1,9 @@
 ## 1. Data model (essential)
 
-- [ ] 1.1 Entities `ShopTheme`, `ShopPage` with draft/published/previous JSON snapshots, page kind, URL segment, menu name, order
-- [ ] 1.2 `BlockType` registry and per-type validators (fields, lengths, references, max 40 blocks/page); tests incl. XSS payloads
-- [ ] 1.3 Limits: 6 designable online pages, 20 total; mandatory pages protected; tests
-- [ ] 1.4 Default template JSON for Startseite, Artikelübersicht, Artikeldetail; idempotent creation for new and existing shops
+- [x] 1.1 Entities `ShopTheme`, `ShopPage` with draft/published/previous JSON snapshots, page kind, URL segment, menu name, order
+- [x] 1.2 `BlockType` registry and per-type validators (fields, lengths, references, max 40 blocks/page); tests incl. XSS payloads
+- [x] 1.3 Limits: 6 designable online pages, 20 total; mandatory pages protected; tests
+- [x] 1.4 Default template JSON for Startseite, Artikelübersicht, Artikeldetail; idempotent creation for new and existing shops
 
 ## 2. Public API (essential)
 
