@@ -28,6 +28,13 @@ Decisions in `Specification/ENDKUNDENSHOP_DECISIONS.md` §4: shop as data, one r
 
 New tables only. Existing shops from the foundation change get mandatory pages via an idempotent startup service. Rollback: previous image ignores tables.
 
+## Interim States
+
+Deliberate gaps at implementation time; each one is closed by a follow-up change, not by this one.
+
+- **Tax rate (shop-public-catalog "Price display").** `Product` has no tax-rate field before `add-article-tax-rate`. The public catalogue therefore returns `Product.price` as gross price with a fixed `taxRatePercent` of 20 (`PublicArticleDto.DEFAULT_TAX_RATE_PERCENT`), the default that change uses. Closed by `add-article-tax-rate` task 4.5.
+- **Shop-owned images (shop-public-catalog "Public image delivery").** Shop asset uploads (`ShopAsset`) arrive with `add-shop-builder-editor`. Until then the public image endpoint and block image references accept only images of the shop's catalogue articles (`ShopCatalogService.publicImage`). Same-origin frontend asset paths (`/assets/...`) of articles are passed through; external URLs and `/api/` paths are dropped. Closed by `add-shop-builder-editor` task 1.5.
+
 ## Open Questions
 
 - Final curated font list (Tobias).

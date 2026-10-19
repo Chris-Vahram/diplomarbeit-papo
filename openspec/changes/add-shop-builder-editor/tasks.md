@@ -4,6 +4,7 @@
 - [ ] 1.2 Draft save with version check; publish page; restore previous published; mandatory-page rules; tests
 - [ ] 1.3 Theme draft save, publish design; tests for override preservation
 - [ ] 1.4 `ShopAsset` upload (PNG/JPEG/WebP, 5 MB, rights flag), quota, list, delete with in-use check; tests
+- [ ] 1.5 Extend `ShopCatalogService.publicImage` and block image references to the shop's own `ShopAsset`s; tests for foreign asset ids (interim state from `add-shop-page-renderer`)
 
 ## 2. Builder UI (essential)
 

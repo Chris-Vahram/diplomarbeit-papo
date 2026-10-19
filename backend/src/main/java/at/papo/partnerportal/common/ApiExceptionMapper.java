@@ -1,5 +1,6 @@
 package at.papo.partnerportal.common;
 
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
@@ -9,9 +10,12 @@ import java.util.Map;
 @Provider
 public class ApiExceptionMapper implements ExceptionMapper<ApiException> {
 
+    // Explicit JSON type: on byte endpoints (@Produces */*) the error body would otherwise
+    // go out without a usable content type.
     @Override
     public Response toResponse(ApiException exception) {
         return Response.status(exception.getStatus())
+                .type(MediaType.APPLICATION_JSON)
                 .entity(Map.of("message", exception.getMessage()))
                 .build();
     }

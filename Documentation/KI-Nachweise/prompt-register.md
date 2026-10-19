@@ -102,6 +102,7 @@
 | AUSSTEHEND-a3702550 | 2026-10-12 | Tobias | Claude Code | Fachliche Einordnung offen | lokale Sitzung `a3702550-bb6a-40ba-9013-6fbb2baac1d8` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-68b929d3 | 2026-10-13 | Tobias | Claude Code | Fachliche Einordnung offen | lokale Sitzung `68b929d3-ea0a-4a96-9aea-ba4245b240ba` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-2f5375fe | 2026-09-28 | Tobias | Claude Code | Fachliche Einordnung offen | lokale Sitzung `2f5375fe-a7ab-4400-a9da-f29fa6b7b20f` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
+| AUSSTEHEND-b64d54ad | 2026-10-19 | Tobias | Claude Code | add-shop-page-renderer umsetzen | lokale Sitzung `b64d54ad-86f4-4d48-b6a9-4a2f6f221cc3` | `EXAKT` | Seiten/Theme-Datenmodell, Blockvalidierung, öffentliche Shop-API, Renderer mit 9 Blöcken, 11 OFL-Schriften; Prüfungen: mvnw package 210/210 grün; openspec validate --strict; Playwright Desktop/Mobil |
 
 ## Noch rückwirkend aufzunehmen
 
