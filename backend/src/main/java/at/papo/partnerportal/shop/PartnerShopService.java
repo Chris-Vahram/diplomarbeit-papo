@@ -3,8 +3,11 @@ package at.papo.partnerportal.shop;
 import at.papo.partnerportal.common.ApiException;
 import at.papo.partnerportal.enablement.ProductEnablement;
 import at.papo.partnerportal.partner.Partner;
+import io.quarkus.narayana.jta.QuarkusTransaction;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import org.hibernate.exception.ConstraintViolationException;
+import org.jboss.logging.Logger;
 
 import java.time.Instant;
 import java.util.HashSet;
@@ -15,21 +18,54 @@ import java.util.Set;
 @ApplicationScoped
 public class PartnerShopService {
 
+    private static final Logger LOG = Logger.getLogger(PartnerShopService.class);
+    private static final int CREATE_ATTEMPTS = 3;
+
     // Same text for unknown and unreachable shops, so the public API does not reveal existence.
     public static final String NOT_REACHABLE = "Dieser Shop ist derzeit nicht erreichbar.";
 
-    @Transactional
+    // The record is created lazily from plain GETs, so company and partner may race on the
+    // first visit, and two equally named partners may race on the same identifier. The insert
+    // therefore runs in its own transaction; a unique-constraint loser re-reads (and, on an
+    // identifier clash, retries with the next suffix) instead of surfacing a 500.
     public PartnerShop findOrCreate(Partner partner) {
-        PartnerShop existing = PartnerShop.find("partner", partner).firstResult();
-        if (existing != null) {
-            return existing;
+        for (int attempt = 0; attempt < CREATE_ATTEMPTS; attempt++) {
+            PartnerShop existing = PartnerShop.find("partner", partner).firstResult();
+            if (existing != null) {
+                return existing;
+            }
+            try {
+                QuarkusTransaction.requiringNew().run(() -> create(partner.id));
+            } catch (RuntimeException exception) {
+                if (!isUniqueViolation(exception)) {
+                    throw exception;
+                }
+                LOG.debugf("Concurrent shop creation for partner %d, re-reading", partner.id);
+            }
         }
+        PartnerShop created = PartnerShop.find("partner", partner).firstResult();
+        if (created == null) {
+            throw new ApiException(409, "Der Webshop konnte gerade nicht angelegt werden. Bitte erneut versuchen.");
+        }
+        return created;
+    }
+
+    private void create(Long partnerId) {
+        Partner partner = Partner.findById(partnerId);
         PartnerShop shop = new PartnerShop();
         shop.partner = partner;
         shop.kennung = ShopKennung.suggest(partner.name, this::isTaken);
         shop.createdAt = Instant.now();
         shop.persist();
-        return shop;
+    }
+
+    private static boolean isUniqueViolation(Throwable exception) {
+        for (Throwable cause = exception; cause != null; cause = cause.getCause()) {
+            if (cause instanceof ConstraintViolationException) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public ShopStatus status(PartnerShop shop) {

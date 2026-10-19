@@ -110,6 +110,33 @@ class PartnerShopResourceTest {
     }
 
     @Test
+    void concurrentFirstVisitsCreateOneShopWithoutError() throws Exception {
+        long first = createPartner("Gleichzeitig Test KG");
+        long second = createPartner("Gleichzeitig Test KG");
+        String token = companyToken();
+        java.util.concurrent.ExecutorService pool = java.util.concurrent.Executors.newFixedThreadPool(6);
+        try {
+            java.util.List<java.util.concurrent.Future<io.restassured.response.Response>> calls = new java.util.ArrayList<>();
+            for (int i = 0; i < 6; i++) {
+                long partnerId = i % 2 == 0 ? first : second;
+                calls.add(pool.submit(() -> given().auth().oauth2(token).when().get(shopPath(partnerId))));
+            }
+            for (var call : calls) {
+                call.get().then().statusCode(200);
+            }
+        } finally {
+            pool.shutdown();
+        }
+
+        String firstKennung = given().auth().oauth2(token).when().get(shopPath(first)).then().extract().path("kennung");
+        String secondKennung = given().auth().oauth2(token).when().get(shopPath(second)).then().extract().path("kennung");
+        org.junit.jupiter.api.Assertions.assertNotEquals(firstKennung, secondKennung);
+        long shops = QuarkusTransaction.requiringNew().call(
+                () -> PartnerShop.count("partner.id in ?1", java.util.List.of(first, second)));
+        org.junit.jupiter.api.Assertions.assertEquals(2, shops);
+    }
+
+    @Test
     void takedownRequiresReasonAndReleaseClearsIt() {
         long partnerId = createPartner("Takedown Test OG", AVAILABLE_PRODUCT);
 
