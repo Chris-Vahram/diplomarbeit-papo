@@ -1,0 +1,72 @@
+import { escapeHtml } from "../../lib/html.js";
+import { articleCardsHtml, imageHtml, priceHtml } from "./article-card.js";
+import { ShopBlock } from "./shop-block.js";
+
+function headingHtml(text) {
+  return text ? `<h2 class="shop-heading">${escapeHtml(text)}</h2>` : "";
+}
+
+// Shared by grid and featured list: loads the shop catalogue once, then renders cards.
+class ArticleListBlock extends ShopBlock {
+  #renderId = 0;
+
+  render(config) {
+    const renderId = ++this.#renderId;
+    this.innerHTML = `<div class="shop-inner">${headingHtml(config.heading)}<p class="shop-muted">Artikel werden geladen …</p></div>`;
+    this.context.api
+      .articles()
+      .then((articles) => {
+        if (renderId !== this.#renderId) return;
+        const selected = this.select(articles, config);
+        // A featured block whose articles all disappeared renders nothing instead of an error.
+        if (selected === null) {
+          this.replaceChildren();
+          return;
+        }
+        this.innerHTML = `<div class="shop-inner">${headingHtml(config.heading)}${articleCardsHtml(this.context.api, selected, config.columns)}</div>`;
+      })
+      .catch(() => {
+        if (renderId !== this.#renderId) return;
+        this.innerHTML = `<div class="shop-inner"><p class="shop-muted">Artikel konnten nicht geladen werden.</p></div>`;
+      });
+  }
+}
+
+class ArticleGridBlock extends ArticleListBlock {
+  select(articles, config) {
+    return config.categoryId ? articles.filter((article) => article.categoryId === config.categoryId) : articles;
+  }
+}
+
+// Keeps the chosen order; ids no longer in the public catalogue are silently omitted.
+class FeaturedArticlesBlock extends ArticleListBlock {
+  select(articles, config) {
+    const byId = new Map(articles.map((article) => [article.id, article]));
+    const selected = (config.articleIds ?? []).map((id) => byId.get(id)).filter(Boolean);
+    return selected.length ? selected : null;
+  }
+}
+
+// Central article data only (shop-pages spec "Single article-detail template").
+class ArticleDetailBlock extends ShopBlock {
+  render(config) {
+    const { api, article } = this.context;
+    if (!article) {
+      this.innerHTML = `<div class="shop-inner"><p class="shop-muted">Dieser Artikel ist nicht verfügbar.</p></div>`;
+      return;
+    }
+    this.innerHTML = `<article class="shop-inner shop-split shop-split--image-${escapeHtml(config.imagePosition ?? "left")}">
+      ${imageHtml(api, article, "shop-split__image")}
+      <div class="shop-split__text">
+        ${article.category ? `<p class="shop-muted">${escapeHtml(article.category)}</p>` : ""}
+        <h1 class="shop-heading">${escapeHtml(article.name)}</h1>
+        ${priceHtml(article)}
+        ${article.description ? `<p class="shop-text">${escapeHtml(article.description)}</p>` : ""}
+      </div>
+    </article>`;
+  }
+}
+
+customElements.define("shop-block-article-grid", ArticleGridBlock);
+customElements.define("shop-block-featured-articles", FeaturedArticlesBlock);
+customElements.define("shop-block-article-detail", ArticleDetailBlock);

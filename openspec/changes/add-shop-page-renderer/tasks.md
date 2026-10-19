@@ -13,13 +13,13 @@
 
 ## 3. Renderer (essential)
 
-- [ ] 3.1 `<shop-page-view>` and theme CSS custom properties; override handling
-- [ ] 3.2 Block elements: hero, heading-text, image, image-text, article-grid, featured-articles, article-detail, contact-person, spacer
-- [ ] 3.3 Shop layout with generated navigation and fixed footer placeholder; responsive check
-- [ ] 3.4 Curated self-hosted fonts added under `vendor/fonts` with licences; font registry
+- [x] 3.1 `<shop-page-view>` and theme CSS custom properties; override handling
+- [x] 3.2 Block elements: hero, heading-text, image, image-text, article-grid, featured-articles, article-detail, contact-person, spacer
+- [x] 3.3 Shop layout with generated navigation and fixed footer placeholder; responsive check
+- [x] 3.4 Curated self-hosted fonts added under `vendor/fonts` with licences; font registry
 
 ## 4. Verification
 
 - [ ] 4.1 Backend tests + package; `git diff --check`
-- [ ] 4.2 Browser desktop/mobile: default shop renders, no external requests
+- [x] 4.2 Browser desktop/mobile: default shop renders, no external requests
 - [ ] 4.3 Update traceability
