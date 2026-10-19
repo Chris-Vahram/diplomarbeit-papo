@@ -20,6 +20,6 @@
 
 ## 4. Verification
 
-- [ ] 4.1 Backend tests + package; `git diff --check`
+- [x] 4.1 Backend tests + package; `git diff --check`
 - [x] 4.2 Browser desktop/mobile: default shop renders, no external requests
-- [ ] 4.3 Update traceability
+- [x] 4.3 Update traceability
