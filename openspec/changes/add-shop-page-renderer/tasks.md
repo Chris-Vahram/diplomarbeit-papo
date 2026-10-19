@@ -7,9 +7,9 @@
 
 ## 2. Public API (essential)
 
-- [ ] 2.1 `GET /api/shop/{kennung}/theme`, `/navigation`, `/pages/{segment}`
-- [ ] 2.2 Public catalogue `/articles`, `/articles/{id}`, `/categories` (enabled ∧ available), gross price + rate
-- [ ] 2.3 Public image endpoint with membership check; tests for foreign ids
+- [x] 2.1 `GET /api/shop/{kennung}/theme`, `/navigation`, `/pages/{segment}`
+- [x] 2.2 Public catalogue `/articles`, `/articles/{id}`, `/categories` (enabled ∧ available), gross price + rate
+- [x] 2.3 Public image endpoint with membership check; tests for foreign ids
 
 ## 3. Renderer (essential)
 
