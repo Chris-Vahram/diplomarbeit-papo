@@ -19,6 +19,17 @@ The system SHALL serve every shop at `/shop/<kennung>` from a separate frontend 
 - **WHEN** a visitor opens a shop identifier that does not exist or is not reachable
 - **THEN** the same neutral page "Dieser Shop ist derzeit nicht erreichbar." is shown, without revealing whether the shop exists
 
+### Requirement: Public shop kill switch
+The system SHALL provide the configuration `papo.shop.public-enabled`, defaulting to false in production deployments. While false, all public shop routes and `/api/shop/*` endpoints SHALL respond as if the shop were offline, independent of release status. Company and partner shop management SHALL remain usable, and both SHALL see the hint "Öffentliche Shops sind auf dieser Umgebung noch deaktiviert." Public links SHALL NOT be shown as clickable while the switch is off.
+
+#### Scenario: Switch off
+- **WHEN** `papo.shop.public-enabled` is false and a visitor opens a released, reachable shop
+- **THEN** the visitor sees the neutral page "Dieser Shop ist derzeit nicht erreichbar." and the API returns the uniform 404
+
+#### Scenario: Management unaffected
+- **WHEN** `papo.shop.public-enabled` is false and the company releases a shop
+- **THEN** the release is stored and the partner sees the status, with the hint "Öffentliche Shops sind auf dieser Umgebung noch deaktiviert."
+
 ### Requirement: Public shop API namespace
 Unauthenticated shop access SHALL be limited to the namespace `/api/shop/{kennung}/…`. The partner SHALL be resolved server-side from the identifier only. Public endpoints SHALL expose no internal identifiers beyond what the shop needs (no partner number, commission, contact data unless published by the partner, no customer data).
 
