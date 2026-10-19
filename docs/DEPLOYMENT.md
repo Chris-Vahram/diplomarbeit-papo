@@ -49,6 +49,7 @@ kein zusätzliches Secret nötig.
 | `DOMAIN` | Produktionsdomain — steuert `KC_HOSTNAME`, Caddy-TLS, Keycloak `redirectUris`/`webOrigins` (siehe `deploy/keycloak/render-and-start.sh`) |
 | `IMAGE_TAG` | Welches Image-Tag `docker-compose.prod.yml` zieht (normal `latest`, siehe Rollback) |
 | `SEED_DEMO_DATA` | Opt-in: Demo-Daten auf einer leeren DB seeden (siehe Abschnitt "Demo-Daten (`SEED_DEMO_DATA`)"); Default `false`, nie im Image |
+| `SHOP_PUBLIC_ENABLED` | Öffentliche Partner-Shops (`/shop/*`, `/api/shop/*`) erreichbar machen; Default `false`. Erst einschalten, wenn die Shop-Rechtstexte (`add-shop-legal-consent`) live sind. Shop-Verwaltung im Portal funktioniert auch ausgeschaltet |
 
 Das GHCR-Package ist **privat**; die VM authentifiziert sich einmalig per
 `docker login ghcr.io` mit einem VM-lokalen, read-only PAT (nicht in GitHub Secrets, nicht

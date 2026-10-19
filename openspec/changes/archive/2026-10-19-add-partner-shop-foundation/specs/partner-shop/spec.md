@@ -64,8 +64,23 @@ The partner SHALL see in "Mein Webshop" the shop identifier, the public link, an
 - **THEN** the page shows status "Online" and the clickable public link
 
 ### Requirement: Company shop overview per partner
-The company SHALL see and manage the shop of each partner in the partner management (identifier, status, release, takedown with reason).
+The company SHALL see and manage the shop of each partner in the partner management (identifier, status, release, takedown with reason). The partner table SHALL show each partner's shop status at a glance through a "Webshop" button in the status's signal colour; the status of all partners SHALL be loaded in one request.
 
 #### Scenario: Company manages shop
-- **WHEN** the company opens a partner's details
-- **THEN** a "Webshop" section shows identifier, status and the actions allowed in that status
+- **WHEN** the company selects "Webshop" for a partner in the partner management
+- **THEN** a "Webshop" dialog shows identifier, status and the actions allowed in that status
+
+#### Scenario: Status at a glance
+- **WHEN** the company opens the partner management
+- **THEN** every partner row shows a "Webshop" button coloured by that partner's shop status, and a partner without a shop record counts as "Nicht freigegeben"
+
+### Requirement: Shop status signal colours
+Shop status SHALL be shown with signal colours consistent with the order status badges: green for "Online" (as "Abgeschlossen"), yellow for the deliberately offline status "Nicht freigegeben" (as "Eingereicht"), red for every unintended offline status (taken offline by the company, partner inactive, no available articles). The colour SHALL never be the only carrier of the status; a German status text SHALL be present.
+
+#### Scenario: Unintended offline is red
+- **WHEN** a released shop is offline because its partner has no available article
+- **THEN** the partner page, the company dialog and the partner table show the status in red together with the text "Offline – keine Artikel"
+
+#### Scenario: Not released is yellow
+- **WHEN** a shop has not been released yet
+- **THEN** its status is shown in yellow with the text "Nicht freigegeben"

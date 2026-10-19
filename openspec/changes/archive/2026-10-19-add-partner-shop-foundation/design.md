@@ -25,7 +25,11 @@ All existing endpoints are role-protected (`@RolesAllowed`), the frontend is one
 
 ## Migration Plan
 
-New table only; no data migration. Rollback: previous image ignores the table; remove the Caddy rule.
+New table only; no data migration. Rollback: previous image ignores the table; remove the Caddy rule. Deploy with `papo.shop.public-enabled=false` (Nachtrag 19.10.2026, see below).
+
+## Nachtrag 2026-10-19: Kill switch
+
+7. **Kill switch `papo.shop.public-enabled` (default false in prod, `SHOP_PUBLIC_ENABLED`).** Every merge into `main` deploys to the only public VM; there is no staging. While false, `findOnline` returns nothing, so every public shop call gets the uniform 404 and the shop page shows the neutral offline text, regardless of shop status. Portal DTOs carry `publicEnabled` so partner and company see that public shops are disabled on this environment. Specified in closed PR #42, added before merging PR #50. dev/test enable the switch; a dedicated test profile covers the off state.
 
 ## Open Questions
 

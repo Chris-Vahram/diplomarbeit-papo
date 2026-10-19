@@ -169,6 +169,14 @@ Jeder Punkt ist ein eigener Change; keine Sammel-Implementierung.
 | 9 | `add-shop-inquiries` | B-05 | 2 |
 | 10 | `add-shop-customer-accounts` | Eigener Realm, Registrierung, Verifizierung, Reset | 6, B-04 |
 
+Merge-Reihenfolge: Jeder Change wird einzeln nach `main` gemergt und deployt.
+Weil `main` direkt auf die öffentliche VM deployt, bleibt der Schalter
+`papo.shop.public-enabled` (`SHOP_PUBLIC_ENABLED`, aus Change 1) dort aus, bis
+Change 7 gemergt ist. Change 7 wird vor Change 6 umgesetzt: keine öffentliche
+Bestellung ohne Rechtstexte. Change 0 wird erst nach Bestätigung durch die Firma
+oder ausdrücklicher Freigabe durch Chris gemergt (ändert die Provisionsbasis).
+Change 10 erst nach B-04. Alle Schemaänderungen bleiben additiv (Hibernate `update`).
+
 Die Mandantenfähigkeit blockiert den Shop nicht: Der Shop hängt am Partner und
 erbt dessen spätere `company_id`. Changes 1–3 sind der Kern; Tobias implementiert
 den Baukasten.

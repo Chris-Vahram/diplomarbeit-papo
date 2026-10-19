@@ -24,10 +24,11 @@ Within a capability package: `XxxResource` (REST), `XxxService` (logic), `Xxx` (
 - Company-facing: `/api/company/<resource>` (e.g. `/api/company/partners`, `/api/company/products`)
 - Partner-facing: `/api/partner/<resource>` (e.g. `/api/partner/orders`, `/api/partner/dashboard`)
 - Shared/no role prefix only for truly role-agnostic reads (none expected in MVP — prefer explicit prefixes for FR-20 clarity).
+- Public shop (B-01): `/api/shop/{kennung}/…` is the **only** unauthenticated namespace. Its resources are `@PermitAll` and carry `@PublicShopEndpoint`, which binds the per-IP rate limit (429) and `X-Robots-Tag: noindex`. The partner is resolved server-side from the identifier; responses expose only what the shop needs (no partner number, commission, contact or customer data); unknown and offline shops return the same 404. No portal endpoint may be reachable from there. The deployment switch `papo.shop.public-enabled` (`SHOP_PUBLIC_ENABLED`, default false in prod) must gate every public shop read; while false, every shop answers like an offline one.
 - Standard REST verbs: `GET` (list/read), `POST` (create), `PUT` (update), no `DELETE` unless a capability spec calls for it.
 
 ### Access control
-Every resource method annotated `@RolesAllowed("company")` or `@RolesAllowed("partner")` — no unannotated protected endpoints (FR-20). Partner-scoped endpoints additionally filter by the caller's linked `Partner` id server-side (resolved from the Keycloak username claim), never trust a client-supplied partner id.
+Every resource method annotated `@RolesAllowed("company")` or `@RolesAllowed("partner")` — no unannotated protected endpoints (FR-20). Sole exception: the public shop namespace above (`@PermitAll`, listed explicitly in `application.properties`). Partner-scoped endpoints additionally filter by the caller's linked `Partner` id server-side (resolved from the Keycloak username claim), never trust a client-supplied partner id.
 
 ### Data conventions
 - **Money** (product price, unit-price snapshot, order value, commission basis/value, `commissionPercent`): `java.math.BigDecimal`, mapped to `numeric` — never `double`/`float`.
@@ -54,7 +55,15 @@ frontend/
     components/        # shared Web Components, reused across company/partner areas
     pages/             # one Custom Element per route
     styles/            # base.css — shared tokens + component styles
+    shop/              # public shop entry modules (shop-app.js, shop.css)
+  shop.html            # public shop entry, served for /shop/<kennung>
 ```
+
+The public shop (`shop.html` + `src/shop/`) is a separate entry: it must not import
+portal modules (`lib/auth.js`, `lib/api.js`, `router.js`, `pages/*`) or `base.css`,
+reads no stored tokens and calls only `/api/shop/*`. `lib/config.js` (base URLs only,
+no imports) is the one shared module. Caddy (prod) and
+`tools/dev_frontend_server.py` (dev) both rewrite `/shop/*` to `shop.html`.
 
 ### Routing
 `src/lib/router.js` is a minimal hash router (`#/company/dashboard`, `#/partner/dashboard`, ...). Each route declares its required role; the router redirects unauthenticated/wrong-role access to `/login` or the caller's own dashboard (FR-20 deep-link protection is enforced again server-side — the frontend guard is UX only, not the security boundary).

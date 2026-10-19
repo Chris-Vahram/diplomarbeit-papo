@@ -69,16 +69,37 @@ und keine echten Registerdaten.
 
 ## 3. Frontend starten
 
-Beliebiger statischer Server im Ordner `frontend/`, z. B.:
+Mitgelieferter statischer Server (nur Python-Standardbibliothek), der wie Caddy in
+Produktion `/shop/<kennung>` auf `shop.html` umleitet:
 
 ```bash
-cd frontend
-python3 -m http.server 3000
+python3 tools/dev_frontend_server.py
 ```
 
 Dann http://localhost:3000 öffnen und mit einem Demo-User anmelden.
 Das Frontend spricht das Backend über `http://localhost:8080/api` an (CORS ist im
 Backend aktiviert); Login-Tokens holt es direkt vom Keycloak auf :8081.
+
+### Öffentlichen Partner-Shop lokal öffnen
+
+Der Shop hat einen eigenen Einstieg `frontend/shop.html`, der keinen Portal-Code lädt.
+Caddy (Produktion) und `tools/dev_frontend_server.py` (lokal) beantworten jeden Pfad
+`/shop/<kennung>` damit; der Link sieht lokal und live gleich aus.
+
+1. Als `company-demo` anmelden → Partnerverwaltung → beim Partner **Webshop** →
+   **Freigeben**. Der Partner braucht mindestens einen freigeschalteten, verfügbaren Artikel.
+2. Den angezeigten Link öffnen, lokal `http://localhost:3000/shop/<kennung>`.
+
+Als Partner zeigt **Mein Webshop** denselben Link und den Status. Unbekannte oder
+offline geschaltete Shops zeigen „Dieser Shop ist derzeit nicht erreichbar.“
+Das Rate-Limit der öffentlichen Shop-API (Standard 60 Anfragen/Minute je IP) ist über
+`SHOP_RATE_LIMIT_PER_MINUTE` einstellbar.
+
+Öffentliche Shops sind lokal (dev) eingeschaltet, in Produktion standardmäßig aus
+(`SHOP_PUBLIC_ENABLED`, siehe `docs/DEPLOYMENT.md`). Zum Testen des ausgeschalteten
+Zustands lokal: `SHOP_PUBLIC_ENABLED=false ./mvnw quarkus:dev` – Shopseiten zeigen dann
+immer „nicht erreichbar“, Portal und Partner sehen „Öffentliche Shops sind auf dieser
+Umgebung noch deaktiviert.“
 
 ## 4. Tests
 

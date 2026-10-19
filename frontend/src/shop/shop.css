@@ -1,0 +1,60 @@
+/* Public shop base styles. Deliberately independent of the portal's base.css;
+   shop themes arrive with add-shop-page-renderer. System fonts only (no external loads). */
+:root {
+  --shop-bg: #f7f7f5;
+  --shop-surface: #ffffff;
+  --shop-text: #1f2328;
+  --shop-muted: #5b6168;
+  --shop-border: #dcdcd7;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --shop-bg: #161718;
+    --shop-surface: #202224;
+    --shop-text: #ececec;
+    --shop-muted: #a4a9ae;
+    --shop-border: #3a3d40;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--shop-bg);
+  color: var(--shop-text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
+}
+
+.shop-root {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 16px;
+}
+
+.shop-loading { color: var(--shop-muted); }
+
+.shop-notice {
+  width: 100%;
+  max-width: 32rem;
+  padding: 2rem 1.5rem;
+  background: var(--shop-surface);
+  border: 1px solid var(--shop-border);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.shop-notice h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  overflow-wrap: anywhere;
+}
+
+.shop-notice p {
+  margin: 0.75rem 0 0;
+  color: var(--shop-muted);
+}
