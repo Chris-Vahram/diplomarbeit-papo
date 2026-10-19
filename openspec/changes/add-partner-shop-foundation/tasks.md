@@ -31,3 +31,4 @@
 - [x] 5.1 Shop URL also locally `/shop/<kennung>` via `tools/dev_frontend_server.py`; no `?kennung=` parameter
 - [x] 5.2 Company "Webshop" dialog restructured (status head, sections Freigabe/Kennung, buttons in one row)
 - [x] 5.3 Signal colours aligned with order status badges; coloured "Webshop" button per partner row; `GET /api/company/shops` overview with test
+- [x] 5.4 Code-review fixes: stale dialog responses ignored, malformed shop URL shows neutral page, partner list loads without shop overview, bare `/shop` routed to shop entry, race-safe shop creation, bounded rate-limiter, shared status rendering, indexing scope documented

@@ -19,8 +19,10 @@
 
 	# Public partner shops (add-partner-shop-foundation): every /shop/<kennung> path gets the
 	# separate shop.html entry, which loads no portal code. Must stay before the SPA fallback.
-	# noindex until a later change enables indexing for released live shops.
-	@shop path /shop/* /shop.html
+	# noindex is fixed here (and in shop.html) on purpose: papo.shop.indexing-enabled only
+	# covers the API; page indexing for released live shops needs its own later change.
+	# Bare /shop is included so it never falls through to the portal SPA.
+	@shop path /shop /shop/* /shop.html
 	handle @shop {
 		root * /srv/frontend-live/current
 		header X-Robots-Tag noindex

@@ -15,13 +15,18 @@ FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
 
 
 class FrontendHandler(http.server.SimpleHTTPRequestHandler):
+    @staticmethod
+    def _is_shop_path(path):
+        path = path.split("?", 1)[0]
+        return path == "/shop" or path.startswith("/shop/") or path == "/shop.html"
+
     def translate_path(self, path):
-        if path.split("?", 1)[0].startswith("/shop/"):
+        if self._is_shop_path(path):
             path = "/shop.html"
         return super().translate_path(path)
 
     def end_headers(self):
-        if self.path.startswith("/shop/") or self.path.startswith("/shop.html"):
+        if self._is_shop_path(self.path):
             self.send_header("X-Robots-Tag", "noindex")
         # Always fetch fresh files while developing.
         self.send_header("Cache-Control", "no-store")
