@@ -155,15 +155,23 @@ class ShopBuilder extends HTMLElement {
 
   #renderLayout() {
     this.#frameReady = false;
+    // Row 1: back, editor tabs, preview size. Row 2 (page bar): only for "Seite bearbeiten".
     this.innerHTML = `
-      ${BACK_BAR}
-      <div class="builder" data-tab="edit">
-        <div class="builder-tabs" role="tablist" aria-label="Shop-Editor">
+      <header class="builder-header">
+        <a class="builder-back" href="#/partner/shop" data-action="back"><i data-lucide="arrow-left"></i><span>Zurück</span></a>
+        <div class="builder-tabs" role="tablist" aria-label="Shop bearbeiten">
           <button type="button" role="tab" data-tab="edit" aria-selected="true">Seite bearbeiten</button>
           <button type="button" role="tab" data-tab="pages" aria-selected="false">Seiten</button>
           <button type="button" role="tab" data-tab="design" aria-selected="false">Design</button>
           <button type="button" role="tab" data-tab="images" aria-selected="false">Bilder</button>
         </div>
+        <span class="builder-header__spacer"></span>
+        <div class="builder-device" role="group" aria-label="Vorschaugröße">
+          <button type="button" data-device="desktop" aria-pressed="true">Computer</button>
+          <button type="button" data-device="mobile" aria-pressed="false">Handy</button>
+        </div>
+      </header>
+      <div class="builder" data-tab="edit">
 
         <div class="builder-pagebar">
           <label class="builder-pagebar__select">Seite
@@ -175,10 +183,6 @@ class ShopBuilder extends HTMLElement {
           <span class="builder-pagebar__spacer"></span>
           <button type="button" class="builder-icon" id="builder-undo" title="Rückgängig (Strg+Z)" aria-label="Rückgängig" disabled>↶</button>
           <button type="button" class="builder-icon" id="builder-redo" title="Wiederholen (Strg+Umschalt+Z)" aria-label="Wiederholen" disabled>↷</button>
-          <div class="builder-device" role="group" aria-label="Vorschaugröße">
-            <button type="button" data-device="desktop" aria-pressed="true">Computer</button>
-            <button type="button" data-device="mobile" aria-pressed="false">Handy</button>
-          </div>
           <button type="button" class="button-secondary" id="builder-restore" title="Vorherige veröffentlichte Version wiederherstellen" hidden>Wiederherstellen</button>
           <button type="button" class="button-primary" id="builder-publish">Seite veröffentlichen</button>
         </div>
@@ -345,6 +349,8 @@ class ShopBuilder extends HTMLElement {
   #showTab(tab) {
     this.#tab = tab;
     this.querySelector(".builder").dataset.tab = tab;
+    // Preview size only matters where a preview is shown.
+    this.querySelector(".builder-header .builder-device").hidden = tab === "pages" || tab === "images";
     this.querySelectorAll(".builder-tabs [data-tab]").forEach((button) =>
       button.setAttribute("aria-selected", String(button.dataset.tab === tab)));
     this.querySelectorAll("[data-panel]").forEach((panel) => {
