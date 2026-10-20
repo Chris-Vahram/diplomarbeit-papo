@@ -34,6 +34,9 @@ public class PublicShopResource {
     ShopCatalogService catalogService;
 
     @Inject
+    ShopAssetService assetService;
+
+    @Inject
     CompanyProfileService companyProfileService;
 
     @GET
@@ -63,7 +66,7 @@ public class PublicShopResource {
     public PublicPageDto page(@PathParam("kennung") String kennung, @PathParam("segment") String segment) {
         ShopPage page = pageService.onlinePage(onlineShop(kennung), segment)
                 .orElseThrow(() -> new ApiException(404, "Diese Seite gibt es nicht."));
-        return new PublicPageDto(page.segment, page.menuName, page.slot,
+        return new PublicPageDto(page.segment, page.menuName, page.slot, page.seoTitle, page.seoDescription,
                 pageService.parse(page.publishedContent).get("blocks"));
     }
 
@@ -103,6 +106,20 @@ public class PublicShopResource {
                 .type(image.contentType)
                 // private + short: an image stops being public when the shop goes offline or the
                 // article is disabled, so shared caches must not keep serving it.
+                .header("Cache-Control", "private, max-age=300")
+                .header("X-Content-Type-Options", "nosniff")
+                .build();
+    }
+
+    // Shop's own uploads, only while a published online page shows them (shop-assets spec).
+    @GET
+    @Path("/assets/{id}")
+    @Produces(MediaType.WILDCARD)
+    public Response asset(@PathParam("kennung") String kennung, @PathParam("id") long id) {
+        ShopAsset asset = assetService.publicAsset(onlineShop(kennung), id)
+                .orElseThrow(() -> new ApiException(404, "Bild nicht gefunden."));
+        return Response.ok(asset.data)
+                .type(asset.contentType)
                 .header("Cache-Control", "private, max-age=300")
                 .header("X-Content-Type-Options", "nosniff")
                 .build();

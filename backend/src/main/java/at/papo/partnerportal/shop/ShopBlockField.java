@@ -18,7 +18,7 @@ record ShopBlockField(String name, Kind kind, int maxLength, boolean required, S
         // One of choices.
         CHOICE,
         BOOLEAN,
-        // Image id that must be public for this shop.
+        // Id of one of the shop's own ShopAssets.
         IMAGE,
         // Category id that must exist.
         CATEGORY,

@@ -19,8 +19,12 @@ Each shop SHALL have a storage quota of 50 MB for its images. The editor SHALL s
 - **THEN** the system rejects it with "Speicherplatz voll – bitte nicht verwendete Bilder löschen."
 
 ### Requirement: Asset ownership and deletion
-Shop images SHALL belong to exactly one shop and SHALL only be referenced by that shop's blocks. The partner SHALL delete unused images; deleting an image used by a published block SHALL be refused with the list of pages using it.
+Shop images SHALL belong to exactly one shop and SHALL only be referenced by that shop's blocks. The partner SHALL delete unused images; deleting an image used by any version of a page (draft, published or the restorable previous version) SHALL be refused with the list of pages using it. The library SHALL show the same use. The public shop SHALL deliver a shop image only while a published online page of that shop shows it.
 
 #### Scenario: Image in use
 - **WHEN** the partner deletes an image used on the published Startseite
 - **THEN** the system refuses and names "Startseite"
+
+#### Scenario: Draft-only image
+- **WHEN** an image is used only in the draft of the Startseite
+- **THEN** the library shows "Verwendet auf: Startseite", deleting it is refused, and the public image URL returns 404

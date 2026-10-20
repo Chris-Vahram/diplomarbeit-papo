@@ -12,6 +12,8 @@ import java.util.UUID;
 // Server-side schema check for a page snapshot {"blocks": [{"id", "type", "config"}, ...]}
 // (shop-pages spec "Typed blocks with validated configuration"). Only whitelisted fields of
 // known types pass; text stays plain text and is escaped by the renderer.
+// Drafts are checked leniently: autosave must keep half-filled blocks and must not fail because
+// an article, category or linked page changed elsewhere. Publishing checks everything.
 public final class ShopBlockValidator {
 
     public static final int MAX_BLOCKS = 40;
@@ -23,6 +25,11 @@ public final class ShopBlockValidator {
     }
 
     public static void validatePage(JsonNode content, ShopPageSlot slot, ShopBlockReferences references) {
+        validatePage(content, slot, references, true);
+    }
+
+    public static void validatePage(JsonNode content, ShopPageSlot slot, ShopBlockReferences references,
+                                    boolean publishing) {
         if (content == null || !content.isObject() || !content.path("blocks").isArray()) {
             throw new ApiException(400, "Der Seiteninhalt ist ungültig.");
         }
@@ -34,7 +41,7 @@ public final class ShopBlockValidator {
         Set<String> ids = new HashSet<>();
         int articleDetailBlocks = 0;
         for (JsonNode block : blocks) {
-            ShopBlockType type = validateBlock(block, references);
+            ShopBlockType type = validateBlock(block, references, publishing);
             if (!ids.add(block.get("id").asText())) {
                 throw new ApiException(400, "Block-IDs müssen innerhalb einer Seite eindeutig sein.");
             }
@@ -51,7 +58,7 @@ public final class ShopBlockValidator {
         }
     }
 
-    static ShopBlockType validateBlock(JsonNode block, ShopBlockReferences references) {
+    static ShopBlockType validateBlock(JsonNode block, ShopBlockReferences references, boolean publishing) {
         if (block == null || !block.isObject()) {
             throw new ApiException(400, "Ein Block ist ungültig.");
         }
@@ -76,11 +83,11 @@ public final class ShopBlockValidator {
                 throw new ApiException(400, "Unbekanntes Feld „" + entry.getKey() + "“ im Block „" + type.label + "“.");
             }
             if (!entry.getValue().isNull()) {
-                validateField(type, field, entry.getValue(), references);
+                validateField(type, field, entry.getValue(), references, publishing);
             }
         }
         for (ShopBlockField field : type.fields.values()) {
-            if (field.required() && isEmpty(config.get(field.name()))) {
+            if (publishing && field.required() && isEmpty(config.get(field.name()))) {
                 throw new ApiException(400, "Das Feld „" + field.name() + "“ im Block „" + type.label + "“ ist erforderlich.");
             }
         }
@@ -88,7 +95,7 @@ public final class ShopBlockValidator {
     }
 
     private static void validateField(ShopBlockType type, ShopBlockField field, JsonNode value,
-                                      ShopBlockReferences references) {
+                                      ShopBlockReferences references, boolean publishing) {
         String where = "„" + field.name() + "“ im Block „" + type.label + "“";
         switch (field.kind()) {
             case TEXT -> {
@@ -111,12 +118,15 @@ public final class ShopBlockValidator {
                 }
             }
             case IMAGE -> {
-                if (!value.canConvertToExactIntegral() || !references.isPublicImage(value.asLong())) {
+                // Checked for drafts too: an asset id never goes stale (deletion refuses used assets),
+                // and a foreign shop's asset must not even be stored.
+                if (!value.canConvertToExactIntegral() || !references.isOwnAsset(value.asLong())) {
                     throw new ApiException(400, "Das Bild in " + where + " ist für diesen Shop nicht verfügbar.");
                 }
             }
             case CATEGORY -> {
-                if (!value.canConvertToExactIntegral() || !references.categoryExists(value.asLong())) {
+                if (!value.canConvertToExactIntegral()
+                        || (publishing && !references.categoryExists(value.asLong()))) {
                     throw new ApiException(400, "Die Kategorie in " + where + " gibt es nicht.");
                 }
             }
@@ -126,13 +136,14 @@ public final class ShopBlockValidator {
                             + field.maxLength() + " Artikel erlaubt.");
                 }
                 for (JsonNode id : value) {
-                    if (!id.canConvertToExactIntegral() || !references.isCatalogueArticle(id.asLong())) {
+                    if (!id.canConvertToExactIntegral()
+                            || (publishing && !references.isCatalogueArticle(id.asLong()))) {
                         throw new ApiException(400, "Ein Artikel in " + where + " ist für diesen Shop nicht freigeschaltet.");
                     }
                 }
             }
             case SEGMENT -> {
-                if (!value.isTextual() || !references.isLinkablePage(value.asText())) {
+                if (!value.isTextual() || (publishing && !references.isLinkablePage(value.asText()))) {
                     throw new ApiException(400, "Die verlinkte Seite in " + where + " gibt es nicht oder ist nicht online.");
                 }
             }

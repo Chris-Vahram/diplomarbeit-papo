@@ -2,7 +2,7 @@
 // router.js, pages/*): the shop runs unauthenticated and only calls /api/shop/<kennung>.
 // Allowed lib modules have no imports of their own: config.js, html.js, format.js.
 import { escapeHtml } from "../lib/html.js";
-import { createShopApi } from "./shop-api.js";
+import { createPreviewApi, createShopApi } from "./shop-api.js";
 import { applyTheme } from "./shop-theme.js";
 import "./shop-page-view.js";
 
@@ -67,6 +67,74 @@ function renderMessage(main, text) {
     <p class="shop-text">${escapeHtml(text)}</p></div></section>`;
 }
 
+// Editor preview (shop-builder spec): /shop.html?preview inside the editor's iframe. The page
+// renders whatever the embedding editor sends; only messages from the same-origin parent count.
+const PREVIEW_DATA = "papo-shop-preview";
+
+// Editing tools inside the preview (shop-preview-tools.js), never loaded by the public shop.
+let previewTools = null;
+
+async function startPreview() {
+  const { installPreviewTools } = await import("./shop-preview-tools.js");
+  previewTools = installPreviewTools(root, (message) => window.parent.postMessage(message, location.origin));
+  window.addEventListener("message", (event) => {
+    if (event.origin !== location.origin || event.source !== window.parent) return;
+    if (event.data?.type === PREVIEW_DATA) renderPreview(event.data.payload);
+  });
+  // Links lead nowhere in the preview; a click on a block selects it in the editor instead.
+  root.addEventListener("click", (event) => {
+    if (event.target.closest("a")) event.preventDefault();
+    const block = event.target.closest("[data-block-id]");
+    if (block) window.parent.postMessage({ type: "papo-shop-select", blockId: block.dataset.blockId }, location.origin);
+  });
+  window.parent.postMessage({ type: "papo-shop-preview-ready" }, location.origin);
+}
+
+// Last preview frame: layout and block context are reused while they stay the same, so an
+// edit only re-renders the changed blocks.
+let previewState = null;
+
+function renderPreview(data) {
+  const api = createPreviewApi(data);
+  applyTheme(document.documentElement, data.theme);
+  document.title = `Vorschau: ${data.page.menuName}`;
+  // bare: the blocks alone, without header and footer (palette preview of one block).
+  if (data.bare) {
+    previewState = null;
+    root.className = "shop-root shop-root--bare shop-root--preview";
+    root.innerHTML = `<main class="shop-main"></main>`;
+    const view = document.createElement("shop-page-view");
+    view.data = { blocks: data.page.blocks, context: { api, article: data.article } };
+    root.querySelector("main").append(view);
+    // Lets the editor measure the drawn block (palette hover preview).
+    window.parent.postMessage({ type: "papo-shop-rendered" }, location.origin);
+    return;
+  }
+  const layoutKey = JSON.stringify([data.shop, data.navigation, data.page.path]);
+  const contextKey = JSON.stringify([data.assetUrls, data.imageUrls, data.article?.id ?? null,
+    data.articles.map((article) => article.id)]);
+  if (previewState?.layoutKey !== layoutKey) {
+    const scrollY = window.scrollY;
+    const main = renderLayout(api, data.shop, data.navigation, data.page.path);
+    root.classList.add("shop-root--preview");
+    const view = document.createElement("shop-page-view");
+    main.append(view);
+    previewState = { layoutKey, contextKey: null, context: null, view };
+    window.scrollTo(0, scrollY);
+  }
+  if (previewState.contextKey !== contextKey) {
+    previewState.contextKey = contextKey;
+    previewState.context = { api, article: data.article };
+  }
+  const { view } = previewState;
+  view.update({ blocks: data.page.blocks, context: previewState.context });
+  view.querySelectorAll(".shop-block--selected").forEach((element) => element.classList.remove("shop-block--selected"));
+  if (data.selectedBlockId) {
+    view.querySelector(`[data-block-id="${CSS.escape(data.selectedBlockId)}"]`)?.classList.add("shop-block--selected");
+  }
+  previewTools?.afterRender(view, data.selectedBlockId);
+}
+
 async function start() {
   const route = readRoute();
   if (!route || !/^[a-z0-9-]{3,40}$/.test(route.kennung)) {
@@ -103,7 +171,13 @@ async function start() {
       api.page(segment),
       isDetail ? api.article(route.articleId).catch(() => null) : null,
     ]);
-    document.title = `${article?.name ?? page.menuName} – ${shop.displayName}`;
+    document.title = article ? `${article.name} – ${shop.displayName}` : page.seoTitle || `${page.menuName} – ${shop.displayName}`;
+    if (page.seoDescription && !article) {
+      const meta = document.createElement("meta");
+      meta.name = "description";
+      meta.content = page.seoDescription;
+      document.head.append(meta);
+    }
     const view = document.createElement("shop-page-view");
     view.data = { blocks: page.blocks, context: { api, article } };
     main.append(view);
@@ -113,4 +187,8 @@ async function start() {
   }
 }
 
-start();
+if (new URLSearchParams(location.search).has("preview")) {
+  startPreview();
+} else {
+  start();
+}

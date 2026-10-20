@@ -254,6 +254,7 @@ h2.shop-heading { font-size: clamp(1.375rem, 3vw, 1.875rem); }
 }
 
 .shop-split__image.shop-image-placeholder { min-height: 12rem; }
+.shop-figure .shop-image-placeholder { aspect-ratio: 16 / 9; border-radius: var(--shop-radius); }
 
 .shop-price { margin: 0.25rem 0 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.5rem; }
 .shop-price__value { font-weight: 700; font-size: 1.125rem; color: var(--shop-primary); }
@@ -290,3 +291,11 @@ h2.shop-heading { font-size: clamp(1.375rem, 3vw, 1.875rem); }
   .shop-block--spacing-large { padding-block: 2.5rem; }
   .shop-header__inner { flex-direction: column; align-items: flex-start; }
 }
+
+/* Editor preview (shop.html?preview): blocks are clickable to select them in the editor. */
+.shop-root--preview .shop-block { cursor: pointer; }
+.shop-root--preview .shop-block:hover { outline: 2px dashed color-mix(in srgb, var(--shop-primary) 45%, transparent); outline-offset: -2px; }
+.shop-root--preview .shop-block--selected,
+.shop-root--preview .shop-block--selected:hover { outline: 3px solid var(--shop-accent); outline-offset: -3px; }
+.shop-root--bare { min-height: 0; }
+.shop-root--bare .shop-block { cursor: default; outline: none !important; }

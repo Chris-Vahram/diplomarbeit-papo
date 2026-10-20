@@ -48,7 +48,8 @@ async function handleResponse(response) {
 
   if (!response.ok) {
     const message = await extractErrorMessage(response);
-    throw new Error(message || `Anfrage fehlgeschlagen (${response.status})`);
+    // status lets callers tell a conflict (409) from other failures, e.g. the shop editor.
+    throw Object.assign(new Error(message || `Anfrage fehlgeschlagen (${response.status})`), { status: response.status });
   }
 
   if (response.status === 204) return null;

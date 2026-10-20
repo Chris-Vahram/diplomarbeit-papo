@@ -1,9 +1,10 @@
 import { escapeHtml } from "../../lib/html.js";
 import { articleCardsHtml, imageHtml, priceHtml } from "./article-card.js";
 import { ShopBlock } from "./shop-block.js";
+import { textField } from "./text-field.js";
 
-function headingHtml(text) {
-  return text ? `<h2 class="shop-heading">${escapeHtml(text)}</h2>` : "";
+function headingHtml(api, text) {
+  return textField(api, "h2", "shop-heading", "heading", text);
 }
 
 // Shared by grid and featured list: loads the shop catalogue once, then renders cards.
@@ -13,7 +14,7 @@ class ArticleListBlock extends ShopBlock {
   render(config) {
     const renderId = ++this.#renderId;
     this.hidden = false;
-    this.innerHTML = `<div class="shop-inner">${headingHtml(config.heading)}<p class="shop-muted">Artikel werden geladen …</p></div>`;
+    this.innerHTML = `<div class="shop-inner">${headingHtml(this.context.api, config.heading)}<p class="shop-muted">Artikel werden geladen …</p></div>`;
     this.context.api
       .articles()
       .then((articles) => {
@@ -26,7 +27,7 @@ class ArticleListBlock extends ShopBlock {
           this.hidden = true;
           return;
         }
-        this.innerHTML = `<div class="shop-inner">${headingHtml(config.heading)}${articleCardsHtml(this.context.api, selected, config.columns)}</div>`;
+        this.innerHTML = `<div class="shop-inner">${headingHtml(this.context.api, config.heading)}${articleCardsHtml(this.context.api, selected, config.columns)}</div>`;
       })
       .catch(() => {
         if (renderId !== this.#renderId) return;

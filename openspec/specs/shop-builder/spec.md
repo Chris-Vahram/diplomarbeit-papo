@@ -1,11 +1,23 @@
-## ADDED Requirements
+# shop-builder Specification
 
+## Purpose
+Shop builder of "Mein Webshop" (B-01/B-02): page miniatures and full-screen editor, palette with hover previews and drag & drop, editing directly in the preview, page management, design tab, publishing and one-step restore, autosave with undo, optimistic locking for the shared partner login, SEO fields and device support.
+
+## Requirements
 ### Requirement: Builder layout
-"Mein Webshop" SHALL provide a builder with a block palette, a live preview rendered by the same components as the public shop, and a properties panel for the selected block. The preview SHALL be switchable between desktop and mobile width.
+"Mein Webshop" SHALL show the shop status and a miniature of every designable page (rendered by the shop itself with the current editing state) with a "Shop bearbeiten" button. The builder SHALL open full screen without the portal navigation and offer "Zurück", which first saves pending changes. The builder SHALL provide a block palette and the list of the page's blocks as tabs of a collapsible left sidebar, a live preview rendered by the same components as the public shop, and a collapsible properties panel for the selected block that scrolls independently and is only opened or closed by its button. The preview SHALL be switchable between desktop and mobile (phone proportions).
 
 #### Scenario: Preview equals public rendering
 - **WHEN** a partner publishes a page without further changes
 - **THEN** the public page looks identical to the editor preview at the same width
+
+#### Scenario: Open a page from its miniature
+- **WHEN** the partner clicks the miniature of "Über uns" on "Mein Webshop"
+- **THEN** the builder opens full screen with "Über uns" loaded
+
+#### Scenario: Leave with unsaved design
+- **WHEN** a theme draft could not be saved and the partner clicks "Zurück"
+- **THEN** the builder retries the save and stays open if it fails again
 
 ### Requirement: Page management
 The partner SHALL be able to add a free page (empty or from a template), rename it, set its menu name and URL segment, reorder pages in the navigation by drag & drop, and delete free pages. Mandatory pages SHALL always stay online. Limits from `shop-pages` SHALL be shown before they are hit ("4 von 6 Seiten online").
@@ -14,16 +26,28 @@ The partner SHALL be able to add a free page (empty or from a template), rename 
 - **WHEN** the partner deletes a free page and confirms
 - **THEN** the page is removed from drafts and, if online, from the public shop
 
+#### Scenario: Linked page keeps its address
+- **WHEN** a published button on another online page links to an online free page and the partner changes that page's URL segment, takes it offline or deletes it
+- **THEN** the system refuses and names the linking pages ("Auf diese Seite verlinkt noch: Startseite.")
+
 #### Scenario: URL segment suggestion
 - **WHEN** the partner creates a page titled "Über uns"
 - **THEN** the suggested URL segment is "ueber-uns"
 
 ### Requirement: Block editing
-The partner SHALL be able to add blocks from the palette, edit their fields in the properties panel, duplicate, delete and reorder them. Reordering SHALL work by drag & drop and by "nach oben"/"nach unten" buttons. Only fields defined by the block schema SHALL be editable.
+The partner SHALL be able to add blocks from the palette by click or by dragging them into the preview (with a visible insertion marker), and to edit, duplicate, delete and reorder them. Each palette entry SHALL show a preview of the block with sample content on hover. Visible texts SHALL be editable directly in the preview; empty texts of the selected block SHALL show a placeholder there. The selected block SHALL get a toolbar in the preview to move it (drag handle, "nach oben"/"nach unten"), change its size step, duplicate and delete it. All fields SHALL also be editable in the properties panel. Only fields defined by the block schema SHALL be editable.
 
 #### Scenario: Keyboard-free reorder
 - **WHEN** the partner presses "nach oben" on the second block
 - **THEN** the block becomes the first block in the draft
+
+#### Scenario: Edit text in place
+- **WHEN** the partner clicks the heading of a block in the preview and types
+- **THEN** the draft and the properties panel show the new heading and the caret stays in the preview
+
+#### Scenario: Drag from the palette
+- **WHEN** the partner drags "Bild + Text" into the preview between the first and second block
+- **THEN** the new block is inserted as the second block and selected
 
 ### Requirement: Design tab
 A separate "Design" tab SHALL let the partner choose all theme colours with a free colour picker (including hex input) and a heading and body font from the curated list, preview the result, and publish it with "Design veröffentlichen", which updates all online pages at once.
@@ -42,6 +66,10 @@ In the properties panel the partner SHALL be able to override theme colours for 
 ### Requirement: Publishing and restore
 The partner SHALL publish pages individually. The partner SHALL be able to restore the previous published version of a page. Mandatory pages SHALL NOT be unpublished.
 
+#### Scenario: Republishing unchanged content
+- **WHEN** the partner publishes a page whose draft equals the published version
+- **THEN** the previous published version stays available for restore
+
 #### Scenario: Restore previous version
 - **WHEN** the partner chooses "Vorherige Version wiederherstellen" on a published page
 - **THEN** the previous published version becomes the published version and the draft
@@ -55,6 +83,10 @@ Draft changes SHALL be saved automatically within 2 seconds of the last edit, wi
 
 ### Requirement: Concurrent editing protection
 Every draft save SHALL include the version the editor loaded. If the stored version is newer, the save SHALL be rejected and the editor SHALL offer to reload.
+
+#### Scenario: Missing version
+- **WHEN** a draft save arrives without a version
+- **THEN** the system rejects it
 
 #### Scenario: Two tabs
 - **WHEN** the same page is saved from two browser tabs
@@ -73,3 +105,4 @@ The builder SHALL be usable on desktop and tablet widths (≥ 768 px). Below tha
 #### Scenario: Phone
 - **WHEN** a partner opens "Mein Webshop" on a 390 px wide screen
 - **THEN** the hint is shown and no editor is rendered
+

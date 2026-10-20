@@ -4,9 +4,10 @@ Partners without technical knowledge shall design their own shop in a clean GUI 
 
 ## What Changes
 
-- "Mein Webshop" becomes a builder with three areas: block palette, live preview (shared renderer, desktop/mobile toggle), properties panel.
+- "Mein Webshop" shows status and page miniatures with "Shop bearbeiten"; the builder opens full screen ("Zurück") with collapsible palette/block-list sidebar, live preview (shared renderer, desktop/phone) and collapsible properties panel.
+- Editing directly in the preview: texts in place, block toolbar (move, size, duplicate, delete), drag & drop from the palette with hover previews.
 - Separate tab "Design" for the theme (free colour pickers, curated font pair), with own draft and "Design veröffentlichen".
-- Page management: add empty page or page from template, rename, menu name, URL segment, order in navigation, delete free pages; mandatory pages always online.
+- Page management: add empty page or page from template, rename, menu name, URL segment, order in navigation, delete free pages; mandatory pages always online; pages linked by published buttons keep their address and stay online.
 - Block editing: add, configure, duplicate, delete, reorder via drag & drop and up/down buttons; colour override per block with one-click "Auf Design zurücksetzen".
 - Publish per page; restore last published version; autosave of drafts; undo/redo within the session.
 - Simple SEO fields per page (title, description) with plain-language explanation.

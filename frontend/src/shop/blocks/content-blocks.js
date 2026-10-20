@@ -1,30 +1,31 @@
 import { escapeHtml } from "../../lib/html.js";
 import { ShopBlock } from "./shop-block.js";
+import { textField } from "./text-field.js";
 
-function headingHtml(text, level = "h2") {
-  return text ? `<${level} class="shop-heading">${escapeHtml(text)}</${level}>` : "";
+function headingHtml(api, text, level = "h2", field = "heading") {
+  return textField(api, level, "shop-heading", field, text);
 }
 
-function textHtml(text) {
-  return text ? `<p class="shop-text">${escapeHtml(text)}</p>` : "";
+function textHtml(api, text, field = "text") {
+  return textField(api, "p", "shop-text", field, text);
 }
 
 class HeroBlock extends ShopBlock {
   render(config) {
     const api = this.context.api;
     const image = config.imageId
-      ? `<img class="shop-hero__image" src="${escapeHtml(api.imageUrl(config.imageId))}" alt="${escapeHtml(config.alt ?? "")}" />`
+      ? `<img class="shop-hero__image" src="${escapeHtml(api.assetUrl(config.imageId))}" alt="${escapeHtml(config.alt ?? "")}" />`
       : "";
     const target = config.buttonPage === "startseite" ? "" : config.buttonPage;
     const button =
       config.buttonLabel && config.buttonPage
-        ? `<a class="shop-button" href="${escapeHtml(api.href(target))}">${escapeHtml(config.buttonLabel)}</a>`
+        ? `<a class="shop-button" href="${escapeHtml(api.href(target))}" data-field="buttonLabel">${escapeHtml(config.buttonLabel)}</a>`
         : "";
     this.innerHTML = `<div class="shop-inner shop-hero shop-align-${escapeHtml(config.align ?? "left")}${image ? " shop-hero--image" : ""}">
       ${image}
       <div class="shop-hero__content">
-        ${headingHtml(config.title, "h1")}
-        ${textHtml(config.text)}
+        ${headingHtml(api, config.title, "h1", "title")}
+        ${textHtml(this.context.api, config.text)}
         ${button}
       </div>
     </div>`;
@@ -34,17 +35,25 @@ class HeroBlock extends ShopBlock {
 class HeadingTextBlock extends ShopBlock {
   render(config) {
     this.innerHTML = `<div class="shop-inner shop-align-${escapeHtml(config.align ?? "left")}">
-      ${headingHtml(config.heading)}
-      ${textHtml(config.text)}
+      ${headingHtml(this.context.api, config.heading)}
+      ${textHtml(this.context.api, config.text)}
     </div>`;
   }
+}
+
+// A draft block may have no image chosen yet (editor preview); published blocks always have one.
+function assetImageHtml(api, config, className = "") {
+  const classes = className ? ` class="${className}"` : "";
+  return config.imageId
+    ? `<img${classes} src="${escapeHtml(api.assetUrl(config.imageId))}" alt="${escapeHtml(config.alt ?? "")}" loading="lazy" />`
+    : `<div class="${className} shop-image-placeholder" aria-hidden="true"></div>`;
 }
 
 class ImageBlock extends ShopBlock {
   render(config) {
     this.innerHTML = `<figure class="shop-inner shop-figure shop-figure--${escapeHtml(config.width ?? "wide")}">
-      <img src="${escapeHtml(this.context.api.imageUrl(config.imageId))}" alt="${escapeHtml(config.alt ?? "")}" loading="lazy" />
-      ${config.caption ? `<figcaption class="shop-muted">${escapeHtml(config.caption)}</figcaption>` : ""}
+      ${assetImageHtml(this.context.api, config)}
+      ${textField(this.context.api, "figcaption", "shop-muted", "caption", config.caption)}
     </figure>`;
   }
 }
@@ -52,10 +61,10 @@ class ImageBlock extends ShopBlock {
 class ImageTextBlock extends ShopBlock {
   render(config) {
     this.innerHTML = `<div class="shop-inner shop-split shop-split--image-${escapeHtml(config.imagePosition ?? "left")}">
-      <img class="shop-split__image" src="${escapeHtml(this.context.api.imageUrl(config.imageId))}" alt="${escapeHtml(config.alt ?? "")}" loading="lazy" />
+      ${assetImageHtml(this.context.api, config, "shop-split__image")}
       <div class="shop-split__text">
-        ${headingHtml(config.heading)}
-        ${textHtml(config.text)}
+        ${headingHtml(this.context.api, config.heading)}
+        ${textHtml(this.context.api, config.text)}
       </div>
     </div>`;
   }
@@ -65,10 +74,10 @@ class ContactPersonBlock extends ShopBlock {
   render(config) {
     const phoneDigits = (config.phone ?? "").replace(/[^\d+]/g, "");
     this.innerHTML = `<div class="shop-inner shop-contact">
-      ${headingHtml(config.heading)}
-      <p class="shop-contact__name">${escapeHtml(config.name)}</p>
-      ${config.role ? `<p class="shop-muted">${escapeHtml(config.role)}</p>` : ""}
-      ${textHtml(config.text)}
+      ${headingHtml(this.context.api, config.heading)}
+      ${textField(this.context.api, "p", "shop-contact__name", "name", config.name)}
+      ${textField(this.context.api, "p", "shop-muted", "role", config.role)}
+      ${textHtml(this.context.api, config.text)}
       <p class="shop-contact__links">
         ${config.email ? `<a href="mailto:${escapeHtml(encodeURIComponent(config.email).replace("%40", "@"))}">${escapeHtml(config.email)}</a>` : ""}
         ${phoneDigits ? `<a href="tel:${escapeHtml(phoneDigits)}">${escapeHtml(config.phone)}</a>` : ""}

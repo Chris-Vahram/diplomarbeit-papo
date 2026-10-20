@@ -21,7 +21,7 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 // Pages and theme of a shop (shop-pages, shop-theme specs): default creation, limits,
-// per-page publishing and theme publishing. Editing endpoints follow in add-shop-builder-editor.
+// per-page publishing and theme publishing. Editor operations live in ShopEditorService.
 @ApplicationScoped
 public class ShopPageService {
 
@@ -95,7 +95,7 @@ public class ShopPageService {
         ShopPage page = new ShopPage();
         page.shop = shop;
         page.kind = ShopPageKind.FREE;
-        page.segment = requireFreeSegment(shop, segment);
+        page.segment = requireFreeSegment(shop, segment, null);
         page.menuName = name;
         page.position = nextPosition(shop);
         page.draftContent = "{\"blocks\":[]}";
@@ -112,7 +112,10 @@ public class ShopPageService {
             throw new ApiException(409, "Es können höchstens " + MAX_ONLINE_PAGES + " Seiten gleichzeitig online sein.");
         }
         validateContent(page, page.draftContent);
-        page.previousPublishedContent = page.publishedContent;
+        // Republishing unchanged content must not replace the restore point with itself.
+        if (page.publishedContent == null || !parse(page.publishedContent).equals(parse(page.draftContent))) {
+            page.previousPublishedContent = page.publishedContent;
+        }
         page.publishedContent = page.draftContent;
         page.publishedAt = Instant.now();
         page.updatedAt = page.publishedAt;
@@ -123,6 +126,7 @@ public class ShopPageService {
     @Transactional
     public ShopPage unpublish(ShopPage page) {
         requireRemovable(page);
+        requireNotLinked(page);
         page.online = false;
         page.updatedAt = Instant.now();
         return page;
@@ -131,6 +135,7 @@ public class ShopPageService {
     @Transactional
     public void delete(ShopPage page) {
         requireRemovable(page);
+        requireNotLinked(page);
         page.delete();
     }
 
@@ -180,14 +185,18 @@ public class ShopPageService {
     }
 
     void validateContent(ShopPage page, String content) {
-        ShopBlockValidator.validatePage(parse(content), page.slot, references(page.shop));
+        validateContent(page, parse(content), true);
+    }
+
+    void validateContent(ShopPage page, JsonNode content, boolean publishing) {
+        ShopBlockValidator.validatePage(content, page.slot, references(page.shop), publishing);
     }
 
     ShopBlockReferences references(PartnerShop shop) {
         return new ShopBlockReferences() {
             @Override
-            public boolean isPublicImage(long imageId) {
-                return catalogService.publicImage(shop.partner, imageId).isPresent();
+            public boolean isOwnAsset(long assetId) {
+                return ShopAsset.count("id = ?1 and shop = ?2", assetId, shop) > 0;
             }
 
             @Override
@@ -210,6 +219,25 @@ public class ShopPageService {
         };
     }
 
+    // A published button on another online page must never point to a page that disappears
+    // or changes its address (shop-pages "Navigation and page URLs").
+    void requireNotLinked(ShopPage page) {
+        if (!page.online) {
+            return;
+        }
+        List<String> linking = ShopPage.<ShopPage>list("shop = ?1 and online = true and kind <> ?2 and id <> ?3 "
+                        + "order by position, id", page.shop, ShopPageKind.SYSTEM, page.id).stream()
+                .filter(other -> other.publishedContent != null && ShopBlockContent
+                        .values(parse(other.publishedContent), ShopBlockField.Kind.SEGMENT).stream()
+                        .anyMatch(value -> value.asText().equals(page.segment)))
+                .map(other -> other.menuName)
+                .toList();
+        if (!linking.isEmpty()) {
+            throw new ApiException(409, "Auf diese Seite verlinkt noch: " + String.join(", ", linking)
+                    + ". Bitte dort zuerst den Link ändern und veröffentlichen.");
+        }
+    }
+
     private void requireDesignable(ShopPage page) {
         if (!page.kind.designable()) {
             throw new ApiException(409, "Systemseiten sind nicht gestaltbar.");
@@ -222,34 +250,36 @@ public class ShopPageService {
         }
     }
 
-    private String requireFreeSegment(PartnerShop shop, String input) {
+    // self = the page being renamed, so keeping its own segment is not a collision.
+    String requireFreeSegment(PartnerShop shop, String input, ShopPage self) {
         String segment = input == null ? "" : input.strip();
         if (segment.isEmpty() || segment.length() > ShopPage.SEGMENT_MAX_LENGTH || !SEGMENT.matcher(segment).matches()) {
             throw new ApiException(400, "Die Seitenadresse darf nur Kleinbuchstaben a–z, Ziffern und einzelne "
                     + "Bindestriche enthalten.");
         }
-        if (ShopPage.count("shop = ?1 and segment = ?2", shop, segment) > 0) {
+        if (ShopPage.count("shop = ?1 and segment = ?2 and id <> ?3", shop, segment,
+                self == null ? -1L : self.id) > 0) {
             throw new ApiException(409, "Diese Seitenadresse ist im Shop bereits vergeben.");
         }
         return segment;
     }
 
-    private long designableCount(PartnerShop shop) {
+    long designableCount(PartnerShop shop) {
         return ShopPage.count("shop = ?1 and kind <> ?2", shop, ShopPageKind.SYSTEM);
     }
 
-    private long onlineCount(PartnerShop shop) {
+    long onlineCount(PartnerShop shop) {
         return ShopPage.count("shop = ?1 and kind <> ?2 and online = true", shop, ShopPageKind.SYSTEM);
     }
 
-    private int nextPosition(PartnerShop shop) {
+    int nextPosition(PartnerShop shop) {
         Integer max = ShopPage.getEntityManager()
                 .createQuery("select max(p.position) from ShopPage p where p.shop = ?1", Integer.class)
                 .setParameter(1, shop).getSingleResult();
         return max == null ? 0 : max + 1;
     }
 
-    private JsonNode readTemplate(String file) {
+    JsonNode readTemplate(String file) {
         try (InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(TEMPLATE_DIR + file)) {
             if (in == null) {
                 throw new IllegalStateException("Shop template missing: " + file);
@@ -261,7 +291,7 @@ public class ShopPageService {
     }
 
     // Template blocks carry no ids; every created page gets fresh ones for editor addressing.
-    private JsonNode withBlockIds(JsonNode template) {
+    JsonNode withBlockIds(JsonNode template) {
         JsonNode content = template.deepCopy();
         for (JsonNode block : content.path("blocks")) {
             ((ObjectNode) block).put("id", UUID.randomUUID().toString());

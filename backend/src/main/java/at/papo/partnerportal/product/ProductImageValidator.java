@@ -5,7 +5,7 @@ import at.papo.partnerportal.common.ApiException;
 // Verifies uploaded product images by sniffing magic bytes rather than trusting the
 // multipart-declared content type (attacker-controlled). SVG is deliberately not accepted:
 // it can carry script and would be served same-origin from the API (see design.md).
-final class ProductImageValidator {
+public final class ProductImageValidator {
 
     static final int MAX_SIZE_BYTES = 2 * 1024 * 1024;
 
@@ -28,6 +28,17 @@ final class ProductImageValidator {
         if (data.length > MAX_SIZE_BYTES) {
             throw new ApiException(400, "Bild ist zu groß (maximal 2 MB erlaubt).");
         }
+        String contentType = sniffContentType(data);
+        if (contentType == null) {
+            throw new ApiException(400,
+                    "Ungültiges Bildformat. Erlaubt sind PNG, JPEG und WEBP (kein SVG oder andere Dateien).");
+        }
+        return contentType;
+    }
+
+    // PNG, JPEG or WEBP from the magic bytes, otherwise null. Shared with shop assets, which
+    // have their own size limit and messages.
+    public static String sniffContentType(byte[] data) {
         if (startsWith(data, PNG_SIGNATURE)) {
             return "image/png";
         }
@@ -37,8 +48,7 @@ final class ProductImageValidator {
         if (isWebp(data)) {
             return "image/webp";
         }
-        throw new ApiException(400,
-                "Ungültiges Bildformat. Erlaubt sind PNG, JPEG und WEBP (kein SVG oder andere Dateien).");
+        return null;
     }
 
     private static boolean isWebp(byte[] data) {

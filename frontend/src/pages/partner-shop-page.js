@@ -1,14 +1,16 @@
 import { apiFetch } from "../lib/api.js";
 import { renderShopStatus } from "../lib/shop-status.js";
+import "../shop-editor/page-thumbnails.js";
 
 // "Mein Webshop" (partner-shop spec): status, public link and the company's offline
-// reason. Read-only - identifier and release are company decisions.
+// reason (identifier and release are company decisions), then miniatures of the shop's
+// pages and the entry into the full-screen builder (shop-builder spec).
 class PartnerShopPage extends HTMLElement {
   connectedCallback() {
     this.classList.add("area--partner");
     this.innerHTML = `
       <h1>Mein Webshop</h1>
-      <p class="page-intro">Hier sehen Sie den Status Ihres öffentlichen Shops. Kennung und Freigabe legt das Unternehmen fest.</p>
+      <p class="page-intro">Hier gestalten Sie Ihren öffentlichen Shop und sehen seinen Status. Kennung und Freigabe legt das Unternehmen fest.</p>
       <section class="shop-panel" aria-labelledby="shop-status-heading">
         <div class="shop-panel__head">
           <h2 id="shop-status-heading">Status</h2>
@@ -27,6 +29,7 @@ class PartnerShopPage extends HTMLElement {
         <p id="shop-error" class="trade-proof-card__error" role="alert" hidden></p>
         <button type="button" id="shop-retry" hidden>Erneut laden</button>
       </section>
+      <shop-page-thumbnails></shop-page-thumbnails>
     `;
     this.querySelector("#shop-retry").addEventListener("click", () => this.load());
     this.load();

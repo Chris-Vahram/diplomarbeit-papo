@@ -3,7 +3,8 @@ package at.papo.partnerportal.shop;
 // Shop-specific checks for ids and segments inside block configurations.
 public interface ShopBlockReferences {
 
-    boolean isPublicImage(long imageId);
+    // Image fields reference the shop's own uploaded ShopAssets.
+    boolean isOwnAsset(long assetId);
 
     boolean categoryExists(long categoryId);
 

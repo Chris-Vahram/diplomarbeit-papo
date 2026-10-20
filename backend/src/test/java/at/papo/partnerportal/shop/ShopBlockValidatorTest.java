@@ -17,11 +17,11 @@ class ShopBlockValidatorTest {
 
     private static final ObjectMapper JSON = new ObjectMapper();
 
-    // Image 7, category 3, articles 1 and 2 and the page "artikel" exist for this shop.
+    // Asset 7, category 3, articles 1 and 2 and the page "artikel" exist for this shop.
     private static final ShopBlockReferences REFS = new ShopBlockReferences() {
         @Override
-        public boolean isPublicImage(long imageId) {
-            return imageId == 7;
+        public boolean isOwnAsset(long assetId) {
+            return assetId == 7;
         }
 
         @Override
@@ -109,6 +109,31 @@ class ShopBlockValidatorTest {
                 .contains("nicht freigeschaltet"));
         assertTrue(rejected(page(block("featured-articles", "{\"articleIds\":[1,1,1,1,1,1,1,1,1,1,1,1,1]}")),
                 ShopPageSlot.HOME).contains("höchstens 12"));
+    }
+
+    @Test
+    void draftsKeepHalfFilledBlocksAndStaleReferences() throws Exception {
+        JsonNode draft = page(block("hero", "{\"title\":\"\",\"buttonPage\":\"offline-seite\"}"),
+                block("featured-articles", "{\"articleIds\":[1,5]}"),
+                block("article-grid", "{\"categoryId\":99}"));
+        assertDoesNotThrow(() -> ShopBlockValidator.validatePage(draft, ShopPageSlot.HOME, REFS, false));
+        assertThrows(ApiException.class, () -> ShopBlockValidator.validatePage(draft, ShopPageSlot.HOME, REFS, true));
+        // Structure, lengths and asset ownership are checked for drafts too.
+        assertThrows(ApiException.class, () -> ShopBlockValidator.validatePage(
+                page(block("image", "{\"imageId\":8}")), ShopPageSlot.HOME, REFS, false));
+        assertThrows(ApiException.class, () -> ShopBlockValidator.validatePage(
+                page(block("heading-text", "{\"html\":\"x\"}")), ShopPageSlot.HOME, REFS, false));
+        assertThrows(ApiException.class, () -> ShopBlockValidator.validatePage(
+                page(block("hero", "{\"buttonPage\":7}")), ShopPageSlot.HOME, REFS, false));
+    }
+
+    // ShopAssetService.isPublished searches published pages for "imageId" in the database.
+    @Test
+    void everyImageFieldIsNamedImageId() {
+        for (ShopBlockType type : ShopBlockType.values()) {
+            type.fields.values().stream().filter(field -> field.kind() == ShopBlockField.Kind.IMAGE)
+                    .forEach(field -> assertEquals("imageId", field.name(), type.id));
+        }
     }
 
     @Test

@@ -9,7 +9,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.Version;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.OptimisticLock;
 import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
@@ -26,6 +28,8 @@ public class ShopPage extends PanacheEntity {
 
     public static final int SEGMENT_MAX_LENGTH = 60;
     public static final int MENU_NAME_MAX_LENGTH = 40;
+    public static final int SEO_TITLE_MAX_LENGTH = 60;
+    public static final int SEO_DESCRIPTION_MAX_LENGTH = 160;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "shop_id", nullable = false)
@@ -46,7 +50,8 @@ public class ShopPage extends PanacheEntity {
     @Column(nullable = false, length = MENU_NAME_MAX_LENGTH)
     public String menuName;
 
-    // Navigation order among designable pages.
+    // Navigation order among designable pages. Reordering must not invalidate an open editor.
+    @OptimisticLock(excluded = true)
     @Column(nullable = false)
     public int position;
 
@@ -65,6 +70,19 @@ public class ShopPage extends PanacheEntity {
     public String previousPublishedContent;
 
     public Instant publishedAt;
+
+    // Optional SEO fields; only take effect once indexing is enabled for released live shops.
+    @Column(length = SEO_TITLE_MAX_LENGTH)
+    public String seoTitle;
+
+    @Column(length = SEO_DESCRIPTION_MAX_LENGTH)
+    public String seoDescription;
+
+    // Optimistic lock for the shared partner login (add-shop-builder-editor Decision 1). The
+    // column default lets schema update add it to existing rows.
+    @Version
+    @Column(nullable = false, columnDefinition = "bigint default 0 not null")
+    public long version;
 
     @Column(nullable = false)
     public Instant updatedAt;

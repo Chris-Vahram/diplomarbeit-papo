@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -34,4 +35,9 @@ public class ShopTheme extends PanacheEntity {
 
     @Column(nullable = false)
     public Instant updatedAt;
+
+    // Optimistic lock, see ShopPage.version.
+    @Version
+    @Column(nullable = false, columnDefinition = "bigint default 0 not null")
+    public long version;
 }
