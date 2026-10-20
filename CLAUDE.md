@@ -136,6 +136,9 @@ Clear German for thesis documents, suitable for an HTL Diplomarbeit; precise, st
 - Stage only the files belonging to that step (`git add <paths>`, no blind
   `git add -A`). Never commit secrets, `.env` files, volumes or private KI evidence.
 - When an OpenSpec task is done, commit the code together with the updated `tasks.md`.
+- Archiving a change is the last commit on its feature branch, once all tasks are done and
+  verified, and goes into the same PR. No separate archive branch or archive PR after the merge.
+  Review fixes after archiving are made in the archived change folder.
 - Local commits on the current working branch need no confirmation.
   Pushing, merging into `main` and deploying still require Chris's explicit approval.
 - Work on a feature branch, not directly on `main`.
