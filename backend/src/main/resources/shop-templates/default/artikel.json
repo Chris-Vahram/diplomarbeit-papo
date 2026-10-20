@@ -1,0 +1,17 @@
+{
+  "blocks": [
+    {
+      "type": "heading-text",
+      "config": {
+        "heading": "Unsere Artikel",
+        "text": "Alle Preise inklusive Umsatzsteuer."
+      }
+    },
+    {
+      "type": "article-grid",
+      "config": {
+        "columns": "3"
+      }
+    }
+  ]
+}

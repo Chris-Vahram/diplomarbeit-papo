@@ -24,7 +24,7 @@ geordnet. Dieses Dokument bleibt der einzige operative Session-Handoff.
 Akzente“, Tobias hat zugestimmt). Start: impeccable `init` → PRODUCT.md, `document` → DESIGN.md
 aus `Design/` (Tobias' System), beides Tobias zeigen, dann Tasks top-down; Shop-Dateien nicht anfassen.
 
-**Tobias' Changes (nicht anfassen):** add-partner-shop-foundation, add-shop-page-renderer,
+**Tobias' Changes (nicht anfassen):** add-partner-shop-foundation und add-shop-page-renderer (beide archiviert),
 add-shop-builder-editor, add-shop-templates, add-shop-design-assistant, add-shop-inquiries,
 add-article-tax-rate, add-shop-guest-checkout, add-shop-legal-consent, add-shop-statistics,
 add-shop-customer-accounts. Entscheidungen: `Specification/ENDKUNDENSHOP_DECISIONS.md`.

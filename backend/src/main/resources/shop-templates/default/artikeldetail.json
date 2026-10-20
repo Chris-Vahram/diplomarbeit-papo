@@ -1,0 +1,10 @@
+{
+  "blocks": [
+    {
+      "type": "article-detail",
+      "config": {
+        "imagePosition": "left"
+      }
+    }
+  ]
+}
