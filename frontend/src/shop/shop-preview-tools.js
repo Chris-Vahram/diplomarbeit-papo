@@ -45,7 +45,7 @@ const STYLES = `
 .papo-tools button:hover:not(:disabled), .papo-tools__grip:hover { background: rgba(255,255,255,.16); }
 .papo-tools button:disabled { opacity: .35; cursor: default; }
 .papo-tools button[aria-pressed="true"] { background: #fff; color: #1f2328; }
-.papo-tools__grip { cursor: grab; }
+.papo-tools__grip { cursor: grab; touch-action: none; }
 .papo-tools__sep { width: 1px; height: 18px; margin: 0 4px; background: rgba(255,255,255,.25); }
 .papo-tools__label { padding: 0 4px 0 2px; opacity: .75; font-weight: 500; }
 .papo-tools [data-action="delete"]:hover { background: #c62828; }
@@ -55,6 +55,8 @@ const STYLES = `
 }
 .papo-drop-line[hidden] { display: none; }
 .shop-block.is-dragging { opacity: .4; }
+.shop-root--preview .shop-block { cursor: grab; }
+.papo-dragging, .papo-dragging * { cursor: grabbing !important; user-select: none !important; }
 `;
 
 export function installPreviewTools(root, post) {
@@ -136,7 +138,7 @@ export function installPreviewTools(root, post) {
     const size = SIZES[type] ?? SPACING;
     const current = String(selected.config[size.field] ?? DEFAULTS[size.field]);
     toolbar.innerHTML = `
-      <span class="papo-tools__grip" draggable="true" title="Ziehen zum Verschieben" aria-hidden="true">${ICONS.grip}</span>
+      <span class="papo-tools__grip" title="Ziehen zum Verschieben" aria-hidden="true">${ICONS.grip}</span>
       <button type="button" data-action="up" title="Nach oben" aria-label="Nach oben"${index <= 0 ? " disabled" : ""}>${ICONS.up}</button>
       <button type="button" data-action="down" title="Nach unten" aria-label="Nach unten"${index === list.length - 1 ? " disabled" : ""}>${ICONS.down}</button>
       <span class="papo-tools__sep"></span>
@@ -176,7 +178,13 @@ export function installPreviewTools(root, post) {
   });
   window.addEventListener("resize", placeToolbar);
 
-  // ---- Reorder by dragging the grip ----------------------------------------------------
+  // ---- Reorder by dragging ------------------------------------------------------------
+  // Pointer events instead of HTML5 drag & drop: the toolbar must keep the text focus
+  // (mousedown default prevented), which would block a native drag start. A block can be
+  // grabbed at the grip or anywhere outside its texts; 6 px of movement starts the drag.
+
+  const DRAG_THRESHOLD = 6;
+  let suppressClick = false;
 
   function dropIndex(clientY) {
     const list = blocks();
@@ -188,16 +196,30 @@ export function installPreviewTools(root, post) {
     return { index: list.length, y: last ? last.bottom : 0 };
   }
 
-  toolbar.addEventListener("dragstart", (event) => {
-    if (!event.target.closest(".papo-tools__grip") || !selected) return;
-    dragged = selected;
-    event.dataTransfer.effectAllowed = "move";
-    event.dataTransfer.setData("text/plain", dragged.dataset.blockId);
-    event.dataTransfer.setDragImage(dragged, 24, 24);
-    setTimeout(() => dragged?.classList.add("is-dragging"));
+  function beginDrag(event, element) {
+    if (event.button !== 0 || !element) return;
+    dragged = { element, startY: event.clientY, active: false, pointerId: event.pointerId };
+  }
+
+  toolbar.addEventListener("pointerdown", (event) => {
+    if (event.target.closest(".papo-tools__grip")) beginDrag(event, selected);
   });
-  document.addEventListener("dragover", (event) => {
-    if (!dragged) return;
+  root.addEventListener("pointerdown", (event) => {
+    if (event.target.closest("[data-editable], button, input, select, textarea")) return;
+    beginDrag(event, event.target.closest("shop-page-view > [data-block-id]"));
+  });
+  // Images and links would otherwise start the browser's own drag.
+  root.addEventListener("dragstart", (event) => event.preventDefault());
+
+  document.addEventListener("pointermove", (event) => {
+    if (!dragged || event.pointerId !== dragged.pointerId) return;
+    if (!dragged.active) {
+      if (Math.abs(event.clientY - dragged.startY) < DRAG_THRESHOLD) return;
+      dragged.active = true;
+      dragged.element.classList.add("is-dragging");
+      document.documentElement.classList.add("papo-dragging");
+      getSelection()?.removeAllRanges();
+    }
     event.preventDefault();
     const { y } = dropIndex(event.clientY);
     dropLine.style.top = `${y + window.scrollY}px`;
@@ -205,16 +227,32 @@ export function installPreviewTools(root, post) {
     if (event.clientY < 48) window.scrollBy(0, -20);
     else if (event.clientY > window.innerHeight - 48) window.scrollBy(0, 20);
   });
-  document.addEventListener("drop", (event) => {
-    if (!dragged) return;
-    event.preventDefault();
-    post({ type: "papo-shop-action", action: "move", blockId: dragged.dataset.blockId, value: dropIndex(event.clientY).index });
-  });
-  document.addEventListener("dragend", () => {
-    dragged?.classList.remove("is-dragging");
+
+  function endDrag(event, drop) {
+    if (!dragged || event.pointerId !== dragged.pointerId) return;
+    if (dragged.active) {
+      if (drop) {
+        post({ type: "papo-shop-action", action: "move", blockId: dragged.element.dataset.blockId,
+          value: dropIndex(event.clientY).index });
+      }
+      dragged.element.classList.remove("is-dragging");
+      document.documentElement.classList.remove("papo-dragging");
+      dropLine.hidden = true;
+      // The click that ends a drag must not select the block under the pointer.
+      suppressClick = true;
+      setTimeout(() => {
+        suppressClick = false;
+      });
+    }
     dragged = null;
-    dropLine.hidden = true;
-  });
+  }
+  document.addEventListener("pointerup", (event) => endDrag(event, true));
+  document.addEventListener("pointercancel", (event) => endDrag(event, false));
+  root.addEventListener("click", (event) => {
+    if (!suppressClick) return;
+    event.stopImmediatePropagation();
+    event.preventDefault();
+  }, true);
 
   return {
     // After every preview render.
