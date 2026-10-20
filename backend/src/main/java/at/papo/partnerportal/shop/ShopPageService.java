@@ -112,7 +112,10 @@ public class ShopPageService {
             throw new ApiException(409, "Es können höchstens " + MAX_ONLINE_PAGES + " Seiten gleichzeitig online sein.");
         }
         validateContent(page, page.draftContent);
-        page.previousPublishedContent = page.publishedContent;
+        // Republishing unchanged content must not replace the restore point with itself.
+        if (page.publishedContent == null || !parse(page.publishedContent).equals(parse(page.draftContent))) {
+            page.previousPublishedContent = page.publishedContent;
+        }
         page.publishedContent = page.draftContent;
         page.publishedAt = Instant.now();
         page.updatedAt = page.publishedAt;
@@ -123,6 +126,7 @@ public class ShopPageService {
     @Transactional
     public ShopPage unpublish(ShopPage page) {
         requireRemovable(page);
+        requireNotLinked(page);
         page.online = false;
         page.updatedAt = Instant.now();
         return page;
@@ -131,6 +135,7 @@ public class ShopPageService {
     @Transactional
     public void delete(ShopPage page) {
         requireRemovable(page);
+        requireNotLinked(page);
         page.delete();
     }
 
@@ -212,6 +217,25 @@ public class ShopPageService {
                         ShopPageSlot.ARTICLE_DETAIL) > 0;
             }
         };
+    }
+
+    // A published button on another online page must never point to a page that disappears
+    // or changes its address (shop-pages "Navigation and page URLs").
+    void requireNotLinked(ShopPage page) {
+        if (!page.online) {
+            return;
+        }
+        List<String> linking = ShopPage.<ShopPage>list("shop = ?1 and online = true and kind <> ?2 and id <> ?3 "
+                        + "order by position, id", page.shop, ShopPageKind.SYSTEM, page.id).stream()
+                .filter(other -> other.publishedContent != null && ShopBlockContent
+                        .values(parse(other.publishedContent), ShopBlockField.Kind.SEGMENT).stream()
+                        .anyMatch(value -> value.asText().equals(page.segment)))
+                .map(other -> other.menuName)
+                .toList();
+        if (!linking.isEmpty()) {
+            throw new ApiException(409, "Auf diese Seite verlinkt noch: " + String.join(", ", linking)
+                    + ". Bitte dort zuerst den Link ändern und veröffentlichen.");
+        }
     }
 
     private void requireDesignable(ShopPage page) {

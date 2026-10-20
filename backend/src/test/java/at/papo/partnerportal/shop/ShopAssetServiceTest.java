@@ -160,6 +160,8 @@ class ShopAssetServiceTest {
             return null;
         }));
         useOnHome(owner, assetId, false);
+        // Draft use counts in the library exactly like it does for deleting.
+        assertEquals(List.of("Startseite"), tx(() -> assetService.list(partner(owner))).assets().get(0).usedOn());
     }
 
     @Test

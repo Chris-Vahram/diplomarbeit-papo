@@ -78,6 +78,7 @@ public class ShopEditorService {
             if (page.kind != ShopPageKind.FREE) {
                 throw new ApiException(409, "Die Adresse einer Pflichtseite kann nicht geändert werden.");
             }
+            pageService.requireNotLinked(page);
             page.segment = pageService.requireFreeSegment(page.shop, segment, page);
         }
         page.menuName = menuName;
@@ -105,7 +106,7 @@ public class ShopEditorService {
     }
 
     @Transactional
-    public ShopPageDto publish(Partner partner, long pageId, long version) {
+    public ShopPageDto publish(Partner partner, long pageId, Long version) {
         ShopPage page = designablePage(shopService.findOrCreate(partner), pageId);
         requireVersion(page.version, version, PAGE_CONFLICT);
         pageService.publish(page);
@@ -123,7 +124,7 @@ public class ShopEditorService {
     // The previous published version becomes published version and draft; the replaced
     // version becomes the new previous one, so a restore can itself be undone once.
     @Transactional
-    public ShopPageDetailDto restore(Partner partner, long pageId, long version) {
+    public ShopPageDetailDto restore(Partner partner, long pageId, Long version) {
         ShopPage page = designablePage(shopService.findOrCreate(partner), pageId);
         requireVersion(page.version, version, PAGE_CONFLICT);
         if (!page.online || page.previousPublishedContent == null) {
@@ -179,7 +180,7 @@ public class ShopEditorService {
     }
 
     @Transactional
-    public ShopThemeDto publishTheme(Partner partner, long version) {
+    public ShopThemeDto publishTheme(Partner partner, Long version) {
         PartnerShop shop = shopService.findOrCreate(partner);
         requireVersion(pageService.theme(shop).version, version, THEME_CONFLICT);
         ShopTheme theme = pageService.publishTheme(shop);
@@ -218,7 +219,11 @@ public class ShopEditorService {
         return page;
     }
 
-    private static void requireVersion(long stored, long sent, String message) {
+    // A missing version would silently match a never-saved page (version 0), so it is refused.
+    private static void requireVersion(long stored, Long sent, String message) {
+        if (sent == null) {
+            throw new ApiException(400, "Die Versionsangabe fehlt. Bitte die Seite neu laden.");
+        }
         if (stored != sent) {
             throw new ApiException(409, message);
         }

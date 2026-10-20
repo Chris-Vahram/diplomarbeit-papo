@@ -23,18 +23,18 @@ public final class ShopEditorRequests {
     public record CreatePage(String menuName, String segment, String template) {
     }
 
-    public record PageSettings(String menuName, String segment, String seoTitle, String seoDescription, long version) {
+    public record PageSettings(String menuName, String segment, String seoTitle, String seoDescription, Long version) {
     }
 
-    public record Draft(JsonNode content, long version) {
+    public record Draft(JsonNode content, Long version) {
     }
 
-    public record Version(long version) {
+    public record Version(Long version) {
     }
 
     public record PageOrder(List<Long> pageIds) {
     }
 
-    public record ThemeDraft(JsonNode theme, long version) {
+    public record ThemeDraft(JsonNode theme, Long version) {
     }
 }

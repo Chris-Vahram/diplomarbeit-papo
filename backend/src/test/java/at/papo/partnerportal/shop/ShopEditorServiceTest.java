@@ -271,6 +271,51 @@ class ShopEditorServiceTest {
     }
 
     @Test
+    void republishingUnchangedContentKeepsTheRestorePoint() throws Exception {
+        long partnerId = createPartner();
+        ShopPageDto home = tx(() -> pageBySegment(partnerId, "startseite"));
+        String template = tx(() -> editorService.page(partner(partnerId), home.id()).published().toString());
+        ShopPageDto saved = saveDraft(partnerId, home, block("heading-text", "{\"heading\":\"Neu\"}"));
+        ShopPageDto first = tx(() -> editorService.publish(partner(partnerId), saved.id(), saved.version()));
+        ShopPageDto second = tx(() -> editorService.publish(partner(partnerId), first.id(), first.version()));
+        ShopPageDetailDto restored = tx(() -> editorService.restore(partner(partnerId), home.id(), second.version()));
+        assertEquals(template, restored.published().toString());
+    }
+
+    @Test
+    void linkedOnlinePageKeepsItsAddressAndStaysOnline() throws Exception {
+        long partnerId = createPartner();
+        ShopPageDetailDto team = tx(() -> editorService.createPage(partner(partnerId),
+                new ShopEditorRequests.CreatePage("Team", "team", null)));
+        ShopPageDto online = tx(() -> editorService.publish(partner(partnerId), team.page().id(), team.page().version()));
+        ShopPageDto home = tx(() -> pageBySegment(partnerId, "startseite"));
+        ShopPageDto linked = saveDraft(partnerId, home,
+                block("hero", "{\"title\":\"Hallo\",\"buttonLabel\":\"Team\",\"buttonPage\":\"team\"}"));
+        tx(() -> editorService.publish(partner(partnerId), linked.id(), linked.version()));
+
+        String expected = "Auf diese Seite verlinkt noch: Startseite. Bitte dort zuerst den Link ändern und veröffentlichen.";
+        assertEquals(expected, rejection(() -> editorService.updateSettings(partner(partnerId), online.id(),
+                new ShopEditorRequests.PageSettings("Team", "wir", null, null, online.version()))));
+        assertEquals(expected, rejection(() -> editorService.unpublish(partner(partnerId), online.id())));
+        assertEquals(expected, rejection(() -> {
+            editorService.delete(partner(partnerId), online.id());
+            return null;
+        }));
+        // Renaming the menu entry only is fine.
+        tx(() -> editorService.updateSettings(partner(partnerId), online.id(),
+                new ShopEditorRequests.PageSettings("Unser Team", "team", null, null, online.version())));
+    }
+
+    @Test
+    void missingVersionIsRefused() throws Exception {
+        long partnerId = createPartner();
+        ShopPageDto home = tx(() -> pageBySegment(partnerId, "startseite"));
+        JsonNode draft = content(block("spacer", "{}"));
+        assertEquals("Die Versionsangabe fehlt. Bitte die Seite neu laden.", rejection(() ->
+                editorService.saveDraft(partner(partnerId), home.id(), new ShopEditorRequests.Draft(draft, null))));
+    }
+
+    @Test
     void draftMayLinkAnOfflinePageButPublishMayNot() throws Exception {
         long partnerId = createPartner();
         tx(() -> editorService.createPage(partner(partnerId), new ShopEditorRequests.CreatePage("Entwurf", "entwurf", null)));

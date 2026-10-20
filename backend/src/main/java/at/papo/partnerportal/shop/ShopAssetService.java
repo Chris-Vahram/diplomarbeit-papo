@@ -11,7 +11,6 @@ import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -35,7 +34,8 @@ public class ShopAssetService {
 
     public ShopAssetListDto list(Partner partner) {
         PartnerShop shop = shopService.findOrCreate(partner);
-        Map<Long, Set<String>> usage = usage(shop, false);
+        // Same rule as delete: drafts and the restore point count as use.
+        Map<Long, Set<String>> usage = usage(shop);
         List<ShopAssetDto> assets = ShopAsset.getEntityManager().createQuery(
                         "select new at.papo.partnerportal.shop.ShopAssetDto(a.id, a.filename, a.contentType, "
                                 + "a.sizeBytes, a.uploadedAt) from ShopAsset a where a.shop = ?1 order by a.uploadedAt desc, a.id desc",
@@ -86,7 +86,7 @@ public class ShopAssetService {
     public void delete(Partner partner, long assetId) {
         PartnerShop shop = shopService.findOrCreate(partner);
         ShopAsset asset = own(shop, assetId);
-        Set<String> pages = usage(shop, true).get(asset.id);
+        Set<String> pages = usage(shop).get(asset.id);
         if (pages != null) {
             throw new ApiException(409, "Das Bild wird noch verwendet auf: " + String.join(", ", pages) + ".");
         }
@@ -99,7 +99,7 @@ public class ShopAssetService {
 
     // Public only while a published online page of this shop shows it; drafts stay private.
     public Optional<ShopAsset> publicAsset(PartnerShop shop, long assetId) {
-        if (!usage(shop, false).containsKey(assetId)) {
+        if (!isPublished(shop, assetId)) {
             return Optional.empty();
         }
         return ShopAsset.<ShopAsset>find("id = ?1 and shop = ?2", assetId, shop).firstResultOptional();
@@ -117,39 +117,34 @@ public class ShopAssetService {
         return sum == null ? 0 : sum;
     }
 
-    // Asset id -> menu names of the pages using it. allVersions = also drafts and the
-    // previous published version; otherwise only published content of online pages.
-    Map<Long, Set<String>> usage(PartnerShop shop, boolean allVersions) {
+    // Asset id -> menu names of the pages using it in any version (draft, published, restore
+    // point), so no page can ever reference a missing image.
+    Map<Long, Set<String>> usage(PartnerShop shop) {
         Map<Long, Set<String>> usage = new LinkedHashMap<>();
-        String query = allVersions ? "shop = ?1 and kind <> ?2 order by position, id"
-                : "shop = ?1 and kind <> ?2 and online = true order by position, id";
-        for (ShopPage page : ShopPage.<ShopPage>list(query, shop, ShopPageKind.SYSTEM)) {
-            List<String> contents = new ArrayList<>();
-            contents.add(page.publishedContent);
-            if (allVersions) {
-                contents.add(page.draftContent);
-                contents.add(page.previousPublishedContent);
-            }
-            for (String content : contents) {
-                if (content != null) {
-                    imageIds(pageService.parse(content))
-                            .forEach(id -> usage.computeIfAbsent(id, key -> new LinkedHashSet<>()).add(page.menuName));
+        for (ShopPage page : ShopPage.<ShopPage>list("shop = ?1 and kind <> ?2 order by position, id",
+                shop, ShopPageKind.SYSTEM)) {
+            for (String content : new String[] { page.publishedContent, page.draftContent, page.previousPublishedContent }) {
+                if (content == null) {
+                    continue;
                 }
+                ShopBlockContent.values(pageService.parse(content), ShopBlockField.Kind.IMAGE).stream()
+                        .filter(JsonNode::canConvertToExactIntegral)
+                        .forEach(id -> usage.computeIfAbsent(id.asLong(), key -> new LinkedHashSet<>()).add(page.menuName));
             }
         }
         return usage;
     }
 
-    private static Set<Long> imageIds(JsonNode content) {
-        Set<Long> ids = new LinkedHashSet<>();
-        for (JsonNode block : content.path("blocks")) {
-            ShopBlockType.byId(block.path("type").asText()).ifPresent(type -> type.fields.values().stream()
-                    .filter(field -> field.kind() == ShopBlockField.Kind.IMAGE)
-                    .map(field -> block.path("config").path(field.name()))
-                    .filter(JsonNode::canConvertToExactIntegral)
-                    .forEach(value -> ids.add(value.asLong())));
-        }
-        return ids;
+    // Public delivery check in the database (jsonb containment) instead of parsing every
+    // online page on each image request. Image fields are all named "imageId".
+    private boolean isPublished(PartnerShop shop, long assetId) {
+        Number count = (Number) ShopAsset.getEntityManager().createNativeQuery(
+                        "select count(*) from shop_page where shop_id = ?1 and online = true and kind <> 'SYSTEM' "
+                                + "and publishedcontent @> cast(?2 as jsonb)")
+                .setParameter(1, shop.id)
+                .setParameter(2, "{\"blocks\":[{\"config\":{\"imageId\":" + assetId + "}}]}")
+                .getSingleResult();
+        return count.longValue() > 0;
     }
 
     private static String cleanFilename(String filename) {
