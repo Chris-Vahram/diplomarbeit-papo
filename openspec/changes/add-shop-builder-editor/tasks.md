@@ -22,5 +22,6 @@
 
 - [x] 3.1 Backend tests + package; `git diff --check`
 - [x] 3.2 Browser test desktop and tablet: build a page, publish, restore, conflict case
-- [ ] 3.3 Usability walkthrough with a non-technical tester; note findings (open: needs a human tester)
 - [x] 3.4 Update traceability
+
+Note (20.10.2026, Tobias): the planned usability walkthrough with a non-technical tester was dropped from this change and was not carried out.
