@@ -1,16 +1,17 @@
 import { apiFetch } from "../lib/api.js";
 import { escapeHtml } from "../lib/html.js";
-import { resolveImageUrl } from "../lib/product-images.js";
 import { showToast } from "../components/toast-notice.js";
 import { BLOCK_TYPES, missingRequired, newBlock } from "./block-schema.js";
 import { EditorHistory } from "./editor-history.js";
 import { assetObjectUrl } from "./asset-library.js";
+import { articleImageUrls, imageIds, postPreview, previewPayload } from "./preview-payload.js";
 import "./asset-library.js";
 import "./block-properties.js";
 import "./design-panel.js";
 import "./page-manager.js";
 
-// Shop builder of "Mein Webshop" (shop-builder spec): block palette, live preview in an
+// Shop builder (shop-builder spec), opened full screen from "Mein Webshop"
+// (#/partner/shop/editor[?page=<id>]): block palette, live preview in an
 // iframe of shop.html?preview (design.md Decision 3) and properties panel, plus the tabs
 // "Seiten", "Design" and "Bilder". Drafts are saved as whole pages with the loaded version
 // (Decision 1); undo/redo is a client-side snapshot stack (Decision 2).
@@ -24,6 +25,17 @@ const SAVE_TEXT = {
   error: "Nicht gespeichert – erneut versuchen",
   conflict: "Nicht gespeichert – Seite wurde inzwischen geändert",
 };
+
+const BACK_BAR = `<header class="builder-header">
+  <a class="builder-back" href="#/partner/shop" data-action="back"><i data-lucide="arrow-left"></i><span>Zurück</span></a>
+  <h1 class="builder-header__title">Shop bearbeiten</h1>
+</header>`;
+
+// Page to open first: ?page=<id> from a thumbnail on "Mein Webshop".
+function requestedPageId() {
+  const query = location.hash.split("?")[1] ?? "";
+  return Number(new URLSearchParams(query).get("page")) || null;
+}
 
 function blockSummary(block) {
   const config = block.config ?? {};
@@ -111,16 +123,28 @@ class ShopBuilder extends HTMLElement {
     if (this.#small) {
       this.#frameReady = false;
       this.#renderSmallScreenHint();
+    } else {
+      this.#renderLayout();
+      this.#load();
+    }
+    this.querySelector("[data-action=back]").addEventListener("click", (event) => this.#back(event));
+    window.lucide?.createIcons();
+  }
+
+  // Back to "Mein Webshop" only once everything is saved; otherwise stay with the message.
+  async #back(event) {
+    event.preventDefault();
+    if (!(await this.#flush())) {
+      showToast("Ihre letzten Änderungen sind noch nicht gespeichert. Bitte „Erneut versuchen“ wählen.", "error");
       return;
     }
-    this.#renderLayout();
-    this.#load();
+    location.hash = "#/partner/shop";
   }
 
   // shop-builder spec "Device support": below 768 px only a hint and the public link.
   #renderSmallScreenHint() {
     const link = this.#shop ? `${location.origin}${this.#shop.publicPath}` : "";
-    this.innerHTML = `<section class="builder-small">
+    this.innerHTML = `${BACK_BAR}<section class="builder-small">
       <p><strong>Der Shop-Editor ist für Computer und Tablet gedacht.</strong></p>
       <p>Öffnen Sie „Mein Webshop“ auf einem größeren Bildschirm, um Ihren Shop zu gestalten.</p>
       ${link ? `<p>Ihr Shop: <a href="${escapeHtml(link)}" target="_blank" rel="noopener">${escapeHtml(link)}</a></p>` : ""}
@@ -130,6 +154,7 @@ class ShopBuilder extends HTMLElement {
   #renderLayout() {
     this.#frameReady = false;
     this.innerHTML = `
+      ${BACK_BAR}
       <div class="builder" data-tab="edit">
         <div class="builder-tabs" role="tablist" aria-label="Shop-Editor">
           <button type="button" role="tab" data-tab="edit" aria-selected="true">Seite bearbeiten</button>
@@ -276,7 +301,8 @@ class ShopBuilder extends HTMLElement {
       this.querySelector("shop-page-manager").list = pages;
       this.#renderDesignPanel();
       this.#renderPalette();
-      await this.#openPage(pages.pages[0].id, { skipFlush: true });
+      const start = pages.pages.find((page) => page.id === requestedPageId()) ?? pages.pages[0];
+      await this.#openPage(start.id, { skipFlush: true });
       this.#resolveArticleImages();
     } catch (error) {
       this.querySelector(".builder-body").innerHTML =
@@ -284,16 +310,8 @@ class ShopBuilder extends HTMLElement {
     }
   }
 
-  // Article images of a not yet public shop come through the portal and need object URLs.
   async #resolveArticleImages() {
-    const urls = [...new Set(this.#preview.articles.map((article) => article.imageUrl).filter((url) => url?.startsWith("/product-images/")))];
-    await Promise.all(urls.map(async (url) => {
-      try {
-        this.#imageUrls[url] = await resolveImageUrl(url);
-      } catch {
-        // Missing image: the card shows its placeholder.
-      }
-    }));
+    this.#imageUrls = await articleImageUrls(this.#preview.articles);
     this.#sendPreview();
   }
 
@@ -762,45 +780,25 @@ class ShopBuilder extends HTMLElement {
     }
   };
 
-  // Navigation from the editor's own page list, so renamed or reordered pages show at once.
-  #navigation() {
-    const items = this.#pages.pages
-      .filter((page) => page.online && page.slot !== "ARTICLE_DETAIL")
-      .map((page) => ({ segment: page.segment, menuName: page.menuName, path: page.slot === "HOME" ? "" : page.segment }));
-    return { ...this.#preview.navigation, items };
-  }
-
   #sendPreview() {
     const frame = this.querySelector("#builder-frame");
     if (!this.#frameReady || !frame || !this.#page || !this.#preview) return;
     this.#loadAssetUrls();
-    const page = this.#page;
-    frame.contentWindow.postMessage({
-      type: "papo-shop-preview",
-      payload: {
-        shop: this.#preview.shop,
-        theme: this.#themeDraft,
-        navigation: this.#navigation(),
-        page: {
-          menuName: page.menuName,
-          path: page.slot === "HOME" ? "" : page.slot === "ARTICLE_DETAIL" ? "artikel" : page.segment,
-          blocks: this.#blocks,
-        },
-        article: page.slot === "ARTICLE_DETAIL" ? this.#preview.articles[0] ?? null : null,
-        articles: this.#preview.articles,
-        assetUrls: this.#assetUrls,
-        imageUrls: this.#imageUrls,
-        selectedBlockId: this.#selectedId,
-      },
-    }, location.origin);
+    postPreview(frame, previewPayload({
+      preview: this.#preview,
+      theme: this.#themeDraft,
+      pages: this.#pages.pages,
+      page: this.#page,
+      blocks: this.#blocks,
+      assetUrls: this.#assetUrls,
+      imageUrls: this.#imageUrls,
+      selectedBlockId: this.#selectedId,
+    }));
   }
 
   // Object URLs for the shop images used on the page; the preview is re-sent once loaded.
   #loadAssetUrls() {
-    const missing = this.#blocks
-      .map((block) => block.config?.imageId)
-      .filter((id) => id && !(id in this.#assetUrls));
-    for (const id of new Set(missing)) {
+    for (const id of imageIds(this.#blocks).filter((candidate) => !(candidate in this.#assetUrls))) {
       this.#assetUrls[id] = "";
       assetObjectUrl(id)
         .then((url) => {

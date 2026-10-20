@@ -1,10 +1,10 @@
 import { apiFetch } from "../lib/api.js";
 import { renderShopStatus } from "../lib/shop-status.js";
-import "../shop-editor/shop-builder.js";
+import "../shop-editor/page-thumbnails.js";
 
 // "Mein Webshop" (partner-shop spec): status, public link and the company's offline
-// reason (identifier and release are company decisions), then the shop builder
-// (shop-builder spec).
+// reason (identifier and release are company decisions), then miniatures of the shop's
+// pages and the entry into the full-screen builder (shop-builder spec).
 class PartnerShopPage extends HTMLElement {
   connectedCallback() {
     this.classList.add("area--partner");
@@ -29,7 +29,7 @@ class PartnerShopPage extends HTMLElement {
         <p id="shop-error" class="trade-proof-card__error" role="alert" hidden></p>
         <button type="button" id="shop-retry" hidden>Erneut laden</button>
       </section>
-      <shop-builder></shop-builder>
+      <shop-page-thumbnails></shop-page-thumbnails>
     `;
     this.querySelector("#shop-retry").addEventListener("click", () => this.load());
     this.load();
@@ -57,7 +57,6 @@ class PartnerShopPage extends HTMLElement {
   render(shop) {
     this.querySelector("#shop-kennung").textContent = shop.kennung;
     renderShopStatus(this, shop);
-    this.querySelector("shop-builder").shop = shop;
   }
 }
 
