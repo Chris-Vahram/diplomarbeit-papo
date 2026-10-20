@@ -179,7 +179,7 @@ class ShopBuilder extends HTMLElement {
             <button type="button" data-device="desktop" aria-pressed="true">Computer</button>
             <button type="button" data-device="mobile" aria-pressed="false">Handy</button>
           </div>
-          <button type="button" class="button-secondary" id="builder-restore" hidden>Vorherige Version wiederherstellen</button>
+          <button type="button" class="button-secondary" id="builder-restore" title="Vorherige veröffentlichte Version wiederherstellen" hidden>Wiederherstellen</button>
           <button type="button" class="button-primary" id="builder-publish">Seite veröffentlichen</button>
         </div>
 
@@ -209,8 +209,14 @@ class ShopBuilder extends HTMLElement {
           </aside>
           <section class="builder-preview" aria-label="Vorschau">
             <div class="builder-frame" data-device="desktop">
-              <iframe id="builder-frame" title="Vorschau des Shops" src="/shop.html?preview=1"></iframe>
-              <div class="builder-drop-layer" hidden><span class="builder-drop-line" hidden></span></div>
+              <div class="builder-frame__bar" aria-hidden="true">
+                <span class="builder-frame__dots"><i></i><i></i><i></i></span>
+                <span class="builder-frame__url" id="builder-frame-url"></span>
+              </div>
+              <div class="builder-frame__screen">
+                <iframe id="builder-frame" title="Vorschau des Shops" src="/shop.html?preview=1"></iframe>
+                <div class="builder-drop-layer" hidden><span class="builder-drop-line" hidden></span></div>
+              </div>
             </div>
           </section>
           <aside class="builder-right" aria-label="Eigenschaften">
@@ -345,6 +351,7 @@ class ShopBuilder extends HTMLElement {
       panel.hidden = panel.dataset.panel !== tab;
     });
     if (tab === "images") this.querySelector("[data-panel=images] shop-asset-library").load();
+    this.#sendPreview();
   }
 
   // ---- Pages -------------------------------------------------------------------------
@@ -400,10 +407,13 @@ class ShopBuilder extends HTMLElement {
     const page = this.#page;
     const changed = page.draftChanged || this.#saveTimer || this.#saving;
     this.querySelector("#builder-page-state").textContent = page.online
-      ? changed ? "Online – Änderungen noch nicht veröffentlicht" : "Online – aktuell"
-      : "Entwurf – noch nicht online";
+      ? changed ? "Online · Änderungen offen" : "Online · aktuell"
+      : "Entwurf · nicht online";
     this.querySelector("#builder-restore").hidden = !page.online || !page.restorable;
-    this.querySelector("#builder-publish").textContent = page.online ? "Änderungen veröffentlichen" : "Seite veröffentlichen";
+    // Address line of the preview window, as the page will appear publicly.
+    const path = page.slot === "HOME" ? "" : page.slot === "ARTICLE_DETAIL" ? "/artikel/…" : `/${page.segment}`;
+    this.querySelector("#builder-frame-url").textContent = `${location.host}/shop/${this.#preview?.shop.kennung ?? ""}${path}`;
+    this.querySelector("#builder-publish").textContent = "Veröffentlichen";
     this.querySelector("#builder-undo").disabled = !this.#history.canUndo;
     this.querySelector("#builder-redo").disabled = !this.#history.canRedo;
   }
@@ -931,7 +941,8 @@ class ShopBuilder extends HTMLElement {
       blocks: this.#blocks,
       assetUrls: this.#assetUrls,
       imageUrls: this.#imageUrls,
-      selectedBlockId: this.#selectedId,
+      // Selection and block toolbar belong to "Seite bearbeiten" only.
+      selectedBlockId: this.#tab === "edit" ? this.#selectedId : null,
     }));
   }
 
