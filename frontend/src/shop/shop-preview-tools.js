@@ -30,6 +30,10 @@ const ICONS = {
 
 const STYLES = `
 [data-editable] { outline: none; cursor: text; border-radius: 3px; }
+/* Empty texts: only shown on the selected block (or while typing), with a placeholder. */
+[data-empty] { display: none; }
+.shop-block--selected [data-empty], [data-empty]:focus { display: block; min-width: 4ch; }
+[data-empty]::before { content: attr(data-placeholder); opacity: .45; pointer-events: none; }
 [data-editable]:hover { box-shadow: 0 0 0 2px color-mix(in srgb, var(--shop-accent) 55%, transparent); }
 [data-editable]:focus { box-shadow: 0 0 0 2px var(--shop-accent); background: color-mix(in srgb, var(--shop-surface) 35%, transparent); }
 .papo-tools {
@@ -108,6 +112,7 @@ export function installPreviewTools(root, post) {
     const element = field?.closest("[data-block-id]");
     if (!element) return;
     const name = field.dataset.field;
+    field.toggleAttribute("data-empty", !field.innerText.trim());
     const value = SINGLE_LINE.has(name) ? field.innerText.replace(/\n/g, " ") : field.innerText;
     // The text is already on screen; re-rendering would move the caret.
     view.adopt(element, { ...element.config, [name]: value });
@@ -186,14 +191,14 @@ export function installPreviewTools(root, post) {
   const DRAG_THRESHOLD = 6;
   let suppressClick = false;
 
-  function dropIndex(clientY) {
-    const list = blocks();
-    for (let i = 0; i < list.length; i++) {
-      const rect = list[i].getBoundingClientRect();
-      if (clientY < rect.top + rect.height / 2) return { index: i, y: rect.top };
+  // beforeId: block the dragged one goes in front of (null = end of the page).
+  function dropTarget(clientY) {
+    for (const element of blocks()) {
+      const rect = element.getBoundingClientRect();
+      if (clientY < rect.top + rect.height / 2) return { beforeId: element.dataset.blockId, y: rect.top };
     }
-    const last = list.at(-1)?.getBoundingClientRect();
-    return { index: list.length, y: last ? last.bottom : 0 };
+    const last = blocks().at(-1)?.getBoundingClientRect();
+    return { beforeId: null, y: last ? last.bottom : 0 };
   }
 
   function beginDrag(event, element) {
@@ -221,7 +226,7 @@ export function installPreviewTools(root, post) {
       getSelection()?.removeAllRanges();
     }
     event.preventDefault();
-    const { y } = dropIndex(event.clientY);
+    const { y } = dropTarget(event.clientY);
     dropLine.style.top = `${y + window.scrollY}px`;
     dropLine.hidden = false;
     if (event.clientY < 48) window.scrollBy(0, -20);
@@ -233,7 +238,7 @@ export function installPreviewTools(root, post) {
     if (dragged.active) {
       if (drop) {
         post({ type: "papo-shop-action", action: "move", blockId: dragged.element.dataset.blockId,
-          value: dropIndex(event.clientY).index });
+          value: dropTarget(event.clientY).beforeId });
       }
       dragged.element.classList.remove("is-dragging");
       document.documentElement.classList.remove("papo-dragging");

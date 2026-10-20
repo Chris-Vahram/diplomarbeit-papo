@@ -12,6 +12,8 @@ const KIND_LABEL = { MANDATORY: "Pflichtseite", FREE: "Eigene Seite" };
 
 class ShopPageManager extends HTMLElement {
   #list = null;
+  // Set by the builder: waits until the open page is saved; resolves false if that failed.
+  beforeChange = null;
   #dragId = null;
   #settingsPage = null;
 
@@ -160,6 +162,7 @@ class ShopPageManager extends HTMLElement {
         break;
       }
       case "offline":
+        if (!(await this.#saved(id))) break;
         await this.#call(`/partner/shop/pages/${id}/unpublish`, { method: "POST" }, `„${page.menuName}“ ist jetzt offline.`, true);
         break;
       case "delete":
@@ -182,6 +185,12 @@ class ShopPageManager extends HTMLElement {
       showToast(error.message, "error");
       return false;
     }
+  }
+
+  async #saved(pageId) {
+    if (!this.beforeChange || (await this.beforeChange(pageId))) return true;
+    showToast("Bitte zuerst die offenen Änderungen dieser Seite speichern.", "error");
+    return false;
   }
 
   #changed(detail) {
@@ -307,9 +316,14 @@ class ShopPageManager extends HTMLElement {
     form.addEventListener("input", () => this.#updateCounters(form));
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
+      const error = this.querySelector("#page-settings-error");
+      if (!(await this.#saved(this.#settingsPage.id))) {
+        error.textContent = "Bitte zuerst die offenen Änderungen dieser Seite speichern.";
+        error.hidden = false;
+        return;
+      }
       // Fresh version: the builder may have autosaved this page since the list was drawn.
       const page = this.#page(this.#settingsPage.id);
-      const error = this.querySelector("#page-settings-error");
       try {
         const saved = await apiFetch(`/partner/shop/pages/${page.id}/settings`, {
           method: "PUT",

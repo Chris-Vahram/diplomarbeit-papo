@@ -76,6 +76,9 @@ class ShopBuilder extends HTMLElement {
   #changeCount = 0;
   #status = "saved";
   #themeTimer = null;
+  #themeFailed = false;
+  // Bumped when pending saves of a page are discarded (page deleted); late answers are ignored.
+  #saveGeneration = 0;
   #themeSaving = null;
 
   // PartnerShopDto, for the public link in the small-screen hint.
@@ -115,7 +118,7 @@ class ShopBuilder extends HTMLElement {
   };
 
   #onBeforeUnload = (event) => {
-    if (this.#saveTimer || this.#saving || this.#status === "error" || this.#themeTimer) {
+    if (this.#saveTimer || this.#saving || this.#status === "error" || this.#themeTimer || this.#themeFailed) {
       event.preventDefault();
     }
   };
@@ -312,9 +315,20 @@ class ShopBuilder extends HTMLElement {
       this.#openPage(event.detail.id);
     });
     this.addEventListener("pages-changed", (event) => this.#onPagesChanged(event.detail));
+    // The open page was deleted: its pending changes are gone with it, so nothing is flushed.
     this.addEventListener("page-deleted", (event) => {
-      if (event.detail.id === this.#page?.id) this.#openPage(this.#pages.pages[0].id);
+      if (event.detail.id !== this.#page?.id) return;
+      this.#saveGeneration += 1;
+      clearTimeout(this.#saveTimer);
+      this.#saveTimer = null;
+      this.#saveAgain = false;
+      this.#setStatus("saved");
+      this.#openPage(this.#pages.pages[0].id, { skipFlush: true });
     });
+    // Page settings and "Offline nehmen" wait for a running autosave of the same page, so the
+    // partner's own action never shows up as a conflict.
+    this.querySelector("shop-page-manager").beforeChange = (pageId) =>
+      (pageId === this.#page?.id ? this.#flush() : Promise.resolve(true));
     this.addEventListener("theme-change", (event) => this.#onThemeChange(event.detail.theme));
     this.addEventListener("theme-publish", () => this.#publishTheme());
   }
@@ -618,8 +632,11 @@ class ShopBuilder extends HTMLElement {
         if (index < this.#blocks.length - 1) this.#applyBlocks(move(this.#blocks, index, index + 1));
         break;
       case "move": {
-        // value = insertion index before removing the block.
-        const to = Math.max(0, Math.min(this.#blocks.length - 1, value > index ? value - 1 : value));
+        // value = id of the block it goes in front of (null = end); ids, because the preview
+        // may skip blocks it cannot render, so its positions are not draft positions.
+        const before = value ? this.#blocks.findIndex((candidate) => candidate.id === value) : this.#blocks.length;
+        if (before === -1) break;
+        const to = before > index ? before - 1 : before;
         if (to !== index) this.#applyBlocks(move(this.#blocks, index, to));
         break;
       }
@@ -798,16 +815,19 @@ class ShopBuilder extends HTMLElement {
     this.#saveTimer = null;
     const count = this.#changeCount;
     const page = this.#page;
+    const generation = this.#saveGeneration;
     this.#setStatus("saving");
     this.#saving = apiFetch(`/partner/shop/pages/${page.id}/draft`, {
       method: "PUT",
       body: JSON.stringify({ content: { blocks: this.#blocks }, version: page.version }),
     })
       .then((saved) => {
+        if (generation !== this.#saveGeneration) return;
         this.#replacePage(saved);
         if (count === this.#changeCount && !this.#saveTimer) this.#setStatus("saved");
       })
       .catch((error) => {
+        if (generation !== this.#saveGeneration) return;
         if (error.status === 409 && /inzwischen geändert/.test(error.message)) {
           this.#setStatus("conflict");
           this.#showConflict(error.message);
@@ -828,9 +848,14 @@ class ShopBuilder extends HTMLElement {
     return this.#saving;
   }
 
-  // Waits until everything is saved; false if saving failed.
+  // Waits until everything is saved; false if saving failed. A failed theme save is retried
+  // once here, so "Zurück" never leaves unsaved design changes behind.
   async #flush() {
-    if (this.#themeTimer) await this.#saveTheme();
+    if (this.#themeTimer || this.#themeFailed) {
+      if (!(await this.#saveTheme())) return false;
+    } else if (this.#themeSaving && !(await this.#themeSaving)) {
+      return false;
+    }
     while (this.#saveTimer || this.#saving) {
       if (this.#saveTimer) await this.#save();
       else await this.#saving;
@@ -883,10 +908,12 @@ class ShopBuilder extends HTMLElement {
     })
       .then((theme) => {
         this.#theme = theme;
+        this.#themeFailed = false;
         this.#renderDesignPanel();
         return true;
       })
       .catch((error) => {
+        this.#themeFailed = true;
         if (error.status === 409) this.#showConflict(error.message);
         else showToast(`Design nicht gespeichert: ${error.message}`, "error");
         return false;

@@ -39,6 +39,8 @@ export function createShopApi(kennung) {
 export function createPreviewApi(data) {
   return {
     kennung: data.shop.kennung,
+    // Blocks render empty texts as fillable placeholders (blocks/text-field.js).
+    editing: true,
     shop: async () => data.shop,
     theme: async () => data.theme,
     navigation: async () => data.navigation,
