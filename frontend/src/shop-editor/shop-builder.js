@@ -6,6 +6,7 @@ import { EditorHistory } from "./editor-history.js";
 import { assetObjectUrl } from "./asset-library.js";
 import { articleImageUrls, imageIds, postPreview, previewPayload } from "./preview-payload.js";
 import "./asset-library.js";
+import { BLOCK_DRAG_TYPE } from "./block-palette.js";
 import "./block-properties.js";
 import "./design-panel.js";
 import "./page-manager.js";
@@ -17,6 +18,7 @@ import "./page-manager.js";
 // (Decision 1); undo/redo is a client-side snapshot stack (Decision 2).
 
 const AUTOSAVE_MS = 1500;
+const COLLAPSE_KEY = "papo.shopBuilder.collapsed";
 const SMALL_SCREEN = window.matchMedia("(max-width: 767px)");
 const SAVE_TEXT = {
   saved: "Gespeichert",
@@ -65,6 +67,7 @@ class ShopBuilder extends HTMLElement {
   #frameReady = false;
   #history = new EditorHistory();
   #pickField = null;
+  #collapseFallback = null;
   #small = null;
   #screenTimer = null;
 
@@ -182,12 +185,20 @@ class ShopBuilder extends HTMLElement {
         </div>
 
         <div class="builder-body">
-          <aside class="builder-left">
+          <aside class="builder-left" aria-label="Seitenleiste">
+            <button type="button" class="builder-collapse" data-collapse="left"></button>
             <div data-panel="edit">
-              <h3 class="builder-panel__title">Abschnitt hinzufügen</h3>
-              <div class="builder-palette" id="builder-palette"></div>
-              <h3 class="builder-panel__title">Abschnitte dieser Seite</h3>
-              <ol class="block-list" id="builder-blocks"></ol>
+              <div class="side-tabs" role="tablist" aria-label="Abschnitte">
+                <button type="button" role="tab" data-side="add" aria-selected="true">Hinzufügen</button>
+                <button type="button" role="tab" data-side="blocks" aria-selected="false">Abschnitte <span class="side-tabs__count" id="builder-block-count"></span></button>
+              </div>
+              <div data-side-panel="add">
+                <p class="builder-hint">Klicken Sie auf einen Abschnitt oder ziehen Sie ihn an die gewünschte Stelle in der Vorschau.</p>
+                <shop-block-palette></shop-block-palette>
+              </div>
+              <div data-side-panel="blocks" hidden>
+                <ol class="block-list" id="builder-blocks"></ol>
+              </div>
             </div>
             <div data-panel="pages" hidden><shop-page-manager></shop-page-manager></div>
             <div data-panel="design" hidden><shop-design-panel></shop-design-panel></div>
@@ -200,9 +211,11 @@ class ShopBuilder extends HTMLElement {
           <section class="builder-preview" aria-label="Vorschau">
             <div class="builder-frame" data-device="desktop">
               <iframe id="builder-frame" title="Vorschau des Shops" src="/shop.html?preview=1"></iframe>
+              <div class="builder-drop-layer" hidden><span class="builder-drop-line"></span></div>
             </div>
           </section>
-          <aside class="builder-right">
+          <aside class="builder-right" aria-label="Eigenschaften">
+            <button type="button" class="builder-collapse" data-collapse="right"></button>
             <shop-block-properties></shop-block-properties>
           </aside>
         </div>
@@ -254,10 +267,20 @@ class ShopBuilder extends HTMLElement {
     this.querySelectorAll("[data-close]").forEach((button) =>
       button.addEventListener("click", () => button.closest("modal-dialog").close()));
 
-    this.querySelector("#builder-palette").addEventListener("click", (event) => {
-      const type = event.target.closest("[data-type]")?.dataset.type;
-      if (type) this.#addBlock(type);
+    this.addEventListener("palette-add", (event) => this.#addBlock(event.detail.type));
+    // Shown after dragstart returns: changing the layout inside dragstart can cancel the drag.
+    this.addEventListener("palette-drag", () => setTimeout(() => {
+      this.querySelector(".builder-drop-layer").hidden = false;
+    }));
+    this.addEventListener("palette-drag-end", () => this.#endDrop());
+    this.#bindDropLayer(this.querySelector(".builder-drop-layer"));
+    this.querySelector(".side-tabs").addEventListener("click", (event) => {
+      const side = event.target.closest("[data-side]")?.dataset.side;
+      if (side) this.#showSideTab(side);
     });
+    this.querySelectorAll("[data-collapse]").forEach((button) =>
+      button.addEventListener("click", () => this.#toggleCollapse(button.dataset.collapse)));
+    this.#applyCollapse();
     const blockList = this.querySelector("#builder-blocks");
     blockList.addEventListener("click", (event) => this.#onBlockListClick(event));
     this.#bindBlockDragAndDrop(blockList);
@@ -300,7 +323,6 @@ class ShopBuilder extends HTMLElement {
       this.#preview = preview;
       this.querySelector("shop-page-manager").list = pages;
       this.#renderDesignPanel();
-      this.#renderPalette();
       const start = pages.pages.find((page) => page.id === requestedPageId()) ?? pages.pages[0];
       await this.#openPage(start.id, { skipFlush: true });
       this.#resolveArticleImages();
@@ -440,18 +462,112 @@ class ShopBuilder extends HTMLElement {
 
   // ---- Blocks ------------------------------------------------------------------------
 
-  #renderPalette() {
-    this.querySelector("#builder-palette").innerHTML = Object.entries(BLOCK_TYPES)
-      .filter(([, type]) => !type.fixed)
-      .map(([id, type]) => `<button type="button" class="palette-item" data-type="${id}" title="${escapeHtml(type.description)}">
-          <span class="palette-item__label">+ ${escapeHtml(type.label)}</span>
-          <span class="palette-item__desc">${escapeHtml(type.description)}</span>
-        </button>`)
-      .join("");
+  // ---- Sidebars ----------------------------------------------------------------------
+
+  #showSideTab(side) {
+    this.querySelectorAll(".side-tabs [data-side]").forEach((button) =>
+      button.setAttribute("aria-selected", String(button.dataset.side === side)));
+    this.querySelectorAll("[data-side-panel]").forEach((panel) => {
+      panel.hidden = panel.dataset.sidePanel !== side;
+    });
+  }
+
+  // Collapsed sidebars are remembered per browser (a convenience, so failures are ignored).
+  #collapsed() {
+    try {
+      return JSON.parse(localStorage.getItem(COLLAPSE_KEY)) ?? {};
+    } catch {
+      return {};
+    }
+  }
+
+  #toggleCollapse(side, open = null) {
+    const state = this.#collapsed();
+    state[side] = open === null ? !state[side] : !open;
+    try {
+      localStorage.setItem(COLLAPSE_KEY, JSON.stringify(state));
+    } catch {
+      // Private mode: the state lasts for this page only.
+      this.#collapseFallback = state;
+    }
+    this.#applyCollapse(state);
+  }
+
+  #applyCollapse(state = this.#collapseFallback ?? this.#collapsed()) {
+    const builder = this.querySelector(".builder");
+    for (const side of ["left", "right"]) {
+      const collapsed = Boolean(state[side]);
+      builder.toggleAttribute(`data-${side}-collapsed`, collapsed);
+      const button = this.querySelector(`[data-collapse="${side}"]`);
+      const label = side === "left" ? "Seitenleiste" : "Eigenschaften";
+      const icon = side === "left" ? (collapsed ? "panel-left-open" : "panel-left-close") : (collapsed ? "panel-right-open" : "panel-right-close");
+      button.setAttribute("aria-expanded", String(!collapsed));
+      button.setAttribute("aria-label", `${label} ${collapsed ? "ausklappen" : "einklappen"}`);
+      button.title = button.getAttribute("aria-label");
+      button.innerHTML = `<i data-lucide="${icon}"></i>`;
+    }
+    window.lucide?.createIcons();
+  }
+
+  // ---- Drag from the palette into the preview -----------------------------------------
+
+  // The layer covers the preview while a palette entry is dragged; the iframe is same-origin,
+  // so the insertion point comes from the rendered blocks' positions.
+  #bindDropLayer(layer) {
+    const line = layer.querySelector(".builder-drop-line");
+    layer.addEventListener("dragover", (event) => {
+      if (!event.dataTransfer.types.includes(BLOCK_DRAG_TYPE)) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "copy";
+      const { y } = this.#dropTarget(event.clientY);
+      line.style.top = `${y}px`;
+      line.hidden = false;
+    });
+    layer.addEventListener("dragleave", (event) => {
+      if (event.target === layer) line.hidden = true;
+    });
+    layer.addEventListener("drop", (event) => {
+      const type = event.dataTransfer.getData(BLOCK_DRAG_TYPE);
+      if (!type || !BLOCK_TYPES[type]) return;
+      event.preventDefault();
+      const { index } = this.#dropTarget(event.clientY);
+      this.#endDrop();
+      this.#addBlock(type, index);
+    });
+  }
+
+  #endDrop() {
+    const layer = this.querySelector(".builder-drop-layer");
+    if (!layer) return;
+    layer.hidden = true;
+    layer.querySelector(".builder-drop-line").hidden = true;
+  }
+
+  // index in the draft where the block goes, y of the insertion line in the frame.
+  #dropTarget(clientY) {
+    const frame = this.querySelector("#builder-frame");
+    const doc = frame.contentDocument;
+    const frameTop = frame.getBoundingClientRect().top;
+    const y = clientY - frameTop;
+    // Scroll the preview when dragging near its upper or lower edge.
+    if (y < 48) frame.contentWindow.scrollBy(0, -24);
+    else if (y > frame.clientHeight - 48) frame.contentWindow.scrollBy(0, 24);
+    const rendered = [...(doc?.querySelectorAll("shop-page-view > [data-block-id]") ?? [])];
+    for (const element of rendered) {
+      const rect = element.getBoundingClientRect();
+      if (y < rect.top + rect.height / 2) {
+        const index = this.#blocks.findIndex((block) => block.id === element.dataset.blockId);
+        return { index, y: rect.top };
+      }
+    }
+    const last = rendered.at(-1)?.getBoundingClientRect();
+    const main = doc?.querySelector(".shop-main")?.getBoundingClientRect();
+    return { index: this.#blocks.length, y: last ? last.bottom : main?.top ?? 0 };
   }
 
   #renderBlockList() {
     const list = this.querySelector("#builder-blocks");
+    this.querySelector("#builder-block-count").textContent = `(${this.#blocks.length})`;
     if (!this.#blocks.length) {
       list.innerHTML = `<li class="builder-empty">Diese Seite ist noch leer. Fügen Sie oben einen Abschnitt hinzu.</li>`;
       return;
@@ -543,18 +659,22 @@ class ShopBuilder extends HTMLElement {
     });
   }
 
-  #addBlock(type) {
+  // index: from a drop into the preview; a click inserts after the selected block.
+  #addBlock(type, index = null) {
     const block = newBlock(type);
     const blocks = [...this.#blocks];
-    const at = this.#blocks.findIndex((candidate) => candidate.id === this.#selectedId);
-    blocks.splice(at === -1 ? blocks.length : at + 1, 0, block);
+    const selected = this.#blocks.findIndex((candidate) => candidate.id === this.#selectedId);
+    const at = index ?? (selected === -1 ? blocks.length : selected + 1);
+    blocks.splice(at, 0, block);
     this.#selectedId = block.id;
+    this.#toggleCollapse("right", true);
     this.#applyBlocks(blocks);
   }
 
   #select(id) {
     this.#selectedId = id;
     if (this.#tab !== "edit") this.#showTab("edit");
+    this.#toggleCollapse("right", true);
     this.#renderBlockList();
     this.#renderProperties();
     this.#sendPreview();
@@ -781,6 +901,10 @@ class ShopBuilder extends HTMLElement {
   };
 
   #sendPreview() {
+    const palette = this.querySelector("shop-block-palette");
+    if (palette && this.#preview && this.#pages) {
+      palette.context = { preview: this.#preview, theme: this.#themeDraft, pages: this.#pages.pages };
+    }
     const frame = this.querySelector("#builder-frame");
     if (!this.#frameReady || !frame || !this.#page || !this.#preview) return;
     this.#loadAssetUrls();

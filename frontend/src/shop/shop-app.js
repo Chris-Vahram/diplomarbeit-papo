@@ -89,7 +89,15 @@ function renderPreview(data) {
   const api = createPreviewApi(data);
   const scrollY = window.scrollY;
   applyTheme(document.documentElement, data.theme);
-  const main = renderLayout(api, data.shop, data.navigation, data.page.path);
+  // bare: the blocks alone, without header and footer (palette preview of one block).
+  let main;
+  if (data.bare) {
+    root.className = "shop-root shop-root--bare";
+    root.innerHTML = `<main class="shop-main"></main>`;
+    main = root.querySelector("main");
+  } else {
+    main = renderLayout(api, data.shop, data.navigation, data.page.path);
+  }
   root.classList.add("shop-root--preview");
   document.title = `Vorschau: ${data.page.menuName}`;
   const view = document.createElement("shop-page-view");

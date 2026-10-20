@@ -124,6 +124,27 @@ export const COLOR_ROLES = [
   { role: "text", label: "Text" },
 ];
 
+// Example content for the palette's hover preview only; new blocks start from `defaults`.
+const SAMPLES = {
+  hero: { title: "Willkommen in unserem Shop", text: "Entdecken Sie unser Sortiment und bestellen Sie bequem online.",
+    buttonLabel: "Zu den Artikeln", buttonPage: "artikel", align: "center", background: "primary" },
+  "heading-text": { heading: "Über uns", text: "Seit über 20 Jahren beraten wir unsere Kundinnen und Kunden persönlich und kompetent." },
+  image: { width: "wide", caption: "Unser Geschäft in Linz" },
+  "image-text": { heading: "Persönliche Beratung", text: "Wir nehmen uns Zeit für Ihre Fragen – vor Ort oder am Telefon.", imagePosition: "left" },
+  "article-grid": { heading: "Unsere Artikel", columns: "3" },
+  "featured-articles": { heading: "Empfehlungen", columns: "3" },
+  "contact-person": { heading: "Ihr Ansprechpartner", name: "Maria Muster", role: "Beratung und Verkauf",
+    email: "maria@example.at", phone: "+43 732 123456" },
+  spacer: { size: "medium", divider: true },
+};
+
+// articleIds: ids to feature in the sample (the shop's first articles).
+export function sampleBlock(type, articleIds = []) {
+  const config = structuredClone(SAMPLES[type] ?? BLOCK_TYPES[type].defaults ?? {});
+  if (type === "featured-articles") config.articleIds = articleIds.slice(0, 3);
+  return { id: `sample-${type}`, type, config };
+}
+
 export function newBlock(type) {
   return { id: crypto.randomUUID(), type, config: structuredClone(BLOCK_TYPES[type].defaults ?? {}) };
 }
