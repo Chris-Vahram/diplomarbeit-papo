@@ -18,7 +18,6 @@ import "./page-manager.js";
 // (Decision 1); undo/redo is a client-side snapshot stack (Decision 2).
 
 const AUTOSAVE_MS = 1500;
-const COLLAPSE_KEY = "papo.shopBuilder.collapsed";
 const SMALL_SCREEN = window.matchMedia("(max-width: 767px)");
 const SAVE_TEXT = {
   saved: "Gespeichert",
@@ -67,7 +66,7 @@ class ShopBuilder extends HTMLElement {
   #frameReady = false;
   #history = new EditorHistory();
   #pickField = null;
-  #collapseFallback = null;
+  #collapsedSides = { left: false, right: false };
   #small = null;
   #screenTimer = null;
 
@@ -472,28 +471,13 @@ class ShopBuilder extends HTMLElement {
     });
   }
 
-  // Collapsed sidebars are remembered per browser (a convenience, so failures are ignored).
-  #collapsed() {
-    try {
-      return JSON.parse(localStorage.getItem(COLLAPSE_KEY)) ?? {};
-    } catch {
-      return {};
-    }
+  // Both sidebars start expanded each time the editor opens and only the buttons change that.
+  #toggleCollapse(side) {
+    this.#collapsedSides[side] = !this.#collapsedSides[side];
+    this.#applyCollapse();
   }
 
-  #toggleCollapse(side, open = null) {
-    const state = this.#collapsed();
-    state[side] = open === null ? !state[side] : !open;
-    try {
-      localStorage.setItem(COLLAPSE_KEY, JSON.stringify(state));
-    } catch {
-      // Private mode: the state lasts for this page only.
-      this.#collapseFallback = state;
-    }
-    this.#applyCollapse(state);
-  }
-
-  #applyCollapse(state = this.#collapseFallback ?? this.#collapsed()) {
+  #applyCollapse(state = this.#collapsedSides) {
     const builder = this.querySelector(".builder");
     for (const side of ["left", "right"]) {
       const collapsed = Boolean(state[side]);
@@ -696,14 +680,12 @@ class ShopBuilder extends HTMLElement {
     const at = index ?? (selected === -1 ? blocks.length : selected + 1);
     blocks.splice(at, 0, block);
     this.#selectedId = block.id;
-    this.#toggleCollapse("right", true);
     this.#applyBlocks(blocks);
   }
 
   #select(id) {
     this.#selectedId = id;
     if (this.#tab !== "edit") this.#showTab("edit");
-    this.#toggleCollapse("right", true);
     this.#renderBlockList();
     this.#renderProperties();
     this.#sendPreview();

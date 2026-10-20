@@ -3947,7 +3947,21 @@ shop-builder .builder-header__title { margin: 0; font-size: var(--font-size-lg);
 
 .builder-left,
 .builder-right { min-width: 0; }
-.builder-left { max-height: calc(100vh - 10rem); overflow-y: auto; padding-right: var(--spacing-1); }
+/* Each sidebar scrolls on its own and stays in view below the sticky editor header. */
+.builder-left,
+.builder-right {
+  position: sticky;
+  top: 4.5rem;
+  align-self: start;
+  max-height: calc(100vh - 5.5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.builder-left { padding-right: var(--spacing-1); }
+.builder-right { padding-right: var(--spacing-1); }
+@media (max-width: 1199px) {
+  .builder-right { position: static; max-height: none; overflow: visible; }
+}
 .builder[data-tab="pages"] .builder-left,
 .builder[data-tab="images"] .builder-left { max-height: none; }
 
@@ -3960,8 +3974,6 @@ shop-builder .builder-header__title { margin: 0; font-size: var(--font-size-lg);
 .builder-counter { color: var(--text-secondary); font-size: var(--font-size-xs); font-weight: normal; }
 
 /* Collapsible sidebars: the toggle stays visible as a narrow strip. */
-.builder-left,
-.builder-right { position: relative; }
 .builder-collapse {
   display: inline-flex;
   align-items: center;
@@ -3978,6 +3990,9 @@ shop-builder .builder-header__title { margin: 0; font-size: var(--font-size-lg);
 .builder-collapse:hover { background: var(--bg-subtle); color: var(--text-primary); }
 .builder-collapse svg { width: 1rem; height: 1rem; }
 .builder-right .builder-collapse { float: right; margin-left: var(--spacing-2); }
+/* The toggle stays reachable while the sidebar content scrolls. */
+.builder-left .builder-collapse,
+.builder-right .builder-collapse { position: sticky; top: 0; z-index: 1; }
 .builder[data-left-collapsed] .builder-left > :not(.builder-collapse),
 .builder[data-right-collapsed] .builder-right > :not(.builder-collapse) { display: none; }
 .builder[data-left-collapsed] .builder-left,
