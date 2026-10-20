@@ -29,6 +29,15 @@ public record PublicArticleDto(
                 imageUrl(product, kennung), product.price, DEFAULT_TAX_RATE_PERCENT);
     }
 
+    // Editor preview of a not yet public shop: uploaded images through the authenticated
+    // portal path, which the editor turns into object URLs (lib/product-images.js).
+    static PublicArticleDto forPreview(Product product) {
+        PublicArticleDto dto = from(product, "");
+        return product.image == null ? dto : new PublicArticleDto(dto.id(), dto.name(), dto.description(),
+                dto.categoryId(), dto.category(), "/product-images/" + product.image.id, dto.grossPrice(),
+                dto.taxRatePercent());
+    }
+
     static String imageUrl(Product product, String kennung) {
         if (product.image != null) {
             return "/api/shop/" + kennung + "/images/" + product.image.id;

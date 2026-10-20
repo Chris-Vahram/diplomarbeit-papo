@@ -8,6 +8,7 @@ public final class UploadLimits {
 
     public static final long IMPORT_FILE_BYTES = 2L * 1024 * 1024;
     public static final long PRODUCT_IMAGE_BYTES = 2L * 1024 * 1024;
+    public static final long SHOP_ASSET_BYTES = 5L * 1024 * 1024;
 
     private UploadLimits() {
     }

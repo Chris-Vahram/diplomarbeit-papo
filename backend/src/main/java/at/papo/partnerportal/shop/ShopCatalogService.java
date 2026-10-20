@@ -45,8 +45,8 @@ public class ShopCatalogService {
                 .getResultList();
     }
 
-    // Images are public only as the image of a catalogue article. Shop-owned uploads join
-    // this check with add-shop-builder-editor.
+    // Article images are public only as the image of a catalogue article. Shop-owned uploads
+    // have their own id space and endpoint (ShopAssetService.publicAsset).
     public Optional<ProductImage> publicImage(Partner partner, long imageId) {
         return ProductEnablement.count("partner = ?1 and product.available = true and product.image.id = ?2",
                 partner, imageId) > 0
