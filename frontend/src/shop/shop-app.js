@@ -71,7 +71,12 @@ function renderMessage(main, text) {
 // renders whatever the embedding editor sends; only messages from the same-origin parent count.
 const PREVIEW_DATA = "papo-shop-preview";
 
-function startPreview() {
+// Editing tools inside the preview (shop-preview-tools.js), never loaded by the public shop.
+let previewTools = null;
+
+async function startPreview() {
+  const { installPreviewTools } = await import("./shop-preview-tools.js");
+  previewTools = installPreviewTools(root, (message) => window.parent.postMessage(message, location.origin));
   window.addEventListener("message", (event) => {
     if (event.origin !== location.origin || event.source !== window.parent) return;
     if (event.data?.type === PREVIEW_DATA) renderPreview(event.data.payload);
@@ -127,6 +132,7 @@ function renderPreview(data) {
   if (data.selectedBlockId) {
     view.querySelector(`[data-block-id="${CSS.escape(data.selectedBlockId)}"]`)?.classList.add("shop-block--selected");
   }
+  previewTools?.afterRender(view, data.selectedBlockId);
 }
 
 async function start() {

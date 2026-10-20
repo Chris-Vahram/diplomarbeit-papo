@@ -3,7 +3,7 @@ import { articleCardsHtml, imageHtml, priceHtml } from "./article-card.js";
 import { ShopBlock } from "./shop-block.js";
 
 function headingHtml(text) {
-  return text ? `<h2 class="shop-heading">${escapeHtml(text)}</h2>` : "";
+  return text ? `<h2 class="shop-heading" data-field="heading">${escapeHtml(text)}</h2>` : "";
 }
 
 // Shared by grid and featured list: loads the shop catalogue once, then renders cards.

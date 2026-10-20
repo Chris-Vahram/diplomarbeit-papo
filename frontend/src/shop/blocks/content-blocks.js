@@ -1,12 +1,13 @@
 import { escapeHtml } from "../../lib/html.js";
 import { ShopBlock } from "./shop-block.js";
 
-function headingHtml(text, level = "h2") {
-  return text ? `<${level} class="shop-heading">${escapeHtml(text)}</${level}>` : "";
+// data-field names the config field a text comes from (inline editing in the editor preview).
+function headingHtml(text, level = "h2", field = "heading") {
+  return text ? `<${level} class="shop-heading" data-field="${field}">${escapeHtml(text)}</${level}>` : "";
 }
 
-function textHtml(text) {
-  return text ? `<p class="shop-text">${escapeHtml(text)}</p>` : "";
+function textHtml(text, field = "text") {
+  return text ? `<p class="shop-text" data-field="${field}">${escapeHtml(text)}</p>` : "";
 }
 
 class HeroBlock extends ShopBlock {
@@ -18,12 +19,12 @@ class HeroBlock extends ShopBlock {
     const target = config.buttonPage === "startseite" ? "" : config.buttonPage;
     const button =
       config.buttonLabel && config.buttonPage
-        ? `<a class="shop-button" href="${escapeHtml(api.href(target))}">${escapeHtml(config.buttonLabel)}</a>`
+        ? `<a class="shop-button" href="${escapeHtml(api.href(target))}" data-field="buttonLabel">${escapeHtml(config.buttonLabel)}</a>`
         : "";
     this.innerHTML = `<div class="shop-inner shop-hero shop-align-${escapeHtml(config.align ?? "left")}${image ? " shop-hero--image" : ""}">
       ${image}
       <div class="shop-hero__content">
-        ${headingHtml(config.title, "h1")}
+        ${headingHtml(config.title, "h1", "title")}
         ${textHtml(config.text)}
         ${button}
       </div>
@@ -52,7 +53,7 @@ class ImageBlock extends ShopBlock {
   render(config) {
     this.innerHTML = `<figure class="shop-inner shop-figure shop-figure--${escapeHtml(config.width ?? "wide")}">
       ${assetImageHtml(this.context.api, config)}
-      ${config.caption ? `<figcaption class="shop-muted">${escapeHtml(config.caption)}</figcaption>` : ""}
+      ${config.caption ? `<figcaption class="shop-muted" data-field="caption">${escapeHtml(config.caption)}</figcaption>` : ""}
     </figure>`;
   }
 }
@@ -74,8 +75,8 @@ class ContactPersonBlock extends ShopBlock {
     const phoneDigits = (config.phone ?? "").replace(/[^\d+]/g, "");
     this.innerHTML = `<div class="shop-inner shop-contact">
       ${headingHtml(config.heading)}
-      <p class="shop-contact__name">${escapeHtml(config.name)}</p>
-      ${config.role ? `<p class="shop-muted">${escapeHtml(config.role)}</p>` : ""}
+      <p class="shop-contact__name" data-field="name">${escapeHtml(config.name)}</p>
+      ${config.role ? `<p class="shop-muted" data-field="role">${escapeHtml(config.role)}</p>` : ""}
       ${textHtml(config.text)}
       <p class="shop-contact__links">
         ${config.email ? `<a href="mailto:${escapeHtml(encodeURIComponent(config.email).replace("%40", "@"))}">${escapeHtml(config.email)}</a>` : ""}

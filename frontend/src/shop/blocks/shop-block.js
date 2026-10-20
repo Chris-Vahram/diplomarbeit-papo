@@ -25,6 +25,11 @@ export class ShopBlock extends HTMLElement {
     this.update();
   }
 
+  // Editor preview: the DOM already shows an inline edit, so only the config is taken over.
+  adoptConfig(value) {
+    this.#config = value ?? {};
+  }
+
   update() {
     const config = this.#config;
     this.className = [

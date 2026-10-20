@@ -3,6 +3,11 @@
 // so an older renderer never breaks on a newer page.
 import "./blocks/index.js";
 
+function isEditing(element) {
+  const active = document.activeElement;
+  return document.hasFocus() && active?.isContentEditable && element.contains(active);
+}
+
 class ShopPageView extends HTMLElement {
   // Config JSON each block element was last rendered with.
   #rendered = new WeakMap();
@@ -11,6 +16,12 @@ class ShopPageView extends HTMLElement {
   set data({ blocks, context }) {
     this.replaceChildren();
     this.update({ blocks, context });
+  }
+
+  // Inline edit in the editor preview: config taken over without re-rendering the block.
+  adopt(element, config) {
+    element.adoptConfig(config);
+    this.#rendered.set(element, JSON.stringify(config));
   }
 
   // Editor preview: re-renders only blocks whose config or context changed and keeps the
@@ -25,6 +36,12 @@ class ShopPageView extends HTMLElement {
       let element = existing.get(block.id);
       if (element?.localName === tag) {
         existing.delete(block.id);
+        // Someone is typing in this block: its text is newer than the round trip through the
+        // editor, and re-rendering would drop the caret.
+        if (isEditing(element)) {
+          ordered.push(element);
+          continue;
+        }
         const contextChanged = element.context !== context;
         if (contextChanged) element.context = context;
         if (contextChanged || this.#rendered.get(element) !== json) element.config = block.config ?? {};

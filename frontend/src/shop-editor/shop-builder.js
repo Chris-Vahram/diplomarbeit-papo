@@ -599,19 +599,38 @@ class ShopBuilder extends HTMLElement {
     const button = event.target.closest("button[data-action]");
     if (!button) return;
     const id = button.closest("[data-block-id]").dataset.blockId;
+    if (button.dataset.action === "select") this.#select(id);
+    else this.#blockAction(button.dataset.action, id);
+  }
+
+  // Shared by the block list and the toolbar in the preview. value: target index for "move",
+  // option for "size" (field = the layout field).
+  #blockAction(action, id, { field, value } = {}) {
     const index = this.#blocks.findIndex((block) => block.id === id);
-    switch (button.dataset.action) {
-      case "select":
-        this.#select(id);
-        break;
+    if (index === -1) return;
+    const block = this.#blocks[index];
+    const fixed = BLOCK_TYPES[block.type]?.fixed;
+    switch (action) {
       case "up":
-        this.#applyBlocks(move(this.#blocks, index, index - 1));
+        if (index > 0) this.#applyBlocks(move(this.#blocks, index, index - 1));
         break;
       case "down":
-        this.#applyBlocks(move(this.#blocks, index, index + 1));
+        if (index < this.#blocks.length - 1) this.#applyBlocks(move(this.#blocks, index, index + 1));
+        break;
+      case "move": {
+        // value = insertion index before removing the block.
+        const to = Math.max(0, Math.min(this.#blocks.length - 1, value > index ? value - 1 : value));
+        if (to !== index) this.#applyBlocks(move(this.#blocks, index, to));
+        break;
+      }
+      case "size":
+        if (["spacing", "width", "size", "columns"].includes(field)) {
+          this.#updateBlock(id, { ...block.config, [field]: value });
+        }
         break;
       case "duplicate": {
-        const copy = { ...structuredClone(this.#blocks[index]), id: crypto.randomUUID() };
+        if (fixed) break;
+        const copy = { ...structuredClone(block), id: crypto.randomUUID() };
         const blocks = [...this.#blocks];
         blocks.splice(index + 1, 0, copy);
         this.#selectedId = copy.id;
@@ -619,13 +638,23 @@ class ShopBuilder extends HTMLElement {
         break;
       }
       case "delete":
+        if (fixed) break;
         if (this.#selectedId === id) this.#selectedId = null;
-        this.#applyBlocks(this.#blocks.filter((block) => block.id !== id));
+        this.#applyBlocks(this.#blocks.filter((candidate) => candidate.id !== id));
         showToast("Abschnitt gelöscht. „Rückgängig“ holt ihn zurück.", "info");
         break;
       default:
     }
   }
+
+  // Text typed directly in the preview. The preview already shows it; the draft follows.
+  #inlineEdit(id, field, value) {
+    const block = this.#blocks.find((candidate) => candidate.id === id);
+    const schema = BLOCK_TYPES[block?.type]?.fields.find((candidate) => candidate.name === field);
+    if (!schema || schema.kind !== "text" || typeof value !== "string") return;
+    this.#updateBlock(id, { ...block.config, [field]: value.slice(0, schema.maxLength) }, `${id}:${field}`);
+  }
+
 
   #bindBlockDragAndDrop(list) {
     let dragged = null;
@@ -896,7 +925,11 @@ class ShopBuilder extends HTMLElement {
       this.#frameReady = true;
       this.#sendPreview();
     } else if (event.data?.type === "papo-shop-select" && this.#blocks.some((block) => block.id === event.data.blockId)) {
-      this.#select(event.data.blockId);
+      if (event.data.blockId !== this.#selectedId) this.#select(event.data.blockId);
+    } else if (event.data?.type === "papo-shop-edit") {
+      this.#inlineEdit(event.data.blockId, event.data.field, event.data.value);
+    } else if (event.data?.type === "papo-shop-action") {
+      this.#blockAction(event.data.action, event.data.blockId, event.data);
     }
   };
 
