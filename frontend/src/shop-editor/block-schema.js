@@ -125,12 +125,17 @@ export const COLOR_ROLES = [
 ];
 
 // Example content for the palette's hover preview only; new blocks start from `defaults`.
+// SAMPLE_IMAGE stands for a bundled example picture (SAMPLE_ASSET_URLS), never a real asset id.
+export const SAMPLE_IMAGE = "beispiel";
+export const SAMPLE_ASSET_URLS = { [SAMPLE_IMAGE]: "/assets/shop-samples/beispielbild.svg" };
 const SAMPLES = {
   hero: { title: "Willkommen in unserem Shop", text: "Entdecken Sie unser Sortiment und bestellen Sie bequem online.",
-    buttonLabel: "Zu den Artikeln", buttonPage: "artikel", align: "center", background: "primary" },
+    imageId: SAMPLE_IMAGE, alt: "Werkstatt", buttonLabel: "Zu den Artikeln", buttonPage: "artikel", align: "left",
+    background: "primary" },
   "heading-text": { heading: "Über uns", text: "Seit über 20 Jahren beraten wir unsere Kundinnen und Kunden persönlich und kompetent." },
-  image: { width: "wide", caption: "Unser Geschäft in Linz" },
-  "image-text": { heading: "Persönliche Beratung", text: "Wir nehmen uns Zeit für Ihre Fragen – vor Ort oder am Telefon.", imagePosition: "left" },
+  image: { imageId: SAMPLE_IMAGE, alt: "Werkstatt", width: "wide", caption: "Unsere Werkstatt in Linz" },
+  "image-text": { imageId: SAMPLE_IMAGE, alt: "Werkstatt", heading: "Persönliche Beratung",
+    text: "Wir nehmen uns Zeit für Ihre Fragen – vor Ort oder am Telefon.", imagePosition: "left" },
   "article-grid": { heading: "Unsere Artikel", columns: "3" },
   "featured-articles": { heading: "Empfehlungen", columns: "3" },
   "contact-person": { heading: "Ihr Ansprechpartner", name: "Maria Muster", role: "Beratung und Verkauf",

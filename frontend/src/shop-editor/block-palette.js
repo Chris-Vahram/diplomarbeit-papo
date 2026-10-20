@@ -1,12 +1,12 @@
 import { escapeHtml } from "../lib/html.js";
-import { BLOCK_TYPES, sampleBlock } from "./block-schema.js";
+import { BLOCK_TYPES, SAMPLE_ASSET_URLS, sampleBlock } from "./block-schema.js";
 import { postPreview, previewPayload } from "./preview-payload.js";
 
 // "Hinzufügen" in the builder's sidebar: one entry per block type with a "+" to add it,
 // a hover preview of what the block looks like (rendered by the shop itself with sample
 // content) and drag & drop into the page preview.
 //
-// context = { preview, theme, pages } (set by the builder). Dispatches "palette-add"
+// context = { preview, theme, pages, imageUrls } (set by the builder). Dispatches "palette-add"
 // ({ type }) on click, "palette-drag" ({ type }) / "palette-drag-end" while dragging.
 
 export const BLOCK_DRAG_TYPE = "application/x-papo-block";
@@ -21,6 +21,7 @@ class ShopBlockPalette extends HTMLElement {
   #frameReady = false;
   #hoverType = null;
   #hoverTimer = null;
+  #hoverItem = null;
 
   connectedCallback() {
     this.innerHTML = `<ul class="builder-palette">${Object.entries(BLOCK_TYPES)
@@ -90,6 +91,8 @@ class ShopBlockPalette extends HTMLElement {
     if (event.data?.type === "papo-shop-preview-ready") {
       this.#frameReady = true;
       if (this.#hoverType) this.#renderHover();
+    } else if (event.data?.type === "papo-shop-rendered" && this.#hoverType) {
+      this.#fitAndReveal(this.#hoverType);
     }
   };
 
@@ -98,14 +101,15 @@ class ShopBlockPalette extends HTMLElement {
     this.#hoverTimer = setTimeout(() => this.#showHover(item), 150);
   }
 
+  // The popover stays invisible until the block is drawn and measured, so it appears once
+  // at its final size instead of resizing in front of the user.
   #showHover(item) {
     if (!this.context) return;
     this.#ensurePopover();
     this.#hoverType = item.dataset.type;
+    this.#hoverItem = item;
     this.#popover.querySelector(".palette-preview__title").textContent = BLOCK_TYPES[this.#hoverType].label;
-    const rect = item.getBoundingClientRect();
-    this.#popover.style.left = `${rect.right + 12}px`;
-    this.#popover.style.top = `${Math.max(8, Math.min(rect.top, window.innerHeight - 260))}px`;
+    this.#popover.classList.remove("is-ready");
     this.#popover.hidden = false;
     if (this.#frameReady) this.#renderHover();
   }
@@ -117,7 +121,7 @@ class ShopBlockPalette extends HTMLElement {
   }
 
   #renderHover() {
-    const { preview, theme, pages } = this.context;
+    const { preview, theme, pages, imageUrls } = this.context;
     const block = sampleBlock(this.#hoverType, preview.articles.map((article) => article.id));
     const payload = previewPayload({
       preview,
@@ -125,17 +129,40 @@ class ShopBlockPalette extends HTMLElement {
       pages,
       page: { menuName: BLOCK_TYPES[this.#hoverType].label, slot: null, segment: "" },
       blocks: [block],
+      assetUrls: SAMPLE_ASSET_URLS,
+      imageUrls,
     });
     postPreview(this.#frame, { ...payload, bare: true });
-    // Fit the frame to the rendered block once the shop has drawn it (same origin).
-    const type = this.#hoverType;
-    requestAnimationFrame(() => setTimeout(() => {
-      if (type !== this.#hoverType) return;
-      const view = this.#frame.contentDocument?.querySelector("shop-page-view");
-      const height = Math.min(PREVIEW_MAX_HEIGHT, Math.max(120, view?.scrollHeight ?? 400));
-      this.#frame.style.height = `${height}px`;
-      this.#popover.querySelector(".palette-preview__viewport").style.height = `${Math.ceil(height * PREVIEW_SCALE)}px`;
-    }, 60));
+  }
+
+  // After the frame reported the block as drawn (same origin, so it can be measured).
+  async #fitAndReveal(type) {
+    await this.#imagesLoaded();
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    if (type !== this.#hoverType) return;
+    // Fit the frame to the rendered block (same origin), then place and reveal the popover.
+    // <shop-page-view> is inline, so the blocks' own boxes give the height.
+    const blocks = [...(this.#frame.contentDocument?.querySelectorAll("shop-page-view > *") ?? [])];
+    const bottom = Math.max(0, ...blocks.map((element) => element.getBoundingClientRect().bottom));
+    const height = Math.min(PREVIEW_MAX_HEIGHT, Math.max(120, Math.ceil(bottom)));
+    this.#frame.style.height = `${height}px`;
+    const viewportHeight = Math.ceil(height * PREVIEW_SCALE);
+    this.#popover.querySelector(".palette-preview__viewport").style.height = `${viewportHeight}px`;
+    const rect = this.#hoverItem.getBoundingClientRect();
+    this.#popover.style.left = `${rect.right + 12}px`;
+    this.#popover.style.top = `${Math.max(8, Math.min(rect.top, window.innerHeight - viewportHeight - 48))}px`;
+    this.#popover.classList.add("is-ready");
+  }
+
+  // Images change the block height; waits for them, but at most 500 ms.
+  #imagesLoaded() {
+    const images = [...(this.#frame.contentDocument?.images ?? [])].filter((image) => !image.complete);
+    const loaded = Promise.all(images.map((image) => new Promise((resolve) => {
+      image.loading = "eager";
+      image.addEventListener("load", resolve, { once: true });
+      image.addEventListener("error", resolve, { once: true });
+    })));
+    return Promise.race([loaded, new Promise((resolve) => setTimeout(resolve, 500))]);
   }
 }
 

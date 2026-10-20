@@ -211,7 +211,7 @@ class ShopBuilder extends HTMLElement {
           <section class="builder-preview" aria-label="Vorschau">
             <div class="builder-frame" data-device="desktop">
               <iframe id="builder-frame" title="Vorschau des Shops" src="/shop.html?preview=1"></iframe>
-              <div class="builder-drop-layer" hidden><span class="builder-drop-line"></span></div>
+              <div class="builder-drop-layer" hidden><span class="builder-drop-line" hidden></span></div>
             </div>
           </section>
           <aside class="builder-right" aria-label="Eigenschaften">
@@ -903,7 +903,7 @@ class ShopBuilder extends HTMLElement {
   #sendPreview() {
     const palette = this.querySelector("shop-block-palette");
     if (palette && this.#preview && this.#pages) {
-      palette.context = { preview: this.#preview, theme: this.#themeDraft, pages: this.#pages.pages };
+      palette.context = { preview: this.#preview, theme: this.#themeDraft, pages: this.#pages.pages, imageUrls: this.#imageUrls };
     }
     const frame = this.querySelector("#builder-frame");
     if (!this.#frameReady || !frame || !this.#page || !this.#preview) return;
