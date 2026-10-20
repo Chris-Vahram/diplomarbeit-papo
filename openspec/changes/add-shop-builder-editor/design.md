@@ -15,7 +15,7 @@ Builds on `add-shop-page-renderer` (JSON snapshots, block registry, shared rende
 3. **Preview renders in an `<iframe>` of `shop.html?preview=…`** fed by `postMessage` with the draft, so the public CSS applies unchanged and editor CSS cannot leak. Desktop/mobile toggle changes iframe width.
 4. **Properties panel generated from a client-side form description per block type** that mirrors the server schema; server validation remains authoritative.
 5. **Drag & drop with native HTML5 DnD plus explicit buttons**; no library (fixed stack).
-6. **Assets: own table `ShopAsset` (shop, bytes or file path, content type, size, uploadedAt, rightsConfirmed)**; quota sum query; reuse `ProductImageValidator` with WebP added.
+6. **Assets: own table `ShopAsset` (shop, bytes or file path, content type, size, uploadedAt, rightsConfirmed)**; quota sum query; reuse `ProductImageValidator` with WebP added. Implemented: block image fields reference only the shop's own `ShopAsset`s (own id space, so no ambiguity with article images); article images stay on `/api/shop/<kennung>/images/{id}`, shop images are served on `/api/shop/<kennung>/assets/{id}` only while a published online page shows them. Drafts are validated leniently (required fields and article/category/link references only on publish) so autosave never loses half-filled blocks.
 
 ## Risks / Trade-offs
 

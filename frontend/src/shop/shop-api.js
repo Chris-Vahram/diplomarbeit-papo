@@ -24,10 +24,29 @@ export function createShopApi(kennung) {
     page: (segment) => get(`/pages/${encodeURIComponent(segment)}`),
     article: (id) => get(`/articles/${encodeURIComponent(id)}`),
     articles: () => (articles ??= get("/articles")),
-    imageUrl: (imageId) => `${base}/images/${encodeURIComponent(imageId)}`,
+    // Block images are the shop's own uploads (shop-assets spec).
+    assetUrl: (assetId) => `${base}/assets/${encodeURIComponent(assetId)}`,
     // Backend URLs ("/api/...") must go through API_BASE (separate backend port in local dev).
     resolveUrl: (url) => (url?.startsWith("/api/") ? API_BASE + url.slice(4) : url),
     // Shop-relative link: "" is the Startseite.
     href: (path = "") => `/shop/${encodeURIComponent(kennung)}${path ? `/${path}` : ""}`,
+  };
+}
+
+// Editor preview (shop-builder spec): same interface, but all data comes from the editor
+// via postMessage, so drafts of a not yet released shop render without any public request.
+// assetUrls maps asset id -> object URL the editor fetched with the partner's login.
+export function createPreviewApi(data) {
+  return {
+    kennung: data.shop.kennung,
+    shop: async () => data.shop,
+    theme: async () => data.theme,
+    navigation: async () => data.navigation,
+    page: async () => data.page,
+    article: async () => data.article,
+    articles: async () => data.articles,
+    assetUrl: (assetId) => data.assetUrls?.[assetId] ?? "",
+    resolveUrl: (url) => data.imageUrls?.[url] ?? (url?.startsWith("/api/") ? "" : url),
+    href: (path = "") => `#${path}`,
   };
 }

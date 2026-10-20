@@ -13,7 +13,7 @@ class HeroBlock extends ShopBlock {
   render(config) {
     const api = this.context.api;
     const image = config.imageId
-      ? `<img class="shop-hero__image" src="${escapeHtml(api.imageUrl(config.imageId))}" alt="${escapeHtml(config.alt ?? "")}" />`
+      ? `<img class="shop-hero__image" src="${escapeHtml(api.assetUrl(config.imageId))}" alt="${escapeHtml(config.alt ?? "")}" />`
       : "";
     const target = config.buttonPage === "startseite" ? "" : config.buttonPage;
     const button =
@@ -40,10 +40,18 @@ class HeadingTextBlock extends ShopBlock {
   }
 }
 
+// A draft block may have no image chosen yet (editor preview); published blocks always have one.
+function assetImageHtml(api, config, className = "") {
+  const classes = className ? ` class="${className}"` : "";
+  return config.imageId
+    ? `<img${classes} src="${escapeHtml(api.assetUrl(config.imageId))}" alt="${escapeHtml(config.alt ?? "")}" loading="lazy" />`
+    : `<div class="${className} shop-image-placeholder" aria-hidden="true"></div>`;
+}
+
 class ImageBlock extends ShopBlock {
   render(config) {
     this.innerHTML = `<figure class="shop-inner shop-figure shop-figure--${escapeHtml(config.width ?? "wide")}">
-      <img src="${escapeHtml(this.context.api.imageUrl(config.imageId))}" alt="${escapeHtml(config.alt ?? "")}" loading="lazy" />
+      ${assetImageHtml(this.context.api, config)}
       ${config.caption ? `<figcaption class="shop-muted">${escapeHtml(config.caption)}</figcaption>` : ""}
     </figure>`;
   }
@@ -52,7 +60,7 @@ class ImageBlock extends ShopBlock {
 class ImageTextBlock extends ShopBlock {
   render(config) {
     this.innerHTML = `<div class="shop-inner shop-split shop-split--image-${escapeHtml(config.imagePosition ?? "left")}">
-      <img class="shop-split__image" src="${escapeHtml(this.context.api.imageUrl(config.imageId))}" alt="${escapeHtml(config.alt ?? "")}" loading="lazy" />
+      ${assetImageHtml(this.context.api, config, "shop-split__image")}
       <div class="shop-split__text">
         ${headingHtml(config.heading)}
         ${textHtml(config.text)}

@@ -8,19 +8,19 @@
 
 ## 2. Builder UI (essential)
 
-- [ ] 2.1 Builder page layout: palette, preview iframe with desktop/mobile toggle, properties panel
-- [ ] 2.2 Preview channel via `postMessage` in `shop.html` preview mode
-- [ ] 2.3 Block add/edit/duplicate/delete; drag & drop and up/down buttons
-- [ ] 2.4 Properties forms per block type incl. article/category pickers and image library
-- [ ] 2.5 Colour override controls with "Auf Design zurücksetzen"
-- [ ] 2.6 Page list: create, rename, menu name, URL segment, order, delete; limit indicator
-- [ ] 2.7 Autosave with status, undo/redo, conflict reload dialog
-- [ ] 2.8 Design tab: colour pickers with hex input, font pair select, publish design
-- [ ] 2.9 SEO fields with explanation; small-screen hint
+- [x] 2.1 Builder page layout: palette, preview iframe with desktop/mobile toggle, properties panel
+- [x] 2.2 Preview channel via `postMessage` in `shop.html` preview mode
+- [x] 2.3 Block add/edit/duplicate/delete; drag & drop and up/down buttons
+- [x] 2.4 Properties forms per block type incl. article/category pickers and image library
+- [x] 2.5 Colour override controls with "Auf Design zurücksetzen"
+- [x] 2.6 Page list: create, rename, menu name, URL segment, order, delete; limit indicator
+- [x] 2.7 Autosave with status, undo/redo, conflict reload dialog
+- [x] 2.8 Design tab: colour pickers with hex input, font pair select, publish design
+- [x] 2.9 SEO fields with explanation; small-screen hint
 
 ## 3. Verification
 
-- [ ] 3.1 Backend tests + package; `git diff --check`
-- [ ] 3.2 Browser test desktop and tablet: build a page, publish, restore, conflict case
-- [ ] 3.3 Usability walkthrough with a non-technical tester; note findings
-- [ ] 3.4 Update traceability
+- [x] 3.1 Backend tests + package; `git diff --check`
+- [x] 3.2 Browser test desktop and tablet: build a page, publish, restore, conflict case
+- [ ] 3.3 Usability walkthrough with a non-technical tester; note findings (open: needs a human tester)
+- [x] 3.4 Update traceability
