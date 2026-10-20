@@ -140,7 +140,9 @@ Clear German for thesis documents, suitable for an HTL Diplomarbeit; precise, st
   verified, and goes into the same PR. No separate archive branch or archive PR after the merge.
   Review fixes after archiving are made in the archived change folder.
 - Local commits on the current working branch need no confirmation.
-  Pushing, merging into `main` and deploying still require Chris's explicit approval.
+  Pushing, creating PRs, merging into `main` and deploying need no separate approval from
+  Chris; they happen when the person working in the session asks for them. A merge into
+  `main` deploys to the public VM.
 - Work on a feature branch, not directly on `main`.
 
 ## Git commit attribution
