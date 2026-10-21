@@ -107,6 +107,8 @@
 | AUSSTEHEND-fa3a3f74 | 2026-10-20 | Tobias | Claude Code | Fachliche Einordnung offen | lokale Sitzung `fa3a3f74-4899-4a25-b2cf-d3811af07ab3` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-3a5e794e | 2026-10-20 | Tobias | Claude Code | add-shop-builder-editor umsetzen (Backend + Baukasten-UI) | lokale Sitzung `3a5e794e-5bd8-45a3-aa59-a8d059ed0f59` | `EXAKT` | Editor-Backend, Bildbibliothek, Baukasten mit Vorschau, Seiten, Design; 17/18 Tasks; Prüfungen: mvnw package 233/233 Tests; Playwright-Editorcheck Desktop/Tablet/Handy; openspec validate --strict; git diff --check |
 
+| AUSSTEHEND-e260c3f6 | 2026-10-20 | Tobias | Claude Code | add-shop-builder-editor: UI-Überarbeitung, Review-Fixes, Archivierung | lokale Sitzung `e260c3f6-addf-40e0-b5cc-b693686d9994` | `EXAKT` | Vollbild-Editor, Vorschau-Bearbeitung, 10 Review-Befunde behoben, Change archiviert, PR #55; Prüfungen: mvnw package 237/237; openspec validate --strict; Playwright-Editorchecks |
+
 ## Noch rückwirkend aufzunehmen
 
 - 23 primäre Claude-Code-Sitzungen vom 01.07. bis 17.07.2026;
