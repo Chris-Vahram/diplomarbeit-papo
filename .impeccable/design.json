@@ -1,0 +1,300 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-21T10:34:53.121856+00:00",
+  "title": "Design System: PAPO Partnerportal",
+  "extensions": {
+    "colorMeta": {
+      "firmengruen": {
+        "role": "primary",
+        "displayName": "Firmengrün",
+        "tonalRamp": [
+          "#111a14",
+          "#223529",
+          "#344e3d",
+          "#456851",
+          "#578462",
+          "#689c6d",
+          "#8dc492",
+          "#d8eedb"
+        ]
+      },
+      "partnerblau": {
+        "role": "primary",
+        "displayName": "Partnerblau",
+        "tonalRamp": [
+          "#243438",
+          "#374e54",
+          "#4a6870",
+          "#5e838d",
+          "#7597a0",
+          "#9ac2c9",
+          "#d4e8eb",
+          "#eff5f6"
+        ]
+      },
+      "stuetzteal": {
+        "role": "secondary",
+        "displayName": "Stützteal",
+        "tonalRamp": [
+          "#223534",
+          "#345250",
+          "#456f6d",
+          "#598c89",
+          "#729f9b",
+          "#abc7c4",
+          "#d8eae8",
+          "#f0f5f5"
+        ]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Text",
+        "tonalRamp": [
+          "#0b110c",
+          "#182019",
+          "#2a362e",
+          "#3d4f43",
+          "#52675a",
+          "#69836f",
+          "#b5c8b9",
+          "#edf2ee"
+        ]
+      },
+      "seite": {
+        "role": "neutral",
+        "displayName": "Seite",
+        "tonalRamp": [
+          "#0b110c",
+          "#182019",
+          "#2a362e",
+          "#3d4f43",
+          "#52675a",
+          "#69836f",
+          "#b5c8b9",
+          "#edf2ee"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Seitentitel h1."
+      },
+      "metric": {
+        "displayName": "Kennzahl",
+        "purpose": "Werte in Metrik-Karten, tabellarische Ziffern."
+      },
+      "title": {
+        "displayName": "Titel",
+        "purpose": "Karten-, Abschnitts- und Modal-Titel."
+      },
+      "body": {
+        "displayName": "Arbeitstext",
+        "purpose": "Tabellen, Formulare, Fließtext (14 px)."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Tabellenköpfe, Badges, Rollenzeile."
+      },
+      "wordmark": {
+        "displayName": "Wortmarke",
+        "purpose": "Nur „PAPO“ in der Sidebar."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Nummern und Codes."
+      }
+    },
+    "shadows": [
+      {
+        "name": "shadow-sm",
+        "value": "0 0.0625rem 0.1875rem 0 rgba(11,17,12,0.09), 0 0.0625rem 0.125rem -0.0625rem rgba(11,17,12,0.09)",
+        "purpose": "Karten, Metrik-Karten."
+      },
+      {
+        "name": "shadow-md",
+        "value": "0 0.25rem 0.375rem -0.0625rem rgba(11,17,12,0.09), 0 0.125rem 0.25rem -0.125rem rgba(11,17,12,0.09)",
+        "purpose": "Toasts, Ausklappmenüs."
+      },
+      {
+        "name": "shadow-xl",
+        "value": "0 1.25rem 1.5625rem -0.3125rem rgba(11,17,12,0.09), 0 0.5rem 0.625rem -0.375rem rgba(11,17,12,0.09)",
+        "purpose": "Modal-Panel."
+      },
+      {
+        "name": "shadow-focus-ring",
+        "value": "0 0 0 0.1875rem rgba(104,156,109,0.35)",
+        "purpose": "Fokusring Firmenbereich."
+      },
+      {
+        "name": "shadow-focus-ring-partner",
+        "value": "0 0 0 0.1875rem rgba(140,172,179,0.40)",
+        "purpose": "Fokusring Partnerbereich."
+      }
+    ],
+    "motion": [
+      {
+        "name": "duration-fast",
+        "value": "100ms",
+        "purpose": "Hover, Fokus, Rahmenwechsel."
+      },
+      {
+        "name": "duration-normal",
+        "value": "150ms",
+        "purpose": "Standardübergang."
+      },
+      {
+        "name": "duration-slow",
+        "value": "250ms",
+        "purpose": "Schublade, größere Flächen."
+      },
+      {
+        "name": "ease-in-out",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Standard-Easing."
+      },
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0, 0, 0.2, 1)",
+        "purpose": "Einblenden."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "drawer",
+        "value": "61.9375em"
+      },
+      {
+        "name": "phone",
+        "value": "47.9375em"
+      },
+      {
+        "name": "wide",
+        "value": "1200px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primärknopf Firma",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Hauptaktion im Firmenbereich (Rollenakzent grün).",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Speichern</button>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1rem;border:none;border-radius:var(--radius-md,.375rem);font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:.875rem;font-weight:600;cursor:pointer;transition:background 100ms cubic-bezier(.4,0,.2,1),border-color 100ms cubic-bezier(.4,0,.2,1)}.ds-btn-primary{background:#689c6d;color:#fff}.ds-btn-primary:hover{background:#578462}.ds-btn-primary:focus-visible{outline:none;box-shadow:0 0 0 .1875rem rgba(104,156,109,.35)}"
+    },
+    {
+      "name": "Primärknopf Partner (Hero)",
+      "kind": "button",
+      "refersTo": "button-primary-hero",
+      "description": "Eine Hauptaktion pro Seite, z. B. „Neue Bestellung“ im Partnerbereich.",
+      "html": "<button class=\"ds-btn ds-btn-hero\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg>Neue Bestellung</button>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1rem;border:none;border-radius:var(--radius-md,.375rem);font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:.875rem;font-weight:600;cursor:pointer;transition:background 100ms cubic-bezier(.4,0,.2,1),border-color 100ms cubic-bezier(.4,0,.2,1)}.ds-btn-hero{background:#5e838d;color:#fff;padding:.75rem 1.5rem;font-size:1rem}.ds-btn-hero:hover{background:#4a6870}.ds-btn-hero:focus-visible{outline:none;box-shadow:0 0 0 .1875rem rgba(140,172,179,.4)}"
+    },
+    {
+      "name": "Sekundärknopf",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Nebenaktionen, Abbrechen, Filter.",
+      "html": "<button class=\"ds-btn ds-btn-secondary\">Abbrechen</button>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1rem;border:none;border-radius:var(--radius-md,.375rem);font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:.875rem;font-weight:600;cursor:pointer;transition:background 100ms cubic-bezier(.4,0,.2,1),border-color 100ms cubic-bezier(.4,0,.2,1)}.ds-btn-secondary{background:#fff;color:#0b110c;border:1px solid #b5c8b9}.ds-btn-secondary:hover{background:#edf2ee;border-color:#8ca594}.ds-btn-secondary:focus-visible{outline:none;box-shadow:0 0 0 .1875rem rgba(104,156,109,.35)}"
+    },
+    {
+      "name": "Eingabefeld",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Formularfeld mit Label darüber.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field__label\">Nachname</span><input class=\"ds-input\" placeholder=\"z. B. Huber\"></label>",
+      "css": ".ds-field{display:flex;flex-direction:column;gap:.25rem;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:.875rem}.ds-field__label{font-weight:600;color:#3d4f43}.ds-input{height:2.5rem;padding:.5rem .75rem;font:inherit;color:#0b110c;background:#fff;border:1px solid #b5c8b9;border-radius:.375rem;transition:border-color 100ms,box-shadow 100ms}.ds-input::placeholder{color:#8ca594}.ds-input:hover{border-color:#8ca594}.ds-input:focus{outline:none;border-color:#689c6d;box-shadow:0 0 0 .1875rem rgba(104,156,109,.35)}"
+    },
+    {
+      "name": "Status-Badges",
+      "kind": "chip",
+      "refersTo": "status-badge-eingegangen",
+      "description": "Bestellstatus als Pille mit Text.",
+      "html": "<span class=\"ds-badge ds-badge--s\">Eingegangen</span> <span class=\"ds-badge ds-badge--r\">Geprüft</span> <span class=\"ds-badge ds-badge--f\">Erledigt</span>",
+      "css": ".ds-badge{display:inline-flex;padding:.125rem .75rem;border-radius:9999px;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:.75rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase}.ds-badge--s{background:#fef3c7;color:#92400e}.ds-badge--r{background:#d4e8eb;color:#374e54}.ds-badge--f{background:#d0fae5;color:#166534}"
+    },
+    {
+      "name": "Metrik-Karte",
+      "kind": "card",
+      "refersTo": "metric-card",
+      "description": "Kennzahl im Dashboard mit Icon-Kreis und Trend.",
+      "html": "<div class=\"ds-metric\"><div class=\"ds-metric__icon\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\"><path d=\"M7 17 17 7\"/><path d=\"M7 7h10v10\"/></svg></div><div class=\"ds-metric__body\"><div class=\"ds-metric__value\">12.480,00 €</div><div class=\"ds-metric__label\">Umsatz diesen Monat</div><div class=\"ds-metric__trend\">+8 % zum Vormonat</div></div></div>",
+      "css": ".ds-metric{display:flex;align-items:center;gap:1rem;padding:1.5rem;background:#fff;border:1px solid #d6e1d8;border-radius:.5rem;box-shadow:0 .0625rem .1875rem 0 rgba(11,17,12,.09),0 .0625rem .125rem -.0625rem rgba(11,17,12,.09);font-family:'Plus Jakarta Sans',system-ui,sans-serif}.ds-metric__icon{display:flex;align-items:center;justify-content:center;width:2.75rem;height:2.75rem;border-radius:9999px;background:#ecfdf4;color:#15803d;flex-shrink:0}.ds-metric__body{display:flex;flex-direction:column;gap:.5rem}.ds-metric__value{font-size:1.5rem;font-weight:700;letter-spacing:-.025em;line-height:1.2;color:#578462;font-variant-numeric:tabular-nums}.ds-metric__label{font-size:.875rem;font-weight:500;color:#52675a}.ds-metric__trend{font-size:.75rem;font-weight:500;color:#15803d}"
+    },
+    {
+      "name": "Sidebar-Navigation",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Hauptnavigation mit Wortmarke, Rolle und aktivem Eintrag.",
+      "html": "<nav class=\"ds-nav\"><div class=\"ds-nav__brand\"><div class=\"ds-nav__mark\">PAPO</div><div class=\"ds-nav__role\">Partner</div></div><a class=\"ds-nav__item is-active\" href=\"#\">Dashboard</a><a class=\"ds-nav__item\" href=\"#\">Meine Endkunden</a><a class=\"ds-nav__item\" href=\"#\">Meine Artikel</a></nav>",
+      "css": ".ds-nav{width:15rem;padding:.75rem;background:#fff;border-right:1px solid #d6e1d8;font-family:'Plus Jakarta Sans',system-ui,sans-serif;display:flex;flex-direction:column;gap:.125rem}.ds-nav__brand{padding:.75rem .5rem 1rem;border-bottom:1px solid #d6e1d8;margin-bottom:.5rem}.ds-nav__mark{font-weight:800;font-size:1.75rem;letter-spacing:-.025em;line-height:1;color:#0b110c}.ds-nav__role{margin-top:.5rem;font-size:.75rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#5e838d}.ds-nav__item{display:flex;align-items:center;height:2.75rem;padding:0 .75rem;border-radius:.375rem;font-size:.875rem;font-weight:500;color:#3d4f43;text-decoration:none;transition:background 100ms,color 100ms}.ds-nav__item:hover{background:#edf2ee;color:#0b110c}.ds-nav__item.is-active{background:#eff5f6;color:#5e838d;font-weight:600}.ds-nav__item:focus-visible{outline:none;box-shadow:0 0 0 .1875rem rgba(140,172,179,.4)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Die Zwei-Schlüssel-Theke",
+    "overview": "Eine gemeinsame Theke, zwei Seiten. Unternehmen und Partner arbeiten an derselben Fläche, mit denselben Tabellen, Formularen und Status, aber jede Seite hat ihren eigenen Schlüssel: Firmengrün für das Unternehmen, Partnerblau für den Partner. Die Rollenfarbe ist kein Schmuck, sondern das Schild über der Theke. Wer auf die Seite schaut, weiß sofort, auf welcher Seite er steht.\n\nDer Rest der Theke ist bewusst ruhig. Eine hell grünstichige Seite (`seite`), weiße Arbeitsflächen mit Haarlinien-Rahmen, eine einzige Schriftfamilie und Daten in Tabellenform. Dichte geht vor Inszenierung: Bestellungen, Artikel, Endkunden und Provisionen müssen schnell lesbar sein. Die Oberfläche soll dabei freundlich und greifbar wirken: Knöpfe sind klar als Knöpfe erkennbar, Karten heben sich leicht ab, Rückmeldungen (Hover, Fokus, Toast) kommen sofort.",
+    "keyCharacteristics": [
+      "Ein Rollenakzent je Bereich, gesteuert über `.context-company` / `.context-partner` am Shell-Root.",
+      "Grünstichige Neutraltöne statt Grau; sie sind die eigentliche Handschrift des Systems.",
+      "Eine Schrift (Plus Jakarta Sans), Hierarchie über Größe und Gewicht.",
+      "Flach mit Haarlinien, leichte Schatten auf Karten, starker Schatten nur bei Modals.",
+      "Status immer als Text-Badge, nie nur als Farbe."
+    ],
+    "rules": [
+      {
+        "name": "The Ein-Schlüssel Rule",
+        "body": "Rollenfarbe kommt ausschließlich aus `--color-accent*`. Kein Bauteil setzt `--color-primary-*` oder `--color-accent-600` direkt; die Kontextklasse am Shell-Root entscheidet.",
+        "section": "colors"
+      },
+      {
+        "name": "The Keine-Mischung Rule",
+        "body": "Firmengrün und Partnerblau erscheinen nie gemeinsam auf einem Bildschirm. Sie sind Rollensignale, keine Dekoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The Bekannte-Lücke Rule",
+        "body": "Weiß auf Firmengrün (3,2:1) und auf Partnerblau (4,1:1) erreicht AA für Text nicht; erst die Hover-Stufen bestehen. Die Lösung (dunklere Ruhestufe oder dunkler Text) ist offen und wird nicht stillschweigend eingebaut; siehe `Design/guidelines/colors.md`.",
+        "section": "colors"
+      },
+      {
+        "name": "The Eine-Familie Rule",
+        "body": "Keine zweite Anzeigeschrift im Portal. Hierarchie entsteht aus Größe und Gewicht.",
+        "section": "typography"
+      },
+      {
+        "name": "The Ziffern-stehen-still Rule",
+        "body": "Geldbeträge und Kennzahlen nutzen `font-variant-numeric: tabular-nums`, damit Spalten und Vergleiche ruhig bleiben.",
+        "section": "typography"
+      },
+      {
+        "name": "The Schatten-ist-grün Rule",
+        "body": "Alle Schatten nutzen den Textton `rgba(11,17,12,…)`, nie reines Schwarz.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Fokus-ist-Schatten Rule",
+        "body": "Fokus wird als Ring über `box-shadow` gezeichnet, nicht über `outline`, und folgt der Rollenfarbe.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do Rollenfarbe immer über `var(--color-accent)` / `--color-accent-hover` / `--color-accent-light` lesen und die Kontextklasse am Shell-Root setzen.",
+      "Do Fließtext in `text` (#0b110c) und Begleittext in `text-sekundaer` (#52675a) setzen.",
+      "Do Status als Badge mit Text zeigen und überall dieselben Statusfarben verwenden.",
+      "Do genau eine Hero-Aktion pro Seite verwenden; im Partnerbereich ist das „Neue Bestellung“.",
+      "Do Kennzahlen und Beträge mit tabellarischen Ziffern setzen.",
+      "Do `prefers-reduced-motion` respektieren; Übergänge bleiben kurz (100–250 ms, `cubic-bezier(0.4, 0, 0.2, 1)`)."
+    ],
+    "donts": [
+      "Don't Firmengrün und Partnerblau auf demselben Bildschirm mischen.",
+      "Don't Hexwerte oder Palettenstufen (`--color-primary-500`, `--color-accent-600`) direkt in Bauteilen setzen, wenn `--color-accent` dasselbe leistet.",
+      "Don't Stützteal verwenden, wenn die Partnerrolle gemeint ist.",
+      "Don't Farbe als einzige Information verwenden.",
+      "Don't Stufen 300/400 von Grün oder Blau als Text auf Weiß verwenden (zu wenig Kontrast).",
+      "Don't farbige Seitenstreifen an Containern oder dekorative Elemente ohne Bedeutung einsetzen.",
+      "Don't Schriften von Google Fonts nachladen; nur selbst gehostete Dateien."
+    ]
+  }
+}
