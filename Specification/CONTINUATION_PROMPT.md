@@ -7,17 +7,16 @@ geordnet. Dieses Dokument bleibt der einzige operative Session-Handoff.
 
 ## Stand 22.10.2026 — hier einsteigen
 
-`refine-portal-frontend` umgesetzt und am 22.10.2026 nach `main` gemergt (deployt auf die VM).
-Enthält auch: Desktop-Listen im Stil der Handy-Karten (Task 3.4, Chris' Wunsch), Shop-Editor-/
-„Mein Webshop“-CSS von Tobias auf Rollen-Tokens (`--color-accent*`, neu `--color-accent-medium`)
-umgestellt, Editor-Ladefehler als gemeinsamer Fehlerzustand. Offen nur Task 5.2: Tobias'
-visuelle Abnahme der Nachher-Screenshots `output/playwright/refine-*-after.png` (lokal, nicht im
-Repo); danach Change archivieren (eigener kleiner PR, weil 5.2 nach dem Merge kommt).
-Achtung: Tobias' unmergter Branch `origin/docs/impeccable-product-context` (21.10.) enthält eine
-eigene PRODUCT.md/DESIGN.md (North Star „Die Zwei-Schlüssel-Theke“, Kontrast offen, Fokus als
-box-shadow). Gültig ist die gemergte Version mit den bestätigten Entscheidungen 1B 2C 3C 4B 5C 6C;
-mit Tobias klären, ob Teile seiner Texte übernommen werden, dann seinen Branch schließen.
-Leitkennzahl Firma = Umsatz (Vorschlag, Chris bestätigen lassen).
+- `refine-portal-frontend` gemergt (PR #59), live, von Tobias abgenommen und archiviert
+  (`openspec/changes/archive/2026-10-22-refine-portal-frontend/`, Spec `portal-visual-design`).
+  Designentscheidungen 1B 2C 3C 4B 5C 6C + Desktop-Listen stehen in `DESIGN.md`.
+- PRODUCT.md aus Chris' und Tobias' Fassung zusammengeführt (PR #60, von Tobias bestätigt);
+  Tobias' Branch `docs/impeccable-product-context` ist damit erledigt und kann gelöscht werden.
+- Leitkennzahl Firmen-Dashboard = Umsatz (Vorschlag, Chris bestätigen lassen).
+- Nächster Kandidat: `add-article-tax-rate` (0/17, spezifiziert von Tobias, kein Code). Chris will
+  ihn übernehmen; Tobias' Rückmeldung, ob er schon angefangen hat, steht aus. Er ist Voraussetzung
+  für `add-shop-guest-checkout`. Übrige offene Changes warten auf Externe (SMTP, BMD-Daten,
+  Thesis-Abnahme) oder gehören Tobias (7 Shop-Changes).
 
 ## Stand 16.10.2026 — vorheriger Stand
 

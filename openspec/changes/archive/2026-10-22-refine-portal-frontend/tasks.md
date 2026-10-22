@@ -24,4 +24,4 @@
 ## 5. Completion — essential
 
 - [x] 5.1 `impeccable detect` on changed files, Playwright desktop/mobile for every page and the main flows (order, customer edit, logins, mail status), `node --check`, `git diff --check`, `openspec validate refine-portal-frontend --strict`; Tobias visual sign-off.
-- [ ] 5.2 Tobias visual sign-off on the implemented state (screenshots `output/playwright/refine-*-after.png`); then archive.
+- [x] 5.2 Tobias visual sign-off on the implemented state (screenshots `output/playwright/refine-*-after.png`); then archive.

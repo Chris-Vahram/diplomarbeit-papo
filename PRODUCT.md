@@ -61,7 +61,7 @@ Gebaut für genau diese Dreiecksbeziehung statt als allgemeiner Webshop: Der Par
 ## Evidence on Hand
 
 - Spezifikation: `Specification/functional_specification_document_partnerportal_final.md`, `Specification/phase2_backlog.md`, `Specification/ENDKUNDENSHOP_DECISIONS.md`, Besprechungsprotokolle in `Documentation/Besprechungsprotokolle/` (Feedback 12.10.2026: Bestellprozess „bereits sehr gut umgesetzt“).
-- Design: `Design/` (README, `tokens.json`, `variables.css`, `guidelines/`), `DESIGN.md`, Variantenentscheidung `openspec/changes/refine-portal-frontend/variants/papo-varianten.html`.
+- Design: `Design/` (README, `tokens.json`, `variables.css`, `guidelines/`), `DESIGN.md`, Variantenentscheidung `openspec/changes/archive/2026-10-22-refine-portal-frontend/variants/papo-varianten.html`.
 - Assets: Artikel-Platzhaltergrafiken `frontend/assets/products/*.svg`, Shop-Beispielbilder `frontend/assets/shop-samples/`, Schriften `frontend/vendor/fonts/`, Lucide-Icons `frontend/vendor/`.
 - Nur Demo-Daten (`DemoDataSeeder`, Demo-Logins `company-demo` / `partner-demo`). Kein Logo-Asset, keine echten Firmendaten, keine Kundenstimmen, keine Kennzahlen oder Referenzen. Nichts davon erfinden; Rechtstexte liefert das Unternehmen.
 
