@@ -115,6 +115,8 @@ export function periodTrends(current, previous) {
 // previous-period value. null when there's nothing meaningful to compare
 // (both zero) — the caller then omits the trend attributes and gets no arrow.
 export function trendInfo(current, previous) {
+  // Period just started / nothing fulfilled yet: a neutral note, not a red "-100 %".
+  if (current === 0 && previous > 0) return { trend: "neutral", label: "Noch keine Abschlüsse im Zeitraum" };
   if (previous === 0) {
     if (current === 0) return null;
     return { trend: "up", label: "ggü. Vorperiode (neu)" };

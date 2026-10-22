@@ -72,7 +72,7 @@ class MetricCard extends HTMLElement {
       badge = `<div class="metric-card__icon metric-card__icon--up"><i data-lucide="arrow-up-right"></i></div>`;
     } else if (trend === "down") {
       badge = `<div class="metric-card__icon metric-card__icon--down"><i data-lucide="arrow-down-right"></i></div>`;
-    } else if (tone === "positive") {
+    } else if (tone === "positive" && trend !== "neutral") {
       badge = `<div class="metric-card__icon metric-card__icon--up"><i data-lucide="arrow-up-right"></i></div>`;
     }
 
@@ -99,7 +99,7 @@ class MetricCard extends HTMLElement {
         <div class="metric-card__body">
           <div class="metric-card__value metric-card__value--${valueTone}">${value}</div>
           <div class="metric-card__label">${label}</div>
-          ${trendLabel ? `<div class="metric-card__trend metric-card__trend--${trend === "down" ? "down" : "up"}">${trendLabel}</div>` : ""}
+          ${trendLabel ? `<div class="metric-card__trend metric-card__trend--${trend === "up" || trend === "down" ? trend : "neutral"}">${trendLabel}</div>` : ""}
         </div>
         ${extra}
       </div>

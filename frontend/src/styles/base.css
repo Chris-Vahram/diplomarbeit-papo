@@ -919,6 +919,10 @@ data-table + .metric-row {
   color: var(--color-success-700);
 }
 
+.metric-card__trend--neutral {
+  color: var(--text-secondary);
+}
+
 .metric-card__trend--down {
   color: var(--color-error-700);
 }
