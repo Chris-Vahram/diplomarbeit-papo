@@ -25,6 +25,13 @@ Below 640 px viewport width the main lists (orders, end customers, partners, art
 - **WHEN** a user opens the order list at 390 px width
 - **THEN** each order is a card showing end customer and value on the first line and date and status on the second, and no horizontal page or table scroll is needed
 
+### Requirement: Calm desktop lists
+From 640 px viewport width the main lists SHALL keep their table layout but use the same emphasis as the phone cards: a calm header without tint, the main field in bold, amounts right-aligned in bold with their unit, and dates in secondary text. Row actions SHALL wrap instead of overflowing the table.
+
+#### Scenario: Order list on desktop
+- **WHEN** a user opens an order list at 1280 px width
+- **THEN** the end customer is bold, the value is right-aligned and bold with "€", the date is muted, and the table needs no horizontal scroll
+
 ### Requirement: Shared loading, empty and error states
 Pages SHALL show loading, empty and error states with the same visual pattern and German text; error states SHALL offer a retry where the action is safe to repeat, and empty states SHALL offer the page's main action where one exists.
 

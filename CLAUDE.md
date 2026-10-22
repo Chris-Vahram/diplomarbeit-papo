@@ -2,7 +2,7 @@
 
 ### Vorrangiger Next-Session-Orchesterstand — 22.10.2026
 
-- Einstieg: `Specification/CONTINUATION_PROMPT.md`, Abschnitt „Stand 22.10.2026 — hier einsteigen“. `refine-portal-frontend` umgesetzt auf Branch `feat/refine-portal-frontend` (lokal committet); offen nur Tobias' visuelle Abnahme (Task 5.2), dann Push/Merge/Deploy mit Chris' OK und Archiv.
+- Einstieg: `Specification/CONTINUATION_PROMPT.md`, Abschnitt „Stand 22.10.2026 — hier einsteigen“. `refine-portal-frontend` ist gemergt und live; offen nur Tobias' visuelle Abnahme (Task 5.2) und danach das Archiv. Tobias' unmergter Branch `docs/impeccable-product-context` kollidiert mit PRODUCT.md/DESIGN.md — klären.
 
 ### Vorheriger Orchesterstand — 16.10.2026
 

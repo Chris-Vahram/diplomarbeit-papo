@@ -10,6 +10,7 @@ import { BLOCK_DRAG_TYPE } from "./block-palette.js";
 import "./block-properties.js";
 import "./design-panel.js";
 import "./page-manager.js";
+import { stateHtml } from "../lib/states.js";
 
 // Shop builder (shop-builder spec), opened full screen from "Mein Webshop"
 // (#/partner/shop/editor[?page=<id>]): block palette, live preview in an
@@ -350,8 +351,13 @@ class ShopBuilder extends HTMLElement {
       await this.#openPage(start.id, { skipFlush: true });
       this.#resolveArticleImages();
     } catch (error) {
-      this.querySelector(".builder-body").innerHTML =
-        `<p class="builder-error" role="alert">Der Editor konnte nicht geladen werden: ${escapeHtml(error.message)}</p>`;
+      const body = this.querySelector(".builder-body");
+      body.innerHTML = stateHtml("error", "Der Editor konnte nicht geladen werden.", {
+        hint: error.message,
+        action: `<button type="button" class="button-secondary" data-builder-retry>Erneut laden</button>`,
+      });
+      body.querySelector("[data-builder-retry]").addEventListener("click", () => location.reload());
+      window.lucide?.createIcons();
     }
   }
 

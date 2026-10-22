@@ -27,6 +27,7 @@ import { stateHtml } from "../lib/states.js";
 // Optional column `mobile`: "title" | "amount" | "meta" | "status" | "hide" places that cell in
 // the compact two-line card below 640px (title + amount on top, meta + status below); columns
 // without a slot follow as labelled lines. A unit in the label ("Wert (€)") is appended to amounts.
+// On desktop the same slots set the emphasis: bold title, right-aligned bold amount, muted meta.
 // States: the table shows "Wird geladen…" until rows are set. Set .error = "message" after a
 // failed read and .retry = () => reload() to offer "Erneut laden" (repeats only the read).
 // Optional .emptyHint = "..." and .emptyAction = "<a …>" (trusted markup) for the empty state.
@@ -327,7 +328,13 @@ class DataTable extends HTMLElement {
       pageRows = filtered.slice(start, start + this._pageSize);
     }
 
-    const head = this._columns.map((c) => `<th>${c.label}</th>`).join("");
+    // Amount headers drop their unit; the cells carry it ("129,00 €"), as on phones.
+    const head = this._columns
+      .map((c) => {
+        const label = c.mobile === "amount" ? String(c.label ?? "").replace(/\s*\([^)]*\)$/, "") : c.label;
+        return `<th${c.mobile ? ` data-mobile="${c.mobile}"` : ""}>${label}</th>`;
+      })
+      .join("");
     const body = pageRows
       .map((row) => {
         const cells = this._columns

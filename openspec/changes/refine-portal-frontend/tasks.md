@@ -14,6 +14,7 @@
 - [x] 3.1 `data-table` stacked cards below 640 px with `data-label`; verify search/filter/pagination/actions on orders, customers, partners, articles.
 - [x] 3.2 Shared states helper and adoption on list/detail pages; verify loading, empty, error + retry.
 - [x] 3.3 Metric card neutral icon without trend.
+- [x] 3.4 Desktop lists with the same emphasis as the phone cards (calm header, bold title, right-aligned amount with unit, muted date, wrapping row actions); verified on orders and partners.
 
 ## 4. Accents
 

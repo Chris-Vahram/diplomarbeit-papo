@@ -246,7 +246,7 @@ Gently rounded, firm rectangles: controls 0.375rem, cards and tables 0.5rem, dia
 - **Sidebar:** white surface with right border; items 2.75rem high, 20px icon, Text Label colour; hover Subtle Sage; active item is a solid strong-accent fill (step 700) with white semibold text (decision 2C, matches Design/'s solid style). Unread count as small red pill. Mobile: off-canvas drawer via topbar toggle.
 
 ### Data Table (`<data-table>`)
-- Search, filters, sorting and pager above/below; header row on accent tint with uppercase labels; rows separated by Border Sage; clickable rows, "neu" badge for unseen orders, dormant marker. Empty state centred secondary text. Planned: compact two-line cards below 640px (3.1); shared states (3.2, decision 6C): icon + title + hint, empty state offers the page's main action where one exists, error state offers "Erneut laden".
+- Search, filters, sorting and pager above/below; uppercase header labels; rows separated by Border Sage; clickable rows, "neu" badge for unseen orders, dormant marker. Empty state centred secondary text. Desktop (from 640px): untinted header on a strong bottom border, roomy cells (1rem × 1.25rem), bold title column, right-aligned bold amount with unit, muted date; row actions wrap. Phones: compact two-line cards (3.1); shared states (3.2, decision 6C): icon + title + hint, empty state offers the page's main action where one exists, error state offers "Erneut laden".
 
 ### Order Wizard Steps
 - Checkpoints in a row joined by a line. Done: filled strong accent with ✓. Current (decision 4B): white circle with strong-accent border and soft accent ring, bold label, plus the text "Schritt N von M". Upcoming: outlined number. Never colour alone.
