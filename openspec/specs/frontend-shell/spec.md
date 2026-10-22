@@ -2,9 +2,7 @@
 
 ## Purpose
 Define frontend bootstrap behavior that keeps shared Web Components reliable across direct loads, reloads, and in-app navigation.
-
 ## Requirements
-
 ### Requirement: Shared components are registered before any page renders
 
 The frontend SHALL register all shared Web Components (including `<data-table>`) before the router mounts the first page, so that pages always assign properties to upgraded elements and never hit custom-element property shadowing.
@@ -51,3 +49,10 @@ The company area SHALL expose one primary navigation entry named „Artikelverwa
 - **WHEN** a partner views the sidebar
 - **THEN** the entries „Meine Endkunden“ and „Meine Artikel“ are shown instead of „Endkunden“ and „Artikel“
 - **AND** the partner article page title reads „Meine Artikel“
+
+### Requirement: Partner navigation includes "Mein Webshop"
+The partner sidebar SHALL contain the item "Mein Webshop", which opens the partner's shop area.
+
+#### Scenario: Navigation item visible
+- **WHEN** a partner is logged in
+- **THEN** the sidebar shows "Mein Webshop" and selecting it opens the shop status page

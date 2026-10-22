@@ -17,7 +17,7 @@ die Reihenfolge und Fragen stehen in `PRODUCT_COMPLETION_PLAN.md`.
 
 ---
 
-## B-01 — External end-customer partner shop  `PLANNED`
+## B-01 — External end-customer partner shop  `IN PROGRESS`
 **What full version is:** Public shop per partner, partner-branded, shows enabled products, end customer orders directly. Order auto-assigned to partner.
 **Why cut:** Meeting 17.06 → #1 process is partner-places-order. Shop = "später, nicht MVP". User decision: fully out of MVP (no clickdummy either).
 **MVP replacement:** none. Partner enters orders internally on behalf of Endkunde.
@@ -25,6 +25,7 @@ die Reihenfolge und Fragen stehen in `PRODUCT_COMPLETION_PLAN.md`.
 **Depends on:** B-02, B-05 (part of same shop). B-04 is not a technical prerequisite (decision 2026-10-15).
 **Update 25.09/12.10.2026:** Requested target: guest order plus optional customer account, no confirmed online payment (25.09). Meeting 12.10: the shop becomes a partner-side homepage builder (sidebar "Mein Webshop", inspiration Jimdo), reachable via `paportal.at/<partner>` or `<partner>.paportal.at` (open). Questions go to the company by e-mail via Prof. Hammer.
 **Planning (2026-10-15):** Guest checkout, seller = company, gross prices + VAT rate, provisional shop URL `paportal.at/shop/<kennung>`, separate customer realm. Status `PLANNED`: specified in OpenSpec changes `add-article-tax-rate` … `add-shop-customer-accounts`. Vorläufige Detailentscheidungen (15.10.2026, Vorbehalt Firmenmeeting): `ENDKUNDENSHOP_DECISIONS.md`.
+**Implementation (2026-10-15):** `add-partner-shop-foundation` implemented and archived (2026-10-19) on branch `feature/partner-shop-foundation` (not yet merged/deployed): `PartnerShop` with company-set identifier, release/takedown with reason, automatic offline rules, public `/shop/<kennung>` entry (`shop.html`) and `/api/shop/{kennung}` with rate limit and noindex, partner page "Mein Webshop". No pages, checkout or legal texts yet; next change: `add-shop-page-renderer`.
 
 ## B-02 — Shop design customization  `PLANNED`
 **What full version is:** Partner customizes logo, colors, shop name, + 2 layout variants. Central product data (price/description) stays locked.

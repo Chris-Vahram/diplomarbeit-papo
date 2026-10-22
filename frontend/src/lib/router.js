@@ -2,8 +2,9 @@ import { isAuthenticated, getSession, ensureValidSession, logout } from "./auth.
 import { apiFetch } from "./api.js";
 import { escapeHtml } from "./html.js";
 
-// Route table: hash path -> { tag, role, title }
+// Route table: hash path -> { tag, role, title, fullscreen? }
 // role: null = public, "company" | "partner" = required realm role for FR-20 deep-link protection.
+// fullscreen: no portal sidebar/topbar; the page brings its own way back (shop builder).
 const routes = {
   "/login": { tag: "login-page", role: null, title: "Anmeldung" },
   "/company/dashboard": { tag: "company-dashboard-page", role: "company", title: "Firmen-Dashboard" },
@@ -18,6 +19,8 @@ const routes = {
   "/partner/orders": { tag: "partner-order-list-page", role: "partner", title: "Meine Bestellungen" },
   "/partner/orders/new": { tag: "partner-order-new-page", role: "partner", title: "Neue Bestellung" },
   "/partner/customers": { tag: "partner-customer-list-page", role: "partner", title: "Meine Endkunden" },
+  "/partner/shop": { tag: "partner-shop-page", role: "partner", title: "Mein Webshop" },
+  "/partner/shop/editor": { tag: "partner-shop-editor-page", role: "partner", title: "Shop bearbeiten", fullscreen: true },
   "/partner/profile": { tag: "partner-profile-page", role: "partner", title: "Mein Profil" },
 };
 
@@ -33,6 +36,7 @@ const NAV_ICONS = {
   "/partner/products": "package",
   "/partner/orders": "shopping-cart",
   "/partner/customers": "contact",
+  "/partner/shop": "store",
   "/partner/profile": "circle-user",
 };
 
@@ -147,6 +151,7 @@ function renderNav() {
         ["/partner/orders", "Meine Bestellungen"],
         ["/partner/customers", "Meine Endkunden"],
         ["/partner/products", "Meine Artikel"],
+        ["/partner/shop", "Mein Webshop"],
       ];
 
   const path = currentPath();
@@ -296,6 +301,7 @@ async function render() {
 
   document.title = `Partnerportal – ${route.title}`;
   appShell.classList.toggle("app-shell--bare", path === "/login");
+  appShell.classList.toggle("app-shell--fullscreen", Boolean(route.fullscreen));
   appRoot.innerHTML = "";
   appRoot.appendChild(document.createElement(route.tag));
   renderNav();
@@ -318,6 +324,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   import("../pages/partner-order-new-page.js");
   import("../pages/partner-customer-list-page.js");
   import("../pages/partner-profile-page.js");
+  import("../pages/partner-shop-page.js");
+  import("../pages/partner-shop-editor-page.js");
   window.addEventListener("hashchange", render);
   render();
 });

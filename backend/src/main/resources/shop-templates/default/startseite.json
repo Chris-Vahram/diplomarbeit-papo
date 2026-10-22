@@ -1,0 +1,31 @@
+{
+  "blocks": [
+    {
+      "type": "hero",
+      "config": {
+        "title": "Willkommen in unserem Shop",
+        "text": "Entdecken Sie unser Sortiment und bestellen Sie bequem online.",
+        "buttonLabel": "Zu den Artikeln",
+        "buttonPage": "artikel",
+        "align": "center",
+        "background": "primary"
+      }
+    },
+    {
+      "type": "article-grid",
+      "config": {
+        "heading": "Unsere Artikel",
+        "columns": "3"
+      }
+    },
+    {
+      "type": "heading-text",
+      "config": {
+        "heading": "Persönliche Beratung",
+        "text": "Sie haben Fragen zu einem Artikel? Wir beraten Sie gerne.",
+        "align": "center",
+        "background": "surface"
+      }
+    }
+  ]
+}

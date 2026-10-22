@@ -49,6 +49,7 @@ kein zusätzliches Secret nötig.
 | `DOMAIN` | Produktionsdomain — steuert `KC_HOSTNAME`, Caddy-TLS, Keycloak `redirectUris`/`webOrigins` (siehe `deploy/keycloak/render-and-start.sh`) |
 | `IMAGE_TAG` | Welches Image-Tag `docker-compose.prod.yml` zieht (normal `latest`, siehe Rollback) |
 | `SEED_DEMO_DATA` | Opt-in: Demo-Daten auf einer leeren DB seeden (siehe Abschnitt "Demo-Daten (`SEED_DEMO_DATA`)"); Default `false`, nie im Image |
+| `SHOP_PUBLIC_ENABLED` | Öffentliche Partner-Shops (`/shop/*`, `/api/shop/*`) erreichbar machen; Default `false`. Erst einschalten, wenn die Shop-Rechtstexte (`add-shop-legal-consent`) live sind. Shop-Verwaltung im Portal funktioniert auch ausgeschaltet |
 
 Das GHCR-Package ist **privat**; die VM authentifiziert sich einmalig per
 `docker login ghcr.io` mit einem VM-lokalen, read-only PAT (nicht in GitHub Secrets, nicht
@@ -59,6 +60,31 @@ im Repo — von Tobias direkt auf der VM eingerichtet).
 Der `deploy`-Job erwartet `docker-compose.prod.yml`, `deploy/` (Caddyfile, Postgres-Init-
 Skript, Keycloak-Realm-Template, Backup-Skript) und `.env.prod` unter `~/papo-deploy` auf
 der VM (einmalig kopiert/geklont, nicht Teil der Pipeline selbst).
+
+> **Achtung – manuell nachziehen:** Die Pipeline aktualisiert nur das Backend-Image und
+> `frontend-live/`. Ändert ein Merge `docker-compose.prod.yml` oder etwas unter `deploy/`
+> (z. B. `deploy/caddy/Caddyfile`), wirkt das auf der VM **erst nach manuellem Kopieren**.
+> Ein grüner Deploy-Job beweist das nicht. Vorfall 19.10.2026: Nach PR #50 lieferte
+> `/shop/<kennung>` das Portal statt `shop.html`, bis das neue Caddyfile auf der VM lag.
+>
+> Ablauf mit Admin-Zugang (nicht `papo-deploy`), vom aktuellen `main` aus:
+>
+> ```bash
+> scp deploy/caddy/Caddyfile <vm>:~/papo-deploy/deploy/caddy/Caddyfile
+> scp docker-compose.prod.yml <vm>:~/papo-deploy/docker-compose.prod.yml
+>
+> # auf der VM
+> cd ~/papo-deploy
+> docker exec papo-prod-caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+> docker exec papo-prod-caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile
+> ```
+>
+> `caddy reload` übernimmt das Caddyfile ohne Unterbrechung. Geänderte Umgebungsvariablen
+> in `docker-compose.prod.yml` greifen erst, wenn der jeweilige Container neu erstellt wird
+> (nächster Deploy bzw. `docker compose -f docker-compose.prod.yml --env-file .env.prod up -d <dienst>`).
+> Danach live prüfen, z. B. `curl -sI https://<domain>/shop/test` → `X-Robots-Tag: noindex`.
+> Andere Dateien unter `deploy/` (Postgres-Init, Keycloak-Template, Backup) gelten ebenso;
+> deren Wirkung hängt vom jeweiligen Dienst ab.
 
 Frontend-Dateien werden vom `deploy`-Job selbst nach `~/papo-deploy/frontend-live/releases/<sha>`
 synchronisiert; `frontend-live/current` ist ein Symlink auf die jeweils aktive Release. Caddy

@@ -27,8 +27,8 @@ der Handoff trennt davon menschliche Thesis-/UI-Abnahme und die SSH-Negativmatri
 
 ## Aktueller Orchesterstatus — 25.09.2026
 
-Aktive OpenSpec-Changes (Stand 17.10.2026): `refine-portal-frontend` 11/12 (nur Tobias-Abnahme offen), `send-order-emails` 5/6,
-`complete-thesis-documentation` 4/6, `decouple-partner-number-from-login` 0/4, `add-unique-bmd-article-number` 0/6, dazu Tobias' 11 Shop-Changes.
+Aktive OpenSpec-Changes (Stand 22.10.2026): `refine-portal-frontend` 11/12 (nur Tobias-Abnahme offen), `send-order-emails` 5/6,
+`complete-thesis-documentation` 4/6, `decouple-partner-number-from-login` 0/4, `add-unique-bmd-article-number` 0/6, dazu Tobias' 9 offene Shop-Changes (`add-shop-page-renderer` und `add-shop-builder-editor` am 20.10. archiviert).
 `harden-tax-identifier-rollout` ist vollständig und archiviert. Die vollständige offene Liste, Protokollauswertung und der Startprompt stehen in
 `Specification/CONTINUATION_PROMPT.md`. Chris hat Push auf `main` samt Deploy für
 den geprüften Stand erlaubt. VM-Demo-Status ist geklärt; kein echter
@@ -140,8 +140,13 @@ Clear German for thesis documents, suitable for an HTL Diplomarbeit; precise, st
 - Stage only the files belonging to that step (`git add <paths>`, no blind
   `git add -A`). Never commit secrets, `.env` files, volumes or private KI evidence.
 - When an OpenSpec task is done, commit the code together with the updated `tasks.md`.
+- Archiving a change is the last commit on its feature branch, once all tasks are done and
+  verified, and goes into the same PR. No separate archive branch or archive PR after the merge.
+  Review fixes after archiving are made in the archived change folder.
 - Local commits on the current working branch need no confirmation.
-  Pushing, merging into `main` and deploying still require Chris's explicit approval.
+  Pushing, creating PRs, merging into `main` and deploying need no separate approval from
+  Chris; they happen when the person working in the session asks for them. A merge into
+  `main` deploys to the public VM.
 - Work on a feature branch, not directly on `main`.
 
 ## Git commit attribution

@@ -1,0 +1,56 @@
+# shop-public-access Specification
+
+## Purpose
+Isolated public access to partner shops: the `/shop/<kennung>` entry without portal code or tokens, the only unauthenticated API namespace `/api/shop/{kennung}`, per-IP rate limiting and search-engine indexing control.
+
+## Requirements
+### Requirement: Public shop route
+The system SHALL serve every shop at `/shop/<kennung>` from a separate frontend entry that loads no portal pages, no portal scripts and no stored portal tokens.
+
+#### Scenario: Shop entry isolated
+- **WHEN** a visitor opens `/shop/huemer-elektro-gmbh`
+- **THEN** the browser loads the shop entry only, and no request to `/api/company/*`, `/api/partner/*` or Keycloak is made
+
+#### Scenario: Same address in development
+- **WHEN** a developer opens a shop on the local development server
+- **THEN** the shop is reached at `/shop/<kennung>` as in production, without query parameters
+
+#### Scenario: Unknown identifier
+- **WHEN** a visitor opens a shop identifier that does not exist or is not reachable
+- **THEN** the same neutral page "Dieser Shop ist derzeit nicht erreichbar." is shown, without revealing whether the shop exists
+
+### Requirement: Public shop kill switch
+The system SHALL provide the configuration `papo.shop.public-enabled`, defaulting to false in production deployments. While false, all public shop routes and `/api/shop/*` endpoints SHALL respond as if the shop were offline, independent of release status. Company and partner shop management SHALL remain usable, and both SHALL see the hint "Öffentliche Shops sind auf dieser Umgebung noch deaktiviert." Public links SHALL NOT be shown as clickable while the switch is off.
+
+#### Scenario: Switch off
+- **WHEN** `papo.shop.public-enabled` is false and a visitor opens a released, reachable shop
+- **THEN** the visitor sees the neutral page "Dieser Shop ist derzeit nicht erreichbar." and the API returns the uniform 404
+
+#### Scenario: Management unaffected
+- **WHEN** `papo.shop.public-enabled` is false and the company releases a shop
+- **THEN** the release is stored and the partner sees the status, with the hint "Öffentliche Shops sind auf dieser Umgebung noch deaktiviert."
+
+### Requirement: Public shop API namespace
+Unauthenticated shop access SHALL be limited to the namespace `/api/shop/{kennung}/…`. The partner SHALL be resolved server-side from the identifier only. Public endpoints SHALL expose no internal identifiers beyond what the shop needs (no partner number, commission, contact data unless published by the partner, no customer data).
+
+#### Scenario: Internal API stays protected
+- **WHEN** an unauthenticated request calls any `/api/company/*` or `/api/partner/*` endpoint
+- **THEN** the system responds 401 as before
+
+#### Scenario: Public status response is minimal
+- **WHEN** a visitor's browser calls `/api/shop/{kennung}` for a reachable shop
+- **THEN** the response contains only the identifier, the display name and reachability, and no commission or internal partner data
+
+### Requirement: Rate limiting of public endpoints
+Public shop endpoints SHALL be rate-limited per client IP. Exceeding the limit SHALL return HTTP 429 with a German message. Client IPs used for limiting SHALL NOT be persisted.
+
+#### Scenario: Limit exceeded
+- **WHEN** one client sends more requests than the configured limit within the window
+- **THEN** further requests receive 429 "Zu viele Anfragen. Bitte kurz warten."
+
+### Requirement: Search engine indexing control
+All shop pages and public shop API responses SHALL carry `noindex` (`X-Robots-Tag: noindex` and `<meta name="robots" content="noindex">`) unless the deployment explicitly enables indexing and the shop is released and reachable. Staging deployments SHALL never enable indexing.
+
+#### Scenario: Staging shop
+- **WHEN** a shop is opened on a deployment without the indexing flag
+- **THEN** the page and API responses carry noindex

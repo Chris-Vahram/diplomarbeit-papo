@@ -22,6 +22,7 @@
 - [ ] 4.2 Partner catalog, cart, order details and print document: gross with net below
 - [ ] 4.3 Import page: price-column net/gross choice
 - [ ] 4.4 Order/commission CSV export includes net and tax columns
+- [ ] 4.5 Public shop catalogue: replace `PublicArticleDto.DEFAULT_TAX_RATE_PERCENT` with the article's `taxRatePercent`; adjust `PublicShopContentTest` (interim state from `add-shop-page-renderer`)
 
 ## 5. Verification
 

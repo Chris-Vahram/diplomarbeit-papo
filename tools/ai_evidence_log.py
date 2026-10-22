@@ -151,18 +151,29 @@ def archive_session(session, source, archive_root, previous=None):
     }
 
 
+# Claude Code names its per-project folder after the absolute path with every
+# non-alphanumeric character (not only "/") replaced by "-", e.g. "4.Klasse" -> "4-Klasse".
+def claude_project_dir(project):
+    return re.sub(r"[^A-Za-z0-9]", "-", str(project))
+
+
 def collect(project, codex_root, claude_root):
     if codex_root.exists():
         for path in codex_root.rglob("*.jsonl"):
             session = codex_session(path, project)
             if session:
                 yield session, path
-    claude_project = claude_root / "projects" / str(project).replace("/", "-")
+    claude_project = claude_root / "projects" / claude_project_dir(project)
     if claude_project.exists():
         for path in claude_project.glob("*.jsonl"):
             session = claude_session(path, project)
             if session:
                 yield session, path
+
+
+def row_person(line):
+    cells = line.split("|")
+    return cells[3].strip() if len(cells) > 3 else ""
 
 
 def register_rows(sessions, register=REGISTER, archived_ids=()):
@@ -172,8 +183,11 @@ def register_rows(sessions, register=REGISTER, archived_ids=()):
     lines = []
     for line in text.splitlines():
         generated = line.startswith("| AUSSTEHEND-") and "Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen" in line
+        # Only this machine's own placeholders may be pruned: another person's sessions are
+        # never in the local archive, so their rows must survive a sync here.
+        own = generated and row_person(line) == PERSON
         # Keep placeholders of archived sessions even after Codex/Claude pruned the local source.
-        if generated and not any(f"`{session_id}`" in line for session_id in archived_ids):
+        if own and not any(f"`{session_id}`" in line for session_id in archived_ids):
             continue
         lines.append(line)
     insertion = next((index for index, line in enumerate(lines) if line.startswith("## Noch rückwirkend")), len(lines))
