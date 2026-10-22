@@ -16,13 +16,15 @@
 // ring: optional 0-100 — a small "part of whole" completion ring (e.g. enabled
 //   vs. total catalog). ring-caption is the tiny label under it. Mutually
 //   exclusive with sparkline (ring takes priority if both are set).
+// lead: boolean attribute — the dashboard's one lead metric (decision 3C): spans the whole
+//   metric row on the accent tint with a larger value.
 // ring-layout: "aside" (default, small ring in the corner) | "full" — a large
 //   ring filling the card's full height on the left, with the value/label
 //   stack to its right. Use "full" when the ring IS the card's main figure,
 //   not a secondary annotation (icon watermark/badge are omitted in this mode).
 class MetricCard extends HTMLElement {
   static get observedAttributes() {
-    return ["label", "value", "icon", "tone", "value-tone", "trend", "trend-label", "sparkline", "ring", "ring-caption", "ring-layout"];
+    return ["lead", "label", "value", "icon", "tone", "value-tone", "trend", "trend-label", "sparkline", "ring", "ring-caption", "ring-layout"];
   }
 
   connectedCallback() {
@@ -64,7 +66,8 @@ class MetricCard extends HTMLElement {
       return;
     }
 
-    let badge = `<div class="metric-card__icon"></div>`;
+    // Without a trend the badge shows the card's own icon (neutral), never an empty circle.
+    let badge = icon ? `<div class="metric-card__icon"><i data-lucide="${icon}"></i></div>` : "";
     if (trend === "up") {
       badge = `<div class="metric-card__icon metric-card__icon--up"><i data-lucide="arrow-up-right"></i></div>`;
     } else if (trend === "down") {
@@ -90,7 +93,7 @@ class MetricCard extends HTMLElement {
     }
 
     this.innerHTML = `
-      <div class="metric-card metric-card--${tone}">
+      <div class="metric-card metric-card--${tone}${this.hasAttribute("lead") ? " metric-card--lead" : ""}">
         ${icon ? `<div class="metric-card__watermark"><i data-lucide="${icon}"></i></div>` : ""}
         ${badge}
         <div class="metric-card__body">

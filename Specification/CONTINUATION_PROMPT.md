@@ -1,11 +1,25 @@
 # PAPO – Next-Session-Context
 
-**Stand:** 16.10.2026 (lokales Datum geprüft). Operative Übergabe; volatile Angaben beim Start prüfen.
+**Stand:** 22.10.2026. Operative Übergabe; volatile Angaben beim Start prüfen.
 Stabile Regeln stehen in `AGENTS.md` und `CLAUDE.md`. Der beschlossene/noch zu
 beschließende Ausbau ist in [PRODUCT_COMPLETION_PLAN.md](PRODUCT_COMPLETION_PLAN.md)
 geordnet. Dieses Dokument bleibt der einzige operative Session-Handoff.
 
-## Stand 16.10.2026 — hier einsteigen
+## Stand 22.10.2026 — hier einsteigen
+
+`refine-portal-frontend` umgesetzt und am 22.10.2026 nach `main` gemergt (deployt auf die VM).
+Enthält auch: Desktop-Listen im Stil der Handy-Karten (Task 3.4, Chris' Wunsch), Shop-Editor-/
+„Mein Webshop“-CSS von Tobias auf Rollen-Tokens (`--color-accent*`, neu `--color-accent-medium`)
+umgestellt, Editor-Ladefehler als gemeinsamer Fehlerzustand. Offen nur Task 5.2: Tobias'
+visuelle Abnahme der Nachher-Screenshots `output/playwright/refine-*-after.png` (lokal, nicht im
+Repo); danach Change archivieren (eigener kleiner PR, weil 5.2 nach dem Merge kommt).
+Achtung: Tobias' unmergter Branch `origin/docs/impeccable-product-context` (21.10.) enthält eine
+eigene PRODUCT.md/DESIGN.md (North Star „Die Zwei-Schlüssel-Theke“, Kontrast offen, Fokus als
+box-shadow). Gültig ist die gemergte Version mit den bestätigten Entscheidungen 1B 2C 3C 4B 5C 6C;
+mit Tobias klären, ob Teile seiner Texte übernommen werden, dann seinen Branch schließen.
+Leitkennzahl Firma = Umsatz (Vorschlag, Chris bestätigen lassen).
+
+## Stand 16.10.2026 — vorheriger Stand
 
 **Live auf paportal.at (main, alle Deploys grün, live geprüft):**
 - B-08 Firmen-Trendpfeile (archiviert), Zeitraum-Presets/Partner-Navigation/Endkunden bearbeiten (12.10.-Feedback).

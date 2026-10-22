@@ -67,14 +67,15 @@ class CompanyOrderListPage extends HTMLElement {
 
     this.table = this.querySelector("#order-table");
     this.table.columns = [
-      { key: "orderDate", label: "Datum", html: true },
+      { key: "orderDate", label: "Datum", html: true, mobile: "meta" },
       { key: "partnerName", label: "Partner" },
-      { key: "kundeName", label: "Endkunde" },
-      { key: "orderValueLabel", label: "Wert (€)" },
+      { key: "kundeName", label: "Endkunde", mobile: "title" },
+      { key: "orderValueLabel", label: "Wert (€)", mobile: "amount" },
       { key: "commissionLabel", label: "Provision (€)" },
-      { key: "statusSelect", label: "Status", html: true },
+      { key: "statusSelect", label: "Status", html: true, mobile: "status" },
     ];
     this.table.emptyMessage = "Noch keine Bestellungen vorhanden.";
+    this.table.retry = () => this.load();
     this.table.searchKeys = ["partnerName", "kundeName"];
     this.table.pageSize = 20;
     this.table.rowKey = "id";
@@ -109,7 +110,7 @@ class CompanyOrderListPage extends HTMLElement {
       ];
       this.renderRows();
     } catch (error) {
-      showToast(error.message, "error");
+      this.table.error = error.message;
     }
   }
 

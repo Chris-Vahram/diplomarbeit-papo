@@ -12,10 +12,6 @@ class CompanyCategoryListPage extends HTMLElement {
           <button type="button" class="button-primary" id="new-category-btn">Neue Artikelkategorie</button>
         </div>
       </div>
-      <p id="category-load-error" class="form-field__error" hidden>
-        Kategorien konnten nicht geladen werden.
-        <button type="button" class="button-secondary" id="category-retry">Erneut laden</button>
-      </p>
       <data-table id="category-table"></data-table>
       <modal-dialog id="category-modal" title="Neue Artikelkategorie">
         <form id="category-form" class="entity-form">
@@ -28,11 +24,12 @@ class CompanyCategoryListPage extends HTMLElement {
     `;
     this.table = this.querySelector("#category-table");
     this.table.columns = [
-      { key: "name", label: "Name" },
-      { key: "activeLabel", label: "Status" },
+      { key: "name", label: "Name", mobile: "title" },
+      { key: "activeLabel", label: "Status", mobile: "status" },
       { key: "actions", label: "", html: true },
     ];
     this.table.emptyMessage = "Noch keine Artikelkategorien angelegt.";
+    this.table.retry = () => this.load();
     this.table.searchKeys = ["name"];
     this.table.pageSize = 20;
     this.table.filters = [{
@@ -41,9 +38,7 @@ class CompanyCategoryListPage extends HTMLElement {
     }];
     this.modal = this.querySelector("#category-modal");
     this.form = this.querySelector("#category-form");
-    this.loadError = this.querySelector("#category-load-error");
     this.querySelector("#new-category-btn").addEventListener("click", () => this.openCreate());
-    this.querySelector("#category-retry").addEventListener("click", () => this.load());
     this.table.addEventListener("click", (event) => {
       const button = event.target.closest("[data-edit-id]");
       if (button) this.openEdit(button.dataset.editId);
@@ -53,7 +48,6 @@ class CompanyCategoryListPage extends HTMLElement {
   }
 
   async load() {
-    this.loadError.hidden = true;
     try {
       this.categories = await apiFetch("/company/categories");
       this.table.rows = this.categories.map((category) => ({
@@ -63,9 +57,7 @@ class CompanyCategoryListPage extends HTMLElement {
       }));
     } catch (error) {
       this.categories = [];
-      this.table.rows = [];
-      this.loadError.hidden = false;
-      showToast(error.message, "error");
+      this.table.error = error.message;
     }
   }
 

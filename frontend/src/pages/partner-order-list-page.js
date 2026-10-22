@@ -1,5 +1,4 @@
 import { apiFetch } from "../lib/api.js";
-import { showToast } from "../components/toast-notice.js";
 import { formatNumber, formatDate } from "../lib/format.js";
 import { renderOrderDetailsHtml } from "../lib/order-details.js";
 
@@ -22,13 +21,16 @@ class PartnerOrderListPage extends HTMLElement {
 
     this.table = this.querySelector("#order-table");
     this.table.columns = [
-      { key: "orderDate", label: "Datum" },
-      { key: "kundeName", label: "Endkunde" },
-      { key: "orderValueLabel", label: "Wert (€)" },
+      { key: "orderDate", label: "Datum", mobile: "meta" },
+      { key: "kundeName", label: "Endkunde", mobile: "title" },
+      { key: "orderValueLabel", label: "Wert (€)", mobile: "amount" },
       { key: "commissionLabel", label: "Provision (€)" },
-      { key: "statusBadge", label: "Status", html: true },
+      { key: "statusBadge", label: "Status", html: true, mobile: "status" },
     ];
     this.table.emptyMessage = "Noch keine Bestellungen vorhanden.";
+    this.table.emptyHint = "Neue Bestellungen für Ihre Endkunden erscheinen hier.";
+    this.table.emptyAction = `<a class="button-primary" href="#/partner/orders/new">Neue Bestellung</a>`;
+    this.table.retry = () => this.load();
     this.table.filters = [
       { key: "kundeName", type: "text", label: "Endkunde" },
       { key: "orderDateIso", type: "daterange", label: "Datum" },
@@ -62,7 +64,7 @@ class PartnerOrderListPage extends HTMLElement {
         statusBadge: `<status-badge status="${o.status.toLowerCase()}"></status-badge>`,
       }));
     } catch (error) {
-      showToast(error.message, "error");
+      this.table.error = error.message;
     }
   }
 

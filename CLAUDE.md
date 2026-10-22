@@ -1,6 +1,10 @@
 # CLAUDE.md – Partnerportal (Diplomarbeit)
 
-### Vorrangiger Next-Session-Orchesterstand — 16.10.2026
+### Vorrangiger Next-Session-Orchesterstand — 22.10.2026
+
+- Einstieg: `Specification/CONTINUATION_PROMPT.md`, Abschnitt „Stand 22.10.2026 — hier einsteigen“. `refine-portal-frontend` ist gemergt und live; offen nur Tobias' visuelle Abnahme (Task 5.2) und danach das Archiv. Tobias' unmergter Branch `docs/impeccable-product-context` kollidiert mit PRODUCT.md/DESIGN.md — klären.
+
+### Vorheriger Orchesterstand — 16.10.2026
 
 - Einstieg: `Specification/CONTINUATION_PROMPT.md`, Abschnitt „Stand 16.10.2026 — hier einsteigen“. Live: B-08, B-04 (Mail auf VM aus bis SMTP-Daten), OIDC-Login-Bindung A+B, Kategorie als Katalog-Referenz, Ponytail-Audit. Nächster Block: `refine-portal-frontend` (impeccable). Shop-Changes gehören Tobias.
 
@@ -23,7 +27,7 @@ der Handoff trennt davon menschliche Thesis-/UI-Abnahme und die SSH-Negativmatri
 
 ## Aktueller Orchesterstatus — 25.09.2026
 
-Aktive OpenSpec-Changes (Stand 16.10.2026): `refine-portal-frontend` 0/11, `send-order-emails` 5/6,
+Aktive OpenSpec-Changes (Stand 22.10.2026): `refine-portal-frontend` 11/12 (nur Tobias-Abnahme offen), `send-order-emails` 5/6,
 `complete-thesis-documentation` 4/6, `decouple-partner-number-from-login` 0/4, `add-unique-bmd-article-number` 0/6, dazu Tobias' 9 offene Shop-Changes (`add-shop-page-renderer` und `add-shop-builder-editor` am 20.10. archiviert).
 `harden-tax-identifier-rollout` ist vollständig und archiviert. Die vollständige offene Liste, Protokollauswertung und der Startprompt stehen in
 `Specification/CONTINUATION_PROMPT.md`. Chris hat Push auf `main` samt Deploy für

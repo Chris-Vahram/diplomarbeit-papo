@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PAPO Designvarianten</title>
+<style>
+@font-face { font-family: 'Plus Jakarta Sans'; font-weight: 400 800; font-display: swap;
+  src: url('../../../../frontend/vendor/fonts/plus-jakarta-sans-latin.woff2') format('woff2'); }
+
+:root {
+  --p50:#f0f7f1; --p100:#d8eedb; --p400:#78b07e; --p500:#689c6d; --p600:#578462; --p700:#456851; --p800:#344e3d;
+  --a50:#eff5f6; --a100:#d4e8eb; --a600:#5e838d; --a700:#4a6870; --a800:#374e54;
+  --n50:#f6f9f7; --n100:#edf2ee; --n200:#d6e1d8; --n300:#b5c8b9; --n400:#8ca594; --n500:#69836f; --n600:#52675a; --n700:#3d4f43; --n950:#0b110c;
+  --ok50:#ecfdf4; --ok100:#d0fae5; --ok700:#15803d; --ok800:#166534;
+  --warn100:#fef3c7; --warn800:#92400e; --err50:#fef2f2; --err100:#fee2e2; --err700:#b91c1c;
+  --info100:#d4e8eb; --info800:#374e54;
+  --shadow-sm: 0 1px 3px 0 rgba(11,17,12,.09), 0 1px 2px -1px rgba(11,17,12,.09);
+  --font: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  /* partner context by default */
+  --accent: var(--a600); --accent-hover: var(--a700); --accent-deep: var(--a700); --accent-deeper: var(--a800); --accent-light: var(--a50);
+}
+.ctx-company { --accent: var(--p500); --accent-hover: var(--p600); --accent-deep: var(--p700); --accent-deeper: var(--p800); --accent-light: var(--p50); }
+
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--font); background: var(--n50); color: var(--n950); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+::selection { background: var(--a100); }
+.page { max-width: 76rem; margin: 0 auto; padding: 2.5rem 1rem 8rem; }
+h1 { font-size: 1.875rem; letter-spacing: -.025em; margin: 0 0 .5rem; }
+.intro { color: var(--n600); max-width: 62ch; margin: 0 0 2.5rem; font-size: .9375rem; }
+section.q { margin-bottom: 3.5rem; }
+.q h2 { font-size: 1.25rem; margin: 0 0 .25rem; }
+.q > p { color: var(--n600); margin: 0 0 1.25rem; font-size: .875rem; max-width: 70ch; }
+.opts { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 1.25rem; }
+@media (max-width: 62em) { .opts { grid-template-columns: 1fr; } }
+
+/* option card = a label wrapping a radio, so the whole card is clickable */
+.opt { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--n200); border-radius: .75rem; box-shadow: var(--shadow-sm); cursor: pointer; transition: border-color 100ms, box-shadow 100ms; overflow: hidden; }
+.opt:hover { border-color: var(--n400); }
+.opt:has(input:checked) { border-color: var(--n950); box-shadow: 0 0 0 2px var(--n950); }
+.opt:has(input:focus-visible) { outline: 3px solid var(--a600); outline-offset: 3px; }
+.opt input { position: absolute; opacity: 0; pointer-events: none; }
+.opt__head { display: flex; align-items: baseline; gap: .5rem; padding: .875rem 1rem .5rem; }
+.opt__letter { font-weight: 800; font-size: .875rem; display: inline-flex; width: 1.5rem; height: 1.5rem; align-items: center; justify-content: center; border-radius: 999px; background: var(--n100); flex-shrink: 0; }
+.opt:has(input:checked) .opt__letter { background: var(--n950); color: #fff; }
+.opt__title { font-weight: 700; font-size: .9375rem; }
+.opt__note { padding: 0 1rem .875rem; font-size: .8125rem; color: var(--n600); }
+.opt__stage { flex: 1; padding: 1.25rem 1rem; background: var(--n50); border-top: 1px solid var(--n200); display: flex; flex-direction: column; gap: .75rem; align-items: flex-start; }
+.tag { display: inline-flex; align-items: center; gap: .25rem; font-size: .75rem; font-weight: 600; padding: .125rem .5rem; border-radius: 999px; }
+.tag--pass { background: var(--ok100); color: var(--ok800); }
+.tag--fail { background: var(--err100); color: var(--err700); }
+.tag--now { background: var(--n100); color: var(--n700); }
+.row { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
+.mini { font-size: .6875rem; color: var(--n600); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+
+/* ── 1 buttons ── */
+.btn { font-family: var(--font); font-size: .875rem; font-weight: 600; padding: .5rem 1rem; min-height: 2.5rem; border: none; border-radius: .375rem; cursor: pointer; display: inline-flex; align-items: center; gap: .5rem; transition: background 100ms; }
+.btn svg { width: 1rem; height: 1rem; }
+.btn--hero { font-size: 1rem; padding: .75rem 1.5rem; min-height: 3rem; }
+.btn--hero svg { width: 1.125rem; height: 1.125rem; }
+.b-now { background: var(--accent); color: #fff; } .b-now:hover { background: var(--accent-hover); }
+.b-deep { background: var(--accent-deep); color: #fff; } .b-deep:hover { background: var(--accent-deeper); }
+.b-dark { background: var(--accent); color: var(--n950); } .b-dark:hover { background: var(--accent-hover); color: #fff; }
+.btn-sec { font-family: var(--font); font-size: .875rem; font-weight: 600; padding: .5rem 1rem; min-height: 2.5rem; border: 1px solid var(--n300); border-radius: .375rem; background: #fff; color: var(--n950); }
+
+/* ── 2 sidebar nav ── */
+.nav { width: 100%; max-width: 15rem; background: #fff; border: 1px solid var(--n200); border-radius: .5rem; padding: .75rem; display: flex; flex-direction: column; gap: 2px; }
+.nav__brand { font-weight: 800; font-size: 1.25rem; letter-spacing: -.025em; padding: .25rem .75rem .75rem; }
+.nav__brand small { display: block; font-size: .6875rem; letter-spacing: .05em; text-transform: uppercase; color: var(--accent-deep); font-weight: 700; }
+.nav a { display: flex; align-items: center; gap: .75rem; height: 2.75rem; padding: 0 .75rem; border-radius: .375rem; font-size: .875rem; font-weight: 500; color: var(--n700); text-decoration: none; }
+.nav a svg { width: 1.25rem; height: 1.25rem; flex-shrink: 0; }
+.nav a:hover { background: var(--n100); color: var(--n950); }
+.nav--now a.on { background: var(--accent-light); color: var(--accent); font-weight: 600; }
+.nav--deep a.on { background: var(--accent-light); color: var(--accent-deep); font-weight: 700; }
+.nav--deep a.on::after { content: ""; margin-left: auto; width: .375rem; height: .375rem; border-radius: 999px; background: var(--accent-deep); }
+.nav--solid a.on { background: var(--accent-deep); color: #fff; font-weight: 600; }
+
+/* ── 3 metric cards ── */
+.metrics { display: grid; gap: .75rem; width: 100%; grid-template-columns: repeat(3, minmax(0,1fr)); }
+.mc { position: relative; background: #fff; border: 1px solid var(--n200); border-radius: .5rem; box-shadow: var(--shadow-sm); padding: .75rem; display: flex; flex-direction: column; align-items: flex-start; gap: .5rem; min-width: 0; }
+.mc__icon { width: 2rem; height: 2rem; border-radius: 999px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--accent-light); color: var(--accent-deep); }
+.mc__icon svg { width: 1rem; height: 1rem; }
+.mc__icon--up { background: var(--ok50); color: var(--ok700); }
+.mc__icon--empty { background: var(--accent-light); }
+.mc__val { font-weight: 700; font-size: 1.0625rem; letter-spacing: -.025em; color: var(--accent-deep); font-variant-numeric: tabular-nums; line-height: 1.2; white-space: nowrap; }
+.mc__lbl { font-size: .6875rem; color: var(--n600); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mc > div { min-width: 0; max-width: 100%; }
+.mc__trend { font-size: .6875rem; color: var(--ok700); font-weight: 600; }
+.metrics--lead { grid-template-columns: 1.6fr 1fr 1fr; }
+.metrics--lead .mc--lead .mc__val { font-size: 1.375rem; }
+.metrics--lead .mc--lead { padding: 1rem; }
+.metrics--band { grid-template-columns: 1fr 1fr; }
+.metrics--band .mc--lead { grid-column: 1 / -1; flex-direction: row; align-items: center; background: var(--accent-light); border-color: transparent; box-shadow: none; padding: 1rem 1.125rem; }
+.metrics--band .mc--lead .mc__val { font-size: 1.75rem; }
+.metrics--band .mc--lead .mc__icon { background: #fff; }
+
+/* ── 4 wizard ── */
+.steps { list-style: none; margin: 0; padding: 0; display: flex; width: 100%; }
+.step { flex: 1; position: relative; display: flex; flex-direction: column; align-items: center; gap: .25rem; min-width: 0; }
+.step:not(:first-child)::before { content: ""; position: absolute; top: .875rem; left: -50%; width: 100%; height: 2px; background: #c7c7c7; z-index: 0; }
+.step.done:not(:first-child)::before, .step.cur:not(:first-child)::before { background: var(--accent); }
+.mk { position: relative; z-index: 1; width: 1.75rem; height: 1.75rem; border-radius: 999px; border: 2px solid var(--n300); background: #fff; color: var(--n600); font-size: .75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.mk svg { width: .875rem; height: .875rem; }
+.sl { font-size: .6875rem; color: var(--n600); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.step.done .mk, .step.cur .mk { background: var(--accent); border-color: var(--accent); color: #fff; }
+.step.done .sl, .step.cur .sl { color: var(--n950); font-weight: 500; }
+.steps--ring .step.cur .mk { background: #fff; color: var(--accent-deep); border-color: var(--accent-deep); box-shadow: 0 0 0 4px var(--accent-light); }
+.steps--ring .step.cur .sl { font-weight: 700; color: var(--accent-deep); }
+.steps--ring .step.done .mk { background: var(--accent-deep); border-color: var(--accent-deep); }
+.steps-caption { font-size: .75rem; color: var(--n600); }
+.steps-caption b { color: var(--n950); }
+.bar { width: 100%; }
+.bar__text { display: flex; justify-content: space-between; font-size: .8125rem; margin-bottom: .5rem; }
+.bar__text b { font-weight: 700; }
+.bar__track { display: grid; grid-template-columns: repeat(4, 1fr); gap: .25rem; }
+.bar__seg { height: .375rem; border-radius: 999px; background: var(--n200); }
+.bar__seg.done { background: var(--accent-deep); }
+.bar__seg.cur { background: linear-gradient(90deg, var(--accent-deep) 50%, var(--n200) 50%); }
+.bar__names { display: grid; grid-template-columns: repeat(4, 1fr); gap: .25rem; margin-top: .375rem; font-size: .6875rem; color: var(--n600); }
+.bar__names span.done::before { content: "✓ "; color: var(--accent-deep); font-weight: 700; }
+.bar__names span.cur { color: var(--n950); font-weight: 700; }
+
+/* ── 5 phone list ── */
+.phone { width: 100%; max-width: 15.5rem; margin: 0 auto; background: var(--n50); border: 6px solid var(--n950); border-radius: 1.5rem; padding: .75rem .5rem; height: 18rem; overflow: hidden; }
+.phone__title { font-weight: 700; font-size: .875rem; margin: 0 .25rem .5rem; }
+.tbl-scroll { overflow-x: auto; background: #fff; border: 1px solid var(--n200); border-radius: .5rem; }
+.tbl { border-collapse: collapse; font-size: .6875rem; min-width: 26rem; }
+.tbl th { text-align: left; background: var(--accent-light); color: var(--n600); font-size: .5625rem; text-transform: uppercase; letter-spacing: .05em; padding: .375rem .5rem; white-space: nowrap; }
+.tbl td { padding: .5rem; border-top: 1px solid var(--n200); white-space: nowrap; }
+.badge { display: inline-flex; padding: .0625rem .5rem; border-radius: 999px; font-size: .5625rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+.badge--sub { background: var(--warn100); color: var(--warn800); }
+.badge--rev { background: var(--info100); color: var(--info800); }
+.badge--ful { background: var(--ok100); color: var(--ok800); }
+.cards { display: flex; flex-direction: column; gap: .5rem; }
+.lc { background: #fff; border: 1px solid var(--n200); border-radius: .5rem; padding: .5rem .625rem; font-size: .6875rem; }
+.lc dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: .125rem .5rem; }
+.lc dt { color: var(--n600); font-size: .625rem; text-transform: uppercase; letter-spacing: .05em; font-weight: 600; }
+.lc dd { margin: 0; text-align: right; }
+.lc2 { background: #fff; border: 1px solid var(--n200); border-radius: .5rem; padding: .5rem .625rem; display: grid; grid-template-columns: 1fr auto; gap: .125rem .5rem; font-size: .75rem; }
+.lc2 b { font-weight: 600; }
+.lc2 .amt { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.lc2 .sub { color: var(--n600); font-size: .6875rem; }
+
+/* ── 6 states ── */
+.state { width: 100%; background: #fff; border: 1px solid var(--n200); border-radius: .5rem; min-height: 9rem; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 1.25rem; gap: .375rem; }
+.state--plain { color: var(--n600); font-size: .8125rem; font-weight: 500; }
+.state svg { width: 2rem; height: 2rem; color: var(--n300); }
+.state__t { font-weight: 600; font-size: .875rem; }
+.state__d { font-size: .75rem; color: var(--n600); max-width: 30ch; }
+.state--err svg { color: var(--err700); }
+.state .btn { margin-top: .375rem; min-height: 2.25rem; font-size: .8125rem; }
+
+/* ── summary bar ── */
+.summary { position: fixed; inset: auto 0 0 0; background: var(--n950); color: #fff; padding: .75rem 1rem; display: flex; gap: 1rem; align-items: center; justify-content: center; flex-wrap: wrap; font-size: .875rem; z-index: 10; }
+.summary code { font-family: ui-monospace, monospace; background: rgba(255,255,255,.1); padding: .25rem .5rem; border-radius: .25rem; }
+.summary button { font-family: var(--font); font-weight: 600; font-size: .8125rem; background: #fff; color: var(--n950); border: none; border-radius: .375rem; padding: .5rem .875rem; cursor: pointer; min-height: 2.25rem; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-dash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></symbol>
+  <symbol id="i-cart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-pkg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></symbol>
+  <symbol id="i-pct" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 5 5 19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10M7 17 17 7"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-trend" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
+</svg>
+
+<main class="page">
+  <h1>PAPO – Designvarianten</h1>
+  <p class="intro"><strong>Entschieden 16.10.2026 (Chris, bestätigt von Tobias): 1B 2C 3C 4B 5C 6C.</strong> Refinement nach Tobias' Design (refine-portal-frontend). Pro Frage eine Karte anklicken, A ist jeweils der heutige Stand. Unten steht die Auswahl zum Kopieren. Gezeigt ist meist der Partnerbereich (blau); Farbregeln gelten im Firmenbereich (grün) gleich.</p>
+
+  <section class="q" data-q="1">
+    <h2>1 · Hauptbutton und Kontrast</h2>
+    <p>Weiße Schrift auf dem heutigen Button erreicht WCAG AA (4,5 : 1) nicht. Gezeigt: normale Buttons und der Hero-Button „Neue Bestellung“, jeweils Firma und Partner.</p>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q1" value="A">
+        <div class="opt__head"><span class="opt__letter">A</span><span class="opt__title">Heute</span></div>
+        <div class="opt__note">Grün 500 / Blau 600, weiße Schrift.</div>
+        <div class="opt__stage">
+          <div class="row ctx-company"><button class="btn b-now" type="button">Speichern</button><span class="tag tag--fail">3,2 : 1</span></div>
+          <div class="row"><button class="btn b-now" type="button">Speichern</button><span class="tag tag--fail">4,1 : 1</span></div>
+          <button class="btn btn--hero b-now" type="button"><svg><use href="#i-plus"/></svg>Neue Bestellung</button>
+        </div></label>
+      <label class="opt"><input type="radio" name="q1" value="B">
+        <div class="opt__head"><span class="opt__letter">B</span><span class="opt__title">Eine Stufe dunkler</span></div>
+        <div class="opt__note">Ruhe Stufe 700, Hover 800. Look bleibt, nur satter. Empfehlung.</div>
+        <div class="opt__stage">
+          <div class="row ctx-company"><button class="btn b-deep" type="button">Speichern</button><span class="tag tag--pass">6,3 : 1</span></div>
+          <div class="row"><button class="btn b-deep" type="button">Speichern</button><span class="tag tag--pass">6,0 : 1</span></div>
+          <button class="btn btn--hero b-deep" type="button"><svg><use href="#i-plus"/></svg>Neue Bestellung</button>
+        </div></label>
+      <label class="opt"><input type="radio" name="q1" value="C">
+        <div class="opt__head"><span class="opt__letter">C</span><span class="opt__title">Dunkle Schrift</span></div>
+        <div class="opt__note">Farbe bleibt wie heute, Schrift fast schwarz. Blau nur knapp über AA.</div>
+        <div class="opt__stage">
+          <div class="row ctx-company"><button class="btn b-dark" type="button">Speichern</button><span class="tag tag--pass">6,0 : 1</span></div>
+          <div class="row"><button class="btn b-dark" type="button">Speichern</button><span class="tag tag--pass">4,6 : 1</span></div>
+          <button class="btn btn--hero b-dark" type="button"><svg><use href="#i-plus"/></svg>Neue Bestellung</button>
+        </div></label>
+    </div>
+  </section>
+
+  <section class="q" data-q="2">
+    <h2>2 · Aktiver Menüpunkt in der Sidebar</h2>
+    <p>Sidebar bleibt hell. Heute verfehlt die Akzentschrift auf dem hellen Hintergrund AA.</p>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q2" value="A">
+        <div class="opt__head"><span class="opt__letter">A</span><span class="opt__title">Heute</span></div>
+        <div class="opt__note">Heller Hintergrund, Schrift Akzent 600. <span class="tag tag--fail">3,7 : 1</span></div>
+        <div class="opt__stage"><nav class="nav nav--now"><div class="nav__brand">PAPO<small>Partner</small></div><a><svg><use href="#i-dash"/></svg>Dashboard</a><a class="on"><svg><use href="#i-cart"/></svg>Bestellungen</a><a><svg><use href="#i-users"/></svg>Meine Endkunden</a><a><svg><use href="#i-pkg"/></svg>Meine Artikel</a></nav></div></label>
+      <label class="opt"><input type="radio" name="q2" value="B">
+        <div class="opt__head"><span class="opt__letter">B</span><span class="opt__title">Kräftigere Schrift + Punkt</span></div>
+        <div class="opt__note">Gleicher heller Hintergrund, Schrift 700 fett, Punkt als Zusatzsignal. <span class="tag tag--pass">5,4 : 1</span></div>
+        <div class="opt__stage"><nav class="nav nav--deep"><div class="nav__brand">PAPO<small>Partner</small></div><a><svg><use href="#i-dash"/></svg>Dashboard</a><a class="on"><svg><use href="#i-cart"/></svg>Bestellungen</a><a><svg><use href="#i-users"/></svg>Meine Endkunden</a><a><svg><use href="#i-pkg"/></svg>Meine Artikel</a></nav></div></label>
+      <label class="opt"><input type="radio" name="q2" value="C">
+        <div class="opt__head"><span class="opt__letter">C</span><span class="opt__title">Vollfarbig</span></div>
+        <div class="opt__note">Wie Tobias' Design/: Akzent 700 als Fläche, weiße Schrift. <span class="tag tag--pass">6,0 : 1</span></div>
+        <div class="opt__stage"><nav class="nav nav--solid"><div class="nav__brand">PAPO<small>Partner</small></div><a><svg><use href="#i-dash"/></svg>Dashboard</a><a class="on"><svg><use href="#i-cart"/></svg>Bestellungen</a><a><svg><use href="#i-users"/></svg>Meine Endkunden</a><a><svg><use href="#i-pkg"/></svg>Meine Artikel</a></nav></div></label>
+    </div>
+  </section>
+
+  <section class="q" data-q="3">
+    <h2>3 · Kennzahlen auf dem Dashboard</h2>
+    <p>Task 3.3 + 4.1: kein leerer Icon-Kreis mehr, eine Leitkennzahl mit Vorrang (Partner: Provision).</p>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q3" value="A">
+        <div class="opt__head"><span class="opt__letter">A</span><span class="opt__title">Heute</span></div>
+        <div class="opt__note">Drei gleich große Karten; ohne Trend ein leerer Kreis.</div>
+        <div class="opt__stage"><div class="metrics">
+          <div class="mc"><span class="mc__icon mc__icon--up"><svg><use href="#i-up"/></svg></span><div><div class="mc__val">412,50 €</div><div class="mc__lbl">Provision</div></div></div>
+          <div class="mc"><span class="mc__icon mc__icon--empty"></span><div><div class="mc__val">4.125 €</div><div class="mc__lbl">Umsatz</div></div></div>
+          <div class="mc"><span class="mc__icon mc__icon--empty"></span><div><div class="mc__val">12</div><div class="mc__lbl">Bestellungen</div></div></div>
+        </div></div></label>
+      <label class="opt"><input type="radio" name="q3" value="B">
+        <div class="opt__head"><span class="opt__letter">B</span><span class="opt__title">Breitere Leitkarte</span></div>
+        <div class="opt__note">Provision breiter und größer, Trend als Text; neutrale Icons statt leerer Kreise.</div>
+        <div class="opt__stage"><div class="metrics metrics--lead">
+          <div class="mc mc--lead"><span class="mc__icon mc__icon--up"><svg><use href="#i-up"/></svg></span><div><div class="mc__val">412,50 €</div><div class="mc__lbl">Provision</div><div class="mc__trend">+12 % ggü. Vormonat</div></div></div>
+          <div class="mc"><span class="mc__icon"><svg><use href="#i-trend"/></svg></span><div><div class="mc__val">4.125 €</div><div class="mc__lbl">Umsatz</div></div></div>
+          <div class="mc"><span class="mc__icon"><svg><use href="#i-check"/></svg></span><div><div class="mc__val">12</div><div class="mc__lbl">Bestellungen</div></div></div>
+        </div></div></label>
+      <label class="opt"><input type="radio" name="q3" value="C">
+        <div class="opt__head"><span class="opt__letter">C</span><span class="opt__title">Leitzeile in Akzentfläche</span></div>
+        <div class="opt__note">Provision als ganze Zeile auf hellem Akzent, darunter zwei kleine Karten.</div>
+        <div class="opt__stage"><div class="metrics metrics--band">
+          <div class="mc mc--lead"><span class="mc__icon"><svg><use href="#i-pct"/></svg></span><div><div class="mc__val">412,50 €</div><div class="mc__lbl">Provision diesen Monat</div><div class="mc__trend">+12 % ggü. Vormonat</div></div></div>
+          <div class="mc"><span class="mc__icon"><svg><use href="#i-trend"/></svg></span><div><div class="mc__val">4.125 €</div><div class="mc__lbl">Umsatz</div></div></div>
+          <div class="mc"><span class="mc__icon"><svg><use href="#i-check"/></svg></span><div><div class="mc__val">12</div><div class="mc__lbl">Bestellungen</div></div></div>
+        </div></div></label>
+    </div>
+  </section>
+
+  <section class="q" data-q="4">
+    <h2>4 · Schritte im Bestell-Wizard</h2>
+    <p>Task 4.2: erledigt, aktuell und offen ohne Farbe unterscheidbar. Beispiel: Partner ist bei Schritt 2.</p>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q4" value="A">
+        <div class="opt__head"><span class="opt__letter">A</span><span class="opt__title">Heute</span></div>
+        <div class="opt__note">Erledigt und aktuell sind gleich gefüllt, nur ✓ vs. Zahl.</div>
+        <div class="opt__stage"><ol class="steps"><li class="step done"><span class="mk"><svg><use href="#i-check"/></svg></span><span class="sl">Endkunde</span></li><li class="step cur"><span class="mk">2</span><span class="sl">Artikel wählen</span></li><li class="step"><span class="mk">3</span><span class="sl">Übersicht</span></li><li class="step"><span class="mk">4</span><span class="sl">Erfolg</span></li></ol></div></label>
+      <label class="opt"><input type="radio" name="q4" value="B">
+        <div class="opt__head"><span class="opt__letter">B</span><span class="opt__title">Aktueller Schritt mit Ring</span></div>
+        <div class="opt__note">Aktuell = weißer Kreis mit Ring + fettes Label, erledigt = gefüllt mit ✓; dazu „Schritt 2 von 4“.</div>
+        <div class="opt__stage"><ol class="steps steps--ring"><li class="step done"><span class="mk"><svg><use href="#i-check"/></svg></span><span class="sl">Endkunde</span></li><li class="step cur"><span class="mk">2</span><span class="sl">Artikel wählen</span></li><li class="step"><span class="mk">3</span><span class="sl">Übersicht</span></li><li class="step"><span class="mk">4</span><span class="sl">Erfolg</span></li></ol><span class="steps-caption">Schritt <b>2 von 4</b> · Artikel wählen</span></div></label>
+      <label class="opt"><input type="radio" name="q4" value="C">
+        <div class="opt__head"><span class="opt__letter">C</span><span class="opt__title">Fortschrittsbalken</span></div>
+        <div class="opt__note">Kompakt, gut am Handy: Text oben, Segmente, Namen mit ✓.</div>
+        <div class="opt__stage"><div class="bar"><div class="bar__text"><b>Artikel wählen</b><span>Schritt 2 von 4</span></div><div class="bar__track"><span class="bar__seg done"></span><span class="bar__seg cur"></span><span class="bar__seg"></span><span class="bar__seg"></span></div><div class="bar__names"><span class="done">Endkunde</span><span class="cur">Artikel</span><span>Übersicht</span><span>Erfolg</span></div></div></div></label>
+    </div>
+  </section>
+
+  <section class="q" data-q="5">
+    <h2>5 · Listen am Handy (390 px)</h2>
+    <p>Task 3.1: Bestellungen, Endkunden, Partner, Artikel. Desktop bleibt Tabelle.</p>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q5" value="A">
+        <div class="opt__head"><span class="opt__letter">A</span><span class="opt__title">Heute</span></div>
+        <div class="opt__note">Tabelle, seitlich wischen.</div>
+        <div class="opt__stage"><div class="phone"><div class="phone__title">Meine Bestellungen</div><div class="tbl-scroll"><table class="tbl"><tr><th>Datum</th><th>Endkunde</th><th>Wert</th><th>Status</th></tr><tr><td>14.10.2026</td><td>Huber, Anna</td><td>248,00 €</td><td><span class="badge badge--sub">Eingereicht</span></td></tr><tr><td>12.10.2026</td><td>Müller, Max</td><td>96,50 €</td><td><span class="badge badge--rev">Geprüft</span></td></tr><tr><td>09.10.2026</td><td>Gruber, Eva</td><td>1.120,00 €</td><td><span class="badge badge--ful">Abgeschlossen</span></td></tr></table></div></div></div></label>
+      <label class="opt"><input type="radio" name="q5" value="B">
+        <div class="opt__head"><span class="opt__letter">B</span><span class="opt__title">Karten mit Feldnamen</span></div>
+        <div class="opt__note">Jede Zeile eine Karte, jedes Feld beschriftet (wie im Spec). Klar, aber länger.</div>
+        <div class="opt__stage"><div class="phone"><div class="phone__title">Meine Bestellungen</div><div class="cards">
+          <div class="lc"><dl><dt>Datum</dt><dd>14.10.2026</dd><dt>Endkunde</dt><dd>Huber, Anna</dd><dt>Wert</dt><dd>248,00 €</dd><dt>Status</dt><dd><span class="badge badge--sub">Eingereicht</span></dd></dl></div>
+          <div class="lc"><dl><dt>Datum</dt><dd>12.10.2026</dd><dt>Endkunde</dt><dd>Müller, Max</dd><dt>Wert</dt><dd>96,50 €</dd><dt>Status</dt><dd><span class="badge badge--rev">Geprüft</span></dd></dl></div>
+        </div></div></div></label>
+      <label class="opt"><input type="radio" name="q5" value="C">
+        <div class="opt__head"><span class="opt__letter">C</span><span class="opt__title">Kompakte Zweizeiler</span></div>
+        <div class="opt__note">Wichtigstes oben (Endkunde, Betrag), darunter Datum + Status. Mehr Einträge pro Bildschirm.</div>
+        <div class="opt__stage"><div class="phone"><div class="phone__title">Meine Bestellungen</div><div class="cards">
+          <div class="lc2"><b>Huber, Anna</b><span class="amt">248,00 €</span><span class="sub">14.10.2026</span><span class="badge badge--sub">Eingereicht</span></div>
+          <div class="lc2"><b>Müller, Max</b><span class="amt">96,50 €</span><span class="sub">12.10.2026</span><span class="badge badge--rev">Geprüft</span></div>
+          <div class="lc2"><b>Gruber, Eva</b><span class="amt">1.120,00 €</span><span class="sub">09.10.2026</span><span class="badge badge--ful">Abgeschlossen</span></div>
+        </div></div></div></label>
+    </div>
+  </section>
+
+  <section class="q" data-q="6">
+    <h2>6 · Leer- und Fehlerzustände</h2>
+    <p>Task 3.2: ein gemeinsames Muster für alle Listen.</p>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q6" value="A">
+        <div class="opt__head"><span class="opt__letter">A</span><span class="opt__title">Heute</span></div>
+        <div class="opt__note">Nur grauer Text, Fehler je Seite unterschiedlich.</div>
+        <div class="opt__stage"><div class="state state--plain">Keine Bestellungen vorhanden.</div></div></label>
+      <label class="opt"><input type="radio" name="q6" value="B">
+        <div class="opt__head"><span class="opt__letter">B</span><span class="opt__title">Icon + Titel + Hinweis</span></div>
+        <div class="opt__note">Ruhig, erklärt den nächsten Schritt; Fehler mit „Erneut laden“.</div>
+        <div class="opt__stage">
+          <div class="state"><svg><use href="#i-inbox"/></svg><div class="state__t">Noch keine Bestellungen</div><div class="state__d">Neue Bestellungen erscheinen hier, sobald Sie eine anlegen.</div></div>
+          <div class="state state--err"><svg><use href="#i-alert"/></svg><div class="state__t">Liste konnte nicht geladen werden</div><button class="btn-sec" type="button">Erneut laden</button></div>
+        </div></label>
+      <label class="opt"><input type="radio" name="q6" value="C">
+        <div class="opt__head"><span class="opt__letter">C</span><span class="opt__title">Mit Aktion</span></div>
+        <div class="opt__note">Wie B, im Leerzustand zusätzlich die passende Hauptaktion (motivierend).</div>
+        <div class="opt__stage">
+          <div class="state"><svg><use href="#i-inbox"/></svg><div class="state__t">Noch keine Bestellungen</div><div class="state__d">Legen Sie Ihre erste Bestellung für einen Endkunden an.</div><button class="btn b-deep" type="button"><svg><use href="#i-plus"/></svg>Neue Bestellung</button></div>
+          <div class="state state--err"><svg><use href="#i-alert"/></svg><div class="state__t">Liste konnte nicht geladen werden</div><button class="btn-sec" type="button"><svg width="16" height="16" style="width:1rem;height:1rem;color:inherit"><use href="#i-refresh"/></svg> Erneut laden</button></div>
+        </div></label>
+    </div>
+  </section>
+</main>
+
+<div class="summary" role="status">
+  <span>Auswahl:</span><code id="sel">–</code>
+  <button type="button" id="copy">Kopieren</button>
+</div>
+
+<script>
+  const sel = document.getElementById("sel");
+  const KEY = "papo-varianten";
+  function update() {
+    const picks = [1, 2, 3, 4, 5, 6].map((n) => {
+      const c = document.querySelector(`input[name="q${n}"]:checked`);
+      return `${n}${c ? c.value : "?"}`;
+    });
+    sel.textContent = picks.join(" ");
+    try { localStorage.setItem(KEY, sel.textContent); } catch (e) {}
+  }
+  try {
+    (localStorage.getItem(KEY) || "").split(" ").forEach((p) => {
+      const input = document.querySelector(`input[name="q${p[0]}"][value="${p[1]}"]`);
+      if (input) input.checked = true;
+    });
+  } catch (e) {}
+  document.addEventListener("change", update);
+  document.getElementById("copy").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(sel.textContent); document.getElementById("copy").textContent = "Kopiert"; } catch (e) {}
+  });
+  update();
+</script>
+</body>
+</html>

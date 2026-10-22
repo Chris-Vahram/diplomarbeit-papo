@@ -27,7 +27,7 @@ class PartnerShopPage extends HTMLElement {
           <dt>Öffentlicher Link</dt><dd id="shop-link"></dd>
         </dl>
         <p id="shop-error" class="trade-proof-card__error" role="alert" hidden></p>
-        <button type="button" id="shop-retry" hidden>Erneut laden</button>
+        <button type="button" class="button-secondary" id="shop-retry" hidden>Erneut laden</button>
       </section>
       <shop-page-thumbnails></shop-page-thumbnails>
     `;

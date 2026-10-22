@@ -196,7 +196,11 @@ class PartnerOrderNewPage extends HTMLElement {
           </button>
         </li>`;
     }).join("");
-    return `<ol class="wizard-checkpoints">${items}</ol>`;
+    // Text step indicator next to the markers (decision 4B) - progress never by colour alone.
+    return `<div class="wizard-progress">
+        <ol class="wizard-checkpoints">${items}</ol>
+        <p class="wizard-progress__text">Schritt <strong>${currentIndex + 1} von ${STEPS.length}</strong> · ${escapeHtml(STEP_LABELS[this.state.step])}</p>
+      </div>`;
   }
 
   wireCheckpointBar() {
@@ -206,7 +210,7 @@ class PartnerOrderNewPage extends HTMLElement {
   }
 
   refreshCheckpointBar() {
-    const bar = this.content.querySelector(".wizard-checkpoints");
+    const bar = this.content.querySelector(".wizard-progress");
     if (!bar) return;
     bar.outerHTML = this.checkpointBarHtml();
     this.wireCheckpointBar();

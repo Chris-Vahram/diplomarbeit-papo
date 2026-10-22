@@ -139,14 +139,15 @@ class CompanyPartnerListPage extends HTMLElement {
 
     this.table = this.querySelector("#partner-table");
     this.table.columns = [
-      { key: "partnerNumber", label: "Nr." },
-      { key: "name", label: "Name" },
-      { key: "commissionLabel", label: "Provision" },
-      { key: "statusBadge", label: "Status", html: true },
+      { key: "partnerNumber", label: "Nr.", mobile: "meta" },
+      { key: "name", label: "Name", mobile: "title" },
+      { key: "commissionLabel", label: "Provision", mobile: "amount" },
+      { key: "statusBadge", label: "Status", html: true, mobile: "status" },
       { key: "proofStatus", label: "Nachweis" },
       { key: "actions", label: "", html: true },
     ];
     this.table.emptyMessage = "Noch keine Partner angelegt.";
+    this.table.retry = () => this.load();
     this.table.searchKeys = ["name", "partnerNumber"];
     this.table.pageSize = 20;
     this.table.filters = [
@@ -170,10 +171,10 @@ class CompanyPartnerListPage extends HTMLElement {
     this.enablementModal = this.querySelector("#enablement-modal");
     this.enablementTable = this.querySelector("#enablement-table");
     this.enablementTable.columns = [
-      { key: "name", label: "Name" },
-      { key: "priceLabel", label: "Preis (€)" },
-      { key: "category", label: "Artikelkategorie" },
-      { key: "enabledCheckbox", label: "Freigeschaltet", html: true },
+      { key: "name", label: "Name", mobile: "title" },
+      { key: "priceLabel", label: "Preis (€)", mobile: "amount" },
+      { key: "category", label: "Artikelkategorie", mobile: "meta" },
+      { key: "enabledCheckbox", label: "Freigeschaltet", html: true, mobile: "status" },
     ];
     this.enablementTable.emptyMessage = "Noch keine Artikel angelegt.";
     this.proofModal = this.querySelector("#proof-modal");
@@ -275,7 +276,7 @@ class CompanyPartnerListPage extends HTMLElement {
       const requestedPartnerId = new URLSearchParams(location.hash.split("?")[1] ?? "").get("enablement");
       if (requestedPartnerId) await this.openEnablement(requestedPartnerId);
     } catch (error) {
-      showToast(error.message, "error");
+      this.table.error = error.message;
     }
   }
 
@@ -503,7 +504,7 @@ class CompanyPartnerListPage extends HTMLElement {
           <li class="login-list__item${l.revokedAt ? " login-list__item--revoked" : ""}">
             <code>${escapeHtml(l.oidcSubject)}</code>
             <span>${l.revokedAt ? `entfernt am ${formatDate(l.revokedAt.slice(0, 10))}` : `seit ${formatDate(l.createdAt.slice(0, 10))}`}</span>
-            ${l.revokedAt ? "" : `<button type="button" class="row-actions__secondary" data-revoke-login-id="${l.id}">Entfernen</button>`}
+            ${l.revokedAt ? "" : `<button type="button" class="button-danger" data-revoke-login-id="${l.id}">Entfernen</button>`}
           </li>`).join("");
     } catch (error) {
       if (partnerId !== this.loginsPartnerId) return;
