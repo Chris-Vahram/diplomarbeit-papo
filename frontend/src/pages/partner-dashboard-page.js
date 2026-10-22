@@ -1,10 +1,10 @@
 import { apiFetch } from "../lib/api.js";
 import { ensureValidSession, getSession } from "../lib/auth.js";
-import { showToast } from "../components/toast-notice.js";
 import { formatEuro, formatNumber, formatDate } from "../lib/format.js";
 import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue, previousPeriod, trendInfo, trailingWindowTrend, toLocalIsoDate, presetPeriod } from "../lib/dashboard-data.js";
 import { escapeHtml } from "../lib/html.js";
 import { renderMonthChart, periodPickerHtml, wirePeriodPicker } from "../lib/dashboard-ui.js";
+import { stateHtml } from "../lib/states.js";
 
 const eur = new Intl.NumberFormat("de-AT", { style: "currency", currency: "EUR" });
 
@@ -50,12 +50,15 @@ class PartnerDashboardPage extends HTMLElement {
     this.chartRow = this.querySelector("#chart-row");
     this.table = this.querySelector("#latest-orders-table");
     this.table.columns = [
-      { key: "orderDate", label: "Datum" },
-      { key: "kundeName", label: "Endkunde" },
-      { key: "orderValueLabel", label: "Wert (€)" },
-      { key: "statusBadge", label: "Status", html: true },
+      { key: "orderDate", label: "Datum", mobile: "meta" },
+      { key: "kundeName", label: "Endkunde", mobile: "title" },
+      { key: "orderValueLabel", label: "Wert (€)", mobile: "amount" },
+      { key: "statusBadge", label: "Status", html: true, mobile: "status" },
     ];
     this.table.emptyMessage = "Noch keine Bestellungen vorhanden.";
+    this.table.emptyHint = "Legen Sie Ihre erste Bestellung für einen Endkunden an.";
+    this.table.emptyAction = `<a class="button-primary" href="#/partner/orders/new">Neue Bestellung</a>`;
+    this.table.retry = () => this.load();
 
     this.querySelector("#new-order-btn").addEventListener("click", () => {
       location.hash = "#/partner/orders/new";
@@ -103,7 +106,7 @@ class PartnerDashboardPage extends HTMLElement {
       this.orders = orders;
       this.render();
     } catch (error) {
-      showToast(error.message, "error");
+      this.table.error = error.message;
     }
   }
 
@@ -146,7 +149,7 @@ class PartnerDashboardPage extends HTMLElement {
     const monthly = monthlyRevenue(this.orders, keys);
 
     this.metricRow.innerHTML = `
-      <metric-card label="Provision (abgeschlossen)" value="${formatEuro(commission)}" icon="percent" ${trendAttrs(commissionTrend)}></metric-card>
+      <metric-card lead label="Provision (abgeschlossen)" value="${formatEuro(commission)}" icon="percent" ${trendAttrs(commissionTrend)}></metric-card>
       <metric-card label="Umsatz (abgeschlossen)" value="${formatEuro(revenue)}" icon="trending-up" ${trendAttrs(revenueTrend)}></metric-card>
       <metric-card label="Abgeschlossene Bestellungen" value="${count}" icon="check-circle" ${trendAttrs(countTrend)}></metric-card>
       <metric-card label="Freigeschaltete Artikel" value="${this.base.enabledProductCount}" ring="${ringPct}" ring-layout="full" ring-caption="von ${total} Artikeln"></metric-card>
@@ -225,7 +228,7 @@ class PartnerDashboardPage extends HTMLElement {
     return `
       <div class="chart-card">
         <h3 class="chart-card__title">Top-Endkunden im gewählten Zeitraum</h3>
-        <div class="bar-chart">${bars || '<p class="data-table__empty">Keine Bestellungen im gewählten Zeitraum.</p>'}</div>
+        <div class="bar-chart">${bars || stateHtml("empty", "Keine Bestellungen im gewählten Zeitraum.")}</div>
       </div>
       <div class="chart-card">
         <h3 class="chart-card__title">Bestellstatus</h3>

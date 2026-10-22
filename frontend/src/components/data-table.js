@@ -1,4 +1,5 @@
 import { escapeHtml } from "../lib/html.js";
+import { stateHtml } from "../lib/states.js";
 
 // Set .columns = [{ key, label, html?, image? }] and .rows = [{...}] as JS properties (not
 // attributes). Cell values are HTML-escaped by default (row data may contain partner/Kunde/
@@ -23,6 +24,12 @@ import { escapeHtml } from "../lib/html.js";
 // "row-click" CustomEvent with detail.id = row[rowKey], for callers to open a details overlay.
 // Optional per-row `rowClass` field (e.g. row.rowClass = "data-table__row--unseen") adds that
 // class to the <tr> - for row-level state that isn't its own column (e.g. "new" highlighting).
+// Optional column `mobile`: "title" | "amount" | "meta" | "status" | "hide" places that cell in
+// the compact two-line card below 640px (title + amount on top, meta + status below); columns
+// without a slot follow as labelled lines. A unit in the label ("Wert (€)") is appended to amounts.
+// States: the table shows "Wird geladen…" until rows are set. Set .error = "message" after a
+// failed read and .retry = () => reload() to offer "Erneut laden" (repeats only the read).
+// Optional .emptyHint = "..." and .emptyAction = "<a …>" (trusted markup) for the empty state.
 class DataTable extends HTMLElement {
   constructor() {
     super();
@@ -36,6 +43,11 @@ class DataTable extends HTMLElement {
     this._filterDefs = [];
     this._filterValues = {};
     this._rowKey = null;
+    this._loading = true;
+    this._error = null;
+    this._retry = null;
+    this._emptyHint = "";
+    this._emptyAction = "";
   }
 
   set columns(cols) {
@@ -46,6 +58,28 @@ class DataTable extends HTMLElement {
   set rows(rows) {
     this._rows = rows ?? [];
     this._page = 1;
+    this._loading = false;
+    this._error = null;
+    this.render();
+  }
+
+  set error(message) {
+    this._error = message;
+    this._loading = false;
+    this.render();
+  }
+
+  set retry(fn) {
+    this._retry = fn;
+  }
+
+  set emptyHint(hint) {
+    this._emptyHint = hint;
+    this.render();
+  }
+
+  set emptyAction(html) {
+    this._emptyAction = html;
     this.render();
   }
 
@@ -126,6 +160,13 @@ class DataTable extends HTMLElement {
       }
     });
     this.addEventListener("click", (event) => {
+      if (event.target.closest("[data-table-retry]")) {
+        this._loading = true;
+        this._error = null;
+        this.render();
+        this._retry?.();
+        return;
+      }
       if (event.target.closest("[data-table-reset]")) {
         this._searchQuery = "";
         for (const def of this._filterDefs) {
@@ -162,6 +203,14 @@ class DataTable extends HTMLElement {
       true,
     );
     this.render();
+  }
+
+  _cellAttrs(column) {
+    const label = String(column.label ?? "");
+    const unit = label.match(/\(([^)]+)\)$/)?.[1];
+    return (column.mobile ? ` data-mobile="${column.mobile}"` : "")
+      + (label ? ` data-label="${escapeHtml(label.replace(/\s*\([^)]*\)$/, ""))}"` : "")
+      + (unit && column.mobile === "amount" ? ` data-unit="${escapeHtml(unit)}"` : "");
   }
 
   _renderImageCell(value) {
@@ -227,9 +276,23 @@ class DataTable extends HTMLElement {
       </div>`;
   }
 
+  _renderState(html) {
+    this.innerHTML = html;
+    window.lucide?.createIcons();
+  }
+
   render() {
+    if (this._error) {
+      const retry = this._retry ? `<button type="button" class="button-secondary" data-table-retry>Erneut laden</button>` : "";
+      this._renderState(stateHtml("error", "Die Liste konnte nicht geladen werden.", { hint: this._error, action: retry }));
+      return;
+    }
+    if (this._loading) {
+      this._renderState(stateHtml("loading", "Wird geladen…"));
+      return;
+    }
     if (this._rows.length === 0) {
-      this.innerHTML = `<p class="data-table__empty">${this._emptyMessage}</p>`;
+      this._renderState(stateHtml("empty", this._emptyMessage, { hint: this._emptyHint, action: this._emptyAction }));
       return;
     }
 
@@ -242,7 +305,7 @@ class DataTable extends HTMLElement {
       : "";
     const resetHtml =
       searchHtml || filtersHtml
-        ? `<button type="button" class="data-table__reset" data-table-reset>Filter zurücksetzen</button>`
+        ? `<button type="button" class="button-ghost" data-table-reset>Filter zurücksetzen</button>`
         : "";
     const toolbarHtml = searchHtml || filtersHtml
       ? `<div class="data-table__toolbar">${searchHtml}${filtersHtml}${resetHtml}</div>`
@@ -250,7 +313,8 @@ class DataTable extends HTMLElement {
 
     const filtered = this._filteredRows();
     if (filtered.length === 0) {
-      this.innerHTML = `${toolbarHtml}<p class="data-table__empty">Keine Treffer.</p>`;
+      this.innerHTML = `${toolbarHtml}${stateHtml("empty", "Keine Treffer.", { hint: "Passen Sie Suche oder Filter an." })}`;
+      window.lucide?.createIcons();
       return;
     }
 
@@ -269,8 +333,9 @@ class DataTable extends HTMLElement {
         const cells = this._columns
           .map((c) => {
             const value = row[c.key] ?? "";
-            if (c.image) return `<td>${this._renderImageCell(value)}</td>`;
-            return `<td>${c.html ? value : escapeHtml(value)}</td>`;
+            const attrs = this._cellAttrs(c);
+            if (c.image) return `<td${attrs}>${this._renderImageCell(value)}</td>`;
+            return `<td${attrs}>${c.html ? value : escapeHtml(value)}</td>`;
           })
           .join("");
         const classes = [this._rowKey ? "data-table__row--clickable" : "", row.rowClass ?? ""]

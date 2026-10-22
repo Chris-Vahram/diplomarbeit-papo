@@ -1,5 +1,4 @@
 import { apiFetch } from "../lib/api.js";
-import { showToast } from "../components/toast-notice.js";
 import { formatNumber } from "../lib/format.js";
 import { resolveImageUrls } from "../lib/product-images.js";
 
@@ -13,12 +12,14 @@ class PartnerProductListPage extends HTMLElement {
 
     this.table = this.querySelector("#product-table");
     this.table.columns = [
-      { key: "imageUrl", label: "Bild", image: true },
-      { key: "name", label: "Name" },
-      { key: "priceLabel", label: "Preis (€)" },
-      { key: "category", label: "Artikelkategorie" },
+      { key: "imageUrl", label: "Bild", image: true, mobile: "hide" },
+      { key: "name", label: "Name", mobile: "title" },
+      { key: "priceLabel", label: "Preis (€)", mobile: "amount" },
+      { key: "category", label: "Artikelkategorie", mobile: "meta" },
     ];
     this.table.emptyMessage = "Noch keine Artikel für Sie freigeschaltet.";
+    this.table.emptyHint = "Die Firma schaltet Artikel für Sie frei.";
+    this.table.retry = () => this.load();
     this.table.searchKeys = ["name"];
     this.table.pageSize = 20;
 
@@ -40,7 +41,7 @@ class PartnerProductListPage extends HTMLElement {
       }));
       this.table.rows = await resolveImageUrls(rows);
     } catch (error) {
-      showToast(error.message, "error");
+      this.table.error = error.message;
     }
   }
 }

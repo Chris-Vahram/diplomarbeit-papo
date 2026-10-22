@@ -1,11 +1,22 @@
 # PAPO – Next-Session-Context
 
-**Stand:** 16.10.2026 (lokales Datum geprüft). Operative Übergabe; volatile Angaben beim Start prüfen.
+**Stand:** 22.10.2026. Operative Übergabe; volatile Angaben beim Start prüfen.
 Stabile Regeln stehen in `AGENTS.md` und `CLAUDE.md`. Der beschlossene/noch zu
 beschließende Ausbau ist in [PRODUCT_COMPLETION_PLAN.md](PRODUCT_COMPLETION_PLAN.md)
 geordnet. Dieses Dokument bleibt der einzige operative Session-Handoff.
 
-## Stand 16.10.2026 — hier einsteigen
+## Stand 22.10.2026 — hier einsteigen
+
+`refine-portal-frontend` ist umgesetzt (Branch `feat/refine-portal-frontend`, lokal committet, nicht
+gepusht). Offen nur Task 5.2: Tobias' visuelle Abnahme der Nachher-Screenshots
+`output/playwright/refine-*-after.png` (Vorher: `*-before.png`), danach Push/PR/Merge/Deploy mit
+Chris' OK und Archivieren. Entscheidungen 1B 2C 3C 4B 5C 6C in `DESIGN.md`. Leitkennzahl Firma =
+Umsatz (Vorschlag, Chris bestätigen lassen). Geprüft: `node --check` aller Module, `git diff --check`,
+`openspec validate --strict`, impeccable detect (nur bekannte Altbefunde), Playwright Desktop/Mobil
+aller 13 Seiten, Fehlerzustand + „Erneut laden“, Bestellung bis „Erfolg“, Endkunde bearbeiten,
+Logins-Dialog, Mail-Status. Lokal dabei eine Demo-Bestellung angelegt (Dev-DB).
+
+## Stand 16.10.2026 — vorheriger Stand
 
 **Live auf paportal.at (main, alle Deploys grün, live geprüft):**
 - B-08 Firmen-Trendpfeile (archiviert), Zeitraum-Presets/Partner-Navigation/Endkunden bearbeiten (12.10.-Feedback).

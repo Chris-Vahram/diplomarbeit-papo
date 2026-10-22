@@ -1,5 +1,4 @@
 import { apiFetch } from "../lib/api.js";
-import { showToast } from "../components/toast-notice.js";
 import { formatEuro, formatNumber } from "../lib/format.js";
 import { filterByPeriod, fulfilledTotals, trailingMonths, monthlyRevenue, toLocalIsoDate, presetPeriod, previousPeriod, periodTrends, trailingWindowTrend } from "../lib/dashboard-data.js";
 import { escapeHtml } from "../lib/html.js";
@@ -35,12 +34,13 @@ class CompanyDashboardPage extends HTMLElement {
     this.chartRow = this.querySelector("#chart-row");
     this.table = this.querySelector("#settlement-table");
     this.table.columns = [
-      { key: "partnerName", label: "Partner" },
+      { key: "partnerName", label: "Partner", mobile: "title" },
       { key: "fulfilledOrderCount", label: "Abgeschlossene Bestellungen" },
       { key: "revenueLabel", label: "Umsatz (€)" },
-      { key: "commissionLabel", label: "Provision (€)" },
+      { key: "commissionLabel", label: "Provision (€)", mobile: "amount" },
     ];
     this.table.emptyMessage = "Noch keine Partner angelegt.";
+    this.table.retry = () => this.load();
     this.table.searchKeys = ["partnerName"];
     this.table.pageSize = 20;
 
@@ -60,7 +60,7 @@ class CompanyDashboardPage extends HTMLElement {
       this.orders = orders;
       this.render();
     } catch (error) {
-      showToast(error.message, "error");
+      this.table.error = error.message;
     }
   }
 
@@ -95,7 +95,7 @@ class CompanyDashboardPage extends HTMLElement {
     const monthly = monthlyRevenue(this.orders, keys);
 
     this.metricRow.innerHTML = `
-      <metric-card label="Umsatz (abgeschlossen)" value="${formatEuro(revenue)}" icon="trending-up" tone="positive" ${trendAttrs(trends.revenueTrend)}></metric-card>
+      <metric-card lead label="Umsatz (abgeschlossen)" value="${formatEuro(revenue)}" icon="trending-up" tone="positive" ${trendAttrs(trends.revenueTrend)}></metric-card>
       <metric-card label="Provision (abgeschlossen)" value="${formatEuro(commission)}" icon="percent" tone="positive" ${trendAttrs(trends.commissionTrend)}></metric-card>
       <metric-card label="Abgeschlossene Bestellungen" value="${count}" icon="check-circle" tone="positive" ${trendAttrs(trends.countTrend)}></metric-card>
       <metric-card label="Ø Bestellwert" value="${formatEuro(avgOrderValue)}" icon="receipt" tone="positive" ${trendAttrs(trends.avgTrend)}></metric-card>

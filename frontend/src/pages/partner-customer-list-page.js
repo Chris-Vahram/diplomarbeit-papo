@@ -61,9 +61,9 @@ class PartnerCustomerListPage extends HTMLElement {
 
     this.table = this.querySelector("#customer-table");
     this.table.columns = [
-      { key: "name", label: "Name" },
+      { key: "name", label: "Name", mobile: "title" },
       { key: "addressLabel", label: "Adresse" },
-      { key: "lastOrderCell", label: "Letzte Bestellung", html: true },
+      { key: "lastOrderCell", label: "Letzte Bestellung", html: true, mobile: "meta" },
       { key: "actions", label: "", html: true },
     ];
     this.table.filters = [
@@ -78,6 +78,7 @@ class PartnerCustomerListPage extends HTMLElement {
       },
     ];
     this.table.emptyMessage = "Noch keine Endkunden angelegt.";
+    this.table.retry = () => this.load();
     this.table.searchKeys = ["name"];
     this.table.pageSize = 20;
 
@@ -276,7 +277,7 @@ class PartnerCustomerListPage extends HTMLElement {
         this.showStatus("Endkunde angelegt. Liste konnte nicht aktualisiert werden.", { retry: true });
         return;
       }
-      showToast(error.message, "error");
+      this.table.error = error.message;
     }
   }
 }
