@@ -97,6 +97,8 @@
 | AUSSTEHEND-438af9ec | 2026-07-04 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `438af9ec-64d8-4f0f-a077-980165157ec0` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 | AUSSTEHEND-1798d34e | 2026-07-01 | Chris | Claude Code | Fachliche Einordnung offen | lokale Sitzung `1798d34e-c42d-4563-9b77-f50fe6084679` | `AUSSTEHEND` | Automatisch privat gesichert; Zusammenfassung und Prüfung nachtragen |
 
+| AUSSTEHEND-e3dc93a9 | 2026-10-16 | Chris | Claude Code | refine-portal-frontend Tasks 3.2-5.1 | lokale Sitzung `e3dc93a9-fb82-40ac-9626-6b853f96b991` | `EXAKT` | Zustände, Leitkennzahl, Wizard umgesetzt; Change bis auf Tobias-Abnahme fertig, lokal committet; Prüfungen: Playwright Desktop/Mobil 13 Seiten + Abläufe, impeccable detect, node --check, git diff --check, openspec validate --strict |
+
 ## Noch rückwirkend aufzunehmen
 
 - 23 primäre Claude-Code-Sitzungen vom 01.07. bis 17.07.2026;
