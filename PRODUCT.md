@@ -2,59 +2,77 @@
 
 <!-- impeccable:product-schema 1 -->
 
+<!-- Zusammengeführt am 22.10.2026 aus Chris' Fassung (init-Interview 16.10.) und Tobias'
+     Fassung (Branch docs/impeccable-product-context, 21.10.). Wo beide abweichen, gelten
+     Chris' bestätigte Interview-Antworten (Nutzung, WCAG-Stufe, Ton). -->
+
 ## Platform
 
 web
 
 ## Users
 
-- **Company (Unternehmen):** internal staff of the reference company (unnamed, roughly 100 partners). They manage partners, commission rates, articles and categories, import partner/article data, enable articles per partner, review all orders and advance their status (submitted → reviewed → fulfilled). Mainly desktop.
-- **Partner:** sales partner companies, one shared organizational login per partner company in the current stage. They select or create an end customer (Kunde), order several articles on the customer's behalf, and follow their own orders and commission. Mainly desktop; mobile use is occasional but must work.
-- **End customer (Endkunde):** receives the goods and the order confirmation; does not use the internal portal. A public partner shop is a separate, later stage (Tobias' shop changes).
+Zwei gleichrangige Hauptnutzergruppen, dazu eine dritte Gruppe im Shop:
+
+- **Unternehmen (Rolle `company`):** Sachbearbeitung im Backoffice, am Desktop. Wickelt eingehende Bestellungen ab (Status `submitted -> reviewed -> fulfilled`), pflegt Partner (inkl. Provisionssatz, aktiv/inaktiv), Artikel und Kategorien, importiert Excel/CSV, schaltet Artikel je Partner frei, verknüpft Logins, sieht alle Bestellungen und Provisionen.
+- **Partner (Rolle `partner`):** Vertriebsfirmen des Unternehmens (Referenzkunde: ca. 100 Partner). Bestellen im Namen ihrer Endkunden: Endkunden auswählen oder anlegen, mehrere Artikel mit Mengen bestellen, eigene Bestellungen und Provision verfolgen. Überwiegend am Desktop; gelegentlich am Handy, dort muss alles ohne seitliches Scrollen funktionieren. Das Dashboard ist der Einstieg.
+- **Endkunden:** nutzen das interne Portal nicht. Im Endkundenshop (Phase 2) sind sie öffentliche Besucher eines Partner-Shops und bestellen als Gast.
 
 ## Product Purpose
 
-PAPO is a company-independent, extensible B2B partner-ordering platform for partner-driven sales (Company → Partner → End Customer). The first stage replaces orders the company used to receive by e-mail and telephone with a structured internal portal. Success: a partner places a correct multi-article order for an end customer in a few steps, the order is assigned to the partner automatically, and the company processes it without re-typing.
+PAPO ist eine webbasierte, unternehmensunabhängige und erweiterbare B2B-Partnerbestellplattform für partnergetriebene Vertriebsmodelle (Kette Unternehmen -> Partner -> Endkunde). Die erste Stufe ersetzt Bestellungen per E-Mail und Telefon durch einen internen Bestellprozess mit automatischer Partnerzuordnung und Provision je Bestellung.
+
+Erfolg heißt: Ein Partner legt in wenigen Schritten eine korrekte Bestellung mit mehreren Artikeln für einen Endkunden an, die Bestellung ist automatisch ihm zugeordnet, und das Unternehmen wickelt alles an einer Stelle ab, ohne abzutippen. Provisionen sind nachvollziehbar.
+
+Phase 2 ergänzt „Mein Webshop“: Jeder Partner gestaltet per Baukasten einen eigenen öffentlichen Shop (`paportal.at/shop/<kennung>`), über den Endkunden direkt bestellen; diese Bestellungen laufen durch dieselbe Pipeline.
+
+PAPO ist der Produktname (HTL-Diplomarbeit, Chris + Tobias), nicht der Kunde. Der Referenzkunde bleibt ungenannt.
 
 ## Positioning
 
-Built around the partner chain rather than a generic shop: every order belongs to a partner and one of their end customers, each partner sees only their enabled articles and their own customers, orders and commission, and the commission is recorded per order. Article master data comes from the company's leading system (BMD) via import; PAPO does not compete with it.
+Gebaut für genau diese Dreiecksbeziehung statt als allgemeiner Webshop: Der Partner bestellt stellvertretend für seinen Endkunden, die Bestellung gehört automatisch zum Partner und erzeugt einen eigenen Provisionsdatensatz mit Preis-Snapshot. Partner sehen nur freigeschaltete Artikel und nur ihre eigenen Endkunden, Bestellungen und Provisionen. Der Partner-Shop nutzt dieselben Artikel, Preise und dieselbe Abwicklung des Unternehmens statt eines separaten Webshops; Verkäufer im rechtlichen Sinn bleibt das Unternehmen. Artikelstammdaten kommen aus dem führenden System des Unternehmens (BMD) per Import; PAPO baut keinen konkurrierenden Stammdatenbestand auf.
 
 ## Operating Context
 
-- Company staff work through lists, filters, dialogs and status changes in an office setting; partners use the dashboard as their landing screen and the guided "Neue Bestellung" wizard as the main action.
-- Data volumes at reference scale: ~200 partners, ~800 articles.
-- Deployed at `paportal.at` (demo data only; no real customer operation approved yet).
-- Thesis project (HTL Diplomarbeit): Chris implements, Tobias owns the visual design (`Design/`).
+- Ablauf Partner: Login (Keycloak) -> Dashboard -> „Neue Bestellung“ (geführter Ablauf: Endkunde wählen/anlegen, Artikel + Mengen, Übersicht) -> Bildschirmbestätigung + Bestell-E-Mail (B-04; Versand auf der VM aus, bis SMTP-Daten vorliegen).
+- Ablauf Unternehmen: Dashboard mit Zeitraum (Woche/Monat/Jahr, Standard Monat) -> Bestellliste mit Filtern -> Statuswechsel; Verwaltung von Partnern, Artikeln, Kategorien, Import, Firmenprofil; Mail-Statusansicht.
+- Shop: Baukasten im Partnerbereich (Seiten, Abschnitte, Design, Bilder), öffentliche Shopseiten, Gastbestellung ohne Online-Zahlung.
+- Datenmengen beim Referenzkunden: rund 200 Partner, rund 800 Artikel.
+- BMD ist das führende Artikel-Stammsystem; PAPO arbeitet derzeit mit Importdaten. Der Datenimport bleibt Dummy, bis Firmendaten vorliegen.
+- Live-Demo auf `paportal.at` (nur Demo-Daten, kein echter Kundenbetrieb). Abnahme durch Betreuer Prof. Hammer und den Referenzkunden in Besprechungen; Tobias verantwortet das visuelle Design.
 
 ## Capabilities and Constraints
 
-- Implemented: partner and article management, categories, Excel/CSV import with column mapping (dummy until company data exists), per-partner article enablement, end customers (create/edit, partner-scoped), multi-article orders with unit-price snapshot, status pipeline, per-order commission, dashboards with period presets and trends, order e-mails (prepared, disabled on the VM), personal partner logins bound to OIDC subjects, company profile and trade-proof upload.
-- Stack is fixed: static HTML/CSS/JavaScript with native Web Components (light DOM), no framework, build step, npm or CDN; Quarkus backend, PostgreSQL, Keycloak.
-- Terminology: user-facing term is **Artikel** (never alternating with "Produkt"); "Endkunde"/"Kunde", "Bestellung", "Provision". Status labels in German.
-- All UI text, validation and error messages in German with correct ä/ö/ü/ß.
-- Undecided: multi-company tenancy and personal company accounts (requested, separate changes), shop URL as path or subdomain, BMD article-number rules, commission settlement/payout.
+- Umgesetzt: Partner- und Artikelverwaltung, Kategorien, Excel/CSV-Import mit Spalten-Mapping, Artikelfreischaltung je Partner, Endkunden (anlegen/bearbeiten, je Partner getrennt), Bestellungen mit mehreren Artikeln und Preis-Snapshot, Statusablauf, Provision je Bestellung, Dashboards mit Zeitraum und Trends, Bestell-E-Mails (vorbereitet), Partner-Logins über Keycloak-Benutzer-ID (mehrere je Partner möglich), Firmenprofil, Gewerbenachweis, Shop-Renderer und Shop-Baukasten.
+- Stack fest: HTML, CSS, native Web Components (Light DOM) ohne Framework, Build-Schritt, npm oder CDN; Quarkus-Backend; PostgreSQL; Keycloak (Realm `partnerportal`, Rollen `company`/`partner`). Keine Alternativen vorschlagen.
+- Terminologie in der UI: **Artikel** (nicht Produkt), **Endkunde**, „Meine Endkunden“, „Meine Artikel“, „Mein Webshop“, „Bestellung“, „Provision“. Alle UI-Texte und Fehlermeldungen auf Deutsch, einfache Sprache, korrekte Umlaute ä/ö/ü/ß.
+- Geldwerte als `BigDecimal`; Provision = Prozent vom Bestellwert (Shop: vom Nettowert, vorläufige Entscheidung), je Bestellung als `CommissionRecord`.
+- Rollentrennung serverseitig: Partner sehen nur eigene Bestellungen, Endkunden und Provision und nur freigeschaltete Artikel; inaktive Partner werden serverseitig blockiert.
+- Shop-Baukasten: Abschnitte untereinander, keine freie Positionierung, kein freies HTML/CSS/JS, kuratierte selbst gehostete Schriften (kein Nachladen von Google Fonts), Bilder nur PNG/JPG/WebP.
+- Zuständigkeit: Shop-Dateien (`frontend/shop.html`, `frontend/src/shop/`, `frontend/src/shop-editor/`, Seiten `partner-shop-*`) gehören zu Tobias' Shop-Changes. Portalweite Designänderungen dürfen sie mitziehen (z. B. Rollen-Tokens), werden aber mit Tobias abgestimmt.
+- Offen: Subdomain oder Pfad für Shops (vorläufig Pfad), Mandantenfähigkeit und persönliche Konten mit Rollen/Audit (beschlossen, noch nicht spezifiziert), BMD-Schnittstelle, Provisionsabrechnung, Firmenregeln für Fachbereiche und Produktgruppen.
 
 ## Brand Commitments
 
-- Name: **PAPO** (the product, not the client). Domain `paportal.at`.
-- Voice: friendly and encouraging but factual. Partners should feel supported (their orders, revenue and commission are visible and easy to reach); no marketing language, no exaggeration. Formal address ("Sie").
-- Visual identity is defined by Tobias in `Design/` (role colours: green for company, blue for partner). It is authoritative; changes go through Tobias.
+- Name **PAPO**, Domain `paportal.at`.
+- Ton: freundlich und ermutigend, aber sachlich. Partner sollen sich unterstützt fühlen (ihre Bestellungen, ihr Umsatz und ihre Provision sind sichtbar und schnell erreichbar). Kein Marketington, keine Übertreibung. Anrede „Sie“.
+- Tobias' Design-System in `Design/` (Tokens, `variables.css`, Guidelines) ist die Grundlage: minimal, rollenunterscheidbar, datenorientiert, barrierefrei. Firmenbereich grün, Partnerbereich blau über einen gemeinsamen Akzent-Mechanismus. Die umgesetzte Ausprägung und die bestätigten Abweichungen stehen in `DESIGN.md`; visuelle Änderungen laufen über Tobias.
 
 ## Evidence on Hand
 
-- Demo data only (`DemoDataSeeder`, demo users `company-demo` / `partner-demo`). No real customers, testimonials, figures or partner names; do not invent any.
-- Article images: `frontend/assets/products/`.
-- Meeting notes in `Documentation/Besprechungsprotokolle/`; newest feedback (12.10.2026): order process "bereits sehr gut umgesetzt".
+- Spezifikation: `Specification/functional_specification_document_partnerportal_final.md`, `Specification/phase2_backlog.md`, `Specification/ENDKUNDENSHOP_DECISIONS.md`, Besprechungsprotokolle in `Documentation/Besprechungsprotokolle/` (Feedback 12.10.2026: Bestellprozess „bereits sehr gut umgesetzt“).
+- Design: `Design/` (README, `tokens.json`, `variables.css`, `guidelines/`), `DESIGN.md`, Variantenentscheidung `openspec/changes/refine-portal-frontend/variants/papo-varianten.html`.
+- Assets: Artikel-Platzhaltergrafiken `frontend/assets/products/*.svg`, Shop-Beispielbilder `frontend/assets/shop-samples/`, Schriften `frontend/vendor/fonts/`, Lucide-Icons `frontend/vendor/`.
+- Nur Demo-Daten (`DemoDataSeeder`, Demo-Logins `company-demo` / `partner-demo`). Kein Logo-Asset, keine echten Firmendaten, keine Kundenstimmen, keine Kennzahlen oder Referenzen. Nichts davon erfinden; Rechtstexte liefert das Unternehmen.
 
 ## Product Principles
 
-1. The order for an end customer is the core path; it stays the most visible and quickest action for partners.
-2. Each role sees exactly its own scope; the interface never suggests data a user cannot access.
-3. Clarity over density tricks: plain German labels, visible status, money always unambiguous.
-4. Extend, don't fork: new stages (shop, tenants) build on the same entities and design system.
-5. No invented business rules: open company decisions stay visibly open.
+1. **Bestellen geht vor.** Der Partner-Bestellprozess ist der Kern; „Neue Bestellung“ ist immer die wichtigste und schnellste Aktion im Partnerbereich.
+2. **Jeder weiß, wo er ist.** Firmen- und Partnerbereich sind sofort unterscheidbar; jede Rolle sieht nur, was ihr zusteht, und die Oberfläche deutet keine fremden Daten an.
+3. **Daten vor Dekoration.** Tabellen, Formulare und Status tragen die Oberfläche; Geldbeträge sind immer eindeutig; Elemente ohne Bedeutung fallen weg.
+4. **Erweiterbar statt fertig.** Die aktuelle Stufe ist der erste Schritt eines Produkts; neue Stufen (Shop, Mandanten) bauen auf denselben Entitäten und demselben Design-System auf. Nichts davon wird stillschweigend vorgezogen.
+5. **Nur Echtes zeigen.** Keine erfundenen Zahlen, Kunden, Geschäftsregeln oder Rechtsaussagen; offene Firmenentscheidungen bleiben sichtbar offen, Platzhalter sind als solche erkennbar.
 
 ## Accessibility & Inclusion
 
-Target: WCAG 2.2 AA for the internal portal — visible keyboard focus, text contrast ≥ 4.5:1, touch targets ≥ 44 px on mobile, `prefers-reduced-motion` respected, status never conveyed by colour alone. Known exception documented in `Design/guidelines/colors.md` (§ Contrast Ratios) must be resolved or justified.
+WCAG 2.2 AA für Portal und öffentliche Shopseiten: Textkontrast ≥ 4.5:1 (UI-Elemente ≥ 3:1), sichtbarer Tastaturfokus, Touch-Ziele ≥ 44 px auf dem Handy, Status nie nur über Farbe, `prefers-reduced-motion` respektieren. Die frühere Kontrastlücke der Primärbuttons ist durch `--color-accent-strong` geschlossen (siehe `DESIGN.md`, „The Strong Accent Rule“).
