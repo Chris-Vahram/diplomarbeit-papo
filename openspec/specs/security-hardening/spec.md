@@ -1,7 +1,7 @@
 # security-hardening Specification
 
 ## Purpose
-TBD - created by archiving change security-hardening-review-fixes. Update Purpose after archive.
+Baseline protections: escaping of user-controlled data before rendering, client-facing errors without internal detail, and secrets only from environment configuration.
 ## Requirements
 ### Requirement: Escape user-controlled data before HTML rendering
 User-controlled text (partner name, Kunde name, username, and any other partner- or company-entered strings) SHALL be HTML-escaped before it is inserted into the DOM via `innerHTML`.

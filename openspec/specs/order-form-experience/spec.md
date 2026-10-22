@@ -1,7 +1,7 @@
 # order-form-experience Specification
 
 ## Purpose
-TBD - created by archiving change improve-order-form. Update Purpose after archive.
+Order entry support: searchable article picker, live line and order totals, commission preview and live summary.
 ## Requirements
 ### Requirement: Searchable product picker
 

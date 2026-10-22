@@ -1,7 +1,7 @@
 # customer-management Specification
 
 ## Purpose
-TBD - created by archiving change add-dormant-kunde-visibility. Update Purpose after archive.
+Partner-scoped end customers: overview with last order date and dormancy marker, creation from the overview with safe submission and clear feedback.
 
 ## Requirements
 

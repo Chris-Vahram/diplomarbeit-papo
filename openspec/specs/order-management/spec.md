@@ -1,7 +1,7 @@
 # order-management Specification
 
 ## Purpose
-TBD - created by archiving change close-fsd-order-gaps. Update Purpose after archive.
+Partner-driven orders for end customers with automatic partner assignment, the status flow submitted -> reviewed -> fulfilled, shipping confirmation, and guards against inactive partners, double submission and unrealistic quantities.
 
 ## Requirements
 

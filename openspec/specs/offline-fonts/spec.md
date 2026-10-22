@@ -1,7 +1,7 @@
 # offline-fonts Specification
 
 ## Purpose
-TBD - created by archiving change self-host-fonts. Update Purpose after archive.
+Self-hosted portal fonts so the interface never loads fonts from an external host.
 ## Requirements
 ### Requirement: Fonts load without an external host
 

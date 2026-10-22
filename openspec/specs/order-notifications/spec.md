@@ -1,7 +1,7 @@
 # order-notifications Specification
 
 ## Purpose
-TBD - created by archiving change order-list-efficiency. Update Purpose after archive.
+Unseen-order count for the company navigation, served without loading the full order list.
 ## Requirements
 ### Requirement: Unseen-order count is served without the full order list
 The system SHALL expose a dedicated endpoint returning only the count of unseen orders, so the company-area unseen-order badge does not require downloading the full order list (with all items and Kunde data) on every navigation.

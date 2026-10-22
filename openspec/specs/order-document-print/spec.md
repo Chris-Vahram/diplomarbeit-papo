@@ -1,7 +1,7 @@
 # order-document-print Specification
 
 ## Purpose
-TBD - created by archiving change add-order-document-print. Update Purpose after archive.
+Printable order document with letterhead and order content, readable layout and without application chrome.
 ## Requirements
 ### Requirement: Printable order document
 

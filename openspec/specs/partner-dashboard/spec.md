@@ -1,7 +1,7 @@
 # partner-dashboard Specification
 
 ## Purpose
-TBD - created by archiving change add-dashboard-date-filter. Update Purpose after archive.
+Partner landing dashboard: period filter, own fulfilled totals and trends from backend data, company name in the heading, latest orders and a prominent new-order action.
 
 ## Requirements
 

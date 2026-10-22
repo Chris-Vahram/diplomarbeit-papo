@@ -1,7 +1,7 @@
 # data-import Specification
 
 ## Purpose
-TBD - created by archiving change order-correctness-hardening. Update Purpose after archive.
+Excel/CSV import of partners and articles with column mapping, controlled categories, tax-identity checks, bounded file size and a validation report.
 
 ## Requirements
 

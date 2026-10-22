@@ -1,7 +1,7 @@
 # product-images Specification
 
 ## Purpose
-TBD - created by archiving change add-product-image-upload. Update Purpose after archive.
+Article images uploaded by the company, served by the backend, reusable from a gallery and stored with safe filenames.
 ## Requirements
 ### Requirement: Company uploads a product image file
 The system SHALL allow a user with the company role to upload an image file, store it, and reference it from a product, without needing an external image URL.

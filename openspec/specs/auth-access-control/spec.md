@@ -1,7 +1,7 @@
 # auth-access-control Specification
 
 ## Purpose
-TBD - created by archiving change build-partnerportal-mvp. Update Purpose after archive.
+Keycloak-based login with the roles company and partner, server-side protection of every view and endpoint, linking of logins to partners, and blocking of inactive partners after authentication.
 
 ## Requirements
 

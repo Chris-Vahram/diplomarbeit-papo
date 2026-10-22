@@ -1,7 +1,7 @@
 # partner-order-wizard Specification
 
 ## Purpose
-TBD - created by archiving change place-order-redesign. Update Purpose after archive.
+Guided order creation in steps (end customer, articles, overview) with checkpoint progress, back-navigation without data loss, per-step validation and completion feedback.
 
 ## Requirements
 
