@@ -1,7 +1,7 @@
 # demo-data-seeding Specification
 
 ## Purpose
-TBD - created by archiving change dummy-data-on-vm. Update Purpose after archive.
+Opt-in demo data for local and demo environments that never overwrites or duplicates existing data.
 
 ## Requirements
 ### Requirement: Opt-in demo data seeding independent of launch mode

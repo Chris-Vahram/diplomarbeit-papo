@@ -1,7 +1,7 @@
 # commission Specification
 
 ## Purpose
-TBD - created by archiving change build-partnerportal-mvp. Update Purpose after archive.
+Per-partner commission percentage set by the company and one commission record per order calculated from the order value, visible to the company for all partners and to each partner for its own orders.
 
 ## Requirements
 

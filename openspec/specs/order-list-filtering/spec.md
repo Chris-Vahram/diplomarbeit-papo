@@ -1,7 +1,7 @@
 # order-list-filtering Specification
 
 ## Purpose
-TBD - created by archiving change add-order-list-filters. Update Purpose after archive.
+Client-side filters on the company and partner order lists (partner, end customer, time range, status) combined with AND, resettable in one click, with a German empty-result message.
 ## Requirements
 ### Requirement: Company order list filters by Partner
 The company order list SHALL offer a Partner filter as a dropdown whose options are the distinct partners appearing in the loaded order list (labelled with the partner name, keyed by partner id so equal names stay distinct), sorted alphabetically for the German locale. Selecting a partner SHALL show only that partner's orders; the neutral option ("Alle") SHALL impose no restriction.

@@ -1,7 +1,7 @@
 # product-management Specification
 
 ## Purpose
-TBD - created by archiving change add-list-search-pagination. Update Purpose after archive.
+Central company management of articles: content, price, category, availability, image and validation, with list search and pagination.
 
 ## Requirements
 

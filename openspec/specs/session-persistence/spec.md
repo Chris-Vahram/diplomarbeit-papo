@@ -1,7 +1,7 @@
 # session-persistence Specification
 
 ## Purpose
-TBD - created by archiving change add-keycloak-session-refresh. Update Purpose after archive.
+Login sessions that survive access-token expiry through transparent refresh, retry the interrupted request, end cleanly when the refresh token expires and keep umlauts in claims.
 ## Requirements
 ### Requirement: Session survives access-token expiry
 

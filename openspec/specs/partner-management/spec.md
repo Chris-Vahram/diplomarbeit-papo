@@ -1,7 +1,7 @@
 # partner-management Specification
 
 ## Purpose
-TBD - created by archiving change add-list-search-pagination. Update Purpose after archive.
+Company management of partner companies (data, commission, status, internal notes, login linking), list search and pagination, and limited self-editing by the partner.
 
 ## Requirements
 

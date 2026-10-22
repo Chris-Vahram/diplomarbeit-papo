@@ -1,7 +1,7 @@
 # company-dashboard Specification
 
 ## Purpose
-TBD - created by archiving change add-dashboard-date-filter. Update Purpose after archive.
+Company landing dashboard: period filter, company-wide totals and per-partner settlement breakdown from backend data only, and trend indicators against the previous period.
 
 ## Requirements
 

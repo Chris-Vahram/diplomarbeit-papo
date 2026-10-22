@@ -1,7 +1,7 @@
 # ai-evidence-logging Specification
 
 ## Purpose
-TBD - created by archiving change automate-ai-evidence-log. Update Purpose after archive.
+Automatische, datensparsame Sicherung der KI-Sitzungen (Codex, Claude Code) als privater Rohbeleg und als Repositoryregister für den KI-Nachweis der Diplomarbeit, ohne erfundene Prüfungen.
 ## Requirements
 ### Requirement: PAPO-Sitzungen automatisch erkennen
 

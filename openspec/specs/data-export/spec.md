@@ -1,7 +1,7 @@
 # data-export Specification
 
 ## Purpose
-TBD - created by archiving change add-german-locale-formatting. Update Purpose after archive.
+Authenticated CSV export of orders and commissions in German number and date format, Excel-compatible encoding, and protection against formula injection.
 ## Requirements
 ### Requirement: German number and date format in CSV exports
 Exported CSV files SHALL write money values with a decimal comma (no thousands grouping) and dates as `dd.MM.yyyy`, so German-locale spreadsheet software parses them as numbers and dates rather than text.

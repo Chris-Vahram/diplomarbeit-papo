@@ -1,7 +1,7 @@
 # partner-order-cart Specification
 
 ## Purpose
-TBD - created by archiving change partner-order-cart. Update Purpose after archive.
+Partner article catalogue with search, cart with live totals and commission preview, and order submission through one canonical order surface.
 ## Requirements
 ### Requirement: Browsable, searchable product catalog
 

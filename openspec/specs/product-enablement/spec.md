@@ -1,7 +1,7 @@
 # product-enablement Specification
 
 ## Purpose
-TBD - created by archiving change add-list-search-pagination. Update Purpose after archive.
+Per-partner article enablement by the company; partners see and order only enabled articles, with a clear message when none are enabled.
 
 ## Requirements
 
