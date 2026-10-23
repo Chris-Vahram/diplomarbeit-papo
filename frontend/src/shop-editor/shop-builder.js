@@ -10,6 +10,7 @@ import { BLOCK_DRAG_TYPE } from "./block-palette.js";
 import "./block-properties.js";
 import "./design-panel.js";
 import "./page-manager.js";
+import "./template-picker.js";
 import { stateHtml } from "../lib/states.js";
 
 // Shop builder (shop-builder spec), opened full screen from "Mein Webshop"
@@ -185,6 +186,7 @@ class ShopBuilder extends HTMLElement {
           <span class="builder-save" id="builder-save" aria-live="polite"></span>
           <button type="button" class="button-secondary" id="builder-retry" hidden>Erneut versuchen</button>
           <span class="builder-pagebar__spacer"></span>
+          <button type="button" class="button-secondary" id="builder-template">Vorlage wählen</button>
           <button type="button" class="builder-icon" id="builder-undo" title="Rückgängig (Strg+Z)" aria-label="Rückgängig" disabled>↶</button>
           <button type="button" class="builder-icon" id="builder-redo" title="Wiederholen (Strg+Umschalt+Z)" aria-label="Wiederholen" disabled>↷</button>
           <button type="button" class="button-secondary" id="builder-restore" title="Vorherige veröffentlichte Version wiederherstellen" hidden>Wiederherstellen</button>
@@ -249,6 +251,8 @@ class ShopBuilder extends HTMLElement {
           </div>
         </modal-dialog>
 
+        <shop-template-picker></shop-template-picker>
+
         <modal-dialog title="Bild wählen" id="builder-image-dialog">
           <shop-asset-library mode="pick"></shop-asset-library>
         </modal-dialog>
@@ -271,6 +275,8 @@ class ShopBuilder extends HTMLElement {
     });
     this.querySelector("#builder-page-select").addEventListener("change", (event) => this.#openPage(Number(event.target.value)));
     this.querySelector("#builder-retry").addEventListener("click", () => this.#save());
+    this.querySelector("#builder-template").addEventListener("click", () => this.querySelector("shop-template-picker").open(this.#page));
+    this.addEventListener("template-apply", (event) => this.#applyTemplate(event.detail));
     this.querySelector("#builder-undo").addEventListener("click", () => this.#undo());
     this.querySelector("#builder-redo").addEventListener("click", () => this.#redo());
     this.querySelector("#builder-publish").addEventListener("click", () => this.#publish());
@@ -336,16 +342,19 @@ class ShopBuilder extends HTMLElement {
 
   async #load() {
     try {
-      const [pages, theme, preview] = await Promise.all([
+      const [pages, theme, preview, templates] = await Promise.all([
         apiFetch("/partner/shop/pages"),
         apiFetch("/partner/shop/theme"),
         apiFetch("/partner/shop/preview"),
+        apiFetch("/partner/shop/templates"),
       ]);
       this.#pages = pages;
       this.#theme = theme;
       this.#themeDraft = theme.draft;
       this.#preview = preview;
       this.querySelector("shop-page-manager").list = pages;
+      this.querySelector("shop-page-manager").templates = templates;
+      this.querySelector("shop-template-picker").templates = templates;
       this.#renderDesignPanel();
       const start = pages.pages.find((page) => page.id === requestedPageId()) ?? pages.pages[0];
       await this.#openPage(start.id, { skipFlush: true });
@@ -720,6 +729,17 @@ class ShopBuilder extends HTMLElement {
     blocks.splice(at, 0, block);
     this.#selectedId = block.id;
     this.#applyBlocks(blocks);
+  }
+
+  // Replaces the draft blocks as one undo step; the theme suggestion only goes into the design
+  // draft when the partner ticked "Farben und Schriften übernehmen". Nothing is published.
+  #applyTemplate({ template, applyTheme }) {
+    this.#selectedId = null;
+    this.#applyBlocks(template.blocks.map((block) => ({ ...structuredClone(block), id: crypto.randomUUID() })));
+    if (applyTheme) this.#onThemeChange(structuredClone(template.theme));
+    showToast(applyTheme
+      ? `Vorlage „${template.name}“ mit Farben und Schriften übernommen.`
+      : `Vorlage „${template.name}“ übernommen.`, "success");
   }
 
   #select(id) {

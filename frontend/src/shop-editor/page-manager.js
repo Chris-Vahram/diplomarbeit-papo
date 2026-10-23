@@ -16,6 +16,13 @@ class ShopPageManager extends HTMLElement {
   beforeChange = null;
   #dragId = null;
   #settingsPage = null;
+  #templates = [];
+
+  // Free-page templates of the catalogue, offered next to "Leere Seite".
+  set templates(value) {
+    this.#templates = value.filter((template) => template.page === "frei");
+    this.#renderTemplates();
+  }
 
   set list(value) {
     this.#list = value;
@@ -44,9 +51,7 @@ class ShopPageManager extends HTMLElement {
           <p class="builder-hint" id="page-new-url"></p>
           <fieldset class="page-manager__templates">
             <legend>Vorlage</legend>
-            <label><input type="radio" name="template" value="leer" checked /> Leere Seite</label>
-            <label><input type="radio" name="template" value="ueber-uns" /> Über uns</label>
-            <label><input type="radio" name="template" value="kontakt" /> Kontakt</label>
+            <span id="page-new-templates"></span>
           </fieldset>
           <p class="builder-error" id="page-new-error" role="alert" hidden></p>
           <div class="entity-form__actions">
@@ -96,6 +101,7 @@ class ShopPageManager extends HTMLElement {
       button.addEventListener("click", () => button.closest("modal-dialog").close()));
     this.querySelector("#page-list").addEventListener("click", (event) => this.#onListClick(event));
     this.querySelector("[data-action=new]").addEventListener("click", () => this.#openNew());
+    this.#renderTemplates();
     this.#bindNewForm();
     this.#bindSettingsForm();
     this.#bindDragAndDrop();
@@ -134,6 +140,15 @@ class ShopPageManager extends HTMLElement {
         </li>`;
       })
       .join("");
+  }
+
+  #renderTemplates() {
+    const target = this.querySelector("#page-new-templates");
+    if (!target) return;
+    target.outerHTML = `<span id="page-new-templates">
+      <label><input type="radio" name="template" value="leer" checked /> Leere Seite</label>
+      ${this.#templates.map((template) => `<label title="${escapeHtml(template.description)}"><input type="radio" name="template" value="${escapeHtml(template.id)}" /> ${escapeHtml(template.name)}</label>`).join("")}
+    </span>`;
   }
 
   #page(id) {

@@ -1,0 +1,84 @@
+import { escapeHtml } from "../lib/html.js";
+
+// Template picker of the builder (shop-templates spec "Applying a template"): lists the
+// catalogue templates of the open page's type with thumbnail, name and description. The dialog
+// itself is the confirmation; "template-apply" ({ template, applyTheme }) goes to the builder,
+// which replaces only the draft. The theme suggestion is used only when the box is ticked.
+
+const PAGE_OF_SLOT = { HOME: "startseite", ARTICLES: "artikel", ARTICLE_DETAIL: "artikeldetail" };
+
+class ShopTemplatePicker extends HTMLElement {
+  templates = [];
+  #choices = [];
+
+  connectedCallback() {
+    this.innerHTML = `
+      <modal-dialog title="Vorlage wählen" id="template-dialog">
+        <form class="template-picker" novalidate>
+          <fieldset class="template-picker__choices">
+            <legend class="builder-hint" id="template-legend"></legend>
+            <div class="template-picker__grid" id="template-grid"></div>
+          </fieldset>
+          <label class="template-picker__theme" id="template-theme" hidden>
+            <input type="checkbox" name="applyTheme" />
+            <span><strong>Farben und Schriften übernehmen</strong>
+              <span class="builder-hint">Ändert den Design-Entwurf für alle Seiten. Ohne Haken bleiben Ihre Farben und Schriften, wie sie sind.</span></span>
+          </label>
+          <p class="template-picker__notice"><strong>Der aktuelle Entwurf wird ersetzt.</strong>
+            Ihre veröffentlichte Seite bleibt unverändert, bis Sie veröffentlichen. Mit „Rückgängig“ holen Sie den bisherigen Entwurf zurück.</p>
+          <div class="entity-form__actions">
+            <button type="button" class="button-secondary" data-close>Abbrechen</button>
+            <button type="submit" class="button-primary" disabled>Vorlage übernehmen</button>
+          </div>
+        </form>
+      </modal-dialog>`;
+    const form = this.querySelector("form");
+    this.querySelector("[data-close]").addEventListener("click", () => this.#dialog.close());
+    form.addEventListener("change", () => this.#update());
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const template = this.#selected();
+      if (!template) return;
+      const applyTheme = Boolean(template.theme) && form.applyTheme.checked;
+      this.#dialog.close();
+      this.dispatchEvent(new CustomEvent("template-apply", { detail: { template, applyTheme }, bubbles: true }));
+    });
+  }
+
+  get #dialog() {
+    return this.querySelector("#template-dialog");
+  }
+
+  // page: ShopPageDto of the open page; free pages (no slot) get the free-page templates.
+  open(page) {
+    const kind = PAGE_OF_SLOT[page.slot] ?? "frei";
+    this.#choices = this.templates.filter((template) => template.page === kind);
+    this.querySelector("#template-legend").textContent = `Vorlagen für „${page.menuName}“`;
+    this.querySelector("#template-grid").innerHTML = this.#choices
+      .map((template, index) => `
+        <label class="template-card">
+          <input type="radio" name="template" value="${index}" />
+          <img class="template-card__image" src="/assets/shop-templates/${escapeHtml(template.thumbnail)}" alt="" loading="lazy" width="320" height="200" />
+          <span class="template-card__name">${escapeHtml(template.name)}</span>
+          <span class="template-card__text">${escapeHtml(template.description)}</span>
+        </label>`)
+      .join("");
+    const form = this.querySelector("form");
+    form.applyTheme.checked = false;
+    this.#update();
+    this.#dialog.open();
+  }
+
+  #selected() {
+    const checked = this.querySelector("input[name=template]:checked");
+    return checked ? this.#choices[Number(checked.value)] : null;
+  }
+
+  #update() {
+    const template = this.#selected();
+    this.querySelector("#template-theme").hidden = !template?.theme;
+    this.querySelector("button[type=submit]").disabled = !template;
+  }
+}
+
+customElements.define("shop-template-picker", ShopTemplatePicker);
