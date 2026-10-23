@@ -1,0 +1,38 @@
+{
+  "blocks": [
+    {
+      "type": "heading-text",
+      "config": {
+        "heading": "Unser Sortiment",
+        "text": "Jeder Artikel hier ist von uns ausgewählt. Alle Preise inklusive Umsatzsteuer.",
+        "background": "surface",
+        "spacing": "large"
+      }
+    },
+    {
+      "type": "article-grid",
+      "config": {
+        "columns": "2"
+      }
+    },
+    {
+      "type": "heading-text",
+      "config": {
+        "heading": "Nicht gefunden, was Sie suchen?",
+        "text": "Sprechen Sie uns an. Wir sagen Ihnen gerne, welcher Artikel zu Ihrem Vorhaben passt.",
+        "align": "center"
+      }
+    }
+  ],
+  "theme": {
+    "colors": {
+      "primary": "#5B3A29",
+      "accent": "#C8963E",
+      "background": "#F6F1E9",
+      "surface": "#FFFDF8",
+      "text": "#2B2118"
+    },
+    "headingFont": "lora",
+    "bodyFont": "source-sans-3"
+  }
+}

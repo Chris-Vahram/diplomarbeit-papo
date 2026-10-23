@@ -14,7 +14,9 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
-// Partner's own shop ("Mein Webshop"): status, theme draft and preview data. The identifier
+import java.util.List;
+
+// Partner's own shop ("Mein Webshop"): status, theme draft, templates and preview data. The identifier
 // and release stay company decisions.
 @Path("/api/partner/shop")
 @RolesAllowed("partner")
@@ -39,6 +41,9 @@ public class PartnerShopResource {
     @Inject
     CompanyProfileService companyProfileService;
 
+    @Inject
+    ShopTemplateCatalog templateCatalog;
+
     @GET
     public PartnerShopDto get() {
         return shopService.toDto(shopService.findOrCreate(currentPartner.resolve()));
@@ -62,6 +67,14 @@ public class PartnerShopResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public ShopThemeDto publishTheme(ShopEditorRequests.Version request) {
         return editorService.publishTheme(currentPartner.resolve(), ShopEditorRequests.require(request).version());
+    }
+
+    // Template catalogue for the builder's picker and the "Neue Seite" dialog (shop-templates spec).
+    @GET
+    @Path("/templates")
+    public List<ShopTemplate> templates() {
+        currentPartner.resolve();
+        return templateCatalog.all();
     }
 
     @GET

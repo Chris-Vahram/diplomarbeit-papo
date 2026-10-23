@@ -1,0 +1,7 @@
+[
+  { "id": "gut", "page": "frei", "name": "Gut", "description": "Gültige Vorlage.", "thumbnail": "gut.webp" },
+  { "id": "unbekannter-block", "page": "frei", "name": "Kaputt", "description": "Unbekannter Blocktyp.", "thumbnail": "x.webp" },
+  { "id": "fehlt", "page": "frei", "name": "Fehlt", "description": "Datei fehlt.", "thumbnail": "x.webp" },
+  { "id": "falsche-seite", "page": "warenkorb", "name": "Falsch", "description": "Keine gestaltbare Seite.", "thumbnail": "x.webp" },
+  { "id": "gut", "page": "frei", "name": "Doppelt", "description": "Doppelte ID.", "thumbnail": "x.webp" }
+]

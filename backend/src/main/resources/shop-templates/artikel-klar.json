@@ -13,5 +13,16 @@
         "columns": "3"
       }
     }
-  ]
+  ],
+  "theme": {
+    "colors": {
+      "primary": "#1F4E79",
+      "accent": "#E07A2F",
+      "background": "#F7F7F5",
+      "surface": "#FFFFFF",
+      "text": "#1F2328"
+    },
+    "headingFont": "plus-jakarta-sans",
+    "bodyFont": "inter"
+  }
 }

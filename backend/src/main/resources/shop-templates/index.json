@@ -1,0 +1,86 @@
+[
+  {
+    "id": "startseite-klar",
+    "page": "startseite",
+    "name": "Klar",
+    "description": "Heller Einstieg mit Willkommenstext, Artikelraster und Beratungshinweis.",
+    "thumbnail": "startseite-klar.webp"
+  },
+  {
+    "id": "startseite-handwerk",
+    "page": "startseite",
+    "name": "Handwerk",
+    "description": "Warme Farben, Serifenschrift und ruhige Textabschnitte für einen persönlichen Betrieb.",
+    "thumbnail": "startseite-handwerk.webp"
+  },
+  {
+    "id": "startseite-kraeftig",
+    "page": "startseite",
+    "name": "Kräftig",
+    "description": "Dunkler Einstieg mit starkem Akzent und viel Platz für das Sortiment.",
+    "thumbnail": "startseite-kraeftig.webp"
+  },
+  {
+    "id": "artikel-klar",
+    "page": "artikel",
+    "name": "Klar",
+    "description": "Kurze Einleitung und Artikelraster mit drei Spalten.",
+    "thumbnail": "artikel-klar.webp"
+  },
+  {
+    "id": "artikel-handwerk",
+    "page": "artikel",
+    "name": "Handwerk",
+    "description": "Großzügige Artikelkarten in zwei Spalten mit Hinweis auf persönliche Beratung.",
+    "thumbnail": "artikel-handwerk.webp"
+  },
+  {
+    "id": "artikel-kraeftig",
+    "page": "artikel",
+    "name": "Kräftig",
+    "description": "Kräftiger Kopfbereich und dichtes Raster mit vier Spalten.",
+    "thumbnail": "artikel-kraeftig.webp"
+  },
+  {
+    "id": "artikeldetail-klar",
+    "page": "artikeldetail",
+    "name": "Klar",
+    "description": "Artikel mit Bild links, ohne weitere Abschnitte.",
+    "thumbnail": "artikeldetail-klar.webp"
+  },
+  {
+    "id": "artikeldetail-handwerk",
+    "page": "artikeldetail",
+    "name": "Handwerk",
+    "description": "Artikel mit Bild rechts und einem Abschnitt zur Beratung.",
+    "thumbnail": "artikeldetail-handwerk.webp"
+  },
+  {
+    "id": "artikeldetail-kraeftig",
+    "page": "artikeldetail",
+    "name": "Kräftig",
+    "description": "Artikel mit Bild links und auffälligem Hinweis für Rückfragen.",
+    "thumbnail": "artikeldetail-kraeftig.webp"
+  },
+  {
+    "id": "seite-ueber-uns",
+    "page": "frei",
+    "name": "Über uns",
+    "description": "Vorstellung Ihres Betriebs in drei Abschnitten.",
+    "thumbnail": "seite-ueber-uns.webp"
+  },
+  {
+    "id": "seite-kontakt",
+    "page": "frei",
+    "name": "Kontakt",
+    "description": "Einleitung und Ansprechpartner mit E-Mail und Telefon.",
+    "thumbnail": "seite-kontakt.webp"
+  },
+  {
+    "id": "seite-aktionen",
+    "page": "frei",
+    "name": "Aktionen",
+    "description": "Auffälliger Kopfbereich und Platz für Aktionsartikel, die Sie im Abschnitt selbst auswählen.",
+    "thumbnail": "seite-aktionen.webp"
+  }
+]

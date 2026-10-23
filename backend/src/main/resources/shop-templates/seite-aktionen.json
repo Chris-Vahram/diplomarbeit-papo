@@ -1,0 +1,30 @@
+{
+  "blocks": [
+    {
+      "type": "hero",
+      "config": {
+        "title": "Aktuelle Aktionen",
+        "text": "Hier stellen Sie Ihre aktuellen Angebote vor.",
+        "align": "center",
+        "background": "accent"
+      }
+    },
+    {
+      "type": "featured-articles",
+      "config": {
+        "heading": "Unsere Empfehlungen",
+        "articleIds": [],
+        "columns": "3"
+      }
+    },
+    {
+      "type": "heading-text",
+      "config": {
+        "heading": "Fragen zu einer Aktion?",
+        "text": "Sprechen Sie uns an. Wir beraten Sie gerne.",
+        "align": "center",
+        "background": "surface"
+      }
+    }
+  ]
+}

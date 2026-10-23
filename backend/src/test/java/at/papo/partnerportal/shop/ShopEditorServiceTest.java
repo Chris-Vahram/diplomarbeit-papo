@@ -97,29 +97,26 @@ class ShopEditorServiceTest {
     }
 
     @Test
-    void freePageFromTemplateKeepsHalfFilledDraftUntilPublish() throws Exception {
+    void freePageFromCatalogueTemplateStartsAsPublishableDraft() {
         long partnerId = createPartner();
         ShopPageDetailDto created = tx(() -> editorService.createPage(partner(partnerId),
-                new ShopEditorRequests.CreatePage("Kontakt", "kontakt", "kontakt")));
+                new ShopEditorRequests.CreatePage("Kontakt", "kontakt", "seite-kontakt")));
         assertFalse(created.page().online());
         assertNull(created.published());
         assertEquals(2, created.draft().get("blocks").size());
         assertTrue(created.draft().at("/blocks/1/id").asText().matches("[0-9a-f-]{36}"));
 
-        // The template's contact block has no name yet: fine for the draft, not for publishing.
-        assertEquals("Das Feld „name“ im Block „Ansprechpartner“ ist erforderlich.",
-                rejection(() -> editorService.publish(partner(partnerId), created.page().id(), created.page().version())));
-
-        ObjectNode draft = created.draft().deepCopy();
-        ((ObjectNode) draft.at("/blocks/1/config")).put("name", "Maria Muster");
-        ShopPageDto saved = tx(() -> editorService.saveDraft(partner(partnerId), created.page().id(),
-                new ShopEditorRequests.Draft(draft, created.page().version())));
-        ShopPageDto published = tx(() -> editorService.publish(partner(partnerId), saved.id(), saved.version()));
+        // Catalogue templates pass the publish checks as they are (shop-templates "Template quality").
+        ShopPageDto published = tx(() -> editorService.publish(partner(partnerId), created.page().id(),
+                created.page().version()));
         assertTrue(published.online());
         assertFalse(published.draftChanged());
 
         assertEquals("Diese Vorlage gibt es nicht.", rejection(() -> editorService.createPage(partner(partnerId),
                 new ShopEditorRequests.CreatePage("X", "x-seite", "gibt-es-nicht"))));
+        // A template of a mandatory page type is no free-page template.
+        assertEquals("Diese Vorlage gibt es nicht.", rejection(() -> editorService.createPage(partner(partnerId),
+                new ShopEditorRequests.CreatePage("Y", "y-seite", "startseite-klar"))));
     }
 
     @Test
@@ -172,7 +169,7 @@ class ShopEditorServiceTest {
     void settingsRenameFreePagesButKeepMandatoryAddresses() {
         long partnerId = createPartner();
         ShopPageDetailDto free = tx(() -> editorService.createPage(partner(partnerId),
-                new ShopEditorRequests.CreatePage("Über uns", "ueber-uns", "ueber-uns")));
+                new ShopEditorRequests.CreatePage("Über uns", "ueber-uns", "seite-ueber-uns")));
         ShopPageDto renamed = tx(() -> editorService.updateSettings(partner(partnerId), free.page().id(),
                 new ShopEditorRequests.PageSettings("Team", "unser-team", " Unser Team ", "Wer wir sind.",
                         free.page().version())));

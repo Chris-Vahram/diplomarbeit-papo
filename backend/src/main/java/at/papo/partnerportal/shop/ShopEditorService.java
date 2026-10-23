@@ -13,7 +13,6 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 // "Mein Webshop" editor (shop-builder spec): page management, whole-page draft saves with
@@ -26,16 +25,14 @@ public class ShopEditorService {
     static final String PAGE_CONFLICT = "Diese Seite wurde inzwischen geändert. Bitte neu laden.";
     static final String THEME_CONFLICT = "Das Design wurde inzwischen geändert. Bitte neu laden.";
 
-    // Free-page templates under shop-templates/default/; "leer" is the empty page.
-    private static final Map<String, String> FREE_TEMPLATES = Map.of(
-            "ueber-uns", "free-ueber-uns.json",
-            "kontakt", "free-kontakt.json");
-
     @Inject
     PartnerShopService shopService;
 
     @Inject
     ShopPageService pageService;
+
+    @Inject
+    ShopTemplateCatalog templateCatalog;
 
     public ShopPageListDto pages(Partner partner) {
         return pageList(shopService.findOrCreate(partner));
@@ -48,13 +45,13 @@ public class ShopEditorService {
     @Transactional
     public ShopPageDetailDto createPage(Partner partner, ShopEditorRequests.CreatePage request) {
         PartnerShop shop = shopService.findOrCreate(partner);
-        String template = request.template() == null || request.template().isBlank() ? "leer" : request.template();
-        if (!template.equals("leer") && !FREE_TEMPLATES.containsKey(template)) {
-            throw new ApiException(400, "Diese Vorlage gibt es nicht.");
-        }
+        // "leer" (or nothing) is the empty page; anything else must be a free-page catalogue template.
+        String templateId = request.template() == null || request.template().isBlank() ? "leer" : request.template();
+        ShopTemplate template = templateId.equals("leer") ? null : templateCatalog.find(templateId, null)
+                .orElseThrow(() -> new ApiException(400, "Diese Vorlage gibt es nicht."));
         ShopPage page = pageService.createFreePage(shop, request.menuName(), request.segment());
-        if (!template.equals("leer")) {
-            JsonNode content = pageService.withBlockIds(pageService.readTemplate(FREE_TEMPLATES.get(template)));
+        if (template != null) {
+            JsonNode content = ShopPageService.withBlockIds(template.content());
             pageService.validateContent(page, content, false);
             page.draftContent = content.toString();
         }

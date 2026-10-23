@@ -19,7 +19,7 @@ public final class ShopEditorRequests {
         return body;
     }
 
-    // template: "leer" (default), "ueber-uns" or "kontakt".
+    // template: "leer" (default) or the id of a free-page catalogue template.
     public record CreatePage(String menuName, String segment, String template) {
     }
 

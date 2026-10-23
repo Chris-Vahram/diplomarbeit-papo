@@ -27,7 +27,6 @@ public class ShopPageService {
 
     public static final int MAX_ONLINE_PAGES = 6;
     public static final int MAX_PAGES = 20;
-    static final String TEMPLATE_DIR = "shop-templates/default/";
 
     private static final Pattern SEGMENT = Pattern.compile("[a-z0-9]+(-[a-z0-9]+)*");
 
@@ -37,8 +36,11 @@ public class ShopPageService {
     @Inject
     ShopCatalogService catalogService;
 
+    @Inject
+    ShopTemplateCatalog templateCatalog;
+
     // Idempotent: creates the theme and every missing slot page. Mandatory pages start
-    // published from the default template; system pages only reserve slot and segment.
+    // published from their default catalogue template; system pages only reserve slot and segment.
     @Transactional
     public void ensureDefaults(PartnerShop shop) {
         Instant now = Instant.now();
@@ -66,7 +68,9 @@ public class ShopPageService {
             page.position = slot.ordinal();
             page.updatedAt = now;
             if (slot.kind == ShopPageKind.MANDATORY) {
-                String content = withBlockIds(readTemplate(slot.templateFile)).toString();
+                String content = withBlockIds(templateCatalog.find(slot.defaultTemplate, slot)
+                        .orElseThrow(() -> new IllegalStateException("Shop template missing: " + slot.defaultTemplate))
+                        .content()).toString();
                 page.draftContent = content;
                 page.publishedContent = content;
                 page.publishedAt = now;
@@ -280,7 +284,7 @@ public class ShopPageService {
     }
 
     JsonNode readTemplate(String file) {
-        try (InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(TEMPLATE_DIR + file)) {
+        try (InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(ShopTemplateCatalog.DIR + file)) {
             if (in == null) {
                 throw new IllegalStateException("Shop template missing: " + file);
             }
@@ -291,7 +295,7 @@ public class ShopPageService {
     }
 
     // Template blocks carry no ids; every created page gets fresh ones for editor addressing.
-    JsonNode withBlockIds(JsonNode template) {
+    static JsonNode withBlockIds(JsonNode template) {
         JsonNode content = template.deepCopy();
         for (JsonNode block : content.path("blocks")) {
             ((ObjectNode) block).put("id", UUID.randomUUID().toString());

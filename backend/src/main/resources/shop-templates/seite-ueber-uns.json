@@ -4,7 +4,8 @@
       "type": "heading-text",
       "config": {
         "heading": "Über uns",
-        "text": "Erzählen Sie hier, wer Sie sind und wofür Ihr Betrieb steht."
+        "text": "Erzählen Sie hier, wer Sie sind und wofür Ihr Betrieb steht.",
+        "spacing": "large"
       }
     },
     {
@@ -13,6 +14,14 @@
         "heading": "Was uns auszeichnet",
         "text": "Beschreiben Sie Ihre Erfahrung, Ihr Team und Ihren Service.",
         "background": "surface"
+      }
+    },
+    {
+      "type": "heading-text",
+      "config": {
+        "heading": "So erreichen Sie uns",
+        "text": "Nennen Sie Ihre Öffnungszeiten und wie man Sie am besten erreicht.",
+        "align": "center"
       }
     }
   ]

@@ -1,0 +1,29 @@
+{
+  "blocks": [
+    {
+      "type": "article-detail",
+      "config": {
+        "imagePosition": "right"
+      }
+    },
+    {
+      "type": "heading-text",
+      "config": {
+        "heading": "Persönliche Beratung",
+        "text": "Sie möchten mehr über diesen Artikel wissen? Wir beraten Sie gerne.",
+        "background": "surface"
+      }
+    }
+  ],
+  "theme": {
+    "colors": {
+      "primary": "#5B3A29",
+      "accent": "#C8963E",
+      "background": "#F6F1E9",
+      "surface": "#FFFDF8",
+      "text": "#2B2118"
+    },
+    "headingFont": "lora",
+    "bodyFont": "source-sans-3"
+  }
+}

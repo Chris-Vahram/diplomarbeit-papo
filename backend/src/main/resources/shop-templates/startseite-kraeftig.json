@@ -1,0 +1,43 @@
+{
+  "blocks": [
+    {
+      "type": "hero",
+      "config": {
+        "title": "Alles für Ihr nächstes Projekt",
+        "text": "Ausgewählte Artikel und persönliche Beratung – bestellen Sie bequem online.",
+        "buttonLabel": "Jetzt Artikel ansehen",
+        "buttonPage": "artikel",
+        "align": "left",
+        "background": "primary",
+        "spacing": "large"
+      }
+    },
+    {
+      "type": "article-grid",
+      "config": {
+        "heading": "Sortiment",
+        "columns": "4"
+      }
+    },
+    {
+      "type": "heading-text",
+      "config": {
+        "heading": "Fragen zu einem Artikel?",
+        "text": "Wir helfen Ihnen gerne weiter – telefonisch oder per E-Mail.",
+        "align": "center",
+        "background": "accent"
+      }
+    }
+  ],
+  "theme": {
+    "colors": {
+      "primary": "#0F2A3D",
+      "accent": "#F2B705",
+      "background": "#FFFFFF",
+      "surface": "#F2F4F6",
+      "text": "#111418"
+    },
+    "headingFont": "montserrat",
+    "bodyFont": "open-sans"
+  }
+}
