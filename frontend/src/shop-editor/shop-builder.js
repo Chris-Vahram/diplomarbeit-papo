@@ -732,11 +732,19 @@ class ShopBuilder extends HTMLElement {
   }
 
   // Replaces the draft blocks as one undo step; the theme suggestion only goes into the design
-  // draft when the partner ticked "Farben und Schriften übernehmen". Nothing is published.
+  // draft when the partner ticked "Farben und Schriften übernehmen", and is then undone with
+  // the blocks. Nothing is published.
   #applyTemplate({ template, applyTheme }) {
     this.#selectedId = null;
-    this.#applyBlocks(template.blocks.map((block) => ({ ...structuredClone(block), id: crypto.randomUUID() })));
-    if (applyTheme) this.#onThemeChange(structuredClone(template.theme));
+    const blocks = template.blocks.map((block) => ({ ...structuredClone(block), id: crypto.randomUUID() }));
+    if (applyTheme) {
+      this.#history.record(JSON.stringify({ blocks: this.#blocks, theme: this.#themeDraft }));
+      this.#blocks = blocks;
+      this.#changed();
+      this.#onThemeChange(structuredClone(template.theme));
+    } else {
+      this.#applyBlocks(blocks);
+    }
     showToast(applyTheme
       ? `Vorlage „${template.name}“ mit Farben und Schriften übernommen.`
       : `Vorlage „${template.name}“ übernommen.`, "success");
@@ -771,17 +779,26 @@ class ShopBuilder extends HTMLElement {
   }
 
   #undo() {
-    const snapshot = this.#history.undo(JSON.stringify(this.#blocks));
-    if (snapshot === null) return;
-    this.#blocks = JSON.parse(snapshot);
-    this.#changed();
+    const snapshot = this.#history.undo(this.#snapshot(this.#history.nextUndo));
+    if (snapshot !== null) this.#restoreSnapshot(snapshot);
   }
 
   #redo() {
-    const snapshot = this.#history.redo(JSON.stringify(this.#blocks));
-    if (snapshot === null) return;
-    this.#blocks = JSON.parse(snapshot);
+    const snapshot = this.#history.redo(this.#snapshot(this.#history.nextRedo));
+    if (snapshot !== null) this.#restoreSnapshot(snapshot);
+  }
+
+  // Snapshots are the block list ("[...]"); a template applied with its theme is one step for
+  // blocks and theme ("{blocks, theme}"), so the current state is taken in the same shape.
+  #snapshot(counterpart = null) {
+    return JSON.stringify(counterpart?.startsWith("{") ? { blocks: this.#blocks, theme: this.#themeDraft } : this.#blocks);
+  }
+
+  #restoreSnapshot(snapshot) {
+    const state = JSON.parse(snapshot);
+    this.#blocks = Array.isArray(state) ? state : state.blocks;
     this.#changed();
+    if (!Array.isArray(state)) this.#onThemeChange(state.theme);
   }
 
   // Strg+Z / Strg+Umschalt+Z outside text fields (inside them the browser's own undo applies).

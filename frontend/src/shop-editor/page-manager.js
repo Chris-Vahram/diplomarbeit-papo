@@ -147,7 +147,8 @@ class ShopPageManager extends HTMLElement {
     if (!target) return;
     target.outerHTML = `<span id="page-new-templates">
       <label><input type="radio" name="template" value="leer" checked /> Leere Seite</label>
-      ${this.#templates.map((template) => `<label title="${escapeHtml(template.description)}"><input type="radio" name="template" value="${escapeHtml(template.id)}" /> ${escapeHtml(template.name)}</label>`).join("")}
+      ${this.#templates.map((template) => `<label><input type="radio" name="template" value="${escapeHtml(template.id)}" />
+        <span>${escapeHtml(template.name)}<span class="page-manager__template-text">${escapeHtml(template.description)}</span></span></label>`).join("")}
     </span>`;
   }
 

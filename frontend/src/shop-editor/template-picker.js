@@ -25,7 +25,7 @@ class ShopTemplatePicker extends HTMLElement {
               <span class="builder-hint">Ändert den Design-Entwurf für alle Seiten. Ohne Haken bleiben Ihre Farben und Schriften, wie sie sind.</span></span>
           </label>
           <p class="template-picker__notice"><strong>Der aktuelle Entwurf wird ersetzt.</strong>
-            Ihre veröffentlichte Seite bleibt unverändert, bis Sie veröffentlichen. Mit „Rückgängig“ holen Sie den bisherigen Entwurf zurück.</p>
+            Ihre veröffentlichte Seite bleibt unverändert, bis Sie veröffentlichen. Mit „Rückgängig“ holen Sie den bisherigen Entwurf zurück, auch Farben und Schriften.</p>
           <div class="entity-form__actions">
             <button type="button" class="button-secondary" data-close>Abbrechen</button>
             <button type="submit" class="button-primary" disabled>Vorlage übernehmen</button>
@@ -67,6 +67,7 @@ class ShopTemplatePicker extends HTMLElement {
     form.applyTheme.checked = false;
     this.#update();
     this.#dialog.open();
+    this.querySelector("input[name=template]")?.focus();
   }
 
   #selected() {
