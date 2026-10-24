@@ -173,8 +173,18 @@ Bestellungen zeigen dann „E-Mail-Versand ist nicht aktiviert“. Einschalten a
    setzen, dann `PAPO_MAIL_ENABLED=true`. Ohne Umleitung startet das Backend nur mit
    `PAPO_MAIL_ALLOW_REAL_RECIPIENTS=true` — das bleibt aus, solange die VM Demo-Daten und
    bekannte Demo-Logins hat.
-3. Backend neu starten (`docker compose -f docker-compose.prod.yml --env-file .env.prod up -d backend`)
-   und mit einer Testbestellung prüfen; der Status steht in den Bestelldetails der Firma.
+3. Backend mit dem **aktiven Release** neu starten und mit einer Testbestellung prüfen; der Status
+   steht in den Bestelldetails der Firma:
+
+   ```bash
+   cd ~/papo-deploy
+   SHA=$(basename "$(readlink frontend-live/current)")
+   IMAGE_TAG=$SHA docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --no-deps backend
+   ```
+
+   Ohne `IMAGE_TAG` startet Compose das lokal gecachte, veraltete `:latest`-Image (der Deploy
+   arbeitet nur mit SHA-Tags). Kontrolle: Die Startzeile „Installed features“ enthält `mailer`
+   und `scheduler`.
 
 `PAPO_MAIL_SHIPPING_ENABLED=true` schaltet die neutral formulierte Abschlussmail bei
 „Abgeschlossen“ ein (Entscheidung 15.10.2026). Absender: `no-reply@paportal.at`. Änderungen an Umleitung/Aktivierung wirken auch auf wartende Mails:
