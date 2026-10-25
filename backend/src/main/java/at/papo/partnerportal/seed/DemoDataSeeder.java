@@ -6,7 +6,9 @@ import at.papo.partnerportal.commission.CommissionService;
 import at.papo.partnerportal.business.BusinessTaxIdentifier;
 import at.papo.partnerportal.business.BusinessTaxIdentifierMigrationService;
 import at.papo.partnerportal.business.BusinessTaxIdentifierType;
+import at.papo.partnerportal.business.CompanyLogin;
 import at.papo.partnerportal.business.CompanyProfile;
+import at.papo.partnerportal.business.CompanyTenancyMigrationService;
 import at.papo.partnerportal.business.TradeRegisterIdentifier;
 import at.papo.partnerportal.business.TradeRegisterIdentifierType;
 import at.papo.partnerportal.common.Address;
@@ -56,8 +58,18 @@ public class DemoDataSeeder {
     @Inject
     BusinessTaxIdentifierMigrationService businessTaxIdentifierMigrationService;
 
+    @Inject
+    CompanyTenancyMigrationService companyTenancyMigrationService;
+
+    // Company 1 of the current seed run (set by seedCompanyProfile).
+    private CompanyProfile company;
+
     @ConfigProperty(name = "papo.seed-demo-data", defaultValue = "false")
     boolean seedDemoData;
+
+    // Tests of pre-tenancy migrations switch the second dev/test company off.
+    @ConfigProperty(name = "papo.seed.second-company", defaultValue = "true")
+    boolean seedSecondCompany;
 
     @Transactional
     void onStart(@Observes StartupEvent event) {
@@ -71,10 +83,16 @@ public class DemoDataSeeder {
             // (bind-partner-login-to-oidc-subject design "Dev/test identity").
             if (launchMode != LaunchMode.NORMAL) {
                 seedPartnerDemoLogin();
+                seedCompanyLogin(COMPANY_DEMO_SUBJECT, company);
             }
             seedProducts();
             seedProductImages();
             seedEnablements();
+            // A second, clearly fictitious company for cross-tenant checks; dev/test only
+            // (add-company-tenancy D7: real companies are provisioned by the operator).
+            if (launchMode != LaunchMode.NORMAL && seedSecondCompany) {
+                seedCompanyTwo();
+            }
             // Tests assume a clean order baseline, so seed orders only in dev or
             // in the explicit NORMAL+flag demo path.
             if (launchMode == LaunchMode.DEVELOPMENT || launchMode == LaunchMode.NORMAL) {
@@ -82,6 +100,7 @@ public class DemoDataSeeder {
             }
         }
         businessTaxIdentifierMigrationService.migrate(launchMode != LaunchMode.NORMAL || seedDemoData);
+        companyTenancyMigrationService.expand();
     }
 
     static boolean shouldSeed(LaunchMode launchMode, long partnerCount) {
@@ -94,6 +113,49 @@ public class DemoDataSeeder {
 
     // Must match the "id" of partner-demo in keycloak/partnerportal-realm.json and the test realm.
     public static final String PARTNER_DEMO_SUBJECT = "7c1d9a2e-4b3f-4e5a-9d6c-2f8b1a0e5c01";
+    // Fixed ids of company-demo, company-zwei and partner-zwei in both committed realms.
+    public static final String COMPANY_DEMO_SUBJECT = "c0a1d2e3-0000-4000-8000-000000000001";
+    public static final String COMPANY_ZWEI_SUBJECT = "c0a1d2e3-0000-4000-8000-000000000002";
+    public static final String PARTNER_ZWEI_SUBJECT = "c0a1d2e3-0000-4000-8000-000000000003";
+
+    private void seedCompanyLogin(String subject, CompanyProfile owner) {
+        CompanyLogin login = new CompanyLogin();
+        login.oidcSubject = subject;
+        login.company = owner;
+        login.createdBy = "demo-seed";
+        login.persist();
+    }
+
+    private void seedCompanyTwo() {
+        CompanyProfile zwei = new CompanyProfile();
+        zwei.businessName = "Testfirma Zwei GmbH";
+        zwei.taxIdentifier = new BusinessTaxIdentifier("AT", BusinessTaxIdentifierType.VAT_ID, "ATU22222222");
+        zwei.tradeRegisterIdentifier = new TradeRegisterIdentifier("AT", TradeRegisterIdentifierType.GISA, "87654321");
+        zwei.persist();
+        seedCompanyLogin(COMPANY_ZWEI_SUBJECT, zwei);
+
+        CompanyProfile companyOne = company;
+        company = zwei;
+        persistPartner("Z-0001", "Zweitpartner Test OG", address("Teststraße", "2", "1010", "Wien"),
+                "zweitpartner@example.at", "+43 1 2222222", "10.00", true, "ATU33333333");
+        Partner partner = Partner.find("partnerNumber", "Z-0001").firstResult();
+        PartnerLogin login = new PartnerLogin();
+        login.oidcSubject = PARTNER_ZWEI_SUBJECT;
+        login.partner = partner;
+        login.createdBy = "demo-seed";
+        login.persist();
+        // Same category name as company 1 on purpose: category names are unique per company.
+        persistProduct("Testartikel Zwei A", "10.00", "Artikel der Testfirma Zwei.", true, "Werkzeug", null);
+        persistProduct("Testartikel Zwei B", "20.00", "Artikel der Testfirma Zwei.", true, null, null);
+        productImageService.upload(zwei, DemoPngGenerator.solidColorPng(64, 64, 160, 60, 60), "Bild Zwei.png");
+        for (String name : List.of("Testartikel Zwei A", "Testartikel Zwei B")) {
+            ProductEnablement enablement = new ProductEnablement();
+            enablement.partner = partner;
+            enablement.product = product(name);
+            enablement.persist();
+        }
+        company = companyOne;
+    }
 
     private void seedPartnerDemoLogin() {
         PartnerLogin login = new PartnerLogin();
@@ -117,6 +179,7 @@ public class DemoDataSeeder {
 
     private void seedCompanyProfile() {
         if (!shouldSeedCompanyProfile(CompanyProfile.count())) {
+            company = CompanyProfile.find("singletonKey", CompanyProfile.CURRENT_KEY).firstResult();
             return;
         }
         CompanyProfile profile = new CompanyProfile();
@@ -125,6 +188,7 @@ public class DemoDataSeeder {
         profile.taxIdentifier = new BusinessTaxIdentifier("AT", BusinessTaxIdentifierType.VAT_ID, "ATU87654321");
         profile.tradeRegisterIdentifier = new TradeRegisterIdentifier("AT", TradeRegisterIdentifierType.GISA, "12345678");
         profile.persist();
+        company = profile;
     }
 
     static boolean shouldSeedCompanyProfile(long profileCount) {
@@ -139,6 +203,7 @@ public class DemoDataSeeder {
     private void persistPartner(String partnerNumber, String name, Address address, String email,
             String phone, String commissionPercent, boolean active, String taxIdentifierValue) {
         Partner partner = new Partner();
+        partner.company = company;
         partner.partnerNumber = partnerNumber;
         partner.name = name;
         partner.address = address;
@@ -181,15 +246,17 @@ public class DemoDataSeeder {
     private void persistProduct(String name, String price, String description, boolean available,
             String category, String imageUrl) {
         Product product = new Product();
+        product.company = company;
         product.name = name;
         product.price = new BigDecimal(price);
         product.description = description;
         product.available = available;
         if (category != null) {
             String normalized = CategoryNames.normalized(category);
-            Category existing = Category.find("normalizedName", normalized).firstResult();
+            Category existing = Category.find("company = ?1 and normalizedName = ?2", company, normalized).firstResult();
             if (existing == null) {
                 existing = new Category();
+                existing.company = company;
                 existing.name = category;
                 existing.normalizedName = normalized;
                 existing.active = true;
@@ -208,9 +275,9 @@ public class DemoDataSeeder {
     // The other seed products keep their external frontend-asset imageUrl untouched;
     // "Wasserwaage 100cm" deliberately keeps no image at all (placeholder-path demo).
     private void seedProductImages() {
-        ProductImageDto blau = productImageService.upload(
+        ProductImageDto blau = productImageService.upload(company,
                 DemoPngGenerator.solidColorPng(64, 64, 58, 90, 120), "Standardbild Blau.png");
-        productImageService.upload(
+        productImageService.upload(company,
                 DemoPngGenerator.solidColorPng(64, 64, 90, 140, 90), "Standardbild Grün.png");
 
         Product akkuschrauber = product("Akkuschrauber 18V Set");

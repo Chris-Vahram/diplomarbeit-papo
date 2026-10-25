@@ -37,11 +37,17 @@ export async function login(username, password) {
 
   const tokens = await response.json();
   sessionStorage.setItem(STORAGE_KEY, JSON.stringify(tokens));
+  window.dispatchEvent(new Event(SESSION_CHANGED));
   return getSession();
 }
 
+// Fired on login and logout so per-identity caches (e.g. product image blobs) are dropped:
+// another company's user in the same tab must never see a cached image (add-company-tenancy).
+export const SESSION_CHANGED = "papo:session-changed";
+
 export function logout() {
   sessionStorage.removeItem(STORAGE_KEY);
+  window.dispatchEvent(new Event(SESSION_CHANGED));
 }
 
 export function getSession() {

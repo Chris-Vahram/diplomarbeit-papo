@@ -4,6 +4,7 @@ import at.papo.partnerportal.commission.CommissionRecord;
 import at.papo.partnerportal.commission.CommissionService;
 import at.papo.partnerportal.order.Order;
 import at.papo.partnerportal.order.OrderStatus;
+import at.papo.partnerportal.security.CurrentCompany;
 import com.opencsv.CSVWriter;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -37,10 +38,13 @@ public class CsvExportService {
     private static final DateTimeFormatter GERMAN_DATE = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     @Inject
+    CurrentCompany currentCompany;
+
+    @Inject
     CommissionService commissionService;
 
     public byte[] exportOrders() {
-        List<Order> orders = Order.listAll();
+        List<Order> orders = Order.list("partner.company = ?1 order by id", currentCompany.resolve());
         Map<Long, CommissionRecord> commissionsByOrderId = commissionService.findForOrders(orders);
 
         return writeCsv(new String[] { "Datum", "Partner", "Kunde", "Wert", "Provision %", "Provision", "Status" },
@@ -60,7 +64,7 @@ public class CsvExportService {
 
     // Only orders with a commission record - settlement-ready sheet, not an order log (design.md).
     public byte[] exportCommissions() {
-        List<CommissionRecord> records = CommissionRecord.listAll();
+        List<CommissionRecord> records = CommissionRecord.list("partner.company = ?1 order by id", currentCompany.resolve());
 
         return writeCsv(new String[] { "Partner", "Bestell-Nr", "Basiswert", "Provision %", "Provision" },
                 records, record -> new String[] {

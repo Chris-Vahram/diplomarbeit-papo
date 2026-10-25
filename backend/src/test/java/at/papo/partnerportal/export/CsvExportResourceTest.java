@@ -4,6 +4,7 @@ import at.papo.partnerportal.commission.CommissionRecord;
 import at.papo.partnerportal.order.Order;
 import at.papo.partnerportal.product.Product;
 import at.papo.partnerportal.support.KeycloakTestTokens;
+import at.papo.partnerportal.support.TestCompanies;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
@@ -43,7 +44,8 @@ class CsvExportResourceTest {
 
         List<String> lines = decodeCsvLines(csv);
         assertEquals("\"Datum\";\"Partner\";\"Kunde\";\"Wert\";\"Provision %\";\"Provision\";\"Status\"", lines.get(0));
-        assertEquals(Order.count() + 1, lines.size());
+        // company-demo exports only company 1 orders (add-company-tenancy).
+        assertEquals(Order.count("partner.company", TestCompanies.one()) + 1, lines.size());
 
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
         String mullerLine = lines.stream().filter(line -> line.contains("Müller")).findFirst()
@@ -70,7 +72,7 @@ class CsvExportResourceTest {
 
         List<String> lines = decodeCsvLines(csv);
         assertEquals("\"Partner\";\"Bestell-Nr\";\"Basiswert\";\"Provision %\";\"Provision\"", lines.get(0));
-        assertEquals(CommissionRecord.count() + 1, lines.size());
+        assertEquals(CommissionRecord.count("partner.company", TestCompanies.one()) + 1, lines.size());
     }
 
     @Test

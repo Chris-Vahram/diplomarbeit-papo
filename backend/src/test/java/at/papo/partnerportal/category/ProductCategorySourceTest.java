@@ -1,5 +1,6 @@
 package at.papo.partnerportal.category;
 
+import at.papo.partnerportal.support.TestCompanies;
 import at.papo.partnerportal.product.Product;
 import at.papo.partnerportal.support.KeycloakTestTokens;
 import io.quarkus.narayana.jta.QuarkusTransaction;
@@ -31,11 +32,13 @@ class ProductCategorySourceTest {
         String token = tokens.tokenFor("company-demo", "company-demo");
         long categoryId = QuarkusTransaction.requiringNew().call(() -> {
             Category category = new Category();
+            category.company = TestCompanies.one();
             category.name = "Quelle Alt";
             category.normalizedName = "quelle alt";
             category.active = true;
             category.persist();
             Product product = new Product();
+            product.company = TestCompanies.one();
             product.name = "Quelle Artikel";
             product.price = new BigDecimal("1.00");
             product.articleCategory = category;

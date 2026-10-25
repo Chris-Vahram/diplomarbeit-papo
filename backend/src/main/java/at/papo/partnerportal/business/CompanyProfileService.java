@@ -1,6 +1,6 @@
 package at.papo.partnerportal.business;
 
-import at.papo.partnerportal.common.ApiException;
+import at.papo.partnerportal.security.CurrentCompany;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -14,24 +14,24 @@ public class CompanyProfileService {
     @Inject
     TradeRegisterIdentifierValidator tradeRegisterIdentifierValidator;
 
+    @Inject
+    CurrentCompany currentCompany;
+
     public CompanyProfileDto get() {
-        return CompanyProfileDto.from(findCurrent());
+        return CompanyProfileDto.from(currentCompany.resolve());
     }
 
     @Transactional
     public CompanyProfileDto update(CompanyProfileRequest request) {
-        CompanyProfile profile = findCurrent();
+        CompanyProfile profile = currentCompany.resolve();
         profile.businessName = request.businessName().trim();
         profile.taxIdentifier = taxIdentifierValidator.normalize(request.taxIdentifier());
         profile.tradeRegisterIdentifier = tradeRegisterIdentifierValidator.normalize(request.tradeRegisterIdentifier());
-        return CompanyProfileDto.from(profile);
-    }
-
-    public CompanyProfile findCurrent() {
-        CompanyProfile profile = CompanyProfile.find("singletonKey", CompanyProfile.CURRENT_KEY).firstResult();
-        if (profile == null) {
-            throw new ApiException(404, "Firmenprofil ist noch nicht angelegt.");
+        // Absent field keeps the address (older clients). Clearing stores "" rather than null:
+        // null means "never set", which the Release A migration may fill from the legacy setting.
+        if (request.orderNoticeEmail() != null) {
+            profile.orderNoticeEmail = request.orderNoticeEmail().trim();
         }
-        return profile;
+        return CompanyProfileDto.from(profile);
     }
 }

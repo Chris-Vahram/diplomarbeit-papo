@@ -76,8 +76,10 @@ export async function apiFetchForm(path, formData) {
 // Fetches a binary response (e.g. an uploaded product image) with the Bearer token and
 // returns the raw Blob - for callers that build their own object URL (see
 // lib/product-images.js) instead of triggering a file download like apiDownload below.
+// no-store: never answer from the HTTP cache - an image cached for another company's login
+// (older releases sent "public, immutable") must not bypass the server's tenant check.
 export async function apiFetchBlob(path) {
-  const response = await authorizedFetch(path);
+  const response = await authorizedFetch(path, { cache: "no-store" });
   if (response.status === 401) clearSessionAndRedirect();
   if (!response.ok) {
     const message = await extractErrorMessage(response);

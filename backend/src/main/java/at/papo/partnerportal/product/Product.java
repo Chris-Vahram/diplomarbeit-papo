@@ -1,5 +1,6 @@
 package at.papo.partnerportal.product;
 
+import at.papo.partnerportal.business.CompanyProfile;
 import at.papo.partnerportal.category.Category;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Column;
@@ -12,6 +13,13 @@ import java.math.BigDecimal;
 
 @Entity
 public class Product extends PanacheEntity {
+
+    // Owning company (add-company-tenancy). Nullable in DDL so Hibernate update can add it to
+    // existing rows; CompanyTenancyMigrationService backfills it and services always set it.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
+    public CompanyProfile company;
+
 
     @Column(nullable = false)
     public String name;

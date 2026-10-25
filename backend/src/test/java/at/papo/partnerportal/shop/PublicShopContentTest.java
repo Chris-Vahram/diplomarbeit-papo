@@ -1,5 +1,6 @@
 package at.papo.partnerportal.shop;
 
+import at.papo.partnerportal.support.TestCompanies;
 import at.papo.partnerportal.business.BusinessTaxIdentifier;
 import at.papo.partnerportal.business.BusinessTaxIdentifierType;
 import at.papo.partnerportal.common.Address;
@@ -51,6 +52,7 @@ class PublicShopContentTest {
     private long createPartner(String... enabledProducts) {
         return QuarkusTransaction.requiringNew().call(() -> {
             Partner partner = new Partner();
+            partner.company = TestCompanies.one();
             partner.partnerNumber = "CAT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
             partner.name = "Katalog " + partner.partnerNumber;
             partner.commissionPercent = new BigDecimal("10.00");
