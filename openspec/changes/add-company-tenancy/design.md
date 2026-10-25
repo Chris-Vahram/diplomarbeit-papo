@@ -23,7 +23,7 @@ The VM holds demo data only (one profile "Huemer GmbH", three partners, eight ar
 
 ### D1 — `CompanyProfile` is the tenant root (no new `Company` table)
 
-The company already exists as one row with name, tax and register identity. Its id becomes the company id; owned tables reference `company_profile.id` through a column named `company_id`. A separate `Company` table would duplicate the name and need a 1:1 join for nothing. `singletonKey` is retired: the entity drops the field, the migration drops the column's NOT NULL and unique constraint (Hibernate `update` never drops columns; without this a second profile insert fails). A slug for later subdomains is deliberately not added (YAGNI; subdomains undecided). Alternative kept open: rename to `Company` when personal accounts or billing need more company-level fields.
+The company already exists as one row with name, tax and register identity. Its id becomes the company id; owned tables reference `companyprofile.id` through a column named `company_id`. A separate `Company` table would duplicate the name and need a 1:1 join for nothing. `singletonKey` is retired: the entity drops the field, the migration drops the column's NOT NULL and unique constraint (Hibernate `update` never drops columns; without this a second profile insert fails). A slug for later subdomains is deliberately not added (YAGNI; subdomains undecided). Alternative kept open: rename to `Company` when personal accounts or billing need more company-level fields.
 
 ### D2 — `company_id` only on roots; everything else is scoped through its parent
 
@@ -46,7 +46,7 @@ The codebase already scopes partner data explicitly via `CurrentPartner`. Compan
 
 | Key | Today | Target | Reason |
 |---|---|---|---|
-| `Partner.partnerNumber` | global unique | unique `(company_id, partner_number)` | Roadmap: each company may have `P-0001`; imported numbers come from each company's own system. |
+| `Partner.partnerNumber` | global unique | unique `(company_id, partnernumber)` | Roadmap: each company may have `P-0001`; imported numbers come from each company's own system. |
 | `Category.normalizedName` | global unique | unique `(company_id, normalized_name)` | Each company owns its catalogue; global categories are a later option. |
 | Product name (import dedupe) | global, app-level | per company, app-level | Same article names in two companies are normal. |
 | BMD article number (future) | — | per company | Dependency for `add-unique-bmd-article-number`. |
@@ -62,7 +62,7 @@ Service-level duplicate checks use the same scope as the database constraint so 
 
 ### D7 — Provisioning is a manual operator task
 
-No self-service, no admin endpoint. The operator (Chris) follows a runbook in `docs/DEPLOYMENT.md` after a database backup: (1) create the Keycloak users for the new company (company user, one partner user) in the VM admin console and copy their IDs; (2) run a checked-in, parameterized SQL script (`deploy/tenancy/provision-company.sql`, psql variables, single transaction) that inserts the `company_profile` row with canonical tax/register values and the `company_login` binding; (3) log in as the new company user, create the partner in the UI, bind the partner login through the existing "Logins" dialog; (4) verify that each company sees only its own data. The SQL script refuses to run if the subject is already bound. Dev/test: `DemoDataSeeder` seeds company 1 (existing data) and a small company 2 (profile, one partner, two articles, one category, enablements) with bindings to fixed realm user IDs.
+No self-service, no admin endpoint. The operator (Chris) follows a runbook in `docs/DEPLOYMENT.md` after a database backup: (1) create the Keycloak users for the new company (company user, one partner user) in the VM admin console and copy their IDs; (2) run a checked-in, parameterized SQL script (`deploy/tenancy/provision-company.sql`, psql variables, single transaction) that inserts the `companyprofile` row with canonical tax/register values and the `company_login` binding; (3) log in as the new company user, create the partner in the UI, bind the partner login through the existing "Logins" dialog; (4) verify that each company sees only its own data. The SQL script refuses to run if the subject is already bound. Dev/test: `DemoDataSeeder` seeds company 1 (existing data) and a small company 2 (profile, one partner, two articles, one category, enablements) with bindings to fixed realm user IDs.
 
 ### D8 — Error semantics
 
@@ -76,14 +76,14 @@ Legend: **FK** = gets `company_id`; **via X** = scoped through parent X; "Change
 
 | Entity (table) | Scope | Change |
 |---|---|---|
-| `CompanyProfile` (`company_profile`) | tenant root | drop singleton lookup (`CompanyProfileService.findCurrent`, `OrderEmailContent`, shop resources, seeder, tax migration); add `orderNoticeEmail` |
+| `CompanyProfile` (`companyprofile`) | tenant root | drop singleton lookup (`CompanyProfileService.findCurrent`, `OrderEmailContent`, shop resources, seeder, tax migration); add `orderNoticeEmail` |
 | `CompanyLogin` (`company_login`) — new | via company | new binding, global unique subject |
-| `Partner` (`partner`) | **FK** | `PartnerService.list/findOrThrow/duplicate check`, `PartnerImportDefinition` duplicate, unique `(company_id, partner_number)` |
+| `Partner` (`partner`) | **FK** | `PartnerService.list/findOrThrow/duplicate check`, `PartnerImportDefinition` duplicate, unique `(company_id, partnernumber)` |
 | `PartnerLogin` (`partner_login`) | via partner | company endpoints go through scoped partner; reject subject bound as company login |
 | `PartnerTradeProof` (`partner_trade_proof`) | via partner | company endpoints via scoped `findOrThrow`; `PartnerService.list` proof query already by partner ids |
 | `Product` (`product`) | **FK** | `ProductService.list/find/lock`, `EnablementService` list/find, `OrderService` item lookup, import dedupe, dashboard `Product.count()` |
 | `Category` (`article_categories`) | **FK** | `CategoryService` list/find/lock-all/duplicate, import category lookup, shop block `categoryExists`, unique `(company_id, normalized_name)` |
-| `ProductImage` (`product_image`) | **FK** | `ProductImageService.list/findOrThrow`, `ProductService.applyImage`, `GET /api/product-images/{id}` for partner (own company only) |
+| `ProductImage` (`productimage`) | **FK** | `ProductImageService.list/findOrThrow`, `ProductService.applyImage`, `GET /api/product-images/{id}` for partner (own company only) |
 | `ProductEnablement` (`product_enablement`) | via partner (+ product same company) | `EnablementService.enable/disable/list` check both sides; `PartnerShopService.overview` query |
 | `Kunde` (`kunde`) | via partner | none for partner API; company `GET /partners/{id}/customers` via scoped partner |
 | `Order` (`orders`) | via partner | `OrderService.listAll/countUnseen/updateStatus/markSeen/createForPartnerId`, `CsvExportService`, `DashboardService.company` |
@@ -126,38 +126,52 @@ Legend: **FK** = gets `company_id`; **via X** = scoped through parent X; "Change
 1. `CsvExportService` and `OrderService.listAll/countUnseen`, `DashboardService.company` use `listAll()`/global counts — a miss leaks all orders of the other company in one download.
 2. `GET /api/product-images/{id}` is readable by every partner for any id (accepted risk 09.07.2026) — becomes a cross-company leak; also `ProductService.applyImage` accepts any image id.
 3. Cross-root references in payloads: product → category/image, enablement partner ↔ product, shop block → `Category.findById` — a foreign id would silently link data across companies.
-4. Migration DDL on prod: Hibernate-named unique constraints (`partner_number`, `normalized_name`, `singleton_key`) must be found by column via `pg_constraint` and dropped; a wrong drop or missed backfill blocks startup on the only VM.
+4. Migration DDL on prod: Hibernate-named unique constraints (`partnernumber`, `normalized_name`, `singletonkey`) in Release B must be found by column via `pg_constraint` and dropped; a wrong drop or missed backfill blocks startup on the only VM.
 5. `CategoryService.lockAll` (`find("order by id").withLock(...)`) and similar global locks — must be limited to own rows, otherwise company A's edit blocks/reads company B's catalogue.
+
+## Additional isolation details (Codex review 25.10.2026)
+
+- **Image caching.** `GET /api/product-images/{id}` answers `Cache-Control: private, no-store` instead of `public, max-age=31536000, immutable`; browser and proxy caches ignore the `Authorization` header, so a cached image would bypass the company check after a login switch. The frontend blob cache (`frontend/src/lib/product-images.js`) is cleared and its object URLs revoked on logout and identity change (`auth.js`). Article imports accept an internal image reference (`/api/product-images/{id}`) only if the image belongs to the caller's company (`ProductImportDefinition`).
+- **Subject exclusivity.** Separate unique constraints on `company_login` and `partner_login` cannot stop one subject being bound on both sides concurrently. Both binding paths (partner binding in `PartnerLoginService` and the company provisioning script) take the same transactional lock `pg_advisory_xact_lock(hashtext('login_subject:' || subject))` before checking both tables and inserting; the existing `partner_login:` key is replaced by this shared key.
 
 ## Migration Plan
 
-New `CompanyTenancyMigrationService.migrate()`, called from `DemoDataSeeder.onStart` right after the tax-identifier migration (which guarantees the demo profile exists), same transaction pattern:
+**Physical names.** The project has no naming strategy: unquoted camelCase maps to lowercase (`companyprofile`, `productimage`, `partner.partnernumber`, `companyprofile.singletonkey`; `article_categories.normalized_name` is explicit). All migration SQL uses these existing names; new columns are explicitly named (`company_id`). No entity is renamed (a new `@Table` name would make Hibernate `update` create an empty new table).
 
-1. `LOCK TABLE` on `company_profile`, `partner`, `product`, `article_categories`, `product_image` (ACCESS EXCLUSIVE).
-2. If `company_profile` has no row: if any of the four owned tables has rows → abort startup with a German `IllegalStateException` ("Mandanten-Übernahme abgebrochen: Daten ohne Firmenprofil."); else nothing to migrate (empty install).
-3. If any owned row has `company_id is null`: allowed only if exactly one profile exists → set `company_id` to that profile's id; otherwise abort ("… mehrere Firmen, nicht zuordenbare Daten.").
-4. Drop the single-column unique constraints on `partner.partner_number`, `article_categories.normalized_name`, `company_profile.singleton_key` (looked up by table+column in `pg_constraint`, skipped if absent) and `ALTER COLUMN singleton_key DROP NOT NULL`.
-5. `ALTER COLUMN company_id SET NOT NULL` on the four tables; `create unique index if not exists` on `(company_id, partner_number)` and `(company_id, normalized_name)` — the same constraints the entity declares for fresh schemas.
-6. Verify (counts of null `company_id` = 0, constraints present); any failure rolls back the transaction and stops startup, leaving data untouched.
+**Why two releases.** The deploy gateway restores the previous image automatically when the new one fails readiness (`deploy/ssh/papo-deploy-gateway` `restore_backend`) and never reverts SQL. Every release must therefore run on the schema the *next* release leaves behind. As with the OIDC binding (Release A/B), the change ships as expand → contract:
 
-Idempotent: on a migrated or fresh database every step is a no-op. Entity mappings declare `company_id` without `nullable = false` in the column DDL (like the tax identifier) so Hibernate `update` can add it to non-empty tables; NOT NULL is enforced by step 5 and by the services.
+**Release A (expand, compatible with the current `main` image):**
+1. `CompanyTenancyMigrationService.expand()`, called from `DemoDataSeeder.onStart` after the tax-identifier migration, one transaction: `LOCK TABLE companyprofile, partner, product, article_categories, productimage IN ACCESS EXCLUSIVE MODE`.
+2. No profile but owned rows → abort startup ("Mandanten-Übernahme abgebrochen: Daten ohne Firmenprofil."). Unassigned owned rows (`company_id is null`) → allowed only with exactly one profile → assign to it; otherwise abort ("… mehrere Firmen, nicht zuordenbare Daten.").
+3. `company_id` stays nullable at database level; the old global unique constraints and `singletonkey` (value `CURRENT` on company 1) stay untouched. Entities declare only the composite uniques `(company_id, partnernumber)` / `(company_id, normalized_name)` and keep `singletonKey` as a nullable, unused field, so Hibernate `update` neither re-adds nor drops the old constraints.
+4. All A code sets `company_id` on every insert and scopes every read; company users resolve via `CompanyLogin`. Company 2 is **not** provisioned in A (old global uniques and NOT NULL `singletonkey` would block it anyway).
+- Automatic rollback A → old `main` image: works unchanged (nullable `company_id` and `company_login` are ignored, singleton row intact). Rows the old image writes meanwhile have no company; the next A start backfills them again (idempotent).
+
+**Release B (contract, compatible with the A image), only after A is live and `company-demo` is bound:**
+1. `CompanyTenancyMigrationService.contract()`: same lock; backfill as in A if needed; verify no `company_id is null`.
+2. `ALTER COLUMN company_id SET NOT NULL` on the four tables; drop the single-column unique constraints on `partner.partnernumber`, `article_categories.normalized_name`, `companyprofile.singletonkey` (looked up by table+column in `pg_constraint`, skipped if absent); `ALTER COLUMN singletonkey DROP NOT NULL`. Entity drops `singletonKey`.
+3. Verify (null counts 0, composite uniques present, old ones gone); any failure rolls back the transaction and stops startup.
+- Automatic rollback B → A image: works (A always writes `company_id`, does not use the singleton or the old uniques).
+- Company 2 is provisioned only after B is verified (D7).
+
+Both steps are idempotent; on a fresh schema (dev/test drop-and-create) they are no-ops.
 
 **Rollout:**
 
-1. Upgrade check locally: start the new release against a database dump created by the current `main` release with schema `update`; verify all rows in company 1, constraints, logins and both demo flows.
-2. On the VM, before merge: `deploy/backup/backup.sh` (dump of `partnerportal` and `keycloak`), note the current image SHA.
-3. Merge → deploy. Company users get 403 until bound (no fallback, D4). Immediately: copy the `company-demo` Keycloak user ID, run the provisioning script's bind-only mode for company 1, log in, verify data.
-4. Only after step 3 is verified: provision company 2 (D7).
+1. Upgrade check locally for each release: start A on a dump created by the current `main` release (schema `update`, demo data), then B on the resulting database; verify rows in company 1, constraints, logins, both demo flows. Also force a readiness failure after a committed A/B migration in `deploy/ssh/test-papo-deploy-gateway.sh` and verify that writes still work on the restored previous image.
+2. On the VM before each merge: `deploy/backup/backup.sh` (dump of `partnerportal` and `keycloak`), note the current image SHA.
+3. Merge A → deploy. Company users get 403 until bound (no fallback, D4). Immediately bind `company-demo` (runbook bind-only mode), log in, verify data. The gateway readiness check only proves an unauthenticated 401, so this manual authenticated check is mandatory.
+4. Merge B → deploy → verify again → provision company 2.
 
 **Rollback:**
 
-- Before company 2 exists: old release needs `company_id` nullable again → runbook SQL `ALTER TABLE partner|product|article_categories|product_image ALTER COLUMN company_id DROP NOT NULL;` and restore a value for `company_profile.singleton_key` (`update company_profile set singleton_key='CURRENT'`) plus its unique constraint; then start the previous SHA. The extra columns/tables stay (ignored by the old release).
-- After company 2 exists: the old release would show both companies' data to every company user → **no code rollback**; restore the pre-deploy backup or fix forward.
-- The database is never rolled back automatically (gateway behaviour unchanged).
+- After A: automatic or manual start of the previous SHA, no SQL needed.
+- After B, before company 2: start the A SHA (automatic restore does this), no SQL needed.
+- After company 2 exists: never start a pre-A image (it would show both companies' data to every company user); restore the pre-B backup or fix forward. The A image stays safe.
 
 ## Risks / Trade-offs
 
-- [Risk] Single VM deploys on merge; a failing migration stops the backend. Mitigation: upgrade check against a real dump, backup before merge, gateway health check keeps/restores the previous image (which then needs the rollback SQL), migration aborts atomically.
+- [Risk] Single VM deploys on merge; a failing migration stops the backend. Mitigation: upgrade check against a real dump, backup before merge, expand/contract keeps every automatic restore schema-compatible, migration aborts atomically.
 - [Risk] A missed query leaks data. Mitigation: central scoped finders, cross-tenant test per endpoint group, grep checklist for `listAll(`, `findById(`, `count(` in company code during review, independent security and database review.
 - [Risk] Keycloak realm changes do not reapply on deploy. Mitigation: VM users are created manually in the admin console; realm JSON only affects dev/test and fresh installs; runbook step.
 - [Risk] Demo logins with known passwords exist for both companies. Mitigation: VM contains demo data only; company-2 users get non-demo passwords stored only in Vaultwarden; before real data all demo logins are disabled (existing DEPLOYMENT.md rule).

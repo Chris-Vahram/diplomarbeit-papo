@@ -45,6 +45,10 @@ A company login binding SHALL map one verified OIDC subject to exactly one compa
 - **WHEN** the operator provisions a company binding for a subject that already has a partner binding
 - **THEN** the provisioning aborts without changes
 
+#### Scenario: Concurrent binding of one subject
+- **WHEN** a partner binding and a company provisioning for the same subject run at the same time
+- **THEN** exactly one succeeds and the other is rejected, because both take the same subject lock before checking
+
 #### Scenario: Revoked company login
 - **WHEN** a company user whose binding was revoked calls a company endpoint
 - **THEN** the system responds 403 with "Kein Firmenkonto mit diesem Login verknüpft."
@@ -80,7 +84,7 @@ Partner numbers, article category names and import duplicate checks SHALL be uni
 - **THEN** the request is rejected with "Diese Kennung ist bereits vergeben."
 
 ### Requirement: Existing data migrates to company one
-On startup the system SHALL assign every company-owned row without company to the single existing company profile, then enforce NOT NULL and per-company unique constraints. The migration SHALL be idempotent and atomic and SHALL stop startup without changes if data cannot be assigned unambiguously.
+On startup the system SHALL assign every company-owned row without company to the single existing company profile. The change SHALL ship as an expand release that stays compatible with the previous image and a contract release that enforces NOT NULL and per-company uniqueness. Each step SHALL be idempotent and atomic and SHALL stop startup without changes if data cannot be assigned unambiguously.
 
 #### Scenario: Existing demo database
 - **WHEN** the new release starts on a database with one company profile and unassigned partners, articles, categories and images
@@ -93,6 +97,10 @@ On startup the system SHALL assign every company-owned row without company to th
 #### Scenario: Repeated start
 - **WHEN** the application restarts on a migrated database
 - **THEN** the migration changes nothing
+
+#### Scenario: Automatic restore after a failed deploy
+- **WHEN** a release's migration has committed and the deploy gateway restores the previous image because readiness failed
+- **THEN** the previous image starts and can still read and write orders, partners and articles
 
 ### Requirement: Manual company provisioning
 A new company SHALL be onboarded only by the operator through the documented runbook (backup, Keycloak users, provisioning script, binding, verification). The system SHALL offer no self-service signup and no company-creation endpoint. Dev and test SHALL seed two companies with fixed login bindings.

@@ -19,6 +19,10 @@ The system SHALL serve a stored product image's bytes at a stable, id-addressed 
 - **WHEN** a company or partner user of company B requests an image id owned by company A
 - **THEN** the system responds with the same not-found result
 
+#### Scenario: No shared caching after a login switch
+- **WHEN** a user of company A loaded an image, logs out and a user of company B logs in in the same browser
+- **THEN** the image is not served from the HTTP or frontend cache; responses are `private, no-store` and the frontend image cache is cleared on logout
+
 ### Requirement: Company picks from a gallery of uploaded images
 The system SHALL let a company user list all product images previously uploaded by the own company and assign any of them to an own product, so one uploaded image can be reused across multiple products of that company.
 

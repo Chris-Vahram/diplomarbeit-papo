@@ -10,7 +10,8 @@ PAPO serves exactly one reference company today: `CompanyProfile` is a singleton
 - **Isolation everywhere:** every company endpoint (45) filters by the caller's company; every foreign id (path or payload) answers 404 as if missing; exports, image/proof downloads, imports, dashboards, unseen counter, mail outbox and shop editor/public reads stay within one company.
 - **Uniqueness per company:** partner number, category name, import duplicate checks (and later the BMD article number). Global stays: OIDC subject, shop identifier (`/shop/<kennung>` has no company segment).
 - **Mail:** order mails are signed with the order's company name; the company notice recipient becomes per-company (see design, open decision).
-- **Migration:** idempotent startup migration assigns all existing rows to "company 1" (the existing profile), then enforces NOT NULL and per-company unique indexes; backup and rollback runbook. **BREAKING** for an old release on the migrated schema (rollback needs the runbook).
+- **Migration in two releases:** Release A (expand) assigns all existing rows to "company 1" and stays compatible with the previous image; Release B (contract) enforces NOT NULL and per-company uniqueness and stays compatible with A. The gateway's automatic restore therefore never starts an incompatible image. Company 2 is provisioned only after B; from then on a pre-A image must never run again (backup restore instead).
+- **Isolation details:** product images `private, no-store` plus frontend cache reset on logout; one shared lock for company and partner login bindings of a subject.
 - **Provisioning:** a second test company and its first company login are created manually by the operator (runbook); dev/test seed two companies; the realm exports gain fixed-id users for company 2. No self-service signup.
 - **Cross-tenant test suite** for every resource, including direct foreign ids and company-B partner logins.
 
