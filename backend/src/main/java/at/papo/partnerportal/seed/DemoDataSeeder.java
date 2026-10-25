@@ -104,8 +104,7 @@ public class DemoDataSeeder {
     }
 
     private void seedPartners() {
-        // Canonical (upper-case) partner number == the Keycloak demo user "partner-demo"
-        // (resolve() upper-cases the login claim), so login -> dashboard works out of the box.
+        // Canonical (upper-case) demo partner number; the login is linked via PartnerLogin (OIDC subject).
         persistPartner("PARTNER-DEMO", "Huemer GmbH", address("Hauptstraße", "12", "4020", "Linz"),
                 "partner-demo@example.at", "+43 660 1234567", "10.00", true, "ATU12345678");
         // No linked Keycloak user yet — demonstrates the manual-provisioning gap (design.md).
