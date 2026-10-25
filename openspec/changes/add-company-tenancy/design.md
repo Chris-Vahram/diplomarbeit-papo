@@ -35,7 +35,7 @@ The codebase already scopes partner data explicitly via `CurrentPartner`. Compan
 
 ### D4 — Tenant resolution from verified identity only
 
-- **Company users:** new entity `CompanyLogin` (`company_login`: `id`, `oidcSubject` unique NOT NULL, `company` FK NOT NULL, `createdAt`, `createdBy`, `revokedAt`, `revokedBy`) — same shape as `PartnerLogin`, so personal accounts can extend both. New `@RequestScoped security/CurrentCompany.resolve()` reads only `JsonWebToken.getSubject()`; no active binding → 403 "Kein Firmenkonto mit diesem Login verknüpft."; revoked → same 403. No username/e-mail/claim fallback. Chosen over a Keycloak user attribute + protocol mapper or Keycloak Organizations because realm changes are not reapplied on deploy (DEPLOYMENT.md), it needs no Keycloak configuration on the VM, and it is testable like `PartnerLogin` (see open decision 2).
+- **Company users:** new entity `CompanyLogin` (`company_login`: `id`, `oidcSubject` unique NOT NULL, `company` FK NOT NULL, `createdAt`, `createdBy`, `revokedAt`, `revokedBy`) — same shape as `PartnerLogin`, so personal accounts can extend both. New `@RequestScoped security/CurrentCompany.resolve()` reads only `JsonWebToken.getSubject()`; no active binding → 403 "Kein Firmenkonto mit diesem Login verknüpft."; revoked → same 403. No username/e-mail/claim fallback. Chosen over a Keycloak user attribute + protocol mapper or Keycloak Organizations because realm changes are not reapplied on deploy (DEPLOYMENT.md), it needs no Keycloak configuration on the VM, and it is testable like `PartnerLogin` (see decision 2).
 - **Partner users:** `CurrentPartner.resolve()` unchanged; company = `partner.company`. A partner endpoint never needs `CurrentCompany`.
 - **One subject, one organization:** a subject may be bound either in `company_login` or in `partner_login`, never both; binding attempts across tables are rejected (409). A token with both roles but only a partner binding gets 403 on company endpoints.
 - **Ignored inputs:** `Host`, `X-Forwarded-Host`, any custom header (e.g. `X-Company-Id`), query parameters and body fields never influence the company. Tests send a conflicting header and expect own-company data.
@@ -58,7 +58,7 @@ Service-level duplicate checks use the same scope as the database constraint so 
 
 ### D6 — Mail per company
 
-`OrderEmailContent` signs with `order.partner.company.businessName` (no singleton lookup). The company notice recipient becomes a nullable company field (`CompanyProfile.orderNoticeEmail`, edited on the existing profile page); empty → the COMPANY row is created as SKIPPED with reason `NO_RECIPIENT`. `PAPO_MAIL_COMPANY_RECIPIENT` is removed; the migration does not copy it (mail is off on the VM, no regression). `papo.mail.redirect-to`, sender and SMTP stay deployment-wide. See open decision 5.
+`OrderEmailContent` signs with `order.partner.company.businessName` (no singleton lookup). The company notice recipient becomes a nullable company field (`CompanyProfile.orderNoticeEmail`, edited on the existing profile page); empty → the COMPANY row is created as SKIPPED with reason `NO_RECIPIENT`. The migration copies a non-empty `papo.mail.company-recipient` into company 1 once (mail is enabled on the VM since `send-order-emails` 4.2); afterwards `PAPO_MAIL_COMPANY_RECIPIENT` is removed. `papo.mail.redirect-to`, sender and SMTP stay deployment-wide. See decision 5.
 
 ### D7 — Provisioning is a manual operator task
 
@@ -165,16 +165,18 @@ Idempotent: on a migrated or fresh database every step is a no-op. Entity mappin
 - [Trade-off] No database-enforced tenant filter (D3); relies on service code plus tests.
 - [Trade-off] Platform-unique shop identifier reveals taken names across companies; accepted, names are public once online.
 
-## Open Decisions (Chris)
+## Decisions (Chris, 25.10.2026)
 
-1. **Tenant root:** reuse `CompanyProfile` as company (D1) or add a separate `Company` table now? Recommendation: reuse; rename later only if needed.
-2. **Company claim source:** server-side `CompanyLogin` binding (D4) vs. Keycloak user attribute + protocol mapper vs. Keycloak Organizations. Recommendation: binding table (consistent with `PartnerLogin`, no realm change on the VM); Organizations only with subdomains/self-service.
-3. **Scoping technique:** explicit service scoping (D3) vs. Hibernate `@TenantId` discriminator. Recommendation: explicit now, discriminator as later hardening.
-4. **Uniqueness:** partner number and category name per company, shop identifier and OIDC subject global (D5). Recommendation: as in D5 (matches roadmap and shop decisions).
-5. **Company notice recipient:** per-company field on the profile, env variable removed (D6) vs. keep env for company 1 only. Recommendation: per-company field; coordinate with `send-order-emails` task 4.2.
-6. **Who provisions and how:** operator Chris via SQL runbook (D7) vs. platform-admin endpoint with a new Keycloak role. Recommendation: runbook for the two test companies; admin endpoint only with personal accounts.
-7. **Login fallback during rollout:** none, fail closed until `company-demo` is bound (D4) vs. transitional "single company" fallback. Recommendation: none.
-8. **Company 2 test data and name:** fictitious name, tax and register values for the second test company. Recommendation: clearly fictitious "Testfirma Zwei GmbH" with synthetic identifiers; no real company data.
-9. **Staging:** run the first two-company version on the current VM (demo data only) or wait for a separate staging VM (PRODUCT_COMPLETION_PLAN decision 1)? Recommendation: ask Herr Bachl; until then local Docker plus the demo VM with demo data only, no real customer.
+All nine planning decisions were taken as recommended:
+
+1. **Tenant root:** reuse `CompanyProfile` as the company (D1); rename only if later needed.
+2. **Company claim source:** server-side `CompanyLogin` binding (D4); no Keycloak attribute or Organizations.
+3. **Scoping technique:** explicit service scoping through central scoped finders (D3); Hibernate `@TenantId` is later hardening.
+4. **Uniqueness:** partner number and category name per company; shop identifier and OIDC subject global (D5).
+5. **Company notice recipient:** per-company field `CompanyProfile.orderNoticeEmail` (D6). Because mail is now enabled on the VM (`send-order-emails` 4.2), the migration copies a non-empty `papo.mail.company-recipient` into company 1 once, then the setting is removed.
+6. **Provisioning:** operator Chris via SQL runbook with backup (D7); admin endpoint only with personal accounts.
+7. **Login fallback:** none; `company-demo` gets 403 until bound after deploy (D4).
+8. **Company 2 test data:** fictitious "Testfirma Zwei GmbH" with synthetic identifiers.
+9. **Staging:** ask Herr Bachl; until then local Docker plus the demo VM with demo data only.
 
 Business rules that need the client company (global categories, partner-number formats, real company onboarding, legal texts per company) remain open and are not decided here.

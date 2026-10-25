@@ -107,21 +107,12 @@ Mitarbeiter-Karrierestufen gleichgesetzt.
 
 ## Nächster konkreter Arbeitsblock
 
-Das UI-Feedback vom 12.10.2026 ist erledigt; parallel spezifiziert Tobias den Shop.
-Beginne mit dem technischen Identity-Grundlagen-Teil aus
-`decouple-partner-number-from-login`: eine stabile OIDC-`sub`-Bindung statt der
-Kopplung von Loginname und Partnernummer. Dieser Teil darf laut aktivem Change
-unabhängig von BMD-Partnernummernregeln umgesetzt werden. Teile ihn daher in einen
-eigenen OpenSpec-Change; lasse BMD-Feldregeln und spätere Partnernummer-Änderungen
-im bestehenden BMD-Change, bis anonymisierte Beispieldaten vorliegen. Beschränke
-die erste Umsetzung auf lokale dev/test-Realm und sichere Migration; keine
-produktive Identitätsänderung oder Demo-VM-Deployment ohne separaten geprüften
-Rollout-/Rollbackplan.
-
-Für diesen Auth-/Persistenzplan ist **höheres Reasoning** sinnvoll: Vertrauensgrenze
-des OIDC-Subjects, eindeutige Bindung, bestehende Demo-Identitäten, Migration,
-Rollback und Autorisierung müssen zusammenpassen. Danach unabhängiger Security-
-und Datenbank-Review.
+Stand 25.10.2026: UI-Feedback (12.10.), OIDC-Login-Bindung (`bind-partner-login-to-oidc-subject`,
+live seit 15.10.) und `refine-portal-frontend` sind erledigt. Nächster Block ist das
+Mandantenfundament: OpenSpec-Change `add-company-tenancy` (zwei Testunternehmen, Firmen-Login
+über `CompanyLogin`, Datenisolation, Migration). Entscheidungen von Chris vom 25.10.2026 stehen
+in dessen `design.md`; vor der Umsetzung unabhängiger Plan-Review (Codex), danach Security-
+und Datenbank-Review des Diffs. Persönliche Konten/Rollen/Audit folgen als eigener Change.
 
 Höheres Reasoning für spätere Planung wird außerdem benötigt für:
 

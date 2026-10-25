@@ -28,7 +28,7 @@ Within a capability package: `XxxResource` (REST), `XxxService` (logic), `Xxx` (
 - Standard REST verbs: `GET` (list/read), `POST` (create), `PUT` (update), no `DELETE` unless a capability spec calls for it.
 
 ### Access control
-Every resource method annotated `@RolesAllowed("company")` or `@RolesAllowed("partner")` — no unannotated protected endpoints (FR-20). Sole exception: the public shop namespace above (`@PermitAll`, listed explicitly in `application.properties`). Partner-scoped endpoints additionally filter by the caller's linked `Partner` id server-side (resolved from the Keycloak username claim), never trust a client-supplied partner id.
+Every resource method annotated `@RolesAllowed("company")` or `@RolesAllowed("partner")` — no unannotated protected endpoints (FR-20). Sole exception: the public shop namespace above (`@PermitAll`, listed explicitly in `application.properties`). Partner-scoped endpoints additionally filter by the caller's linked `Partner` id server-side (resolved via `security/CurrentPartner.resolve()` from the OIDC subject bound in `PartnerLogin`), never trust a client-supplied partner id.
 
 ### Data conventions
 - **Money** (product price, unit-price snapshot, order value, commission basis/value, `commissionPercent`): `java.math.BigDecimal`, mapped to `numeric` — never `double`/`float`.

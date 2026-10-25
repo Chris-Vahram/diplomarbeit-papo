@@ -45,3 +45,4 @@ Each task: first the cross-tenant tests in the named `<Capability>ResourceTest` 
 - [ ] 7.2 Browser check (desktop 1280 px and mobile 390 px): log in as `company-demo` and `company-zwei`, `partner-demo` and `partner-zwei`; each sees only its own partners, articles, orders, dashboard, exports and shop status.
 - [ ] 7.3 `npx --yes @fission-ai/openspec@latest validate add-company-tenancy --strict`, `partnerportal-quality`, independent security and database review (cross-model review recommended: high-stakes change); fix findings.
 - [ ] 7.4 With Chris' approval only: VM rollout per DEPLOYMENT.md (backup, deploy, bind `company-demo`, verify, then provision company 2), record results.
+- [ ] 7.5 On archive: rewrite the Purpose of `openspec/specs/company-profile/spec.md` (still says "deliberately avoiding multi-company tenancy"; a delta cannot change it).

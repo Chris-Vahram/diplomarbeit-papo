@@ -76,7 +76,7 @@ Also in the current stage: central partner + article management by the company, 
 - Active status = DB-only flag `Partner.active`, enforced server-side after authentication. Keycloak stays simple (no enabled-sync).
 - Kunde = reusable entity (select existing or create new); mandatory **Nachname + address**; optional first name, e-mail, phone.
 - Multiple articles per order; `OrderItem` stores a **unit-price snapshot**.
-- Keycloak users are provisioned **manually** (realm export); import creates Partner records only. The login username claim is matched to canonical uppercase `Partner.partnerNumber`; there is no separate `keycloakUsername` field.
+- Keycloak users are provisioned **manually** (realm export); import creates Partner records only. Partner logins are bound to the immutable OIDC subject via `PartnerLogin` (company dialog „Logins“, since 15.10.2026); the partner number is no longer the login name and there is no separate `keycloakUsername` field.
 - Schema: Hibernate auto-generation, no Flyway. dev/test = drop-and-create + programmatic seed (`DemoDataSeeder`, dev/test only); demo/prod = update.
 - Affiliate identifier: deferred, not in MVP.
 - Kunde records are scoped to the creating partner — a partner never sees another partner's end customers.
