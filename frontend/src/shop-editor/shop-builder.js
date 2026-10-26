@@ -15,6 +15,7 @@ import "./template-picker.js";
 import "./setup-dialog.js";
 import "./demo-viewer.js";
 import { stateHtml } from "../lib/states.js";
+import { shopNotVisibleReason } from "../lib/shop-status.js";
 
 // Shop builder (shop-builder spec), opened full screen from "Mein Webshop"
 // (#/partner/shop/editor[?page=<id>]): block palette, live preview in an
@@ -87,7 +88,8 @@ class ShopBuilder extends HTMLElement {
   #saveGeneration = 0;
   #themeSaving = null;
 
-  // PartnerShopDto, for the public link in the small-screen hint.
+  // PartnerShopDto, for the public link in the small-screen hint; its status also decides
+  // whether published pages are publicly visible (reloaded on every #load).
   set shop(value) {
     this.#shop = value;
     if (SMALL_SCREEN.matches) this.#renderSmallScreenHint();
@@ -350,12 +352,15 @@ class ShopBuilder extends HTMLElement {
 
   async #load() {
     try {
-      const [pages, theme, preview, templates] = await Promise.all([
+      const [pages, theme, preview, templates, shop] = await Promise.all([
         apiFetch("/partner/shop/pages"),
         apiFetch("/partner/shop/theme"),
         apiFetch("/partner/shop/preview"),
         apiFetch("/partner/shop/templates"),
+        apiFetch("/partner/shop"),
       ]);
+      this.#shop = shop;
+      this.querySelector("shop-page-manager").notVisible = shopNotVisibleReason(shop);
       this.#pages = pages;
       this.#theme = theme;
       this.#themeDraft = theme.draft;
@@ -451,9 +456,13 @@ class ShopBuilder extends HTMLElement {
       .join("");
     const page = this.#page;
     const changed = page.draftChanged || this.#saveTimer || this.#saving;
-    this.querySelector("#builder-page-state").textContent = page.online
-      ? changed ? "Online · Änderungen offen" : "Online · aktuell"
-      : "Entwurf · nicht online";
+    // "Online" only when visitors can really see the page; otherwise "Veröffentlicht".
+    const live = page.online ? (shopNotVisibleReason(this.#shop) ? "Veröffentlicht" : "Online") : null;
+    const state = this.querySelector("#builder-page-state");
+    state.textContent = live
+      ? changed ? `${live} · Änderungen offen` : `${live} · aktuell`
+      : "Entwurf · nicht veröffentlicht";
+    state.title = page.online ? shopNotVisibleReason(this.#shop) ?? "" : "";
     this.querySelector("#builder-restore").hidden = !page.online || !page.restorable;
     // Address line of the preview window, as the page will appear publicly.
     const path = page.slot === "HOME" ? "" : page.slot === "ARTICLE_DETAIL" ? "/artikel/…" : `/${page.segment}`;
@@ -483,7 +492,10 @@ class ShopBuilder extends HTMLElement {
       });
       this.#replacePage(page);
       await this.#refreshPages();
-      showToast(`„${page.menuName}“ ist veröffentlicht.`, "success");
+      const hidden = shopNotVisibleReason(this.#shop);
+      showToast(hidden
+        ? `„${page.menuName}“ ist veröffentlicht. ${hidden}`
+        : `„${page.menuName}“ ist veröffentlicht und im Shop zu sehen.`, hidden ? "info" : "success");
     } catch (error) {
       if (error.status === 409 && /inzwischen geändert/.test(error.message)) this.#showConflict(error.message);
       else showToast(error.message, "error");
@@ -1062,7 +1074,10 @@ class ShopBuilder extends HTMLElement {
       });
       this.#themeDraft = this.#theme.draft;
       this.#renderDesignPanel();
-      showToast("Design veröffentlicht. Alle Online-Seiten zeigen jetzt die neuen Farben und Schriften.", "success");
+      const hidden = shopNotVisibleReason(this.#shop);
+      showToast(hidden
+        ? `Design veröffentlicht. ${hidden}`
+        : "Design veröffentlicht. Alle Online-Seiten zeigen jetzt die neuen Farben und Schriften.", hidden ? "info" : "success");
     } catch (error) {
       if (error.status === 409) this.#showConflict(error.message);
       else showToast(error.message, "error");
