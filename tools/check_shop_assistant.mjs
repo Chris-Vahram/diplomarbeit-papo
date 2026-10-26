@@ -38,9 +38,16 @@ assert.equal(blocker.title, "Text ist kaum lesbar");
 assert.match(blocker.fix, /dunklere Textfarbe, zum Beispiel #[0-9A-F]{6}/);
 assert.equal(blocker.blockId, "heading-text-1");
 
-// Spec "Borderline contrast": 3.5:1 is a Warnung.
-const border = run([block("heading-text", { heading: "Hallo", background: "surface", colors: { text: "#888888" } })]);
-assert.equal(border.find((finding) => finding.id === "contrast-block:heading-text-1:surface").severity, "warning");
+// Text and secondary text are one finding; the suggestion makes both readable.
+assert.equal(grey.filter((finding) => finding.ruleId === "contrast-block").length, 1);
+const suggested = blocker.fix.match(/#[0-9A-F]{6}/)[0];
+assert.deepEqual(ids(run([block("heading-text", { heading: "Hallo", background: "surface", colors: { text: suggested } })])), []);
+
+// Spec "Borderline contrast": a pair at 3.5:1 is a Warnung (vector #888888 on #FFFFFF), and
+// a block whose worst pair is between 3:1 and 4.5:1 gets a Warnung.
+assert.equal(severityOf(contrast("#888888", "#FFFFFF")), "warning");
+const border = run([block("heading-text", { heading: "Hallo", background: "surface", colors: { text: "#666666" } })]);
+assert.equal(border.find((finding) => finding.ruleId === "contrast-block").severity, "warning");
 
 // A bad theme colour is reported once for the design, not again for every block.
 const badTheme = { ...theme, colors: { ...theme.colors, text: "#BBBBBB" } };

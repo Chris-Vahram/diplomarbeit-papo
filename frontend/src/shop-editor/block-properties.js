@@ -1,12 +1,16 @@
 import { escapeHtml } from "../lib/html.js";
 import { BLOCK_TYPES, COLOR_ROLES, COMMON_FIELDS } from "./block-schema.js";
 import { assetObjectUrl } from "./asset-library.js";
+import { findingsHtml, summaryText } from "./assistant/assistant-view.js";
 
 // Properties panel for the selected block (shop-builder spec "Block editing", "Block colour
 // override in the editor"). Only schema fields are editable. Every edit dispatches
 // "block-change" with { config, key }; key groups typing for undo (editor-history.js).
+// Without a selected block it shows the design assistant's findings for the page and the
+// design; with one, the findings of that block above its fields (shop-design-assistant spec).
 //
-// data: { block, theme, linkPages: [{segment, menuName}], articles, categories }
+// data: { block, theme, linkPages: [{segment, menuName}], articles, categories,
+//         findings: all findings, where: (finding) => place text }
 
 const HEX = /^#[0-9a-f]{6}$/i;
 
@@ -24,6 +28,7 @@ class ShopBlockProperties extends HTMLElement {
       && this.#data.block.config === value.block.config;
     this.#data = value;
     if (!ownEdit) this.#render();
+    else this.#renderFindings();
   }
 
   #config() {
@@ -45,10 +50,12 @@ class ShopBlockProperties extends HTMLElement {
     this.#emit(config, key);
   }
 
+  #tipsOpen = false;
+
   #render() {
     const block = this.#data?.block;
     if (!block) {
-      this.innerHTML = `<p class="builder-empty">Wählen Sie links einen Abschnitt oder klicken Sie in der Vorschau darauf.</p>`;
+      this.#renderOverview();
       return;
     }
     const type = BLOCK_TYPES[block.type];
@@ -58,6 +65,7 @@ class ShopBlockProperties extends HTMLElement {
     }
     this.innerHTML = `
       <h3 class="builder-panel__title">${escapeHtml(type.label)}</h3>
+      <div class="assistant-inline" data-findings></div>
       <div class="builder-props">
         ${type.fields.map((field) => this.#fieldHtml(field)).join("")}
         <h4 class="builder-props__group">Layout</h4>
@@ -67,19 +75,90 @@ class ShopBlockProperties extends HTMLElement {
         ${this.#colorsHtml()}
         <button type="button" class="button-secondary builder-props__reset" data-action="reset-colors">Auf Design zurücksetzen</button>
       </div>`;
-    this.#loadThumb(type);
+    this.#loadThumbs(type);
+    this.#renderFindings();
   }
 
-  #loadThumb(type) {
-    const field = type.fields.find((candidate) => candidate.kind === "image");
-    const id = field && this.#config()[field.name];
-    const thumb = this.querySelector("[data-image-thumb]");
-    if (!id || !thumb) return;
-    assetObjectUrl(id)
-      .then((url) => {
-        thumb.src = url;
-      })
-      .catch(() => {});
+  // Nothing selected: what the assistant found on this page and in the design.
+  #renderOverview() {
+    const findings = this.#data?.findings ?? [];
+    const serious = findings.some((finding) => finding.severity !== "tip");
+    this.innerHTML = `
+      <h3 class="builder-panel__title">Hinweise zu dieser Seite</h3>
+      <p class="assistant-summary${serious ? "" : " is-clear"}">${serious ? "" : `<i data-lucide="circle-check" aria-hidden="true"></i>`}${escapeHtml(summaryText(findings))}</p>
+      <p class="builder-hint">${findings.length
+        ? "Der Assistent prüft Ihre Seite während Sie arbeiten. Blocker verhindern das Veröffentlichen, bei Warnungen fragen wir nach."
+        : "Der Assistent prüft Ihre Seite während Sie arbeiten. Im Moment gibt es nichts zu verbessern."}</p>
+      ${findingsHtml(findings, { where: this.#data?.where, tipsOpen: this.#tipsOpen })}
+      <p class="builder-empty assistant-select-hint">Wählen Sie links einen Abschnitt oder klicken Sie in der Vorschau darauf, um ihn zu bearbeiten.</p>`;
+    this.#bindTips();
+    window.lucide?.createIcons();
+  }
+
+  // Updated on every draft change, also while typing (the fields themselves stay as they are).
+  #renderFindings() {
+    const block = this.#data?.block;
+    if (!block) {
+      this.#renderOverview();
+      return;
+    }
+    const own = (this.#data.findings ?? []).filter((finding) => finding.blockId === block.id);
+    const container = this.querySelector("[data-findings]");
+    if (!container) return;
+    container.hidden = !own.length;
+    container.innerHTML = own.length ? findingsHtml(own, { tipsOpen: this.#tipsOpen }) : "";
+    this.#bindTips();
+    // Inline marker at the affected field or colour.
+    const flagged = new Map(own.filter((finding) => finding.field).map((finding) => [finding.field, finding.severity]));
+    this.querySelectorAll(".builder-field").forEach((row) => {
+      const severity = flagged.get(row.querySelector("[data-field]")?.dataset.field);
+      if (severity) row.dataset.flag = severity;
+      else delete row.dataset.flag;
+    });
+    const colours = new Map(own.filter((finding) => finding.role).map((finding) => [finding.role, finding.severity]));
+    this.querySelectorAll(".builder-color").forEach((row) => {
+      const severity = colours.get(row.querySelector("[data-color]")?.dataset.color);
+      if (severity) row.dataset.flag = severity;
+      else delete row.dataset.flag;
+    });
+    window.lucide?.createIcons();
+  }
+
+  #bindTips() {
+    this.querySelectorAll("[data-assistant-tips]").forEach((details) => details.addEventListener("toggle", () => {
+      this.#tipsOpen = details.open;
+    }));
+  }
+
+  // Moves the keyboard focus to a field or colour named by a finding ("Zum Problem springen").
+  focusField(name) {
+    this.#focus(this.querySelector(`[data-field="${CSS.escape(name)}"]:is(input, textarea, select, button)`));
+  }
+
+  focusColor(role) {
+    const input = this.querySelector(`[data-color-hex="${CSS.escape(role)}"]`);
+    this.#focus(input);
+    input?.select();
+  }
+
+  #focus(target) {
+    target?.scrollIntoView({ block: "center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    target?.focus({ preventScroll: true });
+  }
+
+  #loadThumbs(type) {
+    for (const field of type.fields.filter((candidate) => candidate.kind === "image")) {
+      const id = this.#config()[field.name];
+      const thumb = this.querySelector(`[data-image-thumb="${field.name}"]`);
+      if (!id || !thumb) continue;
+      assetObjectUrl(id)
+        .then((url) => {
+          // Shown once loaded, so a slow image never appears as a broken box.
+          thumb.addEventListener("load", () => { thumb.hidden = false; }, { once: true });
+          thumb.src = url;
+        })
+        .catch(() => {});
+    }
   }
 
   #fieldHtml(field) {
@@ -128,7 +207,7 @@ class ShopBlockProperties extends HTMLElement {
       case "image":
         return `<div class="builder-field">${label}
           <div class="builder-image">
-            <img class="builder-image__thumb" data-image-thumb alt=""${value ? "" : " hidden"} />
+            <img class="builder-image__thumb" data-image-thumb="${field.name}" alt="" hidden />
             <span class="builder-hint" data-image-none${value ? " hidden" : ""}>Kein Bild gewählt.</span>
             <button type="button" class="button-secondary" data-action="pick-image" data-field="${field.name}">${value ? "Bild ändern" : "Bild wählen"}</button>
             ${value && !field.required ? `<button type="button" class="button-secondary" data-action="clear" data-field="${field.name}">Entfernen</button>` : ""}

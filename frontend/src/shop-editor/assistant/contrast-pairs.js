@@ -3,8 +3,9 @@ import { contrast, mix, onColor } from "../../shop/contrast.js";
 // Text/background pairs as shop.css draws them (shop-design-assistant spec "Contrast rule").
 // Mirrored in the backend by ShopDesignRules; keep both in step with shop.css.
 //
-// A pair: { key, label, foreground, background, min, role } - role is the theme colour that
-// fixes it (the text colour, or the fill when the text colour is chosen automatically).
+// A pair: { key, label, foreground, background, min, role, mutedOn } - role is the theme colour
+// that fixes it (the text colour, or the fill when the text colour is chosen automatically);
+// mutedOn marks secondary text, which shop.css mixes from the text colour into that colour.
 
 export const TEXT_MIN = 4.5;
 export const UI_MIN = 3;
@@ -16,18 +17,20 @@ export function severityOf(ratio, min = TEXT_MIN) {
   return null;
 }
 
-const pair = (key, label, foreground, background, min, role) => ({ key, label, foreground, background, min, role });
+const pair = (key, label, foreground, background, min, role, mutedOn = null) =>
+  ({ key, label, foreground, background, min, role, mutedOn });
 
 // --shop-muted: text mixed into the page background.
-const muted = (colors) => mix(colors.text, colors.background, 0.68);
+export const MUTED_SHARE = 0.68;
+const muted = (colors) => mix(colors.text, colors.background, MUTED_SHARE);
 
 // Pairs that use the theme colours alone; every page shows them.
 export function themePairs(colors) {
   return [
     pair("body", "Text auf dem Seitenhintergrund", colors.text, colors.background, TEXT_MIN, "text"),
-    pair("body-muted", "Nebentext auf dem Seitenhintergrund", muted(colors), colors.background, TEXT_MIN, "text"),
+    pair("body-muted", "Nebentext auf dem Seitenhintergrund", muted(colors), colors.background, TEXT_MIN, "text", colors.background),
     pair("surface", "Text auf Flächen (Kopfzeile, Fußzeile, Karten)", colors.text, colors.surface, TEXT_MIN, "text"),
-    pair("surface-muted", "Nebentext auf Flächen", muted(colors), colors.surface, TEXT_MIN, "text"),
+    pair("surface-muted", "Nebentext auf Flächen", muted(colors), colors.surface, TEXT_MIN, "text", colors.background),
     pair("navigation", "Markierung des aktuellen Menüpunkts", colors.primary, colors.surface, UI_MIN, "primary"),
     pair("price", "Preise auf Artikelkarten", colors.primary, colors.surface, TEXT_MIN, "primary"),
     pair("on-primary", "Text auf der Hauptfarbe", onColor(colors.primary), colors.primary, TEXT_MIN, "primary"),
@@ -61,15 +64,15 @@ export function blockPairs(block, colors, form = "klar") {
       break;
     case "surface":
       pairs.push(pair("surface", "Text auf der Fläche", colors.text, colors.surface, TEXT_MIN, "text"));
-      pairs.push(pair("surface-muted", "Nebentext auf der Fläche", muted(colors), colors.surface, TEXT_MIN, "text"));
+      pairs.push(pair("surface-muted", "Nebentext auf der Fläche", muted(colors), colors.surface, TEXT_MIN, "text", colors.background));
       break;
     default:
       pairs.push(pair("body", "Text", colors.text, colors.background, TEXT_MIN, "text"));
-      pairs.push(pair("body-muted", "Nebentext", muted(colors), colors.background, TEXT_MIN, "text"));
+      pairs.push(pair("body-muted", "Nebentext", muted(colors), colors.background, TEXT_MIN, "text", colors.background));
   }
   if (ARTICLE_TYPES.has(block.type)) {
     pairs.push(pair("card", "Text auf Artikelkarten", colors.text, colors.surface, TEXT_MIN, "text"));
-    pairs.push(pair("card-muted", "Kategorie auf Artikelkarten", muted(colors), colors.surface, TEXT_MIN, "text"));
+    pairs.push(pair("card-muted", "Kategorie auf Artikelkarten", muted(colors), colors.surface, TEXT_MIN, "text", colors.background));
     pairs.push(pair("price", "Preise", colors.primary, colors.surface, TEXT_MIN, "primary"));
   }
   button();

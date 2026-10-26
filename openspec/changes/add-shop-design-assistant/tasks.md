@@ -6,9 +6,9 @@
 
 ## 2. UI (essential)
 
-- [ ] 2.1 Assistant panel with severities, explanations, "Zum Problem springen"
-- [ ] 2.2 Inline markers on blocks
-- [ ] 2.3 Publish dialog: blockers stop, warnings require "Trotzdem veröffentlichen"
+- [x] 2.1 Assistant panel with severities, explanations, "Zum Problem springen"
+- [x] 2.2 Inline markers on blocks
+- [x] 2.3 Publish dialog: blockers stop, warnings require "Trotzdem veröffentlichen"
 
 ## 3. Server gating (essential)
 
@@ -17,5 +17,5 @@
 ## 4. Verification
 
 - [ ] 4.1 Tests green; `git diff --check`
-- [ ] 4.2 Browser walkthrough with intentionally bad design
+- [x] 4.2 Browser walkthrough with intentionally bad design
 - [ ] 4.3 Update traceability

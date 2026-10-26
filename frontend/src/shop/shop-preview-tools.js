@@ -1,8 +1,11 @@
 // Editing directly in the editor preview (shop-builder spec "Block editing"): visible texts are
 // editable in place, and the selected block gets a toolbar to move, resize, duplicate and
-// delete it. Loaded only by shop.html?preview inside the editor; the public shop never runs
-// this. Every change goes to the editor as a message; the editor owns the draft, autosave
-// and undo, and sends the updated page back.
+// delete it. Blocks with a Blocker or Warnung of the design assistant carry a marker. Loaded
+// only by shop.html?preview inside the editor; the public shop never runs this. Every change
+// goes to the editor as a message; the editor owns the draft, autosave and undo, and sends
+// the updated page back.
+
+import { escapeHtml } from "../lib/html.js";
 
 // Fields that stay on one line (Enter ends the edit instead of adding a line break).
 const SINGLE_LINE = new Set(["title", "heading", "buttonLabel", "caption", "name", "role"]);
@@ -26,7 +29,10 @@ const ICONS = {
   down: icon('<path d="m6 9 6 6 6-6"/>'),
   copy: icon('<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>'),
   trash: icon('<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>'),
+  blocker: icon('<path d="M2.586 16.726A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2h6.624a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586z"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/>'),
+  warning: icon('<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),
 };
+const FLAG_LABEL = { blocker: ["Blocker", "Blocker"], warning: ["Warnung", "Warnungen"] };
 
 const STYLES = `
 :where([data-editable]) { outline: none; cursor: text; border-radius: 3px; }
@@ -60,6 +66,22 @@ const STYLES = `
 .papo-drop-line[hidden] { display: none; }
 .shop-block.is-dragging { opacity: .4; }
 .shop-root--preview .shop-block { cursor: grab; }
+/* Design assistant marker: severity as icon and word (screen readers), never colour alone. */
+.papo-flag {
+  position: absolute; z-index: 18; display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 9px 0 7px;
+  border: 1px solid transparent; border-radius: 999px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.18);
+  font: 600 12px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; transform: translateX(-100%);
+  transition: transform 100ms ease-out;
+}
+.papo-flag:active { transform: translateX(-100%) scale(.96); }
+.papo-flag:focus-visible { outline: 2px solid #1f2328; outline-offset: 2px; }
+.papo-flag--blocker { background: #b91c1c; color: #fff; }
+.papo-flag--warning { background: #fef3c7; color: #92400e; border-color: #f5d68a; }
+.papo-flag__text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* "Zum Problem springen": the block answers with one short ring that settles. */
+@keyframes papo-flash { from { box-shadow: inset 0 0 0 6px color-mix(in srgb, var(--shop-accent) 70%, transparent); } to { box-shadow: inset 0 0 0 0 transparent; } }
+.papo-flash { animation: papo-flash 900ms cubic-bezier(0.22, 1, 0.36, 1); }
+@media (prefers-reduced-motion: reduce) { .papo-flash { animation-duration: 1ms; } .papo-flag { transition: none; } }
 .papo-dragging, .papo-dragging * { cursor: grabbing !important; user-select: none !important; }
 `;
 
@@ -75,9 +97,11 @@ export function installPreviewTools(root, post) {
   const dropLine = document.createElement("div");
   dropLine.className = "papo-drop-line";
   dropLine.hidden = true;
-  document.body.append(toolbar, dropLine);
+  const flags = document.createElement("div");
+  document.body.append(toolbar, dropLine, flags);
 
   let view = null;
+  let markers = {};
   let selected = null;
   let dragged = null;
   let pending = false;
@@ -90,6 +114,7 @@ export function installPreviewTools(root, post) {
       pending = false;
       makeEditable();
       placeToolbar();
+      placeFlags();
     });
   }).observe(root, { childList: true, subtree: true });
 
@@ -181,7 +206,38 @@ export function installPreviewTools(root, post) {
       value: button.dataset.value,
     });
   });
-  window.addEventListener("resize", placeToolbar);
+  window.addEventListener("resize", () => {
+    placeToolbar();
+    placeFlags();
+  });
+
+  // ---- Design assistant markers -------------------------------------------------------
+
+  function renderFlags() {
+    flags.innerHTML = Object.entries(markers).map(([blockId, { severity, count, title }]) => {
+      const [one, many] = FLAG_LABEL[severity];
+      return `<button type="button" class="papo-flag papo-flag--${severity}" data-flag="${escapeHtml(blockId)}" title="${escapeHtml(title)}">
+        ${ICONS[severity]}<span aria-hidden="true">${count}</span><span class="papo-flag__text">${count} ${count === 1 ? one : many}: ${escapeHtml(title)}</span></button>`;
+    }).join("");
+    placeFlags();
+  }
+
+  // Top right corner of each marked block, below the toolbar's row.
+  function placeFlags() {
+    for (const flag of flags.children) {
+      const element = blocks().find((candidate) => candidate.dataset.blockId === flag.dataset.flag);
+      flag.hidden = !element;
+      if (!element) continue;
+      const rect = element.getBoundingClientRect();
+      flag.style.top = `${rect.top + window.scrollY + 10}px`;
+      flag.style.left = `${rect.right + window.scrollX - 10}px`;
+    }
+  }
+
+  flags.addEventListener("click", (event) => {
+    const flag = event.target.closest("[data-flag]");
+    if (flag) post({ type: "papo-shop-select", blockId: flag.dataset.flag });
+  });
 
   // ---- Reorder by dragging ------------------------------------------------------------
   // Pointer events instead of HTML5 drag & drop: the toolbar must keep the text focus
@@ -261,13 +317,33 @@ export function installPreviewTools(root, post) {
 
   return {
     // After every preview render.
-    afterRender(pageView, selectedBlockId) {
+    // markers: { [blockId]: { severity, count, title } } for Blocker and Warnung findings.
+    afterRender(pageView, selectedBlockId, nextMarkers = {}) {
       view = pageView;
       makeEditable();
       selected = selectedBlockId
         ? blocks().find((element) => element.dataset.blockId === selectedBlockId) ?? null
         : null;
       renderToolbar();
+      if (JSON.stringify(nextMarkers) !== JSON.stringify(markers)) {
+        markers = nextMarkers;
+        renderFlags();
+      } else {
+        placeFlags();
+      }
+    },
+
+    // "Zum Problem springen": bring the block into view and let it answer once.
+    focusBlock(blockId) {
+      const element = blocks().find((candidate) => candidate.dataset.blockId === blockId);
+      if (!element) return;
+      const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      element.scrollIntoView({ block: "center", behavior: reduced ? "auto" : "smooth" });
+      // Restart the ring when the same block is jumped to twice (reading offsetWidth applies the removal).
+      element.classList.remove("papo-flash");
+      void element.offsetWidth;
+      element.classList.add("papo-flash");
+      element.addEventListener("animationend", () => element.classList.remove("papo-flash"), { once: true });
     },
   };
 }

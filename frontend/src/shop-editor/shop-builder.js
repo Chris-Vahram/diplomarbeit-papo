@@ -2,7 +2,7 @@ import { apiFetch } from "../lib/api.js";
 import { API_BASE } from "../lib/config.js";
 import { escapeHtml } from "../lib/html.js";
 import { showToast } from "../components/toast-notice.js";
-import { BLOCK_TYPES, missingRequired, newBlock } from "./block-schema.js";
+import { BLOCK_TYPES, newBlock } from "./block-schema.js";
 import { EditorHistory } from "./editor-history.js";
 import { assetObjectUrl } from "./asset-library.js";
 import { articleImageUrls, imageIds, postPreview, previewPayload } from "./preview-payload.js";
@@ -16,12 +16,15 @@ import "./setup-dialog.js";
 import "./demo-viewer.js";
 import { stateHtml } from "../lib/states.js";
 import { shopNotVisibleReason } from "../lib/shop-status.js";
+import { evaluate, gate, SEVERITIES } from "./assistant/assistant.js";
+import { countText, findingsHtml, summaryText, worstSeverity } from "./assistant/assistant-view.js";
 
 // Shop builder (shop-builder spec), opened full screen from "Mein Webshop"
 // (#/partner/shop/editor[?page=<id>]): block palette, live preview in an
 // iframe of shop.html?preview (design.md Decision 3) and properties panel, plus the tabs
 // "Seiten", "Design" and "Bilder". Drafts are saved as whole pages with the loaded version
-// (Decision 1); undo/redo is a client-side snapshot stack (Decision 2).
+// (Decision 1); undo/redo is a client-side snapshot stack (Decision 2). The design assistant
+// (shop-design-assistant spec) checks the drafts on every change and gates publishing.
 
 const AUTOSAVE_MS = 1500;
 const SMALL_SCREEN = window.matchMedia("(max-width: 767px)");
@@ -56,6 +59,38 @@ function move(list, from, to) {
   return copy;
 }
 
+// Block list marker: the worst Blocker/Warnung of a block, as icon plus hidden word.
+function flagHtml(findings) {
+  if (!findings.length) return "";
+  const severity = findings[0].severity;
+  const text = findings.length === 1 ? findings[0].title : countText(severity, findings.length);
+  return ` <span class="block-row__flag block-row__flag--${severity}" title="${escapeHtml(text)}"><i data-lucide="${SEVERITIES[severity].icon}" aria-hidden="true"></i><span class="visually-hidden">${escapeHtml(`${SEVERITIES[severity].label}: ${text}`)}</span></span>`;
+}
+
+// Preview markers per block: Blocker and Warnung only, so Tipps never clutter the page.
+function previewMarkers(findings) {
+  const markers = {};
+  for (const finding of findings) {
+    if (!finding.blockId || finding.severity === "tip") continue;
+    const marker = markers[finding.blockId] ??= { severity: finding.severity, count: 0, title: finding.title };
+    marker.count += 1;
+  }
+  return markers;
+}
+
+// A publish the server refused (its blocker check, design.md Decision 2), shown like a finding.
+function serverFinding(message) {
+  return {
+    id: "server",
+    severity: "blocker",
+    scope: "page",
+    target: null,
+    title: "Veröffentlichen wurde abgelehnt",
+    why: message,
+    fix: "Beheben Sie den genannten Punkt und veröffentlichen Sie dann erneut.",
+  };
+}
+
 class ShopBuilder extends HTMLElement {
   #shop = null;
   #pages = null;
@@ -76,6 +111,11 @@ class ShopBuilder extends HTMLElement {
   #collapsedSides = { left: false, right: false };
   #small = null;
   #screenTimer = null;
+  // Design assistant: current findings, and what is known about the shop's images
+  // ({ [assetId]: { sizeBytes, width } }) for the image rules.
+  #findings = [];
+  #imageInfo = {};
+  #publishKind = null;
 
   #saveTimer = null;
   #saving = null;
@@ -196,6 +236,7 @@ class ShopBuilder extends HTMLElement {
           <button type="button" class="builder-icon" id="builder-undo" title="Rückgängig (Strg+Z)" aria-label="Rückgängig" disabled>↶</button>
           <button type="button" class="builder-icon" id="builder-redo" title="Wiederholen (Strg+Umschalt+Z)" aria-label="Wiederholen" disabled>↷</button>
           <button type="button" class="button-secondary" id="builder-restore" title="Vorherige veröffentlichte Version wiederherstellen" hidden>Wiederherstellen</button>
+          <button type="button" class="assistant-status" id="builder-assistant" title="Hinweise des Gestaltungs-Assistenten anzeigen"></button>
           <button type="button" class="button-primary" id="builder-publish">Seite veröffentlichen</button>
         </div>
 
@@ -257,6 +298,11 @@ class ShopBuilder extends HTMLElement {
           </div>
         </modal-dialog>
 
+        <modal-dialog title="Veröffentlichen" id="builder-publish-dialog">
+          <div class="publish-check" data-publish-body></div>
+          <div class="entity-form__actions" data-publish-actions></div>
+        </modal-dialog>
+
         <shop-template-picker></shop-template-picker>
         <shop-setup-dialog></shop-setup-dialog>
         <shop-demo-viewer></shop-demo-viewer>
@@ -290,6 +336,20 @@ class ShopBuilder extends HTMLElement {
     this.querySelector("#builder-undo").addEventListener("click", () => this.#undo());
     this.querySelector("#builder-redo").addEventListener("click", () => this.#redo());
     this.querySelector("#builder-publish").addEventListener("click", () => this.#publish());
+    this.querySelector("#builder-assistant").addEventListener("click", () => this.#showAssistant());
+    // "Zum Problem springen" in the inspector, the Design tab and the publish dialog.
+    this.addEventListener("click", (event) => {
+      const jump = event.target.closest("[data-jump]");
+      if (jump) this.#jump(jump.dataset.jump);
+    });
+    const publishDialog = this.querySelector("#builder-publish-dialog");
+    publishDialog.addEventListener("click", (event) => {
+      if (event.target.closest("[data-publish-close]")) publishDialog.close();
+      if (!event.target.closest("[data-publish-confirm]")) return;
+      publishDialog.close();
+      if (this.#publishKind === "theme") this.#publishTheme({ confirmed: true });
+      else this.#publish({ confirmed: true });
+    });
     this.querySelector("#builder-restore").addEventListener("click", () => this.querySelector("#builder-restore-dialog").open());
     this.querySelector("#builder-restore-confirm").addEventListener("click", () => this.#restore());
     this.querySelector("#builder-conflict-reload").addEventListener("click", () => this.#reloadAfterConflict());
@@ -325,6 +385,8 @@ class ShopBuilder extends HTMLElement {
     });
     this.querySelector("#builder-image-dialog").addEventListener("asset-pick", (event) => {
       this.querySelector("#builder-image-dialog").close();
+      // A fresh upload: its file size is only known from the library.
+      if (!this.#imageInfo[event.detail.id]?.sizeBytes) this.#loadImageSizes();
       this.querySelector("shop-block-properties").setImage(this.#pickField, event.detail.id);
     });
     this.addEventListener("page-open", (event) => {
@@ -373,6 +435,7 @@ class ShopBuilder extends HTMLElement {
       const start = pages.pages.find((page) => page.id === requestedPageId()) ?? pages.pages[0];
       await this.#openPage(start.id, { skipFlush: true });
       this.#resolveArticleImages();
+      this.#loadImageSizes();
       if (pages.setupNeeded) this.querySelector("shop-setup-dialog").open(templates);
     } catch (error) {
       const body = this.querySelector(".builder-body");
@@ -472,11 +535,12 @@ class ShopBuilder extends HTMLElement {
     this.querySelector("#builder-redo").disabled = !this.#history.canRedo;
   }
 
-  async #publish() {
-    const problems = missingRequired(this.#blocks);
-    if (problems.length) {
-      this.#select(problems[0].blockId);
-      showToast(`Bitte zuerst ergänzen: ${problems.map((problem) => problem.message).join(" ")}`, "error");
+  // shop-design-assistant spec "Publish gating": Blocker stop, Warnungen need
+  // "Trotzdem veröffentlichen"; the server re-checks the blockers.
+  async #publish({ confirmed = false } = {}) {
+    const { blockers, warnings } = gate(this.#findings, ["page", "block"]);
+    if (blockers.length || (warnings.length && !confirmed)) {
+      this.#openPublishDialog("page", { blockers, warnings });
       return;
     }
     if (!(await this.#flush())) {
@@ -498,11 +562,32 @@ class ShopBuilder extends HTMLElement {
         : `„${page.menuName}“ ist veröffentlicht und im Shop zu sehen.`, hidden ? "info" : "success");
     } catch (error) {
       if (error.status === 409 && /inzwischen geändert/.test(error.message)) this.#showConflict(error.message);
+      else if (error.status === 400) this.#openPublishDialog("page", { blockers: [serverFinding(error.message)] });
       else showToast(error.message, "error");
     } finally {
       button.disabled = false;
       this.#renderPageBar();
     }
+  }
+
+  #openPublishDialog(kind, { blockers = [], warnings = [] }) {
+    this.#publishKind = kind;
+    const dialog = this.querySelector("#builder-publish-dialog");
+    const subject = kind === "theme" ? "das Design" : "diese Seite";
+    const where = (finding) => this.#findingPlace(finding);
+    dialog.setAttribute("title", blockers.length ? "Noch nicht veröffentlichen" : "Vor dem Veröffentlichen");
+    dialog.querySelector("[data-publish-body]").innerHTML = blockers.length
+      ? `<p>Bevor Sie ${subject} veröffentlichen können, ${blockers.length === 1 ? "muss dieser Punkt" : "müssen diese Punkte"} behoben sein:</p>
+        ${findingsHtml(blockers, { where })}`
+      : `<p>Sie können ${subject} veröffentlichen. ${warnings.length === 1 ? "Dieser Punkt stört" : "Diese Punkte stören"} aber Ihre Kundinnen und Kunden:</p>
+        ${findingsHtml(warnings, { where })}`;
+    dialog.querySelector("[data-publish-actions]").innerHTML = blockers.length
+      ? `<button type="button" class="button-primary" data-publish-close>Verstanden</button>`
+      : `<button type="button" class="button-secondary" data-publish-close>Abbrechen</button>
+        <button type="button" class="button-primary" data-publish-confirm>Trotzdem veröffentlichen</button>`;
+    dialog.open();
+    window.lucide?.createIcons();
+    dialog.querySelector("[data-publish-actions] button").focus();
   }
 
   async #restore() {
@@ -629,10 +714,11 @@ class ShopBuilder extends HTMLElement {
         const fixed = type?.fixed;
         const summary = blockSummary(block);
         const selected = block.id === this.#selectedId;
+        const own = this.#findings.filter((finding) => finding.blockId === block.id && finding.severity !== "tip");
         return `<li class="block-row${selected ? " is-selected" : ""}" draggable="true" data-block-id="${escapeHtml(block.id)}">
           <button type="button" class="block-row__select" data-action="select" aria-pressed="${selected}">
             <span class="block-row__handle" aria-hidden="true">⠿</span>
-            <span class="block-row__label">${escapeHtml(type?.label ?? block.type)}</span>
+            <span class="block-row__label">${escapeHtml(type?.label ?? block.type)}${flagHtml(own)}</span>
             ${summary ? `<span class="block-row__summary">${escapeHtml(summary)}</span>` : ""}
           </button>
           <span class="block-row__actions">
@@ -644,6 +730,7 @@ class ShopBuilder extends HTMLElement {
         </li>`;
       })
       .join("");
+    window.lucide?.createIcons();
   }
 
   #onBlockListClick(event) {
@@ -913,10 +1000,95 @@ class ShopBuilder extends HTMLElement {
   };
 
   #renderAll() {
+    this.#runAssistant();
     this.#renderBlockList();
     this.#renderProperties();
     this.#renderPageBar();
     this.#sendPreview();
+  }
+
+  // ---- Design assistant --------------------------------------------------------------
+
+  // Synchronous on every draft change (spec "Live feedback"); nothing leaves the browser.
+  #runAssistant() {
+    if (!this.#page || !this.#themeDraft) return;
+    this.#findings = evaluate({ page: this.#page, blocks: this.#blocks, theme: this.#themeDraft, images: this.#imageInfo });
+    const status = this.querySelector("#builder-assistant");
+    const worst = worstSeverity(this.#findings);
+    status.dataset.severity = worst ?? "none";
+    status.innerHTML = `<i data-lucide="${worst ? SEVERITIES[worst].icon : "circle-check"}" aria-hidden="true"></i><span>${escapeHtml(summaryText(this.#findings))}</span>`;
+    window.lucide?.createIcons();
+  }
+
+  // After a theme change or new image facts: everything that shows findings.
+  #refreshAssistant() {
+    this.#runAssistant();
+    this.#renderBlockList();
+    this.#renderProperties();
+    this.#renderDesignPanel();
+    this.#sendPreview();
+  }
+
+  #findingPlace(finding) {
+    if (finding.scope === "theme") return "Design";
+    const index = this.#blocks.findIndex((block) => block.id === finding.blockId);
+    if (index === -1) return "Ganze Seite";
+    return `Abschnitt ${index + 1} · ${BLOCK_TYPES[this.#blocks[index].type]?.label ?? ""}`;
+  }
+
+  // Status button: the page-wide list sits in the inspector while no block is selected.
+  #showAssistant() {
+    this.#selectedId = null;
+    this.#collapsedSides.right = false;
+    this.#applyCollapse();
+    this.#renderBlockList();
+    this.#renderProperties();
+    this.#sendPreview();
+    this.querySelector(".builder-right").scrollTop = 0;
+  }
+
+  // "Zum Problem springen" (spec "Jump to problem"): selects and shows what the finding is about.
+  #jump(id) {
+    const finding = this.#findings.find((candidate) => candidate.id === id);
+    if (!finding) return;
+    this.querySelector("#builder-publish-dialog").close();
+    switch (finding.target) {
+      case "theme":
+        this.#showTab("design");
+        this.querySelector("shop-design-panel").focusColor(finding.role);
+        break;
+      case "page-settings":
+        this.#showTab("pages");
+        this.querySelector("shop-page-manager").openSettings(this.#page.id);
+        break;
+      case "palette":
+        this.#showTab("edit");
+        this.#collapsedSides.left = false;
+        this.#applyCollapse();
+        this.#showSideTab("add");
+        this.querySelector("shop-block-palette button")?.focus();
+        break;
+      case "block":
+        this.#collapsedSides.right = false;
+        this.#applyCollapse();
+        this.#select(finding.blockId);
+        this.querySelector("#builder-frame")?.contentWindow?.postMessage({ type: "papo-shop-focus", blockId: finding.blockId }, location.origin);
+        if (finding.field) this.querySelector("shop-block-properties").focusField(finding.field);
+        else if (finding.role) this.querySelector("shop-block-properties").focusColor(finding.role);
+        break;
+      default:
+    }
+  }
+
+  // File sizes come from the image library; widths from the loaded images (#loadAssetUrls).
+  async #loadImageSizes() {
+    try {
+      const { assets } = await apiFetch("/partner/shop/assets");
+      for (const asset of assets) this.#imageInfo[asset.id] = { ...this.#imageInfo[asset.id], sizeBytes: asset.sizeBytes };
+      this.#refreshAssistant();
+    } catch {
+      // Without sizes the image rules stay silent; everything else keeps working.
+    }
   }
 
   #renderProperties() {
@@ -931,6 +1103,8 @@ class ShopBuilder extends HTMLElement {
       linkPages,
       articles: this.#preview.articles,
       categories: this.#preview.categories,
+      findings: this.#findings,
+      where: (finding) => this.#findingPlace(finding),
     };
   }
 
@@ -1026,6 +1200,7 @@ class ShopBuilder extends HTMLElement {
       draft: this.#themeDraft,
       fonts: this.#theme.fonts,
       draftChanged: this.#theme.draftChanged || JSON.stringify(this.#themeDraft) !== JSON.stringify(this.#theme.draft),
+      findings: this.#findings.filter((finding) => finding.scope === "theme"),
     };
   }
 
@@ -1033,8 +1208,8 @@ class ShopBuilder extends HTMLElement {
     this.#themeDraft = theme;
     clearTimeout(this.#themeTimer);
     this.#themeTimer = setTimeout(() => this.#saveTheme(), AUTOSAVE_MS);
-    this.#renderDesignPanel();
-    this.#sendPreview();
+    if (this.#page) this.#refreshAssistant();
+    else this.#renderDesignPanel();
   }
 
   async #saveTheme() {
@@ -1064,7 +1239,12 @@ class ShopBuilder extends HTMLElement {
     return this.#themeSaving;
   }
 
-  async #publishTheme() {
+  async #publishTheme({ confirmed = false } = {}) {
+    const { blockers, warnings } = gate(this.#findings, ["theme"]);
+    if (blockers.length || (warnings.length && !confirmed)) {
+      this.#openPublishDialog("theme", { blockers, warnings });
+      return;
+    }
     if (this.#themeTimer && !(await this.#saveTheme())) return;
     if (this.#themeSaving) await this.#themeSaving;
     try {
@@ -1080,6 +1260,7 @@ class ShopBuilder extends HTMLElement {
         : "Design veröffentlicht. Alle Online-Seiten zeigen jetzt die neuen Farben und Schriften.", hidden ? "info" : "success");
     } catch (error) {
       if (error.status === 409) this.#showConflict(error.message);
+      else if (error.status === 400) this.#openPublishDialog("theme", { blockers: [serverFinding(error.message)] });
       else showToast(error.message, "error");
     }
   }
@@ -1117,9 +1298,20 @@ class ShopBuilder extends HTMLElement {
       blocks: this.#blocks,
       assetUrls: this.#assetUrls,
       imageUrls: this.#imageUrls,
-      // Selection and block toolbar belong to "Seite bearbeiten" only.
+      // Selection, block toolbar and assistant markers belong to "Seite bearbeiten" only.
       selectedBlockId: this.#tab === "edit" ? this.#selectedId : null,
+      markers: this.#tab === "edit" ? previewMarkers(this.#findings) : {},
     }));
+  }
+
+  // Pixel width for the "image too small" rule.
+  #measureImage(id, url) {
+    const image = new Image();
+    image.addEventListener("load", () => {
+      this.#imageInfo[id] = { ...this.#imageInfo[id], width: image.naturalWidth };
+      this.#refreshAssistant();
+    }, { once: true });
+    image.src = url;
   }
 
   // Object URLs for the shop images used on the page; the preview is re-sent once loaded.
@@ -1130,6 +1322,7 @@ class ShopBuilder extends HTMLElement {
         .then((url) => {
           this.#assetUrls[id] = url;
           this.#sendPreview();
+          this.#measureImage(id, url);
         })
         .catch(() => {});
     }
