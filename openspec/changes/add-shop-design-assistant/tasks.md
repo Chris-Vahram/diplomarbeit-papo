@@ -1,7 +1,7 @@
 ## 1. Rule engine (essential)
 
-- [ ] 1.1 Rule module interface, registry and evaluation on draft change
-- [ ] 1.2 Contrast rule (WCAG luminance) with shared test vectors
+- [x] 1.1 Rule module interface, registry and evaluation on draft change
+- [x] 1.2 Contrast rule (WCAG luminance) with shared test vectors
 - [ ] 1.3 Alt-text, empty page, logo, Startseite articles, image size, SEO title, required field rules
 
 ## 2. UI (essential)

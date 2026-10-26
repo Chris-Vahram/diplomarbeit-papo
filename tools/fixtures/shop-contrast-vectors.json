@@ -1,0 +1,24 @@
+{
+  "comment": "Shared contrast vectors of the shop design assistant (add-shop-design-assistant design.md Decision 3). Checked by tools/check_shop_assistant.mjs (frontend) and ShopContrastTest (backend). severity: text pair thresholds, Blocker below 3:1, Warnung below 4.5:1, null otherwise.",
+  "contrast": [
+    { "foreground": "#BBBBBB", "background": "#FFFFFF", "ratio": 1.92, "severity": "blocker" },
+    { "foreground": "#000000", "background": "#FFFFFF", "ratio": 21.0, "severity": null },
+    { "foreground": "#FFFFFF", "background": "#FFFFFF", "ratio": 1.0, "severity": "blocker" },
+    { "foreground": "#767676", "background": "#FFFFFF", "ratio": 4.54, "severity": null },
+    { "foreground": "#959595", "background": "#FFFFFF", "ratio": 3.0, "severity": "blocker" },
+    { "foreground": "#888888", "background": "#FFFFFF", "ratio": 3.54, "severity": "warning" },
+    { "foreground": "#E07A2F", "background": "#FFFFFF", "ratio": 3.0, "severity": "warning" },
+    { "foreground": "#FFFFFF", "background": "#1B3A57", "ratio": 11.74, "severity": null },
+    { "foreground": "#15191E", "background": "#F4F5F7", "ratio": 16.18, "severity": null },
+    { "foreground": "#777777", "background": "#000000", "ratio": 4.69, "severity": null }
+  ],
+  "onColor": [
+    { "background": "#E07A2F", "text": "#111111" },
+    { "background": "#1B3A57", "text": "#ffffff" },
+    { "background": "#FFFFFF", "text": "#111111" },
+    { "background": "#000000", "text": "#ffffff" }
+  ],
+  "mix": [
+    { "a": "#15191E", "b": "#F4F5F7", "share": 0.68, "result": "#5c5f63" }
+  ]
+}
