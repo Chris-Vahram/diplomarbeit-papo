@@ -12,7 +12,7 @@
 - [x] 2.5 Demo shop per template: "Vorlage ansehen" in setup dialog and picker, renderer demo mode with page navigation, brand hint, "Diese Vorlage wählen"
 - [x] 2.6 Theme `form` (klar/handwerk/kraeftig): validation, design-tab selection, renderer forms
 - [x] 2.7 Bundled CC0 sample images with provenance, public image endpoint, copy into shop images on apply
-- [ ] 2.8 Renderer redesign and recomposed templates with images (impeccable); thumbnails regenerated
+- [x] 2.8 Renderer redesign and recomposed templates with images (impeccable); thumbnails regenerated
 
 ## 3. Verification
 
