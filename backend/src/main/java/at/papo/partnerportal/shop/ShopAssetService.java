@@ -80,6 +80,33 @@ public class ShopAssetService {
         return new ShopAssetDto(asset.id, asset.filename, asset.contentType, asset.sizeBytes, asset.uploadedAt);
     }
 
+    // Bundled sample photo as the shop's own image (shop-templates "Bundled sample images"):
+    // copied once per shop and found again by its file name, so applying several templates
+    // never duplicates it. The licence (CC0) allows the use; the partner can replace or delete it.
+    @Transactional
+    public long sampleAsset(PartnerShop shop, ShopTemplateImage image, byte[] data) {
+        String filename = "Beispielbild " + image.file();
+        Optional<ShopAsset> existing = ShopAsset.<ShopAsset>find("shop = ?1 and filename = ?2", shop, filename)
+                .firstResultOptional();
+        if (existing.isPresent()) {
+            return existing.get().id;
+        }
+        PartnerShop.getEntityManager().lock(shop, LockModeType.PESSIMISTIC_WRITE);
+        if (usedBytes(shop) + data.length > QUOTA_BYTES) {
+            throw new ApiException(409, "Speicherplatz voll – bitte nicht verwendete Bilder löschen.");
+        }
+        ShopAsset asset = new ShopAsset();
+        asset.shop = shop;
+        asset.data = data;
+        asset.contentType = ProductImageValidator.sniffContentType(data);
+        asset.filename = filename;
+        asset.sizeBytes = data.length;
+        asset.uploadedAt = Instant.now();
+        asset.rightsConfirmed = true;
+        asset.persist();
+        return asset.id;
+    }
+
     // Drafts and the restorable previous version count as use too, so no page can ever
     // reference a missing image.
     @Transactional

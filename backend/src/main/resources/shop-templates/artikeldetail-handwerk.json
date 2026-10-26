@@ -1,0 +1,31 @@
+{
+  "blocks": [
+    {
+      "type": "article-detail",
+      "config": {
+        "imagePosition": "right",
+        "spacing": "large"
+      }
+    },
+    {
+      "type": "article-grid",
+      "config": {
+        "heading": "Unser Sortiment",
+        "columns": "4",
+        "spacing": "large"
+      }
+    }
+  ],
+  "theme": {
+    "colors": {
+      "primary": "#2F4A3A",
+      "accent": "#C08A3E",
+      "background": "#EEF0EA",
+      "surface": "#FFFFFF",
+      "text": "#1E2620"
+    },
+    "headingFont": "merriweather",
+    "bodyFont": "source-sans-3",
+    "form": "handwerk"
+  }
+}

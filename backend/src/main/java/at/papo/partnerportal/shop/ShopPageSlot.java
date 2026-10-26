@@ -3,9 +3,9 @@ package at.papo.partnerportal.shop;
 // The pages every shop has. Free pages have no slot. The segment is reserved per shop,
 // so a free page can never take "warenkorb" or "artikel".
 public enum ShopPageSlot {
-    HOME(ShopPageKind.MANDATORY, "startseite", "Startseite", "startseite.json"),
-    ARTICLES(ShopPageKind.MANDATORY, "artikel", "Artikel", "artikel.json"),
-    ARTICLE_DETAIL(ShopPageKind.MANDATORY, "artikeldetail", "Artikeldetail", "artikeldetail.json"),
+    HOME(ShopPageKind.MANDATORY, "startseite", "Startseite", "startseite-klar"),
+    ARTICLES(ShopPageKind.MANDATORY, "artikel", "Artikel", "artikel-klar"),
+    ARTICLE_DETAIL(ShopPageKind.MANDATORY, "artikeldetail", "Artikeldetail", "artikeldetail-klar"),
     CART(ShopPageKind.SYSTEM, "warenkorb", "Warenkorb", null),
     CHECKOUT(ShopPageKind.SYSTEM, "kasse", "Kasse", null),
     IMPRESSUM(ShopPageKind.SYSTEM, "impressum", "Impressum", null),
@@ -16,13 +16,13 @@ public enum ShopPageSlot {
     public final ShopPageKind kind;
     public final String segment;
     public final String menuName;
-    // Default template file under shop-templates/default/; null for system pages.
-    final String templateFile;
+    // Catalogue template a new shop starts with (ShopTemplateCatalog); null for system pages.
+    final String defaultTemplate;
 
-    ShopPageSlot(ShopPageKind kind, String segment, String menuName, String templateFile) {
+    ShopPageSlot(ShopPageKind kind, String segment, String menuName, String defaultTemplate) {
         this.kind = kind;
         this.segment = segment;
         this.menuName = menuName;
-        this.templateFile = templateFile;
+        this.defaultTemplate = defaultTemplate;
     }
 }

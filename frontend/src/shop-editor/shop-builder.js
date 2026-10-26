@@ -1,4 +1,5 @@
 import { apiFetch } from "../lib/api.js";
+import { API_BASE } from "../lib/config.js";
 import { escapeHtml } from "../lib/html.js";
 import { showToast } from "../components/toast-notice.js";
 import { BLOCK_TYPES, missingRequired, newBlock } from "./block-schema.js";
@@ -10,7 +11,11 @@ import { BLOCK_DRAG_TYPE } from "./block-palette.js";
 import "./block-properties.js";
 import "./design-panel.js";
 import "./page-manager.js";
+import "./template-picker.js";
+import "./setup-dialog.js";
+import "./demo-viewer.js";
 import { stateHtml } from "../lib/states.js";
+import { shopNotVisibleReason } from "../lib/shop-status.js";
 
 // Shop builder (shop-builder spec), opened full screen from "Mein Webshop"
 // (#/partner/shop/editor[?page=<id>]): block palette, live preview in an
@@ -66,6 +71,7 @@ class ShopBuilder extends HTMLElement {
   #device = "desktop";
   #frameReady = false;
   #history = new EditorHistory();
+  #templates = [];
   #pickField = null;
   #collapsedSides = { left: false, right: false };
   #small = null;
@@ -82,7 +88,8 @@ class ShopBuilder extends HTMLElement {
   #saveGeneration = 0;
   #themeSaving = null;
 
-  // PartnerShopDto, for the public link in the small-screen hint.
+  // PartnerShopDto, for the public link in the small-screen hint; its status also decides
+  // whether published pages are publicly visible (reloaded on every #load).
   set shop(value) {
     this.#shop = value;
     if (SMALL_SCREEN.matches) this.#renderSmallScreenHint();
@@ -185,6 +192,7 @@ class ShopBuilder extends HTMLElement {
           <span class="builder-save" id="builder-save" aria-live="polite"></span>
           <button type="button" class="button-secondary" id="builder-retry" hidden>Erneut versuchen</button>
           <span class="builder-pagebar__spacer"></span>
+          <button type="button" class="button-secondary" id="builder-template">Vorlage wählen</button>
           <button type="button" class="builder-icon" id="builder-undo" title="Rückgängig (Strg+Z)" aria-label="Rückgängig" disabled>↶</button>
           <button type="button" class="builder-icon" id="builder-redo" title="Wiederholen (Strg+Umschalt+Z)" aria-label="Wiederholen" disabled>↷</button>
           <button type="button" class="button-secondary" id="builder-restore" title="Vorherige veröffentlichte Version wiederherstellen" hidden>Wiederherstellen</button>
@@ -249,6 +257,10 @@ class ShopBuilder extends HTMLElement {
           </div>
         </modal-dialog>
 
+        <shop-template-picker></shop-template-picker>
+        <shop-setup-dialog></shop-setup-dialog>
+        <shop-demo-viewer></shop-demo-viewer>
+
         <modal-dialog title="Bild wählen" id="builder-image-dialog">
           <shop-asset-library mode="pick"></shop-asset-library>
         </modal-dialog>
@@ -271,6 +283,10 @@ class ShopBuilder extends HTMLElement {
     });
     this.querySelector("#builder-page-select").addEventListener("change", (event) => this.#openPage(Number(event.target.value)));
     this.querySelector("#builder-retry").addEventListener("click", () => this.#save());
+    this.querySelector("#builder-template").addEventListener("click", () => this.querySelector("shop-template-picker").open(this.#page));
+    this.addEventListener("template-apply", (event) => this.#applyTemplate(event.detail));
+    this.addEventListener("shop-setup", (event) => this.#setup(event.detail.style));
+    this.addEventListener("template-demo", (event) => this.#openDemo(event.detail));
     this.querySelector("#builder-undo").addEventListener("click", () => this.#undo());
     this.querySelector("#builder-redo").addEventListener("click", () => this.#redo());
     this.querySelector("#builder-publish").addEventListener("click", () => this.#publish());
@@ -336,20 +352,28 @@ class ShopBuilder extends HTMLElement {
 
   async #load() {
     try {
-      const [pages, theme, preview] = await Promise.all([
+      const [pages, theme, preview, templates, shop] = await Promise.all([
         apiFetch("/partner/shop/pages"),
         apiFetch("/partner/shop/theme"),
         apiFetch("/partner/shop/preview"),
+        apiFetch("/partner/shop/templates"),
+        apiFetch("/partner/shop"),
       ]);
+      this.#shop = shop;
+      this.querySelector("shop-page-manager").notVisible = shopNotVisibleReason(shop);
       this.#pages = pages;
       this.#theme = theme;
       this.#themeDraft = theme.draft;
       this.#preview = preview;
       this.querySelector("shop-page-manager").list = pages;
+      this.querySelector("shop-page-manager").templates = templates;
+      this.querySelector("shop-template-picker").templates = templates;
+      this.#templates = templates;
       this.#renderDesignPanel();
       const start = pages.pages.find((page) => page.id === requestedPageId()) ?? pages.pages[0];
       await this.#openPage(start.id, { skipFlush: true });
       this.#resolveArticleImages();
+      if (pages.setupNeeded) this.querySelector("shop-setup-dialog").open(templates);
     } catch (error) {
       const body = this.querySelector(".builder-body");
       body.innerHTML = stateHtml("error", "Der Editor konnte nicht geladen werden.", {
@@ -432,9 +456,13 @@ class ShopBuilder extends HTMLElement {
       .join("");
     const page = this.#page;
     const changed = page.draftChanged || this.#saveTimer || this.#saving;
-    this.querySelector("#builder-page-state").textContent = page.online
-      ? changed ? "Online · Änderungen offen" : "Online · aktuell"
-      : "Entwurf · nicht online";
+    // "Online" only when visitors can really see the page; otherwise "Veröffentlicht".
+    const live = page.online ? (shopNotVisibleReason(this.#shop) ? "Veröffentlicht" : "Online") : null;
+    const state = this.querySelector("#builder-page-state");
+    state.textContent = live
+      ? changed ? `${live} · Änderungen offen` : `${live} · aktuell`
+      : "Entwurf · nicht veröffentlicht";
+    state.title = page.online ? shopNotVisibleReason(this.#shop) ?? "" : "";
     this.querySelector("#builder-restore").hidden = !page.online || !page.restorable;
     // Address line of the preview window, as the page will appear publicly.
     const path = page.slot === "HOME" ? "" : page.slot === "ARTICLE_DETAIL" ? "/artikel/…" : `/${page.segment}`;
@@ -464,7 +492,10 @@ class ShopBuilder extends HTMLElement {
       });
       this.#replacePage(page);
       await this.#refreshPages();
-      showToast(`„${page.menuName}“ ist veröffentlicht.`, "success");
+      const hidden = shopNotVisibleReason(this.#shop);
+      showToast(hidden
+        ? `„${page.menuName}“ ist veröffentlicht. ${hidden}`
+        : `„${page.menuName}“ ist veröffentlicht und im Shop zu sehen.`, hidden ? "info" : "success");
     } catch (error) {
       if (error.status === 409 && /inzwischen geändert/.test(error.message)) this.#showConflict(error.message);
       else showToast(error.message, "error");
@@ -722,6 +753,100 @@ class ShopBuilder extends HTMLElement {
     this.#applyBlocks(blocks);
   }
 
+  // Demo shop for one template (shop-templates "Demo shop per template"). A mandatory-page
+  // template shows its whole style ("<page>-<style>" for all three pages, starting on its own
+  // page); a free-page template shows that page in the current design. Uses the partner's
+  // articles; nothing is saved.
+  #openDemo({ template, choose }) {
+    // Sample photos ("vorlage:<name>") load straight from the public template image endpoint.
+    const assetUrls = {};
+    const withIds = (blocks) => blocks.map((block, index) => {
+      const imageId = block.config?.imageId;
+      if (typeof imageId === "string" && imageId.startsWith("vorlage:")) {
+        assetUrls[imageId] = `${API_BASE}/shop-templates/images/${encodeURIComponent(imageId.slice("vorlage:".length))}`;
+      }
+      return { ...structuredClone(block), id: `demo-${index}` };
+    });
+    const articles = this.#preview.articles;
+    const pages = {};
+    let items;
+    let theme = this.#themeDraft;
+    let start = "";
+    if (template.page === "frei") {
+      pages.seite = { menuName: template.name, blocks: withIds(template.blocks) };
+      items = [{ segment: "seite", menuName: template.name, path: "seite" }];
+      start = "seite";
+    } else {
+      const style = template.id.slice(template.page.length + 1);
+      const ofStyle = (page) => this.#templates.find((candidate) => candidate.id === `${page}-${style}`);
+      for (const [page, key, menuName] of [["startseite", "", "Startseite"], ["artikel", "artikel", "Artikel"],
+        ["artikeldetail", "artikeldetail", "Artikeldetail"]]) {
+        const found = ofStyle(page);
+        if (found) pages[key] = { menuName, blocks: withIds(found.blocks) };
+      }
+      items = [{ segment: "startseite", menuName: "Startseite", path: "" }, { segment: "artikel", menuName: "Artikel", path: "artikel" }]
+        .filter((item) => item.path in pages);
+      theme = ofStyle("startseite")?.theme ?? template.theme ?? theme;
+      if (template.page === "artikel") start = "artikel";
+      if (template.page === "artikeldetail") start = `artikel/${articles[0]?.id ?? ""}`;
+    }
+    this.querySelector("shop-demo-viewer").open({
+      title: template.name,
+      choose,
+      payload: {
+        shop: this.#preview.shop,
+        theme,
+        navigation: { items, legal: [], sellerName: this.#preview.navigation.sellerName },
+        pages,
+        start,
+        articles,
+        imageUrls: this.#imageUrls,
+        assetUrls,
+      },
+    });
+  }
+
+  // First-time setup: the server sets pages and design, then the editor reloads everything.
+  async #setup(style) {
+    const dialog = this.querySelector("shop-setup-dialog");
+    try {
+      await apiFetch("/partner/shop/setup", { method: "POST", body: JSON.stringify({ style }) });
+      dialog.close();
+      if (style) showToast("Ihr Shop ist eingerichtet. Passen Sie die Seiten jetzt nach Ihren Wünschen an.", "success");
+      this.#mount();
+    } catch (error) {
+      showToast(error.message, "error");
+      dialog.failed();
+    }
+  }
+
+  // Replaces the draft blocks as one undo step; the theme suggestion only goes into the design
+  // draft when the partner ticked "Farben und Schriften übernehmen", and is then undone with
+  // the blocks. Nothing is published. The server prepares the blocks first: fresh ids and the
+  // template's sample photos copied into the shop's own images.
+  async #applyTemplate({ template, applyTheme }) {
+    let content;
+    try {
+      content = await apiFetch(`/partner/shop/templates/${encodeURIComponent(template.id)}/content`, { method: "POST" });
+    } catch (error) {
+      showToast(error.message, "error");
+      return;
+    }
+    this.#selectedId = null;
+    const withTheme = applyTheme && content.theme;
+    if (withTheme) {
+      this.#history.record(JSON.stringify({ blocks: this.#blocks, theme: this.#themeDraft }));
+      this.#blocks = content.blocks;
+      this.#changed();
+      this.#onThemeChange(content.theme);
+    } else {
+      this.#applyBlocks(content.blocks);
+    }
+    showToast(withTheme
+      ? `Vorlage „${template.name}“ mit Form, Farben und Schriften übernommen.`
+      : `Vorlage „${template.name}“ übernommen.`, "success");
+  }
+
   #select(id) {
     this.#selectedId = id;
     if (this.#tab !== "edit") this.#showTab("edit");
@@ -751,17 +876,26 @@ class ShopBuilder extends HTMLElement {
   }
 
   #undo() {
-    const snapshot = this.#history.undo(JSON.stringify(this.#blocks));
-    if (snapshot === null) return;
-    this.#blocks = JSON.parse(snapshot);
-    this.#changed();
+    const snapshot = this.#history.undo(this.#snapshot(this.#history.nextUndo));
+    if (snapshot !== null) this.#restoreSnapshot(snapshot);
   }
 
   #redo() {
-    const snapshot = this.#history.redo(JSON.stringify(this.#blocks));
-    if (snapshot === null) return;
-    this.#blocks = JSON.parse(snapshot);
+    const snapshot = this.#history.redo(this.#snapshot(this.#history.nextRedo));
+    if (snapshot !== null) this.#restoreSnapshot(snapshot);
+  }
+
+  // Snapshots are the block list ("[...]"); a template applied with its theme is one step for
+  // blocks and theme ("{blocks, theme}"), so the current state is taken in the same shape.
+  #snapshot(counterpart = null) {
+    return JSON.stringify(counterpart?.startsWith("{") ? { blocks: this.#blocks, theme: this.#themeDraft } : this.#blocks);
+  }
+
+  #restoreSnapshot(snapshot) {
+    const state = JSON.parse(snapshot);
+    this.#blocks = Array.isArray(state) ? state : state.blocks;
     this.#changed();
+    if (!Array.isArray(state)) this.#onThemeChange(state.theme);
   }
 
   // Strg+Z / Strg+Umschalt+Z outside text fields (inside them the browser's own undo applies).
@@ -940,7 +1074,10 @@ class ShopBuilder extends HTMLElement {
       });
       this.#themeDraft = this.#theme.draft;
       this.#renderDesignPanel();
-      showToast("Design veröffentlicht. Alle Online-Seiten zeigen jetzt die neuen Farben und Schriften.", "success");
+      const hidden = shopNotVisibleReason(this.#shop);
+      showToast(hidden
+        ? `Design veröffentlicht. ${hidden}`
+        : "Design veröffentlicht. Alle Online-Seiten zeigen jetzt die neuen Farben und Schriften.", hidden ? "info" : "success");
     } catch (error) {
       if (error.status === 409) this.#showConflict(error.message);
       else showToast(error.message, "error");

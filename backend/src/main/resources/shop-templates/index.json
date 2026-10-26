@@ -1,0 +1,86 @@
+[
+  {
+    "id": "startseite-klar",
+    "page": "startseite",
+    "name": "Klar",
+    "description": "Heller, präziser Auftritt: großes Foto neben dem Willkommenstext, Sortiment in vier Spalten, Beratung mit Bild.",
+    "thumbnail": "startseite-klar.webp"
+  },
+  {
+    "id": "startseite-handwerk",
+    "page": "startseite",
+    "name": "Handwerk",
+    "description": "Warm und persönlich: Werkstattfoto mit Textfeld, Serifenschrift, Artikel im Passepartout.",
+    "thumbnail": "startseite-handwerk.webp"
+  },
+  {
+    "id": "startseite-kraeftig",
+    "page": "startseite",
+    "name": "Kräftig",
+    "description": "Moderne Marke: Foto über die ganze Breite, große Schrift, Sortiment als Raster mit klaren Linien.",
+    "thumbnail": "startseite-kraeftig.webp"
+  },
+  {
+    "id": "artikel-klar",
+    "page": "artikel",
+    "name": "Klar",
+    "description": "Kurze Einleitung und ruhiges Raster mit vier Spalten.",
+    "thumbnail": "artikel-klar.webp"
+  },
+  {
+    "id": "artikel-handwerk",
+    "page": "artikel",
+    "name": "Handwerk",
+    "description": "Einleitung in Serifenschrift und Artikel im Passepartout, vier Spalten.",
+    "thumbnail": "artikel-handwerk.webp"
+  },
+  {
+    "id": "artikel-kraeftig",
+    "page": "artikel",
+    "name": "Kräftig",
+    "description": "Dunkler Kopfbereich in Großbuchstaben und dichtes Raster mit vier Spalten.",
+    "thumbnail": "artikel-kraeftig.webp"
+  },
+  {
+    "id": "artikeldetail-klar",
+    "page": "artikeldetail",
+    "name": "Klar",
+    "description": "Artikel mit Bild links, darunter weitere Artikel zum Stöbern.",
+    "thumbnail": "artikeldetail-klar.webp"
+  },
+  {
+    "id": "artikeldetail-handwerk",
+    "page": "artikeldetail",
+    "name": "Handwerk",
+    "description": "Artikel mit Bild rechts im Passepartout, darunter weitere Artikel.",
+    "thumbnail": "artikeldetail-handwerk.webp"
+  },
+  {
+    "id": "artikeldetail-kraeftig",
+    "page": "artikeldetail",
+    "name": "Kräftig",
+    "description": "Artikel mit Bild links und großem Preis, darunter weitere Artikel als Raster.",
+    "thumbnail": "artikeldetail-kraeftig.webp"
+  },
+  {
+    "id": "seite-ueber-uns",
+    "page": "frei",
+    "name": "Über uns",
+    "description": "Werkstattfoto, Vorstellung Ihres Betriebs und wie man Sie erreicht.",
+    "thumbnail": "seite-ueber-uns.webp"
+  },
+  {
+    "id": "seite-kontakt",
+    "page": "frei",
+    "name": "Kontakt",
+    "description": "Einleitung und Ansprechpartner mit E-Mail und Telefon.",
+    "thumbnail": "seite-kontakt.webp"
+  },
+  {
+    "id": "seite-aktionen",
+    "page": "frei",
+    "name": "Aktionen",
+    "description": "Kopfbereich in der Akzentfarbe und Platz für Aktionsartikel, die Sie im Abschnitt selbst auswählen.",
+    "thumbnail": "seite-aktionen.webp"
+  }
+]

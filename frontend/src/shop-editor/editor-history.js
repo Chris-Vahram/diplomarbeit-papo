@@ -37,6 +37,15 @@ export class EditorHistory {
     return this.#redo.pop();
   }
 
+  // Snapshot the next undo/redo would restore, without taking it.
+  get nextUndo() {
+    return this.#undo.at(-1) ?? null;
+  }
+
+  get nextRedo() {
+    return this.#redo.at(-1) ?? null;
+  }
+
   get canUndo() {
     return this.#undo.length > 0;
   }

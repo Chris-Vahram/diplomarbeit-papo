@@ -14,7 +14,7 @@ class ArticleListBlock extends ShopBlock {
   render(config) {
     const renderId = ++this.#renderId;
     this.hidden = false;
-    this.innerHTML = `<div class="shop-inner">${headingHtml(this.context.api, config.heading)}<p class="shop-muted">Artikel werden geladen …</p></div>`;
+    this.innerHTML = `<div class="shop-inner shop-list">${headingHtml(this.context.api, config.heading)}<p class="shop-muted">Artikel werden geladen …</p></div>`;
     this.context.api
       .articles()
       .then((articles) => {
@@ -27,7 +27,7 @@ class ArticleListBlock extends ShopBlock {
           this.hidden = true;
           return;
         }
-        this.innerHTML = `<div class="shop-inner">${headingHtml(this.context.api, config.heading)}${articleCardsHtml(this.context.api, selected, config.columns)}</div>`;
+        this.innerHTML = `<div class="shop-inner shop-list">${headingHtml(this.context.api, config.heading)}${articleCardsHtml(this.context.api, selected, config.columns)}</div>`;
       })
       .catch(() => {
         if (renderId !== this.#renderId) return;
@@ -59,10 +59,10 @@ class ArticleDetailBlock extends ShopBlock {
       this.innerHTML = `<div class="shop-inner"><p class="shop-muted">Dieser Artikel ist nicht verfügbar.</p></div>`;
       return;
     }
-    this.innerHTML = `<article class="shop-inner shop-split shop-split--image-${escapeHtml(config.imagePosition ?? "left")}">
-      ${imageHtml(api, article, "shop-split__image")}
+    this.innerHTML = `<article class="shop-inner shop-split shop-detail shop-split--image-${escapeHtml(config.imagePosition ?? "left")}">
+      <div class="shop-detail__media">${imageHtml(api, article, "shop-split__image")}</div>
       <div class="shop-split__text">
-        ${article.category ? `<p class="shop-muted">${escapeHtml(article.category)}</p>` : ""}
+        ${article.category ? `<p class="shop-muted shop-detail__category">${escapeHtml(article.category)}</p>` : ""}
         <h1 class="shop-heading">${escapeHtml(article.name)}</h1>
         ${priceHtml(article)}
         ${article.description ? `<p class="shop-text">${escapeHtml(article.description)}</p>` : ""}

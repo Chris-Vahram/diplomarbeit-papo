@@ -35,4 +35,7 @@ public class PartnerShop extends PanacheEntity {
 
     @Column(nullable = false)
     public Instant createdAt;
+
+    // First-time setup answered ("Shop einrichten", shop-templates spec); null = not yet.
+    public Instant setupAt;
 }

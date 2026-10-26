@@ -27,3 +27,39 @@ Every template SHALL pass all Blocker and Warnung rules of the design assistant 
 #### Scenario: Automated check
 - **WHEN** the template test suite runs
 - **THEN** each template yields no Blocker or Warnung findings
+
+### Requirement: First-time shop setup
+When a partner opens the builder for a shop that has not been set up yet, the builder SHALL first offer a style choice ("Shop einrichten") built from the Startseite templates. Choosing a style SHALL set Startseite, Artikelübersicht and Artikeldetail from that style's templates and the design from its theme suggestion, as both draft and published version, keeping the replaced version for restore. "Überspringen" SHALL keep the default content. Either answer SHALL mark the shop as set up; closing the dialog without an answer SHALL show it again next time. A shop counts as not set up while it has no recorded setup and neither a saved page, a saved design nor a free page, so shops edited before this feature never see the dialog.
+
+#### Scenario: Partner picks a style
+- **WHEN** a partner opens the builder of a new shop and chooses „Handwerk“
+- **THEN** the three mandatory pages and the design show the „Handwerk“ templates and the dialog does not appear again
+
+#### Scenario: Shop edited before
+- **WHEN** a partner whose shop already has a saved page opens the builder
+- **THEN** no setup dialog is shown
+
+#### Scenario: Setup twice
+- **WHEN** a setup request arrives for a shop that is already set up
+- **THEN** the server refuses it and nothing changes
+
+### Requirement: Demo shop per template
+Every template in the setup dialog and in the template picker SHALL offer „Vorlage ansehen“. It SHALL open a demo shop rendered by the shop renderer, without editing tools: for a style, Startseite, Artikelübersicht and Artikeldetail of that style with its theme suggestion; for a free-page template, that page with the current design. The demo SHALL use the partner's enabled articles, allow navigating between its pages and to article details, switch between computer and phone width, and state that colours, fonts, texts and images can be adapted to the partner's own brand. „Diese Vorlage wählen“ SHALL select the template in the dialog it was opened from; nothing is saved by viewing.
+
+#### Scenario: Click through a style
+- **WHEN** the partner opens „Vorlage ansehen“ for „Handwerk“ and clicks an article
+- **THEN** the demo shows the Artikeldetail page of that style for this article, and the partner's shop is unchanged
+
+### Requirement: Form presets in the design
+The theme SHALL accept an optional `form` with the values `klar`, `handwerk` and `kraeftig` (default `klar`). The shop renderer SHALL derive corner style, header, hero composition, article cards, buttons and section rhythm from it, so the three styles differ in form and not only in colour. The partner SHALL be able to change the form in the „Design“ tab; each style's theme suggestion sets its own form.
+
+#### Scenario: Form follows the style
+- **WHEN** the partner sets up the shop with „Kräftig“
+- **THEN** the published theme has form `kraeftig` and the shop shows square corners and a full-width photo header
+
+### Requirement: Bundled sample images
+Templates MAY reference bundled sample images (`"imageId": "vorlage:<name>"`) that ship with the application, each with recorded source and a licence that allows use without attribution. Applying such a template (setup, template picker, new free page) SHALL copy the referenced images into the partner's own shop images once and use those copies, so the partner can replace or delete them like any upload; they count towards the storage quota. The editor's demo shop and template thumbnails SHALL show the sample images directly. Every sample image in a template SHALL have alternative text.
+
+#### Scenario: Image copied once
+- **WHEN** the partner applies two templates that use the same sample image
+- **THEN** the shop's image library contains that image once and both pages reference it

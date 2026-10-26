@@ -1,0 +1,30 @@
+{
+  "blocks": [
+    {
+      "type": "hero",
+      "config": {
+        "title": "Über uns",
+        "text": "Erzählen Sie hier, wer Sie sind und wofür Ihr Betrieb steht.",
+        "align": "left",
+        "imageId": "vorlage:werkstatt",
+        "alt": "Werkstatt mit Werkbank und Werkzeugwand"
+      }
+    },
+    {
+      "type": "heading-text",
+      "config": {
+        "heading": "Was uns auszeichnet",
+        "text": "Beschreiben Sie Ihre Erfahrung, Ihr Team und Ihren Service.",
+        "spacing": "large"
+      }
+    },
+    {
+      "type": "heading-text",
+      "config": {
+        "heading": "So erreichen Sie uns",
+        "text": "Nennen Sie Ihre Öffnungszeiten und wie man Sie am besten erreicht.",
+        "spacing": "medium"
+      }
+    }
+  ]
+}

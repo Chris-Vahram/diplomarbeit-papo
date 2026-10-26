@@ -91,8 +91,9 @@ class PublicShopContentTest {
         visitor().when().get("/api/shop/" + kennung + "/theme")
                 .then().statusCode(200)
                 .header("X-Robots-Tag", "noindex")
-                .body("colors.primary", is("#1F4E79"))
-                .body("headingFont", is("plus-jakarta-sans"));
+                .body("colors.primary", is("#1B3A57"))
+                .body("headingFont", is("work-sans"))
+                .body("form", is("klar"));
 
         visitor().when().get("/api/shop/" + kennung + "/navigation")
                 .then().statusCode(200)
@@ -103,12 +104,12 @@ class PublicShopContentTest {
         visitor().when().get("/api/shop/" + kennung + "/pages/startseite")
                 .then().statusCode(200)
                 .body("slot", is("HOME"))
-                .body("blocks.type", contains("hero", "article-grid", "heading-text"))
+                .body("blocks.type", contains("hero", "article-grid", "image-text"))
                 .body("blocks[0].config.buttonPage", is("artikel"));
 
         visitor().when().get("/api/shop/" + kennung + "/pages/artikeldetail")
                 .then().statusCode(200)
-                .body("blocks.type", contains("article-detail"));
+                .body("blocks.type", contains("article-detail", "article-grid"));
     }
 
     @Test
@@ -130,7 +131,7 @@ class PublicShopContentTest {
         visitor().when().get("/api/shop/" + kennung + "/pages/warenkorb").then().statusCode(404);
         visitor().when().get("/api/shop/" + kennung + "/pages/startseite")
                 .then().statusCode(200)
-                .body("blocks.type", contains("hero", "article-grid", "heading-text"));
+                .body("blocks.type", contains("hero", "article-grid", "image-text"));
     }
 
     @Test

@@ -27,7 +27,6 @@ public class ShopPageService {
 
     public static final int MAX_ONLINE_PAGES = 6;
     public static final int MAX_PAGES = 20;
-    static final String TEMPLATE_DIR = "shop-templates/default/";
 
     private static final Pattern SEGMENT = Pattern.compile("[a-z0-9]+(-[a-z0-9]+)*");
 
@@ -37,8 +36,14 @@ public class ShopPageService {
     @Inject
     ShopCatalogService catalogService;
 
+    @Inject
+    ShopTemplateCatalog templateCatalog;
+
+    @Inject
+    ShopAssetService assetService;
+
     // Idempotent: creates the theme and every missing slot page. Mandatory pages start
-    // published from the default template; system pages only reserve slot and segment.
+    // published from their default catalogue template; system pages only reserve slot and segment.
     @Transactional
     public void ensureDefaults(PartnerShop shop) {
         Instant now = Instant.now();
@@ -66,7 +71,9 @@ public class ShopPageService {
             page.position = slot.ordinal();
             page.updatedAt = now;
             if (slot.kind == ShopPageKind.MANDATORY) {
-                String content = withBlockIds(readTemplate(slot.templateFile)).toString();
+                String content = templateContent(shop, templateCatalog.find(slot.defaultTemplate, slot)
+                        .orElseThrow(() -> new IllegalStateException("Shop template missing: " + slot.defaultTemplate)))
+                        .toString();
                 page.draftContent = content;
                 page.publishedContent = content;
                 page.publishedAt = now;
@@ -280,7 +287,7 @@ public class ShopPageService {
     }
 
     JsonNode readTemplate(String file) {
-        try (InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(TEMPLATE_DIR + file)) {
+        try (InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(ShopTemplateCatalog.DIR + file)) {
             if (in == null) {
                 throw new IllegalStateException("Shop template missing: " + file);
             }
@@ -290,8 +297,24 @@ public class ShopPageService {
         }
     }
 
+    // Template as page content of this shop: fresh block ids, and its bundled sample photos
+    // copied into the shop's own images (once per shop), so the page only references own assets.
+    JsonNode templateContent(PartnerShop shop, ShopTemplate template) {
+        JsonNode content = withBlockIds(template.content());
+        for (JsonNode block : content.path("blocks")) {
+            JsonNode imageId = block.path("config").get("imageId");
+            if (imageId != null && imageId.asText("").startsWith(ShopTemplateCatalog.IMAGE_PREFIX)) {
+                ShopTemplateImage image = templateCatalog
+                        .image(imageId.asText().substring(ShopTemplateCatalog.IMAGE_PREFIX.length())).orElseThrow();
+                ((ObjectNode) block.get("config")).put("imageId",
+                        assetService.sampleAsset(shop, image, templateCatalog.imageBytes(image)));
+            }
+        }
+        return content;
+    }
+
     // Template blocks carry no ids; every created page gets fresh ones for editor addressing.
-    JsonNode withBlockIds(JsonNode template) {
+    static JsonNode withBlockIds(JsonNode template) {
         JsonNode content = template.deepCopy();
         for (JsonNode block : content.path("blocks")) {
             ((ObjectNode) block).put("id", UUID.randomUUID().toString());

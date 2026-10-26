@@ -1,0 +1,23 @@
+{
+  "blocks": [
+    {
+      "type": "heading-text",
+      "config": {
+        "heading": "Kontakt",
+        "text": "Wir sind gerne für Sie da. Schreiben Sie uns oder rufen Sie an.",
+        "spacing": "large"
+      }
+    },
+    {
+      "type": "contact-person",
+      "config": {
+        "heading": "Ihr Ansprechpartner",
+        "name": "Vor- und Nachname",
+        "role": "Funktion, z. B. Beratung und Verkauf",
+        "text": "Ersetzen Sie Name, Funktion und Kontaktdaten durch Ihre eigenen Angaben.",
+        "background": "surface",
+        "spacing": "large"
+      }
+    }
+  ]
+}

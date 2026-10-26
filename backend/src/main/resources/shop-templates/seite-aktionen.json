@@ -1,0 +1,25 @@
+{
+  "blocks": [
+    {
+      "type": "hero",
+      "config": {
+        "title": "Aktuelle Aktionen",
+        "text": "Hier stellen Sie Ihre aktuellen Angebote vor.",
+        "buttonLabel": "Gesamtes Sortiment",
+        "buttonPage": "artikel",
+        "align": "left",
+        "background": "accent",
+        "spacing": "large"
+      }
+    },
+    {
+      "type": "featured-articles",
+      "config": {
+        "heading": "Unsere Empfehlungen",
+        "articleIds": [],
+        "columns": "3",
+        "spacing": "large"
+      }
+    }
+  ]
+}

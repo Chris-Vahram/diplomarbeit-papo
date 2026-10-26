@@ -6,10 +6,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Iterator;
 import java.util.Set;
 
-// Validates a theme snapshot {"colors": {...all roles...}, "headingFont": id, "bodyFont": id}.
+// Validates a theme snapshot {"colors": {...all roles...}, "headingFont": id, "bodyFont": id,
+// "form": "klar" | "handwerk" | "kraeftig"}. form is optional (older themes) and means "klar".
 public final class ShopThemeValidator {
 
-    private static final Set<String> FIELDS = Set.of("colors", "headingFont", "bodyFont");
+    private static final Set<String> FIELDS = Set.of("colors", "headingFont", "bodyFont", "form");
+    // Form presets of the shop renderer (shop-templates spec "Form presets in the design").
+    static final Set<String> FORMS = Set.of("klar", "handwerk", "kraeftig");
 
     private ShopThemeValidator() {
     }
@@ -27,6 +30,10 @@ public final class ShopThemeValidator {
         ShopColors.validate(theme.get("colors"), true, " im Theme");
         requireFont(theme.get("headingFont"), "headingFont");
         requireFont(theme.get("bodyFont"), "bodyFont");
+        JsonNode form = theme.get("form");
+        if (form != null && (!form.isTextual() || !FORMS.contains(form.asText()))) {
+            throw new ApiException(400, "Die Form im Theme ist unbekannt.");
+        }
     }
 
     private static void requireFont(JsonNode value, String field) {

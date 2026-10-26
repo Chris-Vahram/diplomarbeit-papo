@@ -1,0 +1,48 @@
+{
+  "blocks": [
+    {
+      "type": "hero",
+      "config": {
+        "title": "Werkzeug und Material für Ihre Projekte",
+        "text": "Ausgewählte Artikel und persönliche Beratung – sehen Sie sich in Ruhe um.",
+        "buttonLabel": "Zum Sortiment",
+        "buttonPage": "artikel",
+        "align": "left",
+        "spacing": "large",
+        "imageId": "vorlage:messen",
+        "alt": "Hände messen mit einem Lineal auf hellem Holz"
+      }
+    },
+    {
+      "type": "article-grid",
+      "config": {
+        "heading": "Aus unserem Sortiment",
+        "columns": "4"
+      }
+    },
+    {
+      "type": "image-text",
+      "config": {
+        "heading": "Beratung, die weiterhilft",
+        "text": "Sie sind unsicher, welcher Artikel passt? Wir nehmen uns Zeit für Ihre Fragen.\n\nErgänzen Sie hier Telefonnummer, E-Mail-Adresse und Öffnungszeiten, unter denen Ihre Kundschaft Sie erreicht.",
+        "imagePosition": "right",
+        "background": "surface",
+        "spacing": "large",
+        "imageId": "vorlage:werkzeug-auf-holz",
+        "alt": "Werkzeug und Arbeitshandschuhe auf einem Holztisch"
+      }
+    }
+  ],
+  "theme": {
+    "colors": {
+      "primary": "#1B3A57",
+      "accent": "#D9622B",
+      "background": "#F4F5F7",
+      "surface": "#FFFFFF",
+      "text": "#15191E"
+    },
+    "headingFont": "work-sans",
+    "bodyFont": "source-sans-3",
+    "form": "klar"
+  }
+}

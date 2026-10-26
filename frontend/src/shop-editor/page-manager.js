@@ -16,6 +16,20 @@ class ShopPageManager extends HTMLElement {
   beforeChange = null;
   #dragId = null;
   #settingsPage = null;
+  #templates = [];
+  // Set by the builder: why published pages are not publicly visible yet (null = they are).
+  #notVisible = null;
+
+  // Free-page templates of the catalogue, offered next to "Leere Seite".
+  set templates(value) {
+    this.#templates = value.filter((template) => template.page === "frei");
+    this.#renderTemplates();
+  }
+
+  set notVisible(value) {
+    this.#notVisible = value;
+    this.#renderList();
+  }
 
   set list(value) {
     this.#list = value;
@@ -29,6 +43,7 @@ class ShopPageManager extends HTMLElement {
           <p class="page-manager__limits" id="page-limits"></p>
           <button type="button" class="button-primary" data-action="new">Neue Seite</button>
         </div>
+        <p class="builder-hint page-manager__visibility" id="page-visibility" hidden></p>
         <p class="builder-hint">Die Reihenfolge bestimmt das Menü des Shops. Ziehen Sie eine Seite an die gewünschte Stelle oder verwenden Sie die Pfeile.</p>
         <ul class="page-manager__list" id="page-list"></ul>
       </div>
@@ -44,9 +59,7 @@ class ShopPageManager extends HTMLElement {
           <p class="builder-hint" id="page-new-url"></p>
           <fieldset class="page-manager__templates">
             <legend>Vorlage</legend>
-            <label><input type="radio" name="template" value="leer" checked /> Leere Seite</label>
-            <label><input type="radio" name="template" value="ueber-uns" /> Über uns</label>
-            <label><input type="radio" name="template" value="kontakt" /> Kontakt</label>
+            <span id="page-new-templates"></span>
           </fieldset>
           <p class="builder-error" id="page-new-error" role="alert" hidden></p>
           <div class="entity-form__actions">
@@ -96,6 +109,7 @@ class ShopPageManager extends HTMLElement {
       button.addEventListener("click", () => button.closest("modal-dialog").close()));
     this.querySelector("#page-list").addEventListener("click", (event) => this.#onListClick(event));
     this.querySelector("[data-action=new]").addEventListener("click", () => this.#openNew());
+    this.#renderTemplates();
     this.#bindNewForm();
     this.#bindSettingsForm();
     this.#bindDragAndDrop();
@@ -106,15 +120,18 @@ class ShopPageManager extends HTMLElement {
     const listEl = this.querySelector("#page-list");
     if (!listEl || !this.#list) return;
     const { pages, onlineCount, maxOnline, pageCount, maxPages } = this.#list;
+    const visibility = this.querySelector("#page-visibility");
+    visibility.textContent = this.#notVisible ?? "";
+    visibility.hidden = !this.#notVisible;
     this.querySelector("#page-limits").innerHTML =
-      `<strong>${onlineCount} von ${maxOnline}</strong> Seiten online · ${pageCount} von ${maxPages} Seiten insgesamt`;
+      `<strong>${onlineCount} von ${maxOnline}</strong> Seiten ${this.#notVisible ? "veröffentlicht" : "online"} · ${pageCount} von ${maxPages} Seiten insgesamt`;
     this.querySelector("[data-action=new]").disabled = pageCount >= maxPages;
     listEl.innerHTML = pages
       .map((page, index) => {
         // Plain status text, never only a colour.
         const state = page.online
-          ? `<span class="page-state page-state--online">Online</span>${page.draftChanged ? '<span class="page-state">Änderungen noch nicht veröffentlicht</span>' : ""}`
-          : '<span class="page-state page-state--draft">Entwurf – nicht online</span>';
+          ? `<span class="page-state page-state--online"${this.#notVisible ? ` title="${escapeHtml(this.#notVisible)}"` : ""}>${this.#notVisible ? "Veröffentlicht" : "Online"}</span>${page.draftChanged ? '<span class="page-state">Änderungen noch nicht veröffentlicht</span>' : ""}`
+          : '<span class="page-state page-state--draft">Entwurf – nicht veröffentlicht</span>';
         const free = page.kind === "FREE";
         return `<li class="page-row" draggable="true" data-page-id="${page.id}">
           <span class="page-row__handle" aria-hidden="true">⠿</span>
@@ -134,6 +151,16 @@ class ShopPageManager extends HTMLElement {
         </li>`;
       })
       .join("");
+  }
+
+  #renderTemplates() {
+    const target = this.querySelector("#page-new-templates");
+    if (!target) return;
+    target.outerHTML = `<span id="page-new-templates">
+      <label><input type="radio" name="template" value="leer" checked /> Leere Seite</label>
+      ${this.#templates.map((template) => `<label><input type="radio" name="template" value="${escapeHtml(template.id)}" />
+        <span>${escapeHtml(template.name)}<span class="page-manager__template-text">${escapeHtml(template.description)}</span></span></label>`).join("")}
+    </span>`;
   }
 
   #page(id) {
