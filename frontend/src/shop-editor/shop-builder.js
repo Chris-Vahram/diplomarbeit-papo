@@ -1,4 +1,5 @@
 import { apiFetch } from "../lib/api.js";
+import { API_BASE } from "../lib/config.js";
 import { escapeHtml } from "../lib/html.js";
 import { showToast } from "../components/toast-notice.js";
 import { BLOCK_TYPES, missingRequired, newBlock } from "./block-schema.js";
@@ -745,7 +746,15 @@ class ShopBuilder extends HTMLElement {
   // page); a free-page template shows that page in the current design. Uses the partner's
   // articles; nothing is saved.
   #openDemo({ template, choose }) {
-    const withIds = (blocks) => blocks.map((block, index) => ({ ...structuredClone(block), id: `demo-${index}` }));
+    // Sample photos ("vorlage:<name>") load straight from the public template image endpoint.
+    const assetUrls = {};
+    const withIds = (blocks) => blocks.map((block, index) => {
+      const imageId = block.config?.imageId;
+      if (typeof imageId === "string" && imageId.startsWith("vorlage:")) {
+        assetUrls[imageId] = `${API_BASE}/shop-templates/images/${encodeURIComponent(imageId.slice("vorlage:".length))}`;
+      }
+      return { ...structuredClone(block), id: `demo-${index}` };
+    });
     const articles = this.#preview.articles;
     const pages = {};
     let items;
@@ -780,7 +789,7 @@ class ShopBuilder extends HTMLElement {
         start,
         articles,
         imageUrls: this.#imageUrls,
-        assetUrls: {},
+        assetUrls,
       },
     });
   }
@@ -801,20 +810,28 @@ class ShopBuilder extends HTMLElement {
 
   // Replaces the draft blocks as one undo step; the theme suggestion only goes into the design
   // draft when the partner ticked "Farben und Schriften übernehmen", and is then undone with
-  // the blocks. Nothing is published.
-  #applyTemplate({ template, applyTheme }) {
-    this.#selectedId = null;
-    const blocks = template.blocks.map((block) => ({ ...structuredClone(block), id: crypto.randomUUID() }));
-    if (applyTheme) {
-      this.#history.record(JSON.stringify({ blocks: this.#blocks, theme: this.#themeDraft }));
-      this.#blocks = blocks;
-      this.#changed();
-      this.#onThemeChange(structuredClone(template.theme));
-    } else {
-      this.#applyBlocks(blocks);
+  // the blocks. Nothing is published. The server prepares the blocks first: fresh ids and the
+  // template's sample photos copied into the shop's own images.
+  async #applyTemplate({ template, applyTheme }) {
+    let content;
+    try {
+      content = await apiFetch(`/partner/shop/templates/${encodeURIComponent(template.id)}/content`, { method: "POST" });
+    } catch (error) {
+      showToast(error.message, "error");
+      return;
     }
-    showToast(applyTheme
-      ? `Vorlage „${template.name}“ mit Farben und Schriften übernommen.`
+    this.#selectedId = null;
+    const withTheme = applyTheme && content.theme;
+    if (withTheme) {
+      this.#history.record(JSON.stringify({ blocks: this.#blocks, theme: this.#themeDraft }));
+      this.#blocks = content.blocks;
+      this.#changed();
+      this.#onThemeChange(content.theme);
+    } else {
+      this.#applyBlocks(content.blocks);
+    }
+    showToast(withTheme
+      ? `Vorlage „${template.name}“ mit Form, Farben und Schriften übernommen.`
       : `Vorlage „${template.name}“ übernommen.`, "success");
   }
 

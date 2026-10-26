@@ -1,7 +1,8 @@
 // Renders the WebP thumbnails of the shop template catalogue (add-shop-templates design.md
 // Decision 2) with the real shop renderer in its editor-preview mode.
 //
-// Needs the static frontend server (`python3 tools/dev_frontend_server.py`, port 3000) and a
+// Needs the static frontend server (`python3 tools/dev_frontend_server.py`, port 3000), the
+// backend (sample photos, port 8080) and a
 // local Playwright; it is not a project dependency:
 //   npm i --prefix /tmp/pw playwright-core
 //   PLAYWRIGHT_MODULE=/tmp/pw/node_modules/playwright-core/index.mjs \
@@ -13,6 +14,8 @@ const ROOT = new URL("../", import.meta.url);
 const TEMPLATES = new URL("backend/src/main/resources/shop-templates/", ROOT);
 const OUT = new URL("frontend/assets/shop-templates/", ROOT);
 const BASE = process.env.FRONTEND_URL ?? "http://localhost:3000";
+// Sample photos come from the running backend's public template image endpoint.
+const API = process.env.API_URL ?? "http://localhost:8080/api";
 const WIDTH = 1280;
 const HEIGHT = 800;
 
@@ -67,7 +70,10 @@ function payload(entry, template, theme) {
     },
     article: entry.page === "artikeldetail" ? SAMPLE[0] : null,
     articles: SAMPLE,
-    assetUrls: {},
+    assetUrls: Object.fromEntries(template.blocks
+      .map((block) => block.config.imageId)
+      .filter((id) => typeof id === "string" && id.startsWith("vorlage:"))
+      .map((id) => [id, `${API}/shop-templates/images/${encodeURIComponent(id.slice("vorlage:".length))}`])),
     imageUrls: {},
     selectedBlockId: null,
   };
@@ -99,6 +105,9 @@ for (const entry of index.filter((candidate) => !wanted.length || wanted.include
     await ready;
     frame.contentWindow.postMessage({ type: "papo-shop-preview", payload: data }, location.origin);
     await new Promise((resolve) => setTimeout(resolve, 600));
+    // Lazy images below the first viewport never load in a screenshot frame: wait at most 4 s.
+    const images = [...frame.contentDocument.images].map((img) => img.decode().catch(() => {}));
+    await Promise.race([Promise.all(images), new Promise((resolve) => setTimeout(resolve, 4000))]);
     await frame.contentDocument.fonts.ready;
   }, { data, width: WIDTH, height: HEIGHT });
   const png = await page.screenshot({ clip: { x: 0, y: 0, width: WIDTH, height: HEIGHT } });

@@ -46,8 +46,12 @@ export function applyColors(element, colors = {}) {
   }
 }
 
+const FORMS = new Set(["klar", "handwerk", "kraeftig"]);
+
 export function applyTheme(element, theme) {
   applyColors(element, theme.colors);
+  // Form preset of the theme (shop.css [data-form]); older themes have none and mean "klar".
+  element.dataset.form = FORMS.has(theme.form) ? theme.form : "klar";
   element.style.setProperty("--shop-heading-font", SHOP_FONTS[theme.headingFont] ?? SYSTEM_STACK);
   element.style.setProperty("--shop-body-font", SHOP_FONTS[theme.bodyFont] ?? SYSTEM_STACK);
 }
