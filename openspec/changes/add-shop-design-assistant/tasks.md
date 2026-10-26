@@ -16,6 +16,6 @@
 
 ## 4. Verification
 
-- [ ] 4.1 Tests green; `git diff --check`
+- [x] 4.1 Tests green; `git diff --check`
 - [x] 4.2 Browser walkthrough with intentionally bad design
-- [ ] 4.3 Update traceability
+- [x] 4.3 Update traceability

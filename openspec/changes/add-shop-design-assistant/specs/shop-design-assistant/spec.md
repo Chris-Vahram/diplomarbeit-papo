@@ -36,8 +36,8 @@ An image without alternative text SHALL be reported as an emphasised Warnung exp
 The first rule set SHALL additionally contain: empty page (Warnung), missing logo (Tipp), Startseite without an article block (Tipp), image smaller than its display width (Tipp), image larger than 2 MB (Warnung), missing SEO title on an online page (Tipp), empty required block field (Blocker).
 
 #### Scenario: Missing logo
-- **WHEN** the shop has no logo in the Hero block
-- **THEN** a Tipp "Ein Logo macht deinen Shop wiedererkennbar" is shown
+- **WHEN** the first Hero block of the Startseite has no logo (optional image field "Logo")
+- **THEN** a Tipp "Ein Logo macht Ihren Shop wiedererkennbar" is shown
 
 ### Requirement: Publish gating
 Publishing a page or the design SHALL be refused while it has Blocker findings; the server SHALL re-evaluate blocker rules. With Warnung findings, publishing SHALL require an explicit confirmation listing them. Tipps SHALL NOT affect publishing.
