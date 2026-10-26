@@ -18,6 +18,10 @@ class HeroBlock extends ShopBlock {
     const image = config.imageId
       ? `<div class="shop-hero__media"><img src="${escapeHtml(api.assetUrl(config.imageId))}" alt="${escapeHtml(config.alt ?? "")}" /></div>`
       : "";
+    // The logo stands for the shop's name, so screen readers hear the name (shop-design-assistant).
+    const logo = config.logoId
+      ? `<img class="shop-hero__logo" src="${escapeHtml(api.assetUrl(config.logoId))}" alt="${escapeHtml(this.context.shopName ?? "Logo")}" />`
+      : "";
     const target = config.buttonPage === "startseite" ? "" : config.buttonPage;
     const button =
       config.buttonLabel && config.buttonPage
@@ -26,6 +30,7 @@ class HeroBlock extends ShopBlock {
     this.innerHTML = `<div class="shop-hero shop-hero--${image ? "image" : "plain"} shop-align-${escapeHtml(config.align ?? "left")}">
       ${image}
       <div class="shop-hero__body"><div class="shop-hero__content">
+        ${logo}
         ${headingHtml(api, config.title, "h1", "title")}
         ${textHtml(this.context.api, config.text)}
         ${button}

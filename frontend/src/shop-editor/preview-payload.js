@@ -5,7 +5,9 @@ import { resolveImageUrl } from "../lib/product-images.js";
 //
 // preview: ShopPreviewDto, theme: theme draft, pages: page list (ShopPageDto[]), page: the
 // page shown, blocks: its draft blocks; assetUrls/imageUrls: object URLs (see below).
-export function previewPayload({ preview, theme, pages, page, blocks, assetUrls = {}, imageUrls = {}, selectedBlockId = null }) {
+// markers: design assistant markers per block id (builder only).
+export function previewPayload({ preview, theme, pages, page, blocks, assetUrls = {}, imageUrls = {}, selectedBlockId = null,
+  markers = {} }) {
   // Navigation from the editor's own page list, so renamed or reordered pages show at once.
   const items = pages
     .filter((candidate) => candidate.online && candidate.slot !== "ARTICLE_DETAIL")
@@ -28,6 +30,7 @@ export function previewPayload({ preview, theme, pages, page, blocks, assetUrls 
     assetUrls,
     imageUrls,
     selectedBlockId,
+    markers,
   };
 }
 
@@ -52,5 +55,5 @@ export async function articleImageUrls(articles) {
 }
 
 export function imageIds(blocks) {
-  return [...new Set(blocks.map((block) => block.config?.imageId).filter(Boolean))];
+  return [...new Set(blocks.flatMap((block) => [block.config?.imageId, block.config?.logoId]).filter(Boolean))];
 }

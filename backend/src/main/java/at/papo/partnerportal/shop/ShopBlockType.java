@@ -22,7 +22,7 @@ import static at.papo.partnerportal.shop.ShopBlockField.text;
 // accepts ShopBlockField.COMMON: spacing, background and colour overrides.
 public enum ShopBlockType {
     HERO("hero", "Hero/Banner",
-            requiredText("title", 120), text("text", 400), of("imageId", IMAGE), text("alt", 200),
+            of("logoId", IMAGE), requiredText("title", 120), text("text", 400), of("imageId", IMAGE), text("alt", 200),
             text("buttonLabel", 40), of("buttonPage", SEGMENT), choice("align", "left", "center")),
     HEADING_TEXT("heading-text", "Überschrift + Text",
             text("heading", 120), text("text", 4000), choice("align", "left", "center")),

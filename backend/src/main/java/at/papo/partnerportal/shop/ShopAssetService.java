@@ -163,13 +163,14 @@ public class ShopAssetService {
     }
 
     // Public delivery check in the database (jsonb containment) instead of parsing every
-    // online page on each image request. Image fields are all named "imageId".
+    // online page on each image request. Image fields are "imageId" and the Hero's "logoId".
     private boolean isPublished(PartnerShop shop, long assetId) {
         Number count = (Number) ShopAsset.getEntityManager().createNativeQuery(
                         "select count(*) from shop_page where shop_id = ?1 and online = true and kind <> 'SYSTEM' "
-                                + "and publishedcontent @> cast(?2 as jsonb)")
+                                + "and (publishedcontent @> cast(?2 as jsonb) or publishedcontent @> cast(?3 as jsonb))")
                 .setParameter(1, shop.id)
                 .setParameter(2, "{\"blocks\":[{\"config\":{\"imageId\":" + assetId + "}}]}")
+                .setParameter(3, "{\"blocks\":[{\"config\":{\"logoId\":" + assetId + "}}]}")
                 .getSingleResult();
         return count.longValue() > 0;
     }

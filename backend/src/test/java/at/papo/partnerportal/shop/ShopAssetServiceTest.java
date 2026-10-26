@@ -221,4 +221,24 @@ class ShopAssetServiceTest {
         given().header("X-Forwarded-For", "198.18.1.3").when().get("/api/shop/" + otherKennung + "/assets/" + assetId)
                 .then().statusCode(404);
     }
+
+    // The Hero's logo (shop-design-assistant "Missing logo") is delivered like any block image.
+    @Test
+    void publishedHeroLogoIsPublic() throws Exception {
+        long partnerId = createPartner("Kabeltrommel 25m");
+        String companyToken = tokens.tokenFor("company-demo", "company-demo");
+        given().auth().oauth2(companyToken).when().post("/api/company/partners/" + partnerId + "/shop/release")
+                .then().statusCode(200);
+        String kennung = given().auth().oauth2(companyToken).when().get("/api/company/partners/" + partnerId + "/shop")
+                .then().statusCode(200).extract().path("kennung");
+        long assetId = upload(partnerId);
+        ShopPageDto home = tx(() -> editorService.pages(partner(partnerId)).pages().get(0));
+        var draft = json.readTree("{\"blocks\":[{\"id\":\"" + UUID.randomUUID()
+                + "\",\"type\":\"hero\",\"config\":{\"title\":\"Willkommen\",\"logoId\":" + assetId + "}}]}");
+        ShopPageDto saved = tx(() -> editorService.saveDraft(partner(partnerId), home.id(),
+                new ShopEditorRequests.Draft(draft, home.version())));
+        tx(() -> editorService.publish(partner(partnerId), saved.id(), saved.version()));
+        given().header("X-Forwarded-For", "198.18.1.4").when().get("/api/shop/" + kennung + "/assets/" + assetId)
+                .then().statusCode(200).contentType("image/png");
+    }
 }
