@@ -12,7 +12,7 @@
 
 ## 3. Server gating (essential)
 
-- [ ] 3.1 Java blocker rules on page and design publish; same test vectors; tests
+- [x] 3.1 Java blocker rules on page and design publish; same test vectors; tests
 
 ## 4. Verification
 

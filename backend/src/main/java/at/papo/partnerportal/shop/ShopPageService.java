@@ -119,6 +119,7 @@ public class ShopPageService {
             throw new ApiException(409, "Es können höchstens " + MAX_ONLINE_PAGES + " Seiten gleichzeitig online sein.");
         }
         validateContent(page, page.draftContent);
+        ShopDesignRules.requireReadablePage(parse(page.draftContent), parse(theme(page.shop).publishedTheme));
         // Republishing unchanged content must not replace the restore point with itself.
         if (page.publishedContent == null || !parse(page.publishedContent).equals(parse(page.draftContent))) {
             page.previousPublishedContent = page.publishedContent;
@@ -152,6 +153,8 @@ public class ShopPageService {
     public ShopTheme publishTheme(PartnerShop shop) {
         ShopTheme theme = theme(shop);
         ShopThemeValidator.validate(parse(theme.draftTheme));
+        ShopDesignRules.requireReadableTheme(parse(theme.draftTheme),
+                ShopPage.list("shop = ?1 and online = true and kind <> ?2", shop, ShopPageKind.SYSTEM), this);
         theme.previousPublishedTheme = theme.publishedTheme;
         theme.publishedTheme = theme.draftTheme;
         theme.updatedAt = Instant.now();
