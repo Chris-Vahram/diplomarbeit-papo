@@ -42,3 +42,10 @@ When a partner opens the builder for a shop that has not been set up yet, the bu
 #### Scenario: Setup twice
 - **WHEN** a setup request arrives for a shop that is already set up
 - **THEN** the server refuses it and nothing changes
+
+### Requirement: Demo shop per template
+Every template in the setup dialog and in the template picker SHALL offer „Vorlage ansehen“. It SHALL open a demo shop rendered by the shop renderer, without editing tools: for a style, Startseite, Artikelübersicht and Artikeldetail of that style with its theme suggestion; for a free-page template, that page with the current design. The demo SHALL use the partner's enabled articles, allow navigating between its pages and to article details, switch between computer and phone width, and state that colours, fonts, texts and images can be adapted to the partner's own brand. „Diese Vorlage wählen“ SHALL select the template in the dialog it was opened from; nothing is saved by viewing.
+
+#### Scenario: Click through a style
+- **WHEN** the partner opens „Vorlage ansehen“ for „Handwerk“ and clicks an article
+- **THEN** the demo shows the Artikeldetail page of that style for this article, and the partner's shop is unchanged

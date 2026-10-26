@@ -12,6 +12,7 @@ import "./design-panel.js";
 import "./page-manager.js";
 import "./template-picker.js";
 import "./setup-dialog.js";
+import "./demo-viewer.js";
 import { stateHtml } from "../lib/states.js";
 
 // Shop builder (shop-builder spec), opened full screen from "Mein Webshop"
@@ -68,6 +69,7 @@ class ShopBuilder extends HTMLElement {
   #device = "desktop";
   #frameReady = false;
   #history = new EditorHistory();
+  #templates = [];
   #pickField = null;
   #collapsedSides = { left: false, right: false };
   #small = null;
@@ -254,6 +256,7 @@ class ShopBuilder extends HTMLElement {
 
         <shop-template-picker></shop-template-picker>
         <shop-setup-dialog></shop-setup-dialog>
+        <shop-demo-viewer></shop-demo-viewer>
 
         <modal-dialog title="Bild wählen" id="builder-image-dialog">
           <shop-asset-library mode="pick"></shop-asset-library>
@@ -280,6 +283,7 @@ class ShopBuilder extends HTMLElement {
     this.querySelector("#builder-template").addEventListener("click", () => this.querySelector("shop-template-picker").open(this.#page));
     this.addEventListener("template-apply", (event) => this.#applyTemplate(event.detail));
     this.addEventListener("shop-setup", (event) => this.#setup(event.detail.style));
+    this.addEventListener("template-demo", (event) => this.#openDemo(event.detail));
     this.querySelector("#builder-undo").addEventListener("click", () => this.#undo());
     this.querySelector("#builder-redo").addEventListener("click", () => this.#redo());
     this.querySelector("#builder-publish").addEventListener("click", () => this.#publish());
@@ -358,6 +362,7 @@ class ShopBuilder extends HTMLElement {
       this.querySelector("shop-page-manager").list = pages;
       this.querySelector("shop-page-manager").templates = templates;
       this.querySelector("shop-template-picker").templates = templates;
+      this.#templates = templates;
       this.#renderDesignPanel();
       const start = pages.pages.find((page) => page.id === requestedPageId()) ?? pages.pages[0];
       await this.#openPage(start.id, { skipFlush: true });
@@ -733,6 +738,51 @@ class ShopBuilder extends HTMLElement {
     blocks.splice(at, 0, block);
     this.#selectedId = block.id;
     this.#applyBlocks(blocks);
+  }
+
+  // Demo shop for one template (shop-templates "Demo shop per template"). A mandatory-page
+  // template shows its whole style ("<page>-<style>" for all three pages, starting on its own
+  // page); a free-page template shows that page in the current design. Uses the partner's
+  // articles; nothing is saved.
+  #openDemo({ template, choose }) {
+    const withIds = (blocks) => blocks.map((block, index) => ({ ...structuredClone(block), id: `demo-${index}` }));
+    const articles = this.#preview.articles;
+    const pages = {};
+    let items;
+    let theme = this.#themeDraft;
+    let start = "";
+    if (template.page === "frei") {
+      pages.seite = { menuName: template.name, blocks: withIds(template.blocks) };
+      items = [{ segment: "seite", menuName: template.name, path: "seite" }];
+      start = "seite";
+    } else {
+      const style = template.id.slice(template.page.length + 1);
+      const ofStyle = (page) => this.#templates.find((candidate) => candidate.id === `${page}-${style}`);
+      for (const [page, key, menuName] of [["startseite", "", "Startseite"], ["artikel", "artikel", "Artikel"],
+        ["artikeldetail", "artikeldetail", "Artikeldetail"]]) {
+        const found = ofStyle(page);
+        if (found) pages[key] = { menuName, blocks: withIds(found.blocks) };
+      }
+      items = [{ segment: "startseite", menuName: "Startseite", path: "" }, { segment: "artikel", menuName: "Artikel", path: "artikel" }]
+        .filter((item) => item.path in pages);
+      theme = ofStyle("startseite")?.theme ?? template.theme ?? theme;
+      if (template.page === "artikel") start = "artikel";
+      if (template.page === "artikeldetail") start = `artikel/${articles[0]?.id ?? ""}`;
+    }
+    this.querySelector("shop-demo-viewer").open({
+      title: template.name,
+      choose,
+      payload: {
+        shop: this.#preview.shop,
+        theme,
+        navigation: { items, legal: [], sellerName: this.#preview.navigation.sellerName },
+        pages,
+        start,
+        articles,
+        imageUrls: this.#imageUrls,
+        assetUrls: {},
+      },
+    });
   }
 
   // First-time setup: the server sets pages and design, then the editor reloads everything.

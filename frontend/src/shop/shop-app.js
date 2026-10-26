@@ -187,8 +187,53 @@ async function start() {
   }
 }
 
-if (new URLSearchParams(location.search).has("preview")) {
+// Demo shop (shop-templates spec "Demo shop per template"): /shop.html?demo in the editor's
+// template viewer. The editor sends whole pages keyed by path ("" Startseite, "artikel",
+// "artikeldetail", or a free page); links switch between them here. Nothing is editable and
+// nothing is requested from the server.
+const DEMO_DATA = "papo-shop-demo";
+
+function startDemo() {
+  let demo = null;
+  window.addEventListener("message", (event) => {
+    if (event.origin !== location.origin || event.source !== window.parent) return;
+    if (event.data?.type !== DEMO_DATA) return;
+    demo = event.data.payload;
+    showDemo(demo.start ?? "");
+  });
+  root.addEventListener("click", (event) => {
+    const link = event.target.closest('a[href^="#"]');
+    if (!link || !demo) return;
+    event.preventDefault();
+    showDemo(link.getAttribute("href").slice(1));
+  });
+
+  function showDemo(path) {
+    const [segment, articleId] = path.split("/");
+    const isDetail = segment === "artikel" && articleId !== undefined && demo.pages.artikeldetail;
+    const key = isDetail ? "artikeldetail" : segment in demo.pages ? segment : Object.keys(demo.pages)[0];
+    const article = isDetail
+      ? demo.articles.find((candidate) => String(candidate.id) === articleId) ?? demo.articles[0] ?? null
+      : null;
+    const data = { ...demo, article };
+    const api = { ...createPreviewApi(data), editing: false };
+    applyTheme(document.documentElement, demo.theme);
+    document.title = article ? `${article.name} – ${demo.shop.displayName}` : demo.shop.displayName;
+    const main = renderLayout(api, demo.shop, demo.navigation, isDetail ? "artikel" : key);
+    const view = document.createElement("shop-page-view");
+    view.data = { blocks: demo.pages[key].blocks, context: { api, article } };
+    main.append(view);
+    window.scrollTo(0, 0);
+  }
+
+  window.parent.postMessage({ type: "papo-shop-demo-ready" }, location.origin);
+}
+
+const mode = new URLSearchParams(location.search);
+if (mode.has("preview")) {
   startPreview();
+} else if (mode.has("demo")) {
+  startDemo();
 } else {
   start();
 }

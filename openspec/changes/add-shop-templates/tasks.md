@@ -9,6 +9,7 @@
 - [x] 2.2 Template list endpoint and picker UI with confirmation and "Farben und Schriften übernehmen"
 - [ ] 2.3 Automated quality test running assistant rules over all templates (provisional `ShopTemplateQualityTest` with the spec's contrast and alt-text thresholds is in place; switch it to the assistant's rule units once `add-shop-design-assistant` exists)
 - [x] 2.4 First-time setup: setup state, `POST /api/partner/shop/setup`, "Shop einrichten" dialog with style choice and "Überspringen"
+- [x] 2.5 Demo shop per template: "Vorlage ansehen" in setup dialog and picker, renderer demo mode with page navigation, brand hint, "Diese Vorlage wählen"
 
 ## 3. Verification
 
