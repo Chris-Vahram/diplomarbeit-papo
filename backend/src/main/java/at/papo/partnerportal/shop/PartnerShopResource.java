@@ -11,6 +11,7 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
@@ -83,6 +84,13 @@ public class PartnerShopResource {
     public List<ShopTemplate> templates() {
         currentPartner.resolve();
         return templateCatalog.all();
+    }
+
+    // Picker: the template prepared for this shop (sample photos copied into its images).
+    @POST
+    @Path("/templates/{id}/content")
+    public ShopTemplateContentDto templateContent(@PathParam("id") String id) {
+        return editorService.templateContent(currentPartner.resolve(), id);
     }
 
     @GET

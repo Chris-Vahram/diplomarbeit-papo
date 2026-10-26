@@ -8,29 +8,35 @@
         "buttonLabel": "Sortiment ansehen",
         "buttonPage": "artikel",
         "align": "left",
-        "background": "surface",
-        "spacing": "large"
+        "imageId": "vorlage:holz-bearbeiten",
+        "alt": "Hände bearbeiten ein Holzbrett in einer Werkstatt"
       }
     },
     {
       "type": "heading-text",
       "config": {
         "heading": "Was uns wichtig ist",
-        "text": "Erzählen Sie hier in wenigen Sätzen, wofür Ihr Betrieb steht und warum Kundinnen und Kunden bei Ihnen richtig sind."
+        "text": "Erzählen Sie hier in wenigen Sätzen, wofür Ihr Betrieb steht und warum Kundinnen und Kunden bei Ihnen richtig sind.",
+        "align": "center",
+        "spacing": "large"
       }
     },
     {
-      "type": "spacer",
+      "type": "image-text",
       "config": {
-        "size": "small",
-        "divider": true
+        "heading": "Aus der Werkstatt",
+        "text": "Zeigen Sie, wie Sie arbeiten: Ihre Erfahrung, Ihr Team und die Sorgfalt, mit der Sie Ihre Kundschaft beraten.",
+        "imagePosition": "left",
+        "imageId": "vorlage:zuschnitt",
+        "alt": "Handwerker schneidet ein Holzbrett zu"
       }
     },
     {
       "type": "article-grid",
       "config": {
         "heading": "Aus unserem Sortiment",
-        "columns": "2"
+        "columns": "3",
+        "spacing": "large"
       }
     },
     {
@@ -46,13 +52,14 @@
   ],
   "theme": {
     "colors": {
-      "primary": "#5B3A29",
-      "accent": "#C8963E",
-      "background": "#F6F1E9",
-      "surface": "#FFFDF8",
-      "text": "#2B2118"
+      "primary": "#2F4A3A",
+      "accent": "#C08A3E",
+      "background": "#EEF0EA",
+      "surface": "#FFFFFF",
+      "text": "#1E2620"
     },
-    "headingFont": "lora",
-    "bodyFont": "source-sans-3"
+    "headingFont": "merriweather",
+    "bodyFont": "source-sans-3",
+    "form": "handwerk"
   }
 }

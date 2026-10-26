@@ -26,11 +26,18 @@ class ShopTemplateQualityTest {
     void everyTemplatePassesContrastAndAltTextWithOwnAndDefaultTheme() throws Exception {
         JsonNode defaultTheme = MAPPER.readTree(getClass().getClassLoader()
                 .getResourceAsStream(ShopTemplateCatalog.DIR + "theme.json"));
+        List<ShopTemplate> templates = ShopTemplateCatalog.load(MAPPER, ShopTemplateCatalog.DIR);
+        // Free pages have no theme of their own and must work in every style's design.
+        List<ShopTemplate> styles = templates.stream().filter(template -> template.theme() != null).toList();
         List<String> findings = new ArrayList<>();
-        for (ShopTemplate template : ShopTemplateCatalog.load(MAPPER, ShopTemplateCatalog.DIR)) {
+        for (ShopTemplate template : templates) {
             check(template, defaultTheme, "Standard-Theme", findings);
             if (template.theme() != null) {
                 check(template, template.theme(), "eigenes Theme", findings);
+            } else {
+                for (ShopTemplate style : styles) {
+                    check(template, style.theme(), "Theme von " + style.id(), findings);
+                }
             }
         }
         assertEquals(List.of(), findings);
@@ -61,7 +68,7 @@ class ShopTemplateQualityTest {
             if (config.has("colors")) {
                 effective.setAll((ObjectNode) config.get("colors"));
             }
-            checkBlock(findings, at, block.get("type").asText(), config, effective);
+            checkBlock(findings, at, block.get("type").asText(), config, effective, theme.path("form").asText("klar"));
             if (config.hasNonNull("imageId") && config.path("alt").asText("").isBlank()) {
                 findings.add(at + ": Bildbeschreibung fehlt");
             }
@@ -69,13 +76,27 @@ class ShopTemplateQualityTest {
     }
 
     // Mirrors shop.css: text colour per block background, muted text, cards, prices and buttons.
-    private static void checkBlock(List<String> findings, String at, String type, JsonNode config, ObjectNode c) {
+    private static void checkBlock(List<String> findings, String at, String type, JsonNode config, ObjectNode c,
+                                   String form) {
         String text = c.get("text").asText();
         String background = c.get("background").asText();
         String surface = c.get("surface").asText();
         String primary = c.get("primary").asText();
         String accent = c.get("accent").asText();
         String muted = mix(text, background, 0.68);
+        // A hero photo changes the ground: "handwerk" sets the text on a surface panel,
+        // "kraeftig" on a primary scrim over the photo; "klar" keeps it beside the photo.
+        if (type.equals("hero") && config.hasNonNull("imageId") && !form.equals("klar")) {
+            if (form.equals("handwerk")) {
+                require(findings, at + " Text im Textfeld", text, surface, TEXT);
+            } else {
+                require(findings, at + " Text auf Foto", onColor(primary), primary, TEXT);
+            }
+            if (config.hasNonNull("buttonLabel")) {
+                require(findings, at + " Schaltfläche", onColor(accent), accent, TEXT);
+            }
+            return;
+        }
         switch (config.path("background").asText("none")) {
             case "primary" -> require(findings, at + " Text auf Hauptfarbe", onColor(primary), primary, TEXT);
             case "accent" -> require(findings, at + " Text auf Akzentfarbe", onColor(accent), accent, TEXT);

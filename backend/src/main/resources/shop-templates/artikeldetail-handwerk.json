@@ -3,7 +3,8 @@
     {
       "type": "article-detail",
       "config": {
-        "imagePosition": "right"
+        "imagePosition": "right",
+        "spacing": "large"
       }
     },
     {
@@ -11,19 +12,22 @@
       "config": {
         "heading": "Persönliche Beratung",
         "text": "Sie möchten mehr über diesen Artikel wissen? Wir beraten Sie gerne.",
-        "background": "surface"
+        "align": "center",
+        "background": "surface",
+        "spacing": "large"
       }
     }
   ],
   "theme": {
     "colors": {
-      "primary": "#5B3A29",
-      "accent": "#C8963E",
-      "background": "#F6F1E9",
-      "surface": "#FFFDF8",
-      "text": "#2B2118"
+      "primary": "#2F4A3A",
+      "accent": "#C08A3E",
+      "background": "#EEF0EA",
+      "surface": "#FFFFFF",
+      "text": "#1E2620"
     },
-    "headingFont": "lora",
-    "bodyFont": "source-sans-3"
+    "headingFont": "merriweather",
+    "bodyFont": "source-sans-3",
+    "form": "handwerk"
   }
 }

@@ -49,3 +49,17 @@ Every template in the setup dialog and in the template picker SHALL offer „Vor
 #### Scenario: Click through a style
 - **WHEN** the partner opens „Vorlage ansehen“ for „Handwerk“ and clicks an article
 - **THEN** the demo shows the Artikeldetail page of that style for this article, and the partner's shop is unchanged
+
+### Requirement: Form presets in the design
+The theme SHALL accept an optional `form` with the values `klar`, `handwerk` and `kraeftig` (default `klar`). The shop renderer SHALL derive corner style, header, hero composition, article cards, buttons and section rhythm from it, so the three styles differ in form and not only in colour. The partner SHALL be able to change the form in the „Design“ tab; each style's theme suggestion sets its own form.
+
+#### Scenario: Form follows the style
+- **WHEN** the partner sets up the shop with „Kräftig“
+- **THEN** the published theme has form `kraeftig` and the shop shows square corners and a full-width photo header
+
+### Requirement: Bundled sample images
+Templates MAY reference bundled sample images (`"imageId": "vorlage:<name>"`) that ship with the application, each with recorded source and a licence that allows use without attribution. Applying such a template (setup, template picker, new free page) SHALL copy the referenced images into the partner's own shop images once and use those copies, so the partner can replace or delete them like any upload; they count towards the storage quota. The editor's demo shop and template thumbnails SHALL show the sample images directly. Every sample image in a template SHALL have alternative text.
+
+#### Scenario: Image copied once
+- **WHEN** the partner applies two templates that use the same sample image
+- **THEN** the shop's image library contains that image once and both pages reference it

@@ -3,41 +3,46 @@
     {
       "type": "hero",
       "config": {
-        "title": "Willkommen in unserem Shop",
-        "text": "Entdecken Sie unser Sortiment und bestellen Sie bequem online.",
-        "buttonLabel": "Zu den Artikeln",
+        "title": "Werkzeug und Material für Ihre Projekte",
+        "text": "Ausgewählte Artikel, persönliche Beratung und eine Bestellung in wenigen Schritten.",
+        "buttonLabel": "Zum Sortiment",
         "buttonPage": "artikel",
-        "align": "center",
-        "background": "primary",
-        "spacing": "large"
+        "align": "left",
+        "spacing": "large",
+        "imageId": "vorlage:messen",
+        "alt": "Hände messen mit einem Lineal auf hellem Holz"
       }
     },
     {
       "type": "article-grid",
       "config": {
-        "heading": "Unsere Artikel",
-        "columns": "3"
+        "heading": "Aus unserem Sortiment",
+        "columns": "4"
       }
     },
     {
-      "type": "heading-text",
+      "type": "image-text",
       "config": {
-        "heading": "Persönliche Beratung",
-        "text": "Sie haben Fragen zu einem Artikel? Wir beraten Sie gerne.",
-        "align": "center",
-        "background": "surface"
+        "heading": "Beratung, die weiterhilft",
+        "text": "Sie sind unsicher, welcher Artikel passt? Wir nehmen uns Zeit für Ihre Fragen – im Geschäft, am Telefon oder per E-Mail.",
+        "imagePosition": "right",
+        "background": "surface",
+        "spacing": "large",
+        "imageId": "vorlage:werkzeug-auf-holz",
+        "alt": "Werkzeug und Arbeitshandschuhe auf einem Holztisch"
       }
     }
   ],
   "theme": {
     "colors": {
-      "primary": "#1F4E79",
-      "accent": "#E07A2F",
-      "background": "#F7F7F5",
+      "primary": "#1B3A57",
+      "accent": "#D9622B",
+      "background": "#F4F5F7",
       "surface": "#FFFFFF",
-      "text": "#1F2328"
+      "text": "#15191E"
     },
-    "headingFont": "plus-jakarta-sans",
-    "bodyFont": "inter"
+    "headingFont": "work-sans",
+    "bodyFont": "source-sans-3",
+    "form": "klar"
   }
 }

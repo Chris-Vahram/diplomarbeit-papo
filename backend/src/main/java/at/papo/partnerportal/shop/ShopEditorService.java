@@ -36,6 +36,7 @@ public class ShopEditorService {
     @Inject
     ShopTemplateCatalog templateCatalog;
 
+
     public ShopPageListDto pages(Partner partner) {
         return pageList(shopService.findOrCreate(partner));
     }
@@ -53,7 +54,7 @@ public class ShopEditorService {
                 .orElseThrow(() -> new ApiException(400, "Diese Vorlage gibt es nicht."));
         ShopPage page = pageService.createFreePage(shop, request.menuName(), request.segment());
         if (template != null) {
-            JsonNode content = ShopPageService.withBlockIds(template.content());
+            JsonNode content = pageService.templateContent(shop, template);
             pageService.validateContent(page, content, false);
             page.draftContent = content.toString();
         }
@@ -211,7 +212,7 @@ public class ShopEditorService {
                         .orElseThrow(() -> new ApiException(400, "Diesen Stil gibt es nicht.")));
             }
             chosen.forEach((page, template) -> {
-                String content = ShopPageService.withBlockIds(template.content()).toString();
+                String content = pageService.templateContent(shop, template).toString();
                 pageService.validateContent(page, content);
                 page.previousPublishedContent = page.publishedContent;
                 page.draftContent = content;
@@ -232,6 +233,16 @@ public class ShopEditorService {
         shop.setupAt = Instant.now();
         flush(PAGE_CONFLICT);
         return pageList(shop);
+    }
+
+    // Template as page content of this shop: fresh block ids, sample photos copied into the
+    // shop's own images (the editor's template picker applies it as a draft).
+    @Transactional
+    public ShopTemplateContentDto templateContent(Partner partner, String templateId) {
+        PartnerShop shop = shopService.findOrCreate(partner);
+        ShopTemplate template = templateCatalog.all().stream().filter(candidate -> candidate.id().equals(templateId))
+                .findFirst().orElseThrow(() -> new ApiException(404, "Diese Vorlage gibt es nicht."));
+        return new ShopTemplateContentDto(pageService.templateContent(shop, template).get("blocks"), template.theme());
     }
 
     // Not set up yet: no recorded answer and nothing edited so far, so shops built before the

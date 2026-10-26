@@ -100,11 +100,26 @@ class ShopEditorServiceTest {
         assertEquals(detail.published(), detail.draft());
         assertTrue(home.restorable());
         ShopThemeDto theme = tx(() -> editorService.theme(partner(partnerId)));
-        assertEquals("#5B3A29", theme.published().at("/colors/primary").asText());
+        assertEquals("#2F4A3A", theme.published().at("/colors/primary").asText());
+        assertEquals("handwerk", theme.published().at("/form").asText());
         assertFalse(theme.draftChanged());
 
         assertEquals("Der Shop ist bereits eingerichtet.", rejection(() -> editorService.setup(partner(partnerId),
                 new ShopEditorRequests.Setup("kraeftig"))));
+    }
+
+    @Test
+    void sampleImagesAreCopiedOncePerShop() {
+        long partnerId = createPartner();
+        ShopTemplateContentDto first = tx(() -> editorService.templateContent(partner(partnerId), "startseite-klar"));
+        ShopTemplateContentDto second = tx(() -> editorService.templateContent(partner(partnerId), "startseite-klar"));
+        long imageId = first.blocks().get(0).at("/config/imageId").asLong();
+        assertEquals(imageId, second.blocks().get(0).at("/config/imageId").asLong());
+        assertTrue(imageId > 0);
+        assertEquals("klar", first.theme().at("/form").asText());
+        // The new shop already copied the Klar photos for its default pages; nothing is duplicated.
+        assertEquals(1, ShopAsset.count("shop.partner.id = ?1 and filename = ?2", partnerId, "Beispielbild messen.webp"));
+        assertEquals("Diese Vorlage gibt es nicht.", rejection(() -> editorService.templateContent(partner(partnerId), "nein")));
     }
 
     @Test
@@ -289,7 +304,7 @@ class ShopEditorServiceTest {
         ShopThemeDto savedTheme = tx(() -> editorService.saveThemeDraft(partner(partnerId),
                 new ShopEditorRequests.ThemeDraft(draft, theme.version())));
         assertTrue(savedTheme.draftChanged());
-        assertEquals("#1F4E79", savedTheme.published().at("/colors/primary").asText());
+        assertEquals("#1B3A57", savedTheme.published().at("/colors/primary").asText());
 
         assertEquals(ShopEditorService.THEME_CONFLICT, rejection(() -> editorService.saveThemeDraft(partner(partnerId),
                 new ShopEditorRequests.ThemeDraft(draft, theme.version()))));

@@ -3,26 +3,29 @@
     {
       "type": "heading-text",
       "config": {
-        "heading": "Unsere Artikel",
-        "text": "Alle Preise inklusive Umsatzsteuer."
+        "heading": "Sortiment",
+        "text": "Alle Preise inklusive Umsatzsteuer.",
+        "spacing": "large"
       }
     },
     {
       "type": "article-grid",
       "config": {
-        "columns": "3"
+        "columns": "4",
+        "spacing": "small"
       }
     }
   ],
   "theme": {
     "colors": {
-      "primary": "#1F4E79",
-      "accent": "#E07A2F",
-      "background": "#F7F7F5",
+      "primary": "#1B3A57",
+      "accent": "#D9622B",
+      "background": "#F4F5F7",
       "surface": "#FFFFFF",
-      "text": "#1F2328"
+      "text": "#15191E"
     },
-    "headingFont": "plus-jakarta-sans",
-    "bodyFont": "inter"
+    "headingFont": "work-sans",
+    "bodyFont": "source-sans-3",
+    "form": "klar"
   }
 }

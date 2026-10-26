@@ -6,26 +6,28 @@
         "title": "Sortiment",
         "text": "Alle Preise inklusive Umsatzsteuer.",
         "align": "left",
-        "background": "primary",
-        "spacing": "small"
+        "imageId": "vorlage:halle",
+        "alt": "Heller Gang in einer Halle aus Beton"
       }
     },
     {
       "type": "article-grid",
       "config": {
-        "columns": "4"
+        "columns": "4",
+        "spacing": "large"
       }
     }
   ],
   "theme": {
     "colors": {
-      "primary": "#0F2A3D",
+      "primary": "#0F1B26",
       "accent": "#F2B705",
       "background": "#FFFFFF",
-      "surface": "#F2F4F6",
-      "text": "#111418"
+      "surface": "#F2F3F5",
+      "text": "#0E1116"
     },
     "headingFont": "montserrat",
-    "bodyFont": "open-sans"
+    "bodyFont": "open-sans",
+    "form": "kraeftig"
   }
 }

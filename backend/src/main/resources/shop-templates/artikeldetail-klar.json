@@ -3,19 +3,29 @@
     {
       "type": "article-detail",
       "config": {
-        "imagePosition": "left"
+        "imagePosition": "left",
+        "spacing": "large"
+      }
+    },
+    {
+      "type": "heading-text",
+      "config": {
+        "heading": "Fragen zu diesem Artikel?",
+        "text": "Wir beraten Sie gerne – im Geschäft, am Telefon oder per E-Mail.",
+        "background": "surface"
       }
     }
   ],
   "theme": {
     "colors": {
-      "primary": "#1F4E79",
-      "accent": "#E07A2F",
-      "background": "#F7F7F5",
+      "primary": "#1B3A57",
+      "accent": "#D9622B",
+      "background": "#F4F5F7",
       "surface": "#FFFFFF",
-      "text": "#1F2328"
+      "text": "#15191E"
     },
-    "headingFont": "plus-jakarta-sans",
-    "bodyFont": "inter"
+    "headingFont": "work-sans",
+    "bodyFont": "source-sans-3",
+    "form": "klar"
   }
 }

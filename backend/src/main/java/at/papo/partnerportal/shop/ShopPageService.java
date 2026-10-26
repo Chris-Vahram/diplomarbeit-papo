@@ -39,6 +39,9 @@ public class ShopPageService {
     @Inject
     ShopTemplateCatalog templateCatalog;
 
+    @Inject
+    ShopAssetService assetService;
+
     // Idempotent: creates the theme and every missing slot page. Mandatory pages start
     // published from their default catalogue template; system pages only reserve slot and segment.
     @Transactional
@@ -68,9 +71,9 @@ public class ShopPageService {
             page.position = slot.ordinal();
             page.updatedAt = now;
             if (slot.kind == ShopPageKind.MANDATORY) {
-                String content = withBlockIds(templateCatalog.find(slot.defaultTemplate, slot)
-                        .orElseThrow(() -> new IllegalStateException("Shop template missing: " + slot.defaultTemplate))
-                        .content()).toString();
+                String content = templateContent(shop, templateCatalog.find(slot.defaultTemplate, slot)
+                        .orElseThrow(() -> new IllegalStateException("Shop template missing: " + slot.defaultTemplate)))
+                        .toString();
                 page.draftContent = content;
                 page.publishedContent = content;
                 page.publishedAt = now;
@@ -292,6 +295,22 @@ public class ShopPageService {
         } catch (IOException exception) {
             throw new UncheckedIOException(exception);
         }
+    }
+
+    // Template as page content of this shop: fresh block ids, and its bundled sample photos
+    // copied into the shop's own images (once per shop), so the page only references own assets.
+    JsonNode templateContent(PartnerShop shop, ShopTemplate template) {
+        JsonNode content = withBlockIds(template.content());
+        for (JsonNode block : content.path("blocks")) {
+            JsonNode imageId = block.path("config").get("imageId");
+            if (imageId != null && imageId.asText("").startsWith(ShopTemplateCatalog.IMAGE_PREFIX)) {
+                ShopTemplateImage image = templateCatalog
+                        .image(imageId.asText().substring(ShopTemplateCatalog.IMAGE_PREFIX.length())).orElseThrow();
+                ((ObjectNode) block.get("config")).put("imageId",
+                        assetService.sampleAsset(shop, image, templateCatalog.imageBytes(image)));
+            }
+        }
+        return content;
     }
 
     // Template blocks carry no ids; every created page gets fresh ones for editor addressing.

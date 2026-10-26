@@ -3,7 +3,8 @@
     {
       "type": "article-detail",
       "config": {
-        "imagePosition": "left"
+        "imagePosition": "left",
+        "spacing": "large"
       }
     },
     {
@@ -12,19 +13,21 @@
         "heading": "Fragen zu diesem Artikel?",
         "text": "Rufen Sie uns an oder schreiben Sie uns – wir helfen Ihnen gerne weiter.",
         "align": "center",
-        "background": "accent"
+        "background": "accent",
+        "spacing": "large"
       }
     }
   ],
   "theme": {
     "colors": {
-      "primary": "#0F2A3D",
+      "primary": "#0F1B26",
       "accent": "#F2B705",
       "background": "#FFFFFF",
-      "surface": "#F2F4F6",
-      "text": "#111418"
+      "surface": "#F2F3F5",
+      "text": "#0E1116"
     },
     "headingFont": "montserrat",
-    "bodyFont": "open-sans"
+    "bodyFont": "open-sans",
+    "form": "kraeftig"
   }
 }

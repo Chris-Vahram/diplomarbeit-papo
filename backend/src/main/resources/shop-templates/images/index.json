@@ -1,0 +1,82 @@
+[
+  {
+    "name": "holz-bearbeiten",
+    "file": "holz-bearbeiten.webp",
+    "alt": "Hände bearbeiten ein Holzbrett in einer Werkstatt",
+    "title": "Woodworker_in_a_workshop_(Unsplash).jpg",
+    "author": "Ian Schneider goian",
+    "license": "CC0",
+    "source": "https://commons.wikimedia.org/wiki/File:Woodworker_in_a_workshop_(Unsplash).jpg",
+    "note": "Von Wikimedia Commons (Upload aus Unsplash), auf 1600 px verkleinert und als WebP gespeichert."
+  },
+  {
+    "name": "werkzeug-auf-holz",
+    "file": "werkzeug-auf-holz.webp",
+    "alt": "Werkzeug und Arbeitshandschuhe auf einem Holztisch",
+    "title": "Toolkit_and_tools_(Unsplash).jpg",
+    "author": "Todd Quackenbush toddquackenbush",
+    "license": "CC0",
+    "source": "https://commons.wikimedia.org/wiki/File:Toolkit_and_tools_(Unsplash).jpg",
+    "note": "Von Wikimedia Commons (Upload aus Unsplash), auf 1600 px verkleinert und als WebP gespeichert."
+  },
+  {
+    "name": "zuschnitt",
+    "file": "zuschnitt.webp",
+    "alt": "Handwerker schneidet ein Holzbrett zu",
+    "title": "Craft_Workshop_(Unsplash).jpg",
+    "author": "Igor Ovsyannykov igorovsyannykov",
+    "license": "CC0",
+    "source": "https://commons.wikimedia.org/wiki/File:Craft_Workshop_(Unsplash).jpg",
+    "note": "Von Wikimedia Commons (Upload aus Unsplash), auf 1600 px verkleinert und als WebP gespeichert."
+  },
+  {
+    "name": "werkstatt",
+    "file": "werkstatt.webp",
+    "alt": "Werkstatt mit Werkbank und Werkzeugwand",
+    "title": "Woodworking_workshop_(Unsplash).jpg",
+    "author": "s w wengenroad",
+    "license": "CC0",
+    "source": "https://commons.wikimedia.org/wiki/File:Woodworking_workshop_(Unsplash).jpg",
+    "note": "Von Wikimedia Commons (Upload aus Unsplash), auf 1600 px verkleinert und als WebP gespeichert."
+  },
+  {
+    "name": "standbohrmaschine",
+    "file": "standbohrmaschine.webp",
+    "alt": "Hände an einer Standbohrmaschine im Halbdunkel",
+    "title": "The_Workshop_(Unsplash).jpg",
+    "author": "Adi Goldstein adigold1",
+    "license": "CC0",
+    "source": "https://commons.wikimedia.org/wiki/File:The_Workshop_(Unsplash).jpg",
+    "note": "Von Wikimedia Commons (Upload aus Unsplash), auf 1600 px verkleinert und als WebP gespeichert."
+  },
+  {
+    "name": "schweissen",
+    "file": "schweissen.webp",
+    "alt": "Schweißer bei der Arbeit, Funken sprühen",
+    "title": "Welder_in_a_workshop_(Unsplash).jpg",
+    "author": "Uğur Gürcüoğlu sharkdesignstudio",
+    "license": "CC0",
+    "source": "https://commons.wikimedia.org/wiki/File:Welder_in_a_workshop_(Unsplash).jpg",
+    "note": "Von Wikimedia Commons (Upload aus Unsplash), auf 1600 px verkleinert und als WebP gespeichert."
+  },
+  {
+    "name": "messen",
+    "file": "messen.webp",
+    "alt": "Hände messen mit einem Lineal auf hellem Holz",
+    "title": "Beekeeper's_workshop_(Unsplash).jpg",
+    "author": "Roman Kraft romankraft",
+    "license": "CC0",
+    "source": "https://commons.wikimedia.org/wiki/File:Beekeeper%27s_workshop_(Unsplash).jpg",
+    "note": "Von Wikimedia Commons (Upload aus Unsplash), auf 1600 px verkleinert und als WebP gespeichert."
+  },
+  {
+    "name": "halle",
+    "file": "halle.webp",
+    "alt": "Heller Gang in einer Halle aus Beton",
+    "title": "Black_white_concrete_interior_(Unsplash).jpg",
+    "author": "Verne Ho verneho",
+    "license": "CC0",
+    "source": "https://commons.wikimedia.org/wiki/File:Black_white_concrete_interior_(Unsplash).jpg",
+    "note": "Von Wikimedia Commons (Upload aus Unsplash), auf 1600 px verkleinert und als WebP gespeichert."
+  }
+]
