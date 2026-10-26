@@ -210,7 +210,7 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
   letter-spacing: -0.02em;
   text-wrap: balance;
   overflow-wrap: break-word;
-  hyphens: auto;
+  hyphens: manual;
 }
 
 h1.shop-heading {
@@ -322,7 +322,7 @@ h2.shop-heading { font-size: clamp(1.625rem, 2.8vw, 2.375rem); }
 .shop-card__link:hover .shop-card__image { transform: scale(1.035); }
 .shop-card__link:active .shop-card__image { transform: scale(1.01); transition-duration: 120ms; }
 .shop-card__body { display: flex; flex-direction: column; gap: 0.25rem; padding: 1rem 0 0; flex: 1; }
-.shop-card__name { font-weight: 600; line-height: 1.35; overflow-wrap: break-word; hyphens: auto; }
+.shop-card__name { font-weight: 600; line-height: 1.35; overflow-wrap: break-word; hyphens: manual; }
 .shop-card__link:hover .shop-card__name { text-decoration: underline; }
 .shop-card__category { color: var(--shop-muted); font-size: 0.875rem; }
 
@@ -405,6 +405,13 @@ h2.shop-heading { font-size: clamp(1.625rem, 2.8vw, 2.375rem); }
   overflow: hidden;
 }
 
+[data-form="klar"] .shop-card__body { gap: 0.375rem; }
+[data-form="klar"] .shop-card .shop-price {
+  margin-top: auto;
+  padding-top: 0.625rem;
+  border-top: 1px solid var(--shop-border);
+}
+
 [data-form="klar"] .shop-list > .shop-heading {
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--shop-border);
@@ -425,12 +432,12 @@ h2.shop-heading { font-size: clamp(1.625rem, 2.8vw, 2.375rem); }
 [data-form="handwerk"] .shop-header__name { font-size: 1.5rem; letter-spacing: -0.01em; }
 [data-form="handwerk"] .shop-nav ul { justify-content: center; }
 
-[data-form="handwerk"] shop-block-hero:has(.shop-hero--image) { padding-block: 0; }
+[data-form="handwerk"] shop-block-hero:has(.shop-hero--image) { padding-top: 0; }
 [data-form="handwerk"] .shop-hero--image {
   display: grid;
   max-width: calc(var(--shop-max-width) + 2 * var(--shop-gutter));
   margin: 0 auto;
-  padding: var(--shop-gutter);
+  padding: var(--shop-gutter) var(--shop-gutter) 0;
 }
 [data-form="handwerk"] .shop-hero--image > * { grid-area: 1 / 1; }
 [data-form="handwerk"] .shop-hero__media {
@@ -438,10 +445,13 @@ h2.shop-heading { font-size: clamp(1.625rem, 2.8vw, 2.375rem); }
   border-radius: var(--shop-radius);
   overflow: hidden;
 }
+/* The panel reaches past the photo's lower edge: the photo is the material, the panel lies on it. */
 [data-form="handwerk"] .shop-hero--image .shop-hero__body {
   align-self: end;
-  padding: clamp(1rem, 3vw, 2.5rem);
+  padding: 0 clamp(1rem, 3vw, 2.5rem);
+  margin-bottom: -3.5rem;
 }
+[data-form="handwerk"] shop-block-hero:has(.shop-hero--image) { padding-bottom: 3.5rem; }
 [data-form="handwerk"] .shop-hero--image .shop-hero__content {
   padding: clamp(1.75rem, 3.5vw, 3rem);
   border-radius: calc(var(--shop-radius) - 4px);
@@ -540,7 +550,7 @@ h2.shop-heading { font-size: clamp(1.625rem, 2.8vw, 2.375rem); }
   letter-spacing: 0.08em;
 }
 
-[data-form="kraeftig"] .shop-list > .shop-heading { text-transform: uppercase; font-size: clamp(1.5rem, 2.6vw, 2.125rem); }
+[data-form="kraeftig"] .shop-list > .shop-heading { text-transform: uppercase; font-size: clamp(2rem, 4.2vw, 3.5rem); line-height: 1; letter-spacing: -0.03em; }
 [data-form="kraeftig"] .shop-list > .shop-heading::after {
   content: "";
   display: block;
@@ -589,6 +599,9 @@ h2.shop-heading { font-size: clamp(1.625rem, 2.8vw, 2.375rem); }
   .shop-price__value { font-size: 1rem; }
   [data-form="handwerk"] .shop-card { padding: 0.375rem 0.375rem 0.875rem; }
   [data-form="handwerk"] .shop-card__body { padding: 0.75rem 0.375rem 0; }
+  [data-form="handwerk"] .shop-card__name { font-size: 0.875rem; }
+  [data-form="handwerk"] .shop-hero--image .shop-hero__body { margin-bottom: 0; }
+  [data-form="handwerk"] shop-block-hero:has(.shop-hero--image) { padding-bottom: 1.5rem; }
   [data-form="kraeftig"] .shop-card__name { font-size: 0.75rem; letter-spacing: 0.02em; }
   [data-form="kraeftig"] .shop-price__value { font-size: 1.125rem; }
   .shop-header__inner { flex-direction: column; align-items: flex-start; gap: 0; }

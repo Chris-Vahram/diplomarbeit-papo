@@ -6,8 +6,8 @@
         "title": "Sortiment",
         "text": "Alle Preise inklusive Umsatzsteuer.",
         "align": "left",
-        "imageId": "vorlage:halle",
-        "alt": "Heller Gang in einer Halle aus Beton"
+        "background": "primary",
+        "spacing": "medium"
       }
     },
     {

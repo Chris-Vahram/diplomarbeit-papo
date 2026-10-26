@@ -1,30 +1,18 @@
 {
   "blocks": [
     {
-      "type": "hero",
+      "type": "heading-text",
       "config": {
-        "title": "Unser Sortiment",
+        "heading": "Unser Sortiment",
         "text": "Jeder Artikel hier ist von uns ausgewählt. Alle Preise inklusive Umsatzsteuer.",
-        "align": "left",
-        "imageId": "vorlage:werkzeug-auf-holz",
-        "alt": "Werkzeug und Arbeitshandschuhe auf einem Holztisch"
+        "spacing": "large"
       }
     },
     {
       "type": "article-grid",
       "config": {
-        "columns": "3",
-        "spacing": "large"
-      }
-    },
-    {
-      "type": "heading-text",
-      "config": {
-        "heading": "Nicht gefunden, was Sie suchen?",
-        "text": "Sprechen Sie uns an. Wir sagen Ihnen gerne, welcher Artikel zu Ihrem Vorhaben passt.",
-        "align": "center",
-        "background": "surface",
-        "spacing": "large"
+        "columns": "4",
+        "spacing": "small"
       }
     }
   ],

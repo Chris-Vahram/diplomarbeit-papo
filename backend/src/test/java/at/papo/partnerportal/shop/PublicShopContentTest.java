@@ -109,7 +109,7 @@ class PublicShopContentTest {
 
         visitor().when().get("/api/shop/" + kennung + "/pages/artikeldetail")
                 .then().statusCode(200)
-                .body("blocks.type", contains("article-detail", "heading-text"));
+                .body("blocks.type", contains("article-detail", "article-grid"));
     }
 
     @Test

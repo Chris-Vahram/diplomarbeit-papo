@@ -5,6 +5,8 @@
       "config": {
         "title": "Aktuelle Aktionen",
         "text": "Hier stellen Sie Ihre aktuellen Angebote vor.",
+        "buttonLabel": "Gesamtes Sortiment",
+        "buttonPage": "artikel",
         "align": "left",
         "background": "accent",
         "spacing": "large"
@@ -16,16 +18,6 @@
         "heading": "Unsere Empfehlungen",
         "articleIds": [],
         "columns": "3",
-        "spacing": "large"
-      }
-    },
-    {
-      "type": "heading-text",
-      "config": {
-        "heading": "Fragen zu einer Aktion?",
-        "text": "Sprechen Sie uns an. Wir beraten Sie gerne.",
-        "align": "center",
-        "background": "surface",
         "spacing": "large"
       }
     }

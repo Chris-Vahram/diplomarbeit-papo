@@ -4,7 +4,7 @@
       "type": "hero",
       "config": {
         "title": "Gutes Werkzeug, ehrliche Beratung",
-        "text": "Bei uns bestellen Sie Artikel, die wir selbst kennen und empfehlen.",
+        "text": "Hier finden Sie Artikel, die wir selbst kennen und empfehlen.",
         "buttonLabel": "Sortiment ansehen",
         "buttonPage": "artikel",
         "align": "left",
@@ -13,11 +13,10 @@
       }
     },
     {
-      "type": "heading-text",
+      "type": "article-grid",
       "config": {
-        "heading": "Was uns wichtig ist",
-        "text": "Erzählen Sie hier in wenigen Sätzen, wofür Ihr Betrieb steht und warum Kundinnen und Kunden bei Ihnen richtig sind.",
-        "align": "center",
+        "heading": "Aus unserem Sortiment",
+        "columns": "4",
         "spacing": "large"
       }
     },
@@ -25,28 +24,12 @@
       "type": "image-text",
       "config": {
         "heading": "Aus der Werkstatt",
-        "text": "Zeigen Sie, wie Sie arbeiten: Ihre Erfahrung, Ihr Team und die Sorgfalt, mit der Sie Ihre Kundschaft beraten.",
+        "text": "Erzählen Sie, wofür Ihr Betrieb steht: Ihre Erfahrung, Ihr Team und die Sorgfalt, mit der Sie Ihre Kundschaft beraten.",
         "imagePosition": "left",
+        "background": "surface",
+        "spacing": "large",
         "imageId": "vorlage:zuschnitt",
         "alt": "Handwerker schneidet ein Holzbrett zu"
-      }
-    },
-    {
-      "type": "article-grid",
-      "config": {
-        "heading": "Aus unserem Sortiment",
-        "columns": "3",
-        "spacing": "large"
-      }
-    },
-    {
-      "type": "heading-text",
-      "config": {
-        "heading": "Beratung, wie Sie sie brauchen",
-        "text": "Rufen Sie uns an oder schreiben Sie uns. Wir nehmen uns Zeit für Ihre Fragen.",
-        "align": "center",
-        "background": "primary",
-        "spacing": "large"
       }
     }
   ],

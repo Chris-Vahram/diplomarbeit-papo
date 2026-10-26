@@ -23,9 +23,7 @@
       "config": {
         "heading": "So erreichen Sie uns",
         "text": "Nennen Sie Ihre Öffnungszeiten und wie man Sie am besten erreicht.",
-        "align": "center",
-        "background": "surface",
-        "spacing": "large"
+        "spacing": "medium"
       }
     }
   ]

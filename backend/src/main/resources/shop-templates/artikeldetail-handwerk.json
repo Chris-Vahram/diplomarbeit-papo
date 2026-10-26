@@ -8,12 +8,10 @@
       }
     },
     {
-      "type": "heading-text",
+      "type": "article-grid",
       "config": {
-        "heading": "Persönliche Beratung",
-        "text": "Sie möchten mehr über diesen Artikel wissen? Wir beraten Sie gerne.",
-        "align": "center",
-        "background": "surface",
+        "heading": "Das könnte Sie auch interessieren",
+        "columns": "4",
         "spacing": "large"
       }
     }

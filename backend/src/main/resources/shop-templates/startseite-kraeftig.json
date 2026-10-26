@@ -4,7 +4,7 @@
       "type": "hero",
       "config": {
         "title": "Alles für Ihr nächstes Projekt",
-        "text": "Ausgewählte Artikel und persönliche Beratung – bestellen Sie bequem online.",
+        "text": "Ausgewählte Artikel und persönliche Beratung aus einer Hand.",
         "buttonLabel": "Jetzt Artikel ansehen",
         "buttonPage": "artikel",
         "align": "left",
@@ -24,7 +24,7 @@
       "type": "image-text",
       "config": {
         "heading": "Fragen zu einem Artikel?",
-        "text": "Wir helfen Ihnen gerne weiter – telefonisch oder per E-Mail.",
+        "text": "Wir helfen Ihnen gerne weiter – im Geschäft, telefonisch oder per E-Mail.",
         "imagePosition": "right",
         "background": "primary",
         "spacing": "large",

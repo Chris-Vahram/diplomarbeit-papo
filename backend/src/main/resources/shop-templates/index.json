@@ -31,35 +31,35 @@
     "id": "artikel-handwerk",
     "page": "artikel",
     "name": "Handwerk",
-    "description": "Foto mit Einleitung, Artikel in drei Spalten und ein Hinweis auf persönliche Beratung.",
+    "description": "Einleitung in Serifenschrift und Artikel im Passepartout, vier Spalten.",
     "thumbnail": "artikel-handwerk.webp"
   },
   {
     "id": "artikel-kraeftig",
     "page": "artikel",
     "name": "Kräftig",
-    "description": "Großer Kopfbereich mit Foto und dichtes Raster mit vier Spalten.",
+    "description": "Dunkler Kopfbereich in Großbuchstaben und dichtes Raster mit vier Spalten.",
     "thumbnail": "artikel-kraeftig.webp"
   },
   {
     "id": "artikeldetail-klar",
     "page": "artikeldetail",
     "name": "Klar",
-    "description": "Artikel mit Bild links und einem ruhigen Hinweis auf Beratung.",
+    "description": "Artikel mit Bild links, darunter weitere Artikel zum Stöbern.",
     "thumbnail": "artikeldetail-klar.webp"
   },
   {
     "id": "artikeldetail-handwerk",
     "page": "artikeldetail",
     "name": "Handwerk",
-    "description": "Artikel mit Bild rechts im Passepartout und einem Abschnitt zur Beratung.",
+    "description": "Artikel mit Bild rechts im Passepartout, darunter weitere Artikel.",
     "thumbnail": "artikeldetail-handwerk.webp"
   },
   {
     "id": "artikeldetail-kraeftig",
     "page": "artikeldetail",
     "name": "Kräftig",
-    "description": "Artikel mit Bild links, großem Preis und auffälligem Hinweis für Rückfragen.",
+    "description": "Artikel mit Bild links und großem Preis, darunter weitere Artikel als Raster.",
     "thumbnail": "artikeldetail-kraeftig.webp"
   },
   {

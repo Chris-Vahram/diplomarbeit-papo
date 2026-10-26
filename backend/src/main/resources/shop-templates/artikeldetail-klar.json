@@ -8,11 +8,12 @@
       }
     },
     {
-      "type": "heading-text",
+      "type": "article-grid",
       "config": {
-        "heading": "Fragen zu diesem Artikel?",
-        "text": "Wir beraten Sie gerne – im Geschäft, am Telefon oder per E-Mail.",
-        "background": "surface"
+        "heading": "Weitere Artikel",
+        "columns": "4",
+        "background": "surface",
+        "spacing": "large"
       }
     }
   ],

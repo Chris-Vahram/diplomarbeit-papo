@@ -8,12 +8,10 @@
       }
     },
     {
-      "type": "heading-text",
+      "type": "article-grid",
       "config": {
-        "heading": "Fragen zu diesem Artikel?",
-        "text": "Rufen Sie uns an oder schreiben Sie uns – wir helfen Ihnen gerne weiter.",
-        "align": "center",
-        "background": "accent",
+        "heading": "Weitere Artikel",
+        "columns": "4",
         "spacing": "large"
       }
     }
