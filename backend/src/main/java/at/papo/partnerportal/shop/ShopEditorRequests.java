@@ -37,4 +37,8 @@ public final class ShopEditorRequests {
 
     public record ThemeDraft(JsonNode theme, Long version) {
     }
+
+    // style: suffix of the "startseite-<style>" template, e.g. "handwerk"; null = keep the default.
+    public record Setup(String style) {
+    }
 }

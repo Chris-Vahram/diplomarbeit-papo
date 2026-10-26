@@ -11,6 +11,7 @@ import "./block-properties.js";
 import "./design-panel.js";
 import "./page-manager.js";
 import "./template-picker.js";
+import "./setup-dialog.js";
 import { stateHtml } from "../lib/states.js";
 
 // Shop builder (shop-builder spec), opened full screen from "Mein Webshop"
@@ -252,6 +253,7 @@ class ShopBuilder extends HTMLElement {
         </modal-dialog>
 
         <shop-template-picker></shop-template-picker>
+        <shop-setup-dialog></shop-setup-dialog>
 
         <modal-dialog title="Bild wählen" id="builder-image-dialog">
           <shop-asset-library mode="pick"></shop-asset-library>
@@ -277,6 +279,7 @@ class ShopBuilder extends HTMLElement {
     this.querySelector("#builder-retry").addEventListener("click", () => this.#save());
     this.querySelector("#builder-template").addEventListener("click", () => this.querySelector("shop-template-picker").open(this.#page));
     this.addEventListener("template-apply", (event) => this.#applyTemplate(event.detail));
+    this.addEventListener("shop-setup", (event) => this.#setup(event.detail.style));
     this.querySelector("#builder-undo").addEventListener("click", () => this.#undo());
     this.querySelector("#builder-redo").addEventListener("click", () => this.#redo());
     this.querySelector("#builder-publish").addEventListener("click", () => this.#publish());
@@ -359,6 +362,7 @@ class ShopBuilder extends HTMLElement {
       const start = pages.pages.find((page) => page.id === requestedPageId()) ?? pages.pages[0];
       await this.#openPage(start.id, { skipFlush: true });
       this.#resolveArticleImages();
+      if (pages.setupNeeded) this.querySelector("shop-setup-dialog").open(templates);
     } catch (error) {
       const body = this.querySelector(".builder-body");
       body.innerHTML = stateHtml("error", "Der Editor konnte nicht geladen werden.", {
@@ -729,6 +733,20 @@ class ShopBuilder extends HTMLElement {
     blocks.splice(at, 0, block);
     this.#selectedId = block.id;
     this.#applyBlocks(blocks);
+  }
+
+  // First-time setup: the server sets pages and design, then the editor reloads everything.
+  async #setup(style) {
+    const dialog = this.querySelector("shop-setup-dialog");
+    try {
+      await apiFetch("/partner/shop/setup", { method: "POST", body: JSON.stringify({ style }) });
+      dialog.close();
+      if (style) showToast("Ihr Shop ist eingerichtet. Passen Sie die Seiten jetzt nach Ihren Wünschen an.", "success");
+      this.#mount();
+    } catch (error) {
+      showToast(error.message, "error");
+      dialog.failed();
+    }
   }
 
   // Replaces the draft blocks as one undo step; the theme suggestion only goes into the design

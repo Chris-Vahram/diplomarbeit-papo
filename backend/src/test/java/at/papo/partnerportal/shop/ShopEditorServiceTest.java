@@ -85,6 +85,43 @@ class ShopEditorServiceTest {
     }
 
     @Test
+    void firstSetupPublishesTheChosenStyleOnce() {
+        long partnerId = createPartner();
+        assertTrue(tx(() -> editorService.pages(partner(partnerId))).setupNeeded());
+        assertEquals("Diesen Stil gibt es nicht.", rejection(() -> editorService.setup(partner(partnerId),
+                new ShopEditorRequests.Setup("gibt-es-nicht"))));
+        assertTrue(tx(() -> editorService.pages(partner(partnerId))).setupNeeded());
+
+        ShopPageListDto list = tx(() -> editorService.setup(partner(partnerId), new ShopEditorRequests.Setup("handwerk")));
+        assertFalse(list.setupNeeded());
+        ShopPageDto home = tx(() -> pageBySegment(partnerId, "startseite"));
+        ShopPageDetailDto detail = tx(() -> editorService.page(partner(partnerId), home.id()));
+        assertEquals("Gutes Werkzeug, ehrliche Beratung", detail.published().at("/blocks/0/config/title").asText());
+        assertEquals(detail.published(), detail.draft());
+        assertTrue(home.restorable());
+        ShopThemeDto theme = tx(() -> editorService.theme(partner(partnerId)));
+        assertEquals("#5B3A29", theme.published().at("/colors/primary").asText());
+        assertFalse(theme.draftChanged());
+
+        assertEquals("Der Shop ist bereits eingerichtet.", rejection(() -> editorService.setup(partner(partnerId),
+                new ShopEditorRequests.Setup("kraeftig"))));
+    }
+
+    @Test
+    void skippingKeepsTheDefaultsAndEditedShopsNeedNoSetup() throws Exception {
+        long skipping = createPartner();
+        ShopPageDto before = tx(() -> pageBySegment(skipping, "startseite"));
+        assertFalse(tx(() -> editorService.setup(partner(skipping), new ShopEditorRequests.Setup(null))).setupNeeded());
+        assertEquals(before.version(), tx(() -> pageBySegment(skipping, "startseite")).version());
+
+        // A shop edited before the setup existed is treated as set up.
+        long edited = createPartner();
+        ShopPageDto home = tx(() -> pageBySegment(edited, "startseite"));
+        saveDraft(edited, home, block("heading-text", "{\"heading\":\"Eigene Seite\"}"));
+        assertFalse(tx(() -> editorService.pages(partner(edited))).setupNeeded());
+    }
+
+    @Test
     void pageListShowsDesignablePagesAndLimits() {
         long partnerId = createPartner();
         ShopPageListDto list = tx(() -> editorService.pages(partner(partnerId)));

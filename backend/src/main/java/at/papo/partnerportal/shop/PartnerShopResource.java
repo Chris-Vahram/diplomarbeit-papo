@@ -69,6 +69,14 @@ public class PartnerShopResource {
         return editorService.publishTheme(currentPartner.resolve(), ShopEditorRequests.require(request).version());
     }
 
+    // First-time setup "Shop einrichten" (shop-templates spec).
+    @POST
+    @Path("/setup")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ShopPageListDto setup(ShopEditorRequests.Setup request) {
+        return editorService.setup(currentPartner.resolve(), ShopEditorRequests.require(request));
+    }
+
     // Template catalogue for the builder's picker and the "Neue Seite" dialog (shop-templates spec).
     @GET
     @Path("/templates")

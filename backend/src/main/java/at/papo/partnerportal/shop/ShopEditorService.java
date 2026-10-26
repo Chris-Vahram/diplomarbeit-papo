@@ -12,7 +12,9 @@ import org.hibernate.StaleStateException;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 // "Mein Webshop" editor (shop-builder spec): page management, whole-page draft saves with
@@ -188,7 +190,56 @@ public class ShopEditorService {
     private ShopPageListDto pageList(PartnerShop shop) {
         return new ShopPageListDto(designablePages(shop).stream().map(ShopPageDto::from).toList(),
                 pageService.onlineCount(shop), ShopPageService.MAX_ONLINE_PAGES,
-                pageService.designableCount(shop), ShopPageService.MAX_PAGES);
+                pageService.designableCount(shop), ShopPageService.MAX_PAGES, setupNeeded(shop));
+    }
+
+    // First-time setup (shop-templates spec): a style sets the three mandatory pages from its
+    // "<page>-<style>" templates and the design from the Startseite template's theme, published
+    // at once with the replaced version kept for restore. Only possible while setupNeeded.
+    @Transactional
+    public ShopPageListDto setup(Partner partner, ShopEditorRequests.Setup request) {
+        PartnerShop shop = shopService.findOrCreate(partner);
+        if (!setupNeeded(shop)) {
+            throw new ApiException(409, "Der Shop ist bereits eingerichtet.");
+        }
+        String style = request.style();
+        if (style != null && !style.isBlank()) {
+            Instant now = Instant.now();
+            Map<ShopPage, ShopTemplate> chosen = new LinkedHashMap<>();
+            for (ShopPage page : ShopPage.<ShopPage>list("shop = ?1 and kind = ?2", shop, ShopPageKind.MANDATORY)) {
+                chosen.put(page, templateCatalog.find(page.slot.segment + "-" + style, page.slot)
+                        .orElseThrow(() -> new ApiException(400, "Diesen Stil gibt es nicht.")));
+            }
+            chosen.forEach((page, template) -> {
+                String content = ShopPageService.withBlockIds(template.content()).toString();
+                pageService.validateContent(page, content);
+                page.previousPublishedContent = page.publishedContent;
+                page.draftContent = content;
+                page.publishedContent = content;
+                page.publishedAt = now;
+                page.updatedAt = now;
+            });
+            JsonNode suggestion = templateCatalog.find(ShopPageSlot.HOME.segment + "-" + style, ShopPageSlot.HOME)
+                    .map(ShopTemplate::theme).orElse(null);
+            if (suggestion != null) {
+                ShopTheme theme = pageService.theme(shop);
+                theme.previousPublishedTheme = theme.publishedTheme;
+                theme.draftTheme = suggestion.toString();
+                theme.publishedTheme = theme.draftTheme;
+                theme.updatedAt = now;
+            }
+        }
+        shop.setupAt = Instant.now();
+        flush(PAGE_CONFLICT);
+        return pageList(shop);
+    }
+
+    // Not set up yet: no recorded answer and nothing edited so far, so shops built before the
+    // setup existed never get it.
+    private static boolean setupNeeded(PartnerShop shop) {
+        return shop.setupAt == null
+                && ShopPage.count("shop = ?1 and (version > 0 or kind = ?2)", shop, ShopPageKind.FREE) == 0
+                && ShopTheme.count("shop = ?1 and version > 0", shop) == 0;
     }
 
     private ShopPageDetailDto detail(ShopPage page) {

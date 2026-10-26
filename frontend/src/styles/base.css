@@ -4489,6 +4489,7 @@ shop-builder .builder-header__title { margin: 0; font-size: var(--font-size-lg);
 /* Template picker (shop-templates): thumbnail cards; the native radio stays visible so the
    choice is never shown by colour alone. */
 .template-picker { display: flex; flex-direction: column; gap: var(--spacing-4); }
+.setup-dialog__intro { margin: 0; }
 .template-picker__choices { border: none; margin: 0; padding: 0; min-width: 0; }
 .template-picker__choices legend { padding: 0; margin-bottom: var(--spacing-3); }
 .template-picker__grid {
