@@ -10,7 +10,7 @@
     {
       "type": "article-grid",
       "config": {
-        "heading": "Das könnte Sie auch interessieren",
+        "heading": "Unser Sortiment",
         "columns": "4",
         "spacing": "large"
       }

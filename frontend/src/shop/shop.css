@@ -260,6 +260,8 @@ h2.shop-heading { font-size: clamp(1.625rem, 2.8vw, 2.375rem); }
   transition: transform 220ms var(--shop-ease);
 }
 
+/* On an accent ground the accent button would vanish: it takes the primary colour there. */
+.shop-block--bg-accent .shop-button { background: var(--shop-primary); color: var(--shop-on-primary); }
 .shop-button:hover { filter: brightness(1.06); }
 .shop-button:hover::after { transform: translateX(3px); }
 .shop-button:active { transform: scale(0.97); transition-duration: 60ms; }
@@ -463,14 +465,14 @@ h2.shop-heading { font-size: clamp(1.625rem, 2.8vw, 2.375rem); }
 [data-form="handwerk"] h1.shop-heading { font-size: clamp(2.25rem, 4.6vw, 3.75rem); letter-spacing: -0.015em; line-height: 1.08; }
 [data-form="handwerk"] .shop-heading { font-weight: 700; letter-spacing: -0.01em; }
 
-[data-form="handwerk"] .shop-list > .shop-heading {
+[data-form="handwerk"] .shop-list > .shop-heading:not([data-empty]) {
   display: flex;
   align-items: center;
   gap: 1.5rem;
   text-align: center;
 }
-[data-form="handwerk"] .shop-list > .shop-heading::before,
-[data-form="handwerk"] .shop-list > .shop-heading::after {
+[data-form="handwerk"] .shop-list > .shop-heading:not([data-empty])::before,
+[data-form="handwerk"] .shop-list > .shop-heading:not([data-empty])::after {
   content: "";
   flex: 1;
   border-top: 1px solid var(--shop-border);
@@ -551,7 +553,7 @@ h2.shop-heading { font-size: clamp(1.625rem, 2.8vw, 2.375rem); }
 }
 
 [data-form="kraeftig"] .shop-list > .shop-heading { text-transform: uppercase; font-size: clamp(2rem, 4.2vw, 3.5rem); line-height: 1; letter-spacing: -0.03em; }
-[data-form="kraeftig"] .shop-list > .shop-heading::after {
+[data-form="kraeftig"] .shop-list > .shop-heading:not([data-empty])::after {
   content: "";
   display: block;
   width: 3rem;

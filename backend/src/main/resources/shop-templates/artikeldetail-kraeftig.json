@@ -10,7 +10,7 @@
     {
       "type": "article-grid",
       "config": {
-        "heading": "Weitere Artikel",
+        "heading": "Unser Sortiment",
         "columns": "4",
         "spacing": "large"
       }

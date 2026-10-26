@@ -24,7 +24,7 @@
       "type": "image-text",
       "config": {
         "heading": "Beratung, die weiterhilft",
-        "text": "Sie sind unsicher, welcher Artikel passt? Wir nehmen uns Zeit für Ihre Fragen – im Geschäft, am Telefon oder per E-Mail.",
+        "text": "Sie sind unsicher, welcher Artikel passt? Wir nehmen uns Zeit für Ihre Fragen.\n\nErgänzen Sie hier Telefonnummer, E-Mail-Adresse und Öffnungszeiten, unter denen Ihre Kundschaft Sie erreicht.",
         "imagePosition": "right",
         "background": "surface",
         "spacing": "large",

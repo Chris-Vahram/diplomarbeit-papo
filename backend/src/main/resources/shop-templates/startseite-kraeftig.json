@@ -24,7 +24,7 @@
       "type": "image-text",
       "config": {
         "heading": "Fragen zu einem Artikel?",
-        "text": "Wir helfen Ihnen gerne weiter – im Geschäft, telefonisch oder per E-Mail.",
+        "text": "Wir helfen Ihnen gerne weiter.\n\nErgänzen Sie hier Telefonnummer und E-Mail-Adresse, unter denen Ihre Kundschaft Sie erreicht.",
         "imagePosition": "right",
         "background": "primary",
         "spacing": "large",
