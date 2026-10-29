@@ -1,0 +1,31 @@
+{
+  "blocks": [
+    {
+      "type": "heading-text",
+      "config": {
+        "heading": "Unser Sortiment",
+        "text": "Jeder Artikel hier ist von uns ausgewählt. Alle Preise inklusive Umsatzsteuer.",
+        "spacing": "medium"
+      }
+    },
+    {
+      "type": "article-grid",
+      "config": {
+        "columns": "4",
+        "spacing": "small"
+      }
+    }
+  ],
+  "theme": {
+    "colors": {
+      "primary": "#2F4A3A",
+      "accent": "#C08A3E",
+      "background": "#EEF0EA",
+      "surface": "#FFFFFF",
+      "text": "#1E2620"
+    },
+    "headingFont": "merriweather",
+    "bodyFont": "source-sans-3",
+    "form": "handwerk"
+  }
+}

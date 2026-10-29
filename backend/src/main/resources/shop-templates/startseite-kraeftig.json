@@ -1,0 +1,48 @@
+{
+  "blocks": [
+    {
+      "type": "hero",
+      "config": {
+        "title": "Alles für Ihr nächstes Projekt",
+        "text": "Ausgewählte Artikel und persönliche Beratung aus einer Hand.",
+        "buttonLabel": "Jetzt Artikel ansehen",
+        "buttonPage": "artikel",
+        "align": "left",
+        "imageId": "vorlage:standbohrmaschine",
+        "alt": "Hände an einer Standbohrmaschine im Halbdunkel"
+      }
+    },
+    {
+      "type": "article-grid",
+      "config": {
+        "heading": "Sortiment",
+        "columns": "4",
+        "spacing": "large"
+      }
+    },
+    {
+      "type": "image-text",
+      "config": {
+        "heading": "Fragen zu einem Artikel?",
+        "text": "Wir helfen Ihnen gerne weiter.\n\nErgänzen Sie hier Telefonnummer und E-Mail-Adresse, unter denen Ihre Kundschaft Sie erreicht.",
+        "imagePosition": "right",
+        "background": "primary",
+        "spacing": "large",
+        "imageId": "vorlage:schweissen",
+        "alt": "Schweißer bei der Arbeit, Funken sprühen"
+      }
+    }
+  ],
+  "theme": {
+    "colors": {
+      "primary": "#0F1B26",
+      "accent": "#F2B705",
+      "background": "#FFFFFF",
+      "surface": "#F2F3F5",
+      "text": "#0E1116"
+    },
+    "headingFont": "montserrat",
+    "bodyFont": "open-sans",
+    "form": "kraeftig"
+  }
+}

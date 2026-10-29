@@ -191,14 +191,14 @@ class ShopPageServiceTest {
         long partnerId = createShop();
         String original = QuarkusTransaction.requiringNew().call(() -> {
             ShopTheme theme = pageService.theme(shop(partnerId));
-            theme.draftTheme = theme.publishedTheme.replace("plus-jakarta-sans", "lora");
+            theme.draftTheme = theme.publishedTheme.replace("work-sans", "lora");
             return theme.publishedTheme;
         });
         tx(() -> {
             ShopTheme theme = pageService.publishTheme(shop(partnerId));
             assertEquals(original, theme.previousPublishedTheme);
             assertTrue(theme.publishedTheme.contains("lora"));
-            theme.draftTheme = original.replace("plus-jakarta-sans", "comic-sans");
+            theme.draftTheme = original.replace("work-sans", "comic-sans");
         });
         rejection(() -> pageService.publishTheme(shop(partnerId)));
     }

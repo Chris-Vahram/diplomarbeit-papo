@@ -22,7 +22,7 @@ export function articleCardsHtml(api, articles, columns) {
     .map(
       (article) => `<li class="shop-card">
         <a class="shop-card__link" href="${escapeHtml(api.href(`artikel/${article.id}`))}">
-          ${imageHtml(api, article, "shop-card__image")}
+          <span class="shop-card__media">${imageHtml(api, article, "shop-card__image")}</span>
           <span class="shop-card__body">
             <span class="shop-card__name">${escapeHtml(article.name)}</span>
             ${article.category ? `<span class="shop-card__category">${escapeHtml(article.category)}</span>` : ""}

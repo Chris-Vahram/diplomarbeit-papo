@@ -1,0 +1,12 @@
+{
+  "colors": {
+    "primary": "#1B3A57",
+    "accent": "#D9622B",
+    "background": "#F4F5F7",
+    "surface": "#FFFFFF",
+    "text": "#15191E"
+  },
+  "headingFont": "work-sans",
+  "bodyFont": "source-sans-3",
+  "form": "klar"
+}

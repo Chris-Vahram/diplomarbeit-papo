@@ -7,6 +7,12 @@ import { COLOR_ROLES } from "./block-schema.js";
 // dispatches "theme-publish".
 
 const HEX = /^#[0-9a-f]{6}$/i;
+// Form presets of the shop renderer (shop.css [data-form]); themes without form mean "klar".
+const FORMS = [
+  { id: "klar", label: "Klar", hint: "Hell und präzise: Foto neben dem Text, feine Linien." },
+  { id: "handwerk", label: "Handwerk", hint: "Warm: Foto mit Textfeld, Artikel im Passepartout, runde Knöpfe." },
+  { id: "kraeftig", label: "Kräftig", hint: "Markant: Foto über die ganze Breite, große Schrift, eckige Formen." },
+];
 
 class ShopDesignPanel extends HTMLElement {
   #theme = null;
@@ -42,8 +48,12 @@ class ShopDesignPanel extends HTMLElement {
       .join("");
     this.innerHTML = `
       <h3 class="builder-panel__title">Design</h3>
-      <p class="builder-hint">Farben und Schriften gelten für alle Seiten. Einzelne Abschnitte können eigene Farben haben; die bleiben beim Veröffentlichen erhalten.</p>
+      <p class="builder-hint">Form, Farben und Schriften gelten für alle Seiten. Einzelne Abschnitte können eigene Farben haben; die bleiben beim Veröffentlichen erhalten.</p>
       <div class="builder-props">
+        <h4 class="builder-props__group">Form</h4>
+        <div class="builder-field"><label for="theme-form">Gestaltung von Kopfbereich, Karten und Knöpfen</label>
+          <select id="theme-form" data-form>${FORMS.map((form) => `<option value="${form.id}"${form.id === (this.#theme.form ?? "klar") ? " selected" : ""}>${form.label}</option>`).join("")}</select></div>
+        <p class="builder-hint" id="theme-form-hint">${escapeHtml(FORMS.find((form) => form.id === (this.#theme.form ?? "klar"))?.hint ?? "")}</p>
         <h4 class="builder-props__group">Farben</h4>
         ${COLOR_ROLES.map(({ role, label }) => {
           const value = this.#theme.colors[role];
@@ -96,7 +106,10 @@ class ShopDesignPanel extends HTMLElement {
 
   #onChange = (event) => {
     const target = event.target;
-    if (target.dataset.font) {
+    if (target.dataset.form !== undefined) {
+      this.#emit({ ...this.#theme, form: target.value });
+      this.querySelector("#theme-form-hint").textContent = FORMS.find((form) => form.id === target.value)?.hint ?? "";
+    } else if (target.dataset.font) {
       this.#emit({ ...this.#theme, [target.dataset.font]: target.value });
     } else if (target.dataset.colorHex && !HEX.test(target.value)) {
       target.value = this.#theme.colors[target.dataset.colorHex];

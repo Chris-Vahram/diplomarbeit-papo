@@ -87,6 +87,58 @@ class ShopEditorServiceTest {
     }
 
     @Test
+    void firstSetupPublishesTheChosenStyleOnce() {
+        long partnerId = createPartner();
+        assertTrue(tx(() -> editorService.pages(partner(partnerId))).setupNeeded());
+        assertEquals("Diesen Stil gibt es nicht.", rejection(() -> editorService.setup(partner(partnerId),
+                new ShopEditorRequests.Setup("gibt-es-nicht"))));
+        assertTrue(tx(() -> editorService.pages(partner(partnerId))).setupNeeded());
+
+        ShopPageListDto list = tx(() -> editorService.setup(partner(partnerId), new ShopEditorRequests.Setup("handwerk")));
+        assertFalse(list.setupNeeded());
+        ShopPageDto home = tx(() -> pageBySegment(partnerId, "startseite"));
+        ShopPageDetailDto detail = tx(() -> editorService.page(partner(partnerId), home.id()));
+        assertEquals("Gutes Werkzeug, ehrliche Beratung", detail.published().at("/blocks/0/config/title").asText());
+        assertEquals(detail.published(), detail.draft());
+        assertTrue(home.restorable());
+        ShopThemeDto theme = tx(() -> editorService.theme(partner(partnerId)));
+        assertEquals("#2F4A3A", theme.published().at("/colors/primary").asText());
+        assertEquals("handwerk", theme.published().at("/form").asText());
+        assertFalse(theme.draftChanged());
+
+        assertEquals("Der Shop ist bereits eingerichtet.", rejection(() -> editorService.setup(partner(partnerId),
+                new ShopEditorRequests.Setup("kraeftig"))));
+    }
+
+    @Test
+    void sampleImagesAreCopiedOncePerShop() {
+        long partnerId = createPartner();
+        ShopTemplateContentDto first = tx(() -> editorService.templateContent(partner(partnerId), "startseite-klar"));
+        ShopTemplateContentDto second = tx(() -> editorService.templateContent(partner(partnerId), "startseite-klar"));
+        long imageId = first.blocks().get(0).at("/config/imageId").asLong();
+        assertEquals(imageId, second.blocks().get(0).at("/config/imageId").asLong());
+        assertTrue(imageId > 0);
+        assertEquals("klar", first.theme().at("/form").asText());
+        // The new shop already copied the Klar photos for its default pages; nothing is duplicated.
+        assertEquals(1, ShopAsset.count("shop.partner.id = ?1 and filename = ?2", partnerId, "Beispielbild messen.webp"));
+        assertEquals("Diese Vorlage gibt es nicht.", rejection(() -> editorService.templateContent(partner(partnerId), "nein")));
+    }
+
+    @Test
+    void skippingKeepsTheDefaultsAndEditedShopsNeedNoSetup() throws Exception {
+        long skipping = createPartner();
+        ShopPageDto before = tx(() -> pageBySegment(skipping, "startseite"));
+        assertFalse(tx(() -> editorService.setup(partner(skipping), new ShopEditorRequests.Setup(null))).setupNeeded());
+        assertEquals(before.version(), tx(() -> pageBySegment(skipping, "startseite")).version());
+
+        // A shop edited before the setup existed is treated as set up.
+        long edited = createPartner();
+        ShopPageDto home = tx(() -> pageBySegment(edited, "startseite"));
+        saveDraft(edited, home, block("heading-text", "{\"heading\":\"Eigene Seite\"}"));
+        assertFalse(tx(() -> editorService.pages(partner(edited))).setupNeeded());
+    }
+
+    @Test
     void pageListShowsDesignablePagesAndLimits() {
         long partnerId = createPartner();
         ShopPageListDto list = tx(() -> editorService.pages(partner(partnerId)));
@@ -99,29 +151,26 @@ class ShopEditorServiceTest {
     }
 
     @Test
-    void freePageFromTemplateKeepsHalfFilledDraftUntilPublish() throws Exception {
+    void freePageFromCatalogueTemplateStartsAsPublishableDraft() {
         long partnerId = createPartner();
         ShopPageDetailDto created = tx(() -> editorService.createPage(partner(partnerId),
-                new ShopEditorRequests.CreatePage("Kontakt", "kontakt", "kontakt")));
+                new ShopEditorRequests.CreatePage("Kontakt", "kontakt", "seite-kontakt")));
         assertFalse(created.page().online());
         assertNull(created.published());
         assertEquals(2, created.draft().get("blocks").size());
         assertTrue(created.draft().at("/blocks/1/id").asText().matches("[0-9a-f-]{36}"));
 
-        // The template's contact block has no name yet: fine for the draft, not for publishing.
-        assertEquals("Das Feld „name“ im Block „Ansprechpartner“ ist erforderlich.",
-                rejection(() -> editorService.publish(partner(partnerId), created.page().id(), created.page().version())));
-
-        ObjectNode draft = created.draft().deepCopy();
-        ((ObjectNode) draft.at("/blocks/1/config")).put("name", "Maria Muster");
-        ShopPageDto saved = tx(() -> editorService.saveDraft(partner(partnerId), created.page().id(),
-                new ShopEditorRequests.Draft(draft, created.page().version())));
-        ShopPageDto published = tx(() -> editorService.publish(partner(partnerId), saved.id(), saved.version()));
+        // Catalogue templates pass the publish checks as they are (shop-templates "Template quality").
+        ShopPageDto published = tx(() -> editorService.publish(partner(partnerId), created.page().id(),
+                created.page().version()));
         assertTrue(published.online());
         assertFalse(published.draftChanged());
 
         assertEquals("Diese Vorlage gibt es nicht.", rejection(() -> editorService.createPage(partner(partnerId),
                 new ShopEditorRequests.CreatePage("X", "x-seite", "gibt-es-nicht"))));
+        // A template of a mandatory page type is no free-page template.
+        assertEquals("Diese Vorlage gibt es nicht.", rejection(() -> editorService.createPage(partner(partnerId),
+                new ShopEditorRequests.CreatePage("Y", "y-seite", "startseite-klar"))));
     }
 
     @Test
@@ -174,7 +223,7 @@ class ShopEditorServiceTest {
     void settingsRenameFreePagesButKeepMandatoryAddresses() {
         long partnerId = createPartner();
         ShopPageDetailDto free = tx(() -> editorService.createPage(partner(partnerId),
-                new ShopEditorRequests.CreatePage("Über uns", "ueber-uns", "ueber-uns")));
+                new ShopEditorRequests.CreatePage("Über uns", "ueber-uns", "seite-ueber-uns")));
         ShopPageDto renamed = tx(() -> editorService.updateSettings(partner(partnerId), free.page().id(),
                 new ShopEditorRequests.PageSettings("Team", "unser-team", " Unser Team ", "Wer wir sind.",
                         free.page().version())));
@@ -257,7 +306,7 @@ class ShopEditorServiceTest {
         ShopThemeDto savedTheme = tx(() -> editorService.saveThemeDraft(partner(partnerId),
                 new ShopEditorRequests.ThemeDraft(draft, theme.version())));
         assertTrue(savedTheme.draftChanged());
-        assertEquals("#1F4E79", savedTheme.published().at("/colors/primary").asText());
+        assertEquals("#1B3A57", savedTheme.published().at("/colors/primary").asText());
 
         assertEquals(ShopEditorService.THEME_CONFLICT, rejection(() -> editorService.saveThemeDraft(partner(partnerId),
                 new ShopEditorRequests.ThemeDraft(draft, theme.version()))));

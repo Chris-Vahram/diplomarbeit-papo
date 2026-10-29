@@ -20,14 +20,16 @@ export const SHOP_FONTS = {
 const COLOR_ROLES = ["primary", "accent", "background", "surface", "text"];
 const HEX = /^#[0-9a-f]{6}$/i;
 
-// Readable text colour on a filled background (WCAG relative luminance).
+// Readable text colour on a filled background: whichever of dark and white has the higher
+// WCAG contrast (mirrored in ShopTemplateQualityTest).
 function onColor(hex) {
   const channel = (offset) => {
     const value = parseInt(hex.slice(offset, offset + 2), 16) / 255;
     return value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
   };
   const luminance = 0.2126 * channel(1) + 0.7152 * channel(3) + 0.0722 * channel(5);
-  return luminance > 0.4 ? "#111111" : "#ffffff";
+  // #111111 has luminance ≈ 0.0056; contrast = (lighter + 0.05) / (darker + 0.05).
+  return (luminance + 0.05) / 0.0556 > 1.05 / (luminance + 0.05) ? "#111111" : "#ffffff";
 }
 
 // Sets the given colour roles on an element. Used for the theme (document root) and for
@@ -44,8 +46,12 @@ export function applyColors(element, colors = {}) {
   }
 }
 
+const FORMS = new Set(["klar", "handwerk", "kraeftig"]);
+
 export function applyTheme(element, theme) {
   applyColors(element, theme.colors);
+  // Form preset of the theme (shop.css [data-form]); older themes have none and mean "klar".
+  element.dataset.form = FORMS.has(theme.form) ? theme.form : "klar";
   element.style.setProperty("--shop-heading-font", SHOP_FONTS[theme.headingFont] ?? SYSTEM_STACK);
   element.style.setProperty("--shop-body-font", SHOP_FONTS[theme.bodyFont] ?? SYSTEM_STACK);
 }

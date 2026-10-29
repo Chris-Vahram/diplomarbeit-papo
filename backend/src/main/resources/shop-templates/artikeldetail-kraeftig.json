@@ -1,0 +1,31 @@
+{
+  "blocks": [
+    {
+      "type": "article-detail",
+      "config": {
+        "imagePosition": "left",
+        "spacing": "large"
+      }
+    },
+    {
+      "type": "article-grid",
+      "config": {
+        "heading": "Unser Sortiment",
+        "columns": "4",
+        "spacing": "large"
+      }
+    }
+  ],
+  "theme": {
+    "colors": {
+      "primary": "#0F1B26",
+      "accent": "#F2B705",
+      "background": "#FFFFFF",
+      "surface": "#F2F3F5",
+      "text": "#0E1116"
+    },
+    "headingFont": "montserrat",
+    "bodyFont": "open-sans",
+    "form": "kraeftig"
+  }
+}

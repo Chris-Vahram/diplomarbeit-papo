@@ -1,0 +1,48 @@
+{
+  "blocks": [
+    {
+      "type": "hero",
+      "config": {
+        "title": "Gutes Werkzeug, ehrliche Beratung",
+        "text": "Hier finden Sie Artikel, die wir selbst kennen und empfehlen.",
+        "buttonLabel": "Sortiment ansehen",
+        "buttonPage": "artikel",
+        "align": "left",
+        "imageId": "vorlage:holz-bearbeiten",
+        "alt": "Hände bearbeiten ein Holzbrett in einer Werkstatt"
+      }
+    },
+    {
+      "type": "article-grid",
+      "config": {
+        "heading": "Aus unserem Sortiment",
+        "columns": "4",
+        "spacing": "large"
+      }
+    },
+    {
+      "type": "image-text",
+      "config": {
+        "heading": "Aus der Werkstatt",
+        "text": "Erzählen Sie, wofür Ihr Betrieb steht: Ihre Erfahrung, Ihr Team und die Sorgfalt, mit der Sie Ihre Kundschaft beraten.",
+        "imagePosition": "left",
+        "background": "surface",
+        "spacing": "large",
+        "imageId": "vorlage:zuschnitt",
+        "alt": "Handwerker schneidet ein Holzbrett zu"
+      }
+    }
+  ],
+  "theme": {
+    "colors": {
+      "primary": "#2F4A3A",
+      "accent": "#C08A3E",
+      "background": "#EEF0EA",
+      "surface": "#FFFFFF",
+      "text": "#1E2620"
+    },
+    "headingFont": "merriweather",
+    "bodyFont": "source-sans-3",
+    "form": "handwerk"
+  }
+}

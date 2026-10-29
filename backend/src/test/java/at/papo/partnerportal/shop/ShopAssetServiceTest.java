@@ -79,6 +79,12 @@ class ShopAssetServiceTest {
         throw new AssertionError("Expected ApiException", thrown);
     }
 
+    // A new shop already holds the sample photos of its default templates; the tests look at
+    // the partner's own uploads.
+    private static List<ShopAssetDto> uploads(ShopAssetListDto list) {
+        return list.assets().stream().filter(asset -> !asset.filename().startsWith("Beispielbild ")).toList();
+    }
+
     private static Partner partner(long id) {
         return Partner.findById(id);
     }
@@ -115,11 +121,12 @@ class ShopAssetServiceTest {
 
         long assetId = upload(partnerId);
         ShopAssetListDto list = tx(() -> assetService.list(partner(partnerId)));
-        assertEquals(1, list.assets().size());
-        assertEquals(assetId, list.assets().get(0).id());
-        assertEquals("laden.png", list.assets().get(0).filename());
-        assertEquals("image/png", list.assets().get(0).contentType());
-        assertEquals(PNG.length, list.usedBytes());
+        assertEquals(1, uploads(list).size());
+        assertEquals(assetId, uploads(list).get(0).id());
+        assertEquals("laden.png", uploads(list).get(0).filename());
+        assertEquals("image/png", uploads(list).get(0).contentType());
+        assertEquals(PNG.length + list.assets().stream().filter(asset -> asset.filename().startsWith("Beispielbild "))
+                .mapToLong(ShopAssetDto::sizeBytes).sum(), list.usedBytes());
         assertEquals(50L * 1024 * 1024, list.quotaBytes());
     }
 
@@ -183,7 +190,7 @@ class ShopAssetServiceTest {
             assetService.delete(partner(partnerId), unused);
             return null;
         });
-        assertEquals(1, tx(() -> assetService.list(partner(partnerId))).assets().size());
+        assertEquals(1, uploads(tx(() -> assetService.list(partner(partnerId)))).size());
     }
 
     @Test

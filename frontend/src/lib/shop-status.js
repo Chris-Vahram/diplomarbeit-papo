@@ -39,6 +39,25 @@ export function shopActionButton(partnerId, status) {
     title="Webshop: ${label}" aria-label="Webshop verwalten (Status: ${label})">Webshop</button>`;
 }
 
+// Why the partner's shop cannot be seen publicly right now, from the partner's view; null when
+// it can. Used by the editor so "Veröffentlichen" never suggests visitors already see a page.
+const NOT_VISIBLE = {
+  NOT_RELEASED: "Ihr Shop ist noch nicht öffentlich sichtbar, weil das Unternehmen ihn noch nicht freigegeben hat.",
+  OFFLINE_COMPANY: "Ihr Shop ist derzeit nicht öffentlich sichtbar, weil das Unternehmen ihn offline genommen hat.",
+  OFFLINE_INACTIVE: "Ihr Shop ist derzeit nicht öffentlich sichtbar, weil Ihr Partnerzugang deaktiviert ist.",
+  OFFLINE_NO_ARTICLES: "Ihr Shop ist derzeit nicht öffentlich sichtbar, weil keine Artikel für Sie freigeschaltet sind.",
+};
+
+export function shopNotVisibleReason(shop) {
+  if (!shop) return null;
+  if (shop.status === "ONLINE") {
+    return shop.publicEnabled === false
+      ? "Ihr Shop ist freigegeben, öffentliche Shops sind auf dieser Umgebung aber noch deaktiviert."
+      : null;
+  }
+  return NOT_VISIBLE[shop.status] ?? "Ihr Shop ist derzeit nicht öffentlich sichtbar.";
+}
+
 // Same URL locally and in production: tools/dev_frontend_server.py mirrors the Caddy rewrite.
 export function shopPublicUrl(shop) {
   return `${location.origin}${shop.publicPath}`;

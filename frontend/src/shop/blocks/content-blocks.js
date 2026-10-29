@@ -10,24 +10,26 @@ function textHtml(api, text, field = "text") {
   return textField(api, "p", "shop-text", field, text);
 }
 
+// Without image the hero is type on the block background; with image the theme's form decides
+// the composition (shop.css): split (klar), photo with panel (handwerk), full-bleed (kraeftig).
 class HeroBlock extends ShopBlock {
   render(config) {
     const api = this.context.api;
     const image = config.imageId
-      ? `<img class="shop-hero__image" src="${escapeHtml(api.assetUrl(config.imageId))}" alt="${escapeHtml(config.alt ?? "")}" />`
+      ? `<div class="shop-hero__media"><img src="${escapeHtml(api.assetUrl(config.imageId))}" alt="${escapeHtml(config.alt ?? "")}" /></div>`
       : "";
     const target = config.buttonPage === "startseite" ? "" : config.buttonPage;
     const button =
       config.buttonLabel && config.buttonPage
         ? `<a class="shop-button" href="${escapeHtml(api.href(target))}" data-field="buttonLabel">${escapeHtml(config.buttonLabel)}</a>`
         : "";
-    this.innerHTML = `<div class="shop-inner shop-hero shop-align-${escapeHtml(config.align ?? "left")}${image ? " shop-hero--image" : ""}">
+    this.innerHTML = `<div class="shop-hero shop-hero--${image ? "image" : "plain"} shop-align-${escapeHtml(config.align ?? "left")}">
       ${image}
-      <div class="shop-hero__content">
+      <div class="shop-hero__body"><div class="shop-hero__content">
         ${headingHtml(api, config.title, "h1", "title")}
         ${textHtml(this.context.api, config.text)}
         ${button}
-      </div>
+      </div></div>
     </div>`;
   }
 }
@@ -73,7 +75,7 @@ class ImageTextBlock extends ShopBlock {
 class ContactPersonBlock extends ShopBlock {
   render(config) {
     const phoneDigits = (config.phone ?? "").replace(/[^\d+]/g, "");
-    this.innerHTML = `<div class="shop-inner shop-contact">
+    this.innerHTML = `<div class="shop-inner shop-contact"><div class="shop-contact__card">
       ${headingHtml(this.context.api, config.heading)}
       ${textField(this.context.api, "p", "shop-contact__name", "name", config.name)}
       ${textField(this.context.api, "p", "shop-muted", "role", config.role)}
@@ -82,7 +84,7 @@ class ContactPersonBlock extends ShopBlock {
         ${config.email ? `<a href="mailto:${escapeHtml(encodeURIComponent(config.email).replace("%40", "@"))}">${escapeHtml(config.email)}</a>` : ""}
         ${phoneDigits ? `<a href="tel:${escapeHtml(phoneDigits)}">${escapeHtml(config.phone)}</a>` : ""}
       </p>
-    </div>`;
+    </div></div>`;
   }
 }
 

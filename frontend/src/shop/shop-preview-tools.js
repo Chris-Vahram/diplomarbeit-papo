@@ -29,7 +29,7 @@ const ICONS = {
 };
 
 const STYLES = `
-[data-editable] { outline: none; cursor: text; border-radius: 3px; }
+:where([data-editable]) { outline: none; cursor: text; border-radius: 3px; }
 /* Empty texts: only shown on the selected block (or while typing), with a placeholder. */
 [data-empty] { display: none; }
 .shop-block--selected [data-empty], [data-empty]:focus { display: block; min-width: 4ch; }

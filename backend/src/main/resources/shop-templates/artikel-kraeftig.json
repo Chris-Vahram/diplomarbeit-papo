@@ -1,0 +1,33 @@
+{
+  "blocks": [
+    {
+      "type": "hero",
+      "config": {
+        "title": "Sortiment",
+        "text": "Alle Preise inklusive Umsatzsteuer.",
+        "align": "left",
+        "background": "primary",
+        "spacing": "medium"
+      }
+    },
+    {
+      "type": "article-grid",
+      "config": {
+        "columns": "4",
+        "spacing": "large"
+      }
+    }
+  ],
+  "theme": {
+    "colors": {
+      "primary": "#0F1B26",
+      "accent": "#F2B705",
+      "background": "#FFFFFF",
+      "surface": "#F2F3F5",
+      "text": "#0E1116"
+    },
+    "headingFont": "montserrat",
+    "bodyFont": "open-sans",
+    "form": "kraeftig"
+  }
+}
