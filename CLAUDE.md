@@ -1,6 +1,10 @@
 # CLAUDE.md – Partnerportal (Diplomarbeit)
 
-### Vorrangiger Next-Session-Orchesterstand — 22.10.2026
+### Vorrangiger Next-Session-Orchesterstand — 29.10.2026
+
+- Einstieg: `Specification/CONTINUATION_PROMPT.md`, Abschnitt „Stand 29.10.2026 — hier einsteigen“. Reihenfolge: VM-Backup (PR #68) → PR #66 mergen (Mandantenfähigkeit Release A) → sofort `company-demo` binden → erst dann Release B. Antworten an Chris kurz, ein Befehl pro Codeblock.
+
+### Vorheriger Orchesterstand — 22.10.2026
 
 - Einstieg: `Specification/CONTINUATION_PROMPT.md`, Abschnitt „Stand 22.10.2026 — hier einsteigen“. `refine-portal-frontend` gemergt, abgenommen und archiviert; PRODUCT.md aus beiden Fassungen zusammengeführt (PR #60). Nächster Kandidat: `add-article-tax-rate` (Chris übernimmt, sobald Tobias bestätigt).
 
