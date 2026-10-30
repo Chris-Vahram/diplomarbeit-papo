@@ -5,7 +5,20 @@ Stabile Regeln stehen in `AGENTS.md` und `CLAUDE.md`. Der beschlossene/noch zu
 beschließende Ausbau ist in [PRODUCT_COMPLETION_PLAN.md](PRODUCT_COMPLETION_PLAN.md)
 geordnet. Dieses Dokument bleibt der einzige operative Session-Handoff.
 
-## Stand 30.10.2026 — hier einsteigen (Release A live, company-demo gebunden)
+## Stand 30.10.2026 (Nachmittag) — hier einsteigen (Mandantenfähigkeit komplett, archiviert)
+
+**Erledigt:** Release B (PR #71, contract-Migration, `singletonKey` und `PAPO_MAIL_COMPANY_RECIPIENT`
+entfernt) live; Firma 2 „Testfirma Zwei GmbH“ mit `company-zwei`/`partner-zwei` (Zufallspasswörter →
+Vaultwarden) angelegt, Partner `P-1002` in Firma 2 an `partner-zwei` gebunden, Trennung live mit echten
+Tokens geprüft. `add-company-tenancy` archiviert (`openspec/changes/archive/2026-10-30-add-company-tenancy/`).
+
+**Als Nächstes:** 1. Backup-Cron auf der VM einrichten (`backup.sh` liegt jetzt in der gefixten Fassung
+dort; Zeile aus docs/DEPLOYMENT.md „Backups“). 2. `send-order-emails` 4.2: Firmen-E-Mail im Firmenprofil
+eintragen, Testbestellung, dann archivieren. 3. Vor echten Daten: Demo-Logins deaktivieren, Hinweis
+„Passwort = Benutzername“ auf der Login-Seite entfernen, Passwörter von `company-zwei`/`partner-zwei`
+rotieren (standen im Chatprotokoll).
+
+## Stand 30.10.2026 (Vormittag) — Release A live, company-demo gebunden
 
 **Erledigt 30.10.:** VM-Backup manuell erstellt (`deploy/backup/*-20261030-013703.dump`), PR #68
 (Backup-Fix) und PR #66 (Release A) gemergt und deployt, `company-demo` (Keycloak-ID `3755bf72-…`)

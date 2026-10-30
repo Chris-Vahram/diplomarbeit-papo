@@ -42,12 +42,12 @@ Each task: first the cross-tenant tests in the named `<Capability>ResourceTest` 
 
 ## 7. Final verification — essential
 
-- [ ] 7.1 Full `./mvnw test` and `./mvnw package` green; all cross-tenant tests from 2.1 and 4.x present and green.
-- [ ] 7.2 Browser check (desktop 1280 px and mobile 390 px): log in as `company-demo` and `company-zwei`, `partner-demo` and `partner-zwei`; each sees only its own partners, articles, orders, dashboard, exports and shop status.
-- [ ] 7.3 `npx --yes @fission-ai/openspec@latest validate add-company-tenancy --strict`, `partnerportal-quality`, independent security and database review (cross-model review recommended: high-stakes change); fix findings.
-- [ ] 7.4 VM rollout of Release A per DEPLOYMENT.md (backup, merge/deploy, bind `company-demo`, authenticated check), record results.
-- [ ] 7.4b VM rollout of Release B (backup, merge/deploy, authenticated check), then provision company 2 and check both companies, record results.
-- [ ] 7.5 On archive: rewrite the Purpose of `openspec/specs/company-profile/spec.md` (still says "deliberately avoiding multi-company tenancy"; a delta cannot change it).
+- [x] 7.1 Full `./mvnw test` and `./mvnw package` green; all cross-tenant tests from 2.1 and 4.x present and green.
+- [x] 7.2 Browser check (desktop 1280 px and mobile 390 px): log in as `company-demo` and `company-zwei`, `partner-demo` and `partner-zwei`; each sees only its own partners, articles, orders, dashboard, exports and shop status.
+- [x] 7.3 `npx --yes @fission-ai/openspec@latest validate add-company-tenancy --strict`, `partnerportal-quality`, independent security and database review (cross-model review recommended: high-stakes change); fix findings.
+- [x] 7.4 VM rollout of Release A per DEPLOYMENT.md (backup, merge/deploy, bind `company-demo`, authenticated check), record results.
+- [x] 7.4b VM rollout of Release B (backup, merge/deploy, authenticated check), then provision company 2 and check both companies, record results.
+- [x] 7.5 On archive: rewrite the Purpose of `openspec/specs/company-profile/spec.md` (still says "deliberately avoiding multi-company tenancy"; a delta cannot change it).
 
 ## Implementation notes (Release A, 25.10.2026)
 
@@ -63,3 +63,5 @@ Each task: first the cross-tenant tests in the named `<Capability>ResourceTest` 
 - `singletonKey` removed from `CompanyProfile`; "company 1" is now the profile with the lowest id (seeder, `TestCompanies`), the tax migration validates every profile. Company 1 keeps `CURRENT` in migrated databases so a restored A image still finds it.
 - `papo.mail.company-recipient` / `PAPO_MAIL_COMPANY_RECIPIENT` removed (config, compose, `.env.prod.example`, docs); dev/test company 1 is seeded with `firma@example.test`.
 - Upgrade/restore check (scratch Postgres, three jars: pre-A `f3471d7^1`, A `main`, B branch): pre-A seeds → A expands → B contracts (NOT NULL, only composite uniques left, `singletonkey` nullable with `CURRENT`) → A starts on the B schema and writes → B again → second company with the same partner number inserted → B and A both start with two companies.
+- 7.4b (30.10.2026): PR #71 deployed (backup 09:21 UTC before), schema on the VM checked (`company_id` NOT NULL on all four tables, partner only `UNIQUE (company_id, partnernumber)`), `company-demo` login shows its 3 partners, 8 articles, 22 orders. Company 2 "Testfirma Zwei GmbH" created with Keycloak users `company-zwei`/`partner-zwei` (random passwords, Vaultwarden) and `provision-company.sql`; partner `P-1002` created in company 2 (same number as in company 1), `partner-zwei` bound. Real tokens: each company lists only its own partners, `company-zwei` gets 404 on a company-1 partner id, both partner logins resolve to their own partner.
+- 7.1–7.5 (30.10.2026): 263/263 tests and package green for A and B; strict validate green. 7.2 was checked live on paportal.at for all four logins at desktop width (browser + real-token API calls), mobile width was not rechecked for B (no frontend change in B). 7.3: two Codex adversarial reviews on A (spec + diff, fixed), one on B (approve, no findings); no separate `partnerportal-quality` run for B. 7.4: A rollout and `company-demo` binding on 30.10. (handoff). 7.5: Purpose of `company-profile` rewritten in the main spec at archive.
