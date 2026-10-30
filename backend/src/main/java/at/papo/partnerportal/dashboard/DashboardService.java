@@ -8,6 +8,7 @@ import at.papo.partnerportal.order.OrderDto;
 import at.papo.partnerportal.order.OrderStatus;
 import at.papo.partnerportal.partner.Partner;
 import at.papo.partnerportal.product.Product;
+import at.papo.partnerportal.security.CurrentCompany;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -23,6 +24,9 @@ import java.util.stream.Collectors;
 public class DashboardService {
 
     private static final int LATEST_ORDERS_LIMIT = 5;
+
+    @Inject
+    CurrentCompany currentCompany;
 
     @Inject
     CommissionService commissionService;
@@ -56,18 +60,19 @@ public class DashboardService {
                 .toList();
 
         return new PartnerDashboardDto(totalCommission, totalRevenue, fulfilledOrders.size(),
-                enablementService.countEnabledForPartner(partner), Product.count(), latestOrders);
+                enablementService.countEnabledForPartner(partner), Product.count("company", partner.company), latestOrders);
     }
 
     // Two list queries + a batch commission lookup (same pattern as OrderService.listAll)
     // instead of per-order/per-partner queries - avoids N+1 across ~200 partners.
     public CompanyDashboardDto buildForCompany() {
-        List<Order> fulfilledOrders = Order.list("status", OrderStatus.FULFILLED);
+        var company = currentCompany.resolve();
+        List<Order> fulfilledOrders = Order.list("status = ?1 and partner.company = ?2", OrderStatus.FULFILLED, company);
         Map<Long, CommissionRecord> commissionsByOrderId = commissionService.findForOrders(fulfilledOrders);
         Map<Long, List<Order>> ordersByPartnerId = fulfilledOrders.stream()
                 .collect(Collectors.groupingBy(order -> order.partner.id));
 
-        List<CompanySettlementDto> settlement = Partner.<Partner>listAll().stream()
+        List<CompanySettlementDto> settlement = Partner.<Partner>list("company", company).stream()
                 .map(partner -> {
                     List<Order> partnerOrders = ordersByPartnerId.getOrDefault(partner.id, List.of());
                     BigDecimal revenue = partnerOrders.stream()

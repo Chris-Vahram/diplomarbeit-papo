@@ -10,6 +10,15 @@ const INTERNAL_PREFIX = "/product-images/";
 // every list render.
 const blobUrlCache = new Map();
 
+// Per identity only: a login switch drops and revokes every cached object URL, and the
+// generation bump makes requests still in flight from the old login discard their result.
+let generation = 0;
+window.addEventListener("papo:session-changed", () => {
+  generation += 1;
+  blobUrlCache.forEach((objectUrl) => URL.revokeObjectURL(objectUrl));
+  blobUrlCache.clear();
+});
+
 function isInternal(url) {
   return typeof url === "string" && url.startsWith(INTERNAL_PREFIX);
 }
@@ -20,7 +29,9 @@ function isInternal(url) {
 export async function resolveImageUrl(url) {
   if (!isInternal(url)) return url;
   if (blobUrlCache.has(url)) return blobUrlCache.get(url);
+  const requestGeneration = generation;
   const blob = await apiFetchBlob(url);
+  if (requestGeneration !== generation) return "";
   const objectUrl = URL.createObjectURL(blob);
   blobUrlCache.set(url, objectUrl);
   return objectUrl;

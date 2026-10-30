@@ -1,6 +1,8 @@
 package at.papo.partnerportal.category;
 
+import at.papo.partnerportal.business.CompanyProfile;
 import at.papo.partnerportal.common.ApiException;
+import at.papo.partnerportal.security.CurrentCompany;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -19,8 +21,11 @@ public class CategoryService {
     @Inject
     EntityManager entityManager;
 
+    @Inject
+    CurrentCompany currentCompany;
+
     public List<CategoryDto> list() {
-        return Category.<Category>find("order by name, id").list().stream()
+        return Category.<Category>find("company = ?1 order by name, id", currentCompany.resolve()).list().stream()
                 .map(CategoryDto::from)
                 .toList();
     }
@@ -29,11 +34,13 @@ public class CategoryService {
     public CategoryDto create(CategoryCreateRequest request) {
         String name = CategoryNames.requireValid(request.name());
         String normalizedName = name.toLowerCase(Locale.ROOT);
-        lockAll();
-        if (Category.count("normalizedName", normalizedName) > 0) {
+        CompanyProfile company = currentCompany.resolve();
+        lockAll(company);
+        if (Category.count("company = ?1 and normalizedName = ?2", company, normalizedName) > 0) {
             throw new ApiException(409, "Artikelkategorie bereits vorhanden.");
         }
         Category category = new Category();
+        category.company = company;
         category.name = name;
         category.normalizedName = normalizedName;
         category.active = true;
@@ -47,12 +54,13 @@ public class CategoryService {
 
     @Transactional
     public CategoryDto update(Long id, CategoryUpdateRequest request) {
-        List<Category> lockedCategories = lockAll();
+        CompanyProfile company = currentCompany.resolve();
+        List<Category> lockedCategories = lockAll(company);
         Category category = lockedCategories.stream().filter(item -> Objects.equals(item.id, id)).findFirst()
                 .orElseThrow(() -> new ApiException(404, "Artikelkategorie nicht gefunden."));
         String name = CategoryNames.requireValid(request.name());
         String normalizedName = name.toLowerCase(Locale.ROOT);
-        if (Category.count("normalizedName = ?1 and id <> ?2", normalizedName, id) > 0) {
+        if (Category.count("company = ?1 and normalizedName = ?2 and id <> ?3", company, normalizedName, id) > 0) {
             throw new ApiException(409, "Artikelkategorie bereits vorhanden.");
         }
         category.name = name;
@@ -62,6 +70,11 @@ public class CategoryService {
     }
 
     public Category findForProductInput(Long categoryId, String legacyName) {
+        return findForProductInput(currentCompany.resolve(), categoryId, legacyName);
+    }
+
+    // Foreign categories behave like unknown ones (add-company-tenancy D8).
+    public Category findForProductInput(CompanyProfile company, Long categoryId, String legacyName) {
         if (categoryId != null && legacyName != null && !legacyName.isBlank()) {
             throw new ApiException(400, "Artikelkategorie darf entweder über ID oder Namen angegeben werden.");
         }
@@ -69,7 +82,7 @@ public class CategoryService {
             if (categoryId <= 0) {
                 throw new ApiException(400, "Artikelkategorie nicht gefunden.");
             }
-            Category category = Category.findById(categoryId);
+            Category category = Category.find("id = ?1 and company = ?2", categoryId, company).firstResult();
             if (category == null) {
                 throw new ApiException(400, "Artikelkategorie nicht gefunden.");
             }
@@ -79,7 +92,7 @@ public class CategoryService {
             return null;
         }
         String normalizedName = CategoryNames.normalized(legacyName);
-        Category category = Category.find("normalizedName", normalizedName).firstResult();
+        Category category = Category.find("company = ?1 and normalizedName = ?2", company, normalizedName).firstResult();
         if (category == null) {
             throw new ApiException(400, "Artikelkategorie nicht gefunden.");
         }
@@ -98,8 +111,13 @@ public class CategoryService {
         }).toList();
     }
 
-    private List<Category> lockAll() {
-        List<Category> categories = Category.<Category>find("order by id").withLock(LockModeType.PESSIMISTIC_WRITE).list();
+    // Serialises catalogue edits of one company: locking the company row also covers the case
+    // of a company without categories; other companies' catalogues stay unlocked.
+    private List<Category> lockAll(CompanyProfile company) {
+        entityManager.lock(entityManager.contains(company) ? company
+                : entityManager.find(CompanyProfile.class, company.id), LockModeType.PESSIMISTIC_WRITE);
+        List<Category> categories = Category.<Category>find("company = ?1 order by id", company)
+                .withLock(LockModeType.PESSIMISTIC_WRITE).list();
         categories.forEach(entityManager::refresh);
         return categories;
     }

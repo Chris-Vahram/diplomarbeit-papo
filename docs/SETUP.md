@@ -37,16 +37,20 @@ Keycloak importiert beim Start automatisch den Realm `partnerportal`
 
 | Benutzer | Passwort | Rolle |
 |---|---|---|
-| `company-demo` | `company-demo` | company |
-| `partner-demo` | `partner-demo` | partner |
+| `company-demo` | `company-demo` | company (Firma 1 „Huemer GmbH“) |
+| `partner-demo` | `partner-demo` | partner (Firma 1) |
+| `company-zwei` | `company-zwei` | company (Firma 2 „Testfirma Zwei GmbH“, nur dev/test) |
+| `partner-zwei` | `partner-zwei` | partner (Firma 2, nur dev/test) |
 
 **Provisionierungs-Konvention:** Keycloak-User werden manuell angelegt und von
 der Firma im Dialog „Logins“ (Partnerverwaltung) über ihre Keycloak-Benutzer-ID
-mit dem Partner verknüpft. `partner-demo` hat in beiden Realm-Dateien die feste ID
-`7c1d9a2e-4b3f-4e5a-9d6c-2f8b1a0e5c01`; der `DemoDataSeeder` legt die Bindung in
-dev/test an. Ein älterer lokaler Keycloak-Container hat noch eine zufällige ID —
+mit dem Partner verknüpft. Firmenbenutzer werden über `company_login` an ihre Firma
+gebunden (Mandantenfähigkeit). Alle vier Demo-User haben in beiden Realm-Dateien feste
+IDs (`partner-demo` `7c1d9a2e-…`, `company-demo`/`company-zwei`/`partner-zwei`
+`c0a1d2e3-0000-4000-8000-00000000000{1,2,3}`); der `DemoDataSeeder` legt Firma 2 und alle
+Bindungen in dev/test an. Ein älterer lokaler Keycloak-Container hat noch eine zufällige ID —
 dann einmal neu erstellen (kein Datenvolume, der Realm wird neu importiert), sonst
-scheitert der Partner-Login mit „Kein Partnerkonto mit diesem Login verknüpft.“:
+scheitert der Login mit „Kein Partnerkonto …“ bzw. „Kein Firmenkonto mit diesem Login verknüpft.“:
 
 ```bash
 docker compose up -d --force-recreate keycloak

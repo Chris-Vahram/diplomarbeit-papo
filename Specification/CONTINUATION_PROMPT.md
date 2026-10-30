@@ -1,11 +1,52 @@
 # PAPO – Next-Session-Context
 
-**Stand:** 22.10.2026. Operative Übergabe; volatile Angaben beim Start prüfen.
+**Stand:** 29.10.2026. Operative Übergabe; volatile Angaben beim Start prüfen.
 Stabile Regeln stehen in `AGENTS.md` und `CLAUDE.md`. Der beschlossene/noch zu
 beschließende Ausbau ist in [PRODUCT_COMPLETION_PLAN.md](PRODUCT_COMPLETION_PLAN.md)
 geordnet. Dieses Dokument bleibt der einzige operative Session-Handoff.
 
-## Stand 22.10.2026 — hier einsteigen
+## Stand 29.10.2026 — hier einsteigen (Mandantenfähigkeit Release A wartet auf Merge)
+
+**Offen, in dieser Reihenfolge:**
+1. **Backup auf der VM** (Chris). `backup.sh` brach ab (`.env.prod` Zeile 11 mit Sonderzeichen,
+   Skript las die ganze Datei per `.`). Fix = PR #68 (`fix/backup-env-parsing`, liest nur `DB_USER`).
+   Es gibt **kein** `backup.log` → der nächtliche Cron war nie eingerichtet; es existieren keine
+   regelmäßigen Backups. Nach Merge #68: Skript per scp auf die VM, Cron laut docs/DEPLOYMENT.md
+   „Backups“ einrichten.
+2. **PR #66 mergen** = Release A (expand) von `add-company-tenancy` (Branch
+   `feat/company-tenancy-release-a`, main inkl. Tobias' PR #67 eingemergt, 263/263 Tests grün).
+   Merge deployt sofort; danach bekommen Firmenbenutzer 403 bis zur Bindung.
+3. **Direkt danach `company-demo` binden** (DEPLOYMENT.md „Mandantenfähigkeit“, Schritt 3):
+   Keycloak-ID von `company-demo` kopieren, `deploy/tenancy/provision-company.sql` per scp auf die VM,
+   im Postgres-Container mit `subject`, `company_id` (aus `select id, businessname from companyprofile`)
+   und `operator` ausführen, als `company-demo` anmelden und prüfen.
+4. **Erst danach Release B** (Task 3.4 in `openspec/changes/add-company-tenancy/tasks.md`): eigener
+   Branch/PR — `contract()` (NOT NULL, alte Unique-Constraints `partner.partnernumber`,
+   `article_categories.normalized_name`, `companyprofile.singletonkey` per `pg_constraint` droppen,
+   `singletonkey` nullable), Entity ohne `singletonKey`, `papo.mail.company-recipient` entfernen,
+   Kompatibilitätscheck A-Image auf B-Schema (gleiches Vorgehen wie bei A: `git archive` + beide JARs
+   gegen Scratch-DB). Dann 7.4b (VM, Firma 2 anlegen), 7.5 (Purpose `company-profile`), Archiv.
+
+**Was Release A enthält:** `CompanyLogin` + `security/CurrentCompany`, alle Firmen-Services filtern
+nach Firma (fremde IDs 404), `company_id` an Partner/Product/Category/ProductImage,
+`CompanyTenancyMigrationService.expand()`, gemeinsame Sperre `LoginSubjectLock`, Mail-Absender/
+Empfänger je Firma (`CompanyProfile.orderNoticeEmail`, „“ = bewusst geleert, null = nie gesetzt),
+Bilder `private, no-store` + Frontend `cache: "no-store"` + Generationszähler, Testfirma 2
+(`company-zwei`/`partner-zwei`, feste Realm-IDs `c0a1d2e3-0000-4000-8000-00000000000{1,2,3}`).
+Tests: `business/CompanyTenancyResourceTest`, `CompanyTenancyMigrationTest`, `support/TestCompanies`.
+Zwei Codex-Adversarial-Reviews (Spec + Diff) eingearbeitet. Details: tasks.md „Implementation notes“.
+
+**Sonst offen:** `send-order-emails` 4.2 — SMTP auf VM aktiv (Image läuft mit mailer/scheduler),
+Testbestellung + Firmen-Empfänger (kommt nach Release A übers Firmenprofil) noch zu prüfen, dann
+archivieren. Leitkennzahl Firma = Umsatz bestätigen lassen. Drei GitHub-Tokens im KI-Roharchiv
+widerrufen (seit 16.10. offen). Tobias' Branch `docs/impeccable-product-context` kann weg.
+
+**Lokale Umgebung:** Tests mit `./mvnw -o test -Dquarkus.http.test-port=8091` (Dev Services gehen).
+Lokaler Keycloak nach `--force-recreate` braucht `kcadm … update realms/partnerportal -s sslRequired=NONE`
+(Docker-Desktop-Netz). Ausgabewunsch Chris: kurz, ein Befehl pro Codeblock, Schritte nummeriert
+(Plugin `i-have-adhd` installiert, mit `/i-have-adhd` aktivieren).
+
+## Stand 22.10.2026
 
 - `refine-portal-frontend` gemergt (PR #59), live, von Tobias abgenommen und archiviert
   (`openspec/changes/archive/2026-10-22-refine-portal-frontend/`, Spec `portal-visual-design`).

@@ -5,6 +5,7 @@ import at.papo.partnerportal.mail.OrderEmail.RecipientRole;
 import at.papo.partnerportal.mail.OrderEmail.Status;
 import at.papo.partnerportal.mail.OrderEmail.Type;
 import at.papo.partnerportal.order.Order;
+import at.papo.partnerportal.security.CurrentCompany;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -24,6 +25,9 @@ public class OrderEmailService {
     @Inject
     MailConfig config;
 
+    @Inject
+    CurrentCompany currentCompany;
+
     // Returns the customer notice for the order response (QUEUED, REDIRECTED, NO_ADDRESS,
     // INVALID_ADDRESS, DISABLED).
     public String queueForNewOrder(Order order) {
@@ -41,9 +45,7 @@ public class OrderEmailService {
     }
 
     public List<OrderEmailDto> listForOrder(Long orderId) {
-        if (Order.findById(orderId) == null) {
-            throw new ApiException(404, "Bestellung nicht gefunden.");
-        }
+        findOwnOrder(orderId);
         return OrderEmail.<OrderEmail>find("order.id = ?1 order by id", orderId).stream()
                 .map(OrderEmailDto::from)
                 .toList();
@@ -51,6 +53,7 @@ public class OrderEmailService {
 
     @Transactional
     public OrderEmailDto retry(Long orderId, Long emailId) {
+        findOwnOrder(orderId);
         OrderEmail email = OrderEmail.findById(emailId);
         if (email == null || !email.order.id.equals(orderId)) {
             throw new ApiException(404, "E-Mail nicht gefunden.");
@@ -82,7 +85,7 @@ public class OrderEmailService {
         return switch (role) {
             case CUSTOMER -> order.kunde.email;
             case PARTNER -> order.partner.email;
-            case COMPANY -> config.companyRecipient().orElse(null);
+            case COMPANY -> order.partner.company.orderNoticeEmail;
         };
     }
 
@@ -100,7 +103,9 @@ public class OrderEmailService {
             return existing;
         }
         String address = normalize(currentAddress(order, role));
-        if (address == null) {
+        // A customer without address simply gets no mail; a company without recipient keeps a
+        // visible SKIPPED row so the omission is explained in the order details (design D6).
+        if (address == null && role != RecipientRole.COMPANY) {
             return null;
         }
         OrderEmail email = new OrderEmail();
@@ -109,7 +114,10 @@ public class OrderEmailService {
         email.recipientRole = role;
         email.deliveryMode = config.deliveryMode();
         email.redirectTo = config.redirectTarget();
-        if (!config.enabled()) {
+        if (address == null) {
+            email.status = Status.SKIPPED;
+            email.skipReason = "NO_RECIPIENT";
+        } else if (!config.enabled()) {
             email.status = Status.SKIPPED;
             email.skipReason = "DISABLED";
         } else if (!isValid(address)) {
@@ -132,5 +140,12 @@ public class OrderEmailService {
             return "DISABLED".equals(customer.skipReason) ? "DISABLED" : "INVALID_ADDRESS";
         }
         return customer.deliveryMode == OrderEmail.DeliveryMode.REDIRECT ? "REDIRECTED" : "QUEUED";
+    }
+
+    // Company-side: mails of another company's order behave like a missing order.
+    private void findOwnOrder(Long orderId) {
+        if (Order.count("id = ?1 and partner.company = ?2", orderId, currentCompany.resolve()) == 0) {
+            throw new ApiException(404, "Bestellung nicht gefunden.");
+        }
     }
 }

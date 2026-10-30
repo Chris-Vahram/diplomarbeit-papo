@@ -28,6 +28,9 @@ public class PartnerShopService {
     boolean publicEnabled;
 
     @Inject
+    at.papo.partnerportal.security.CurrentCompany currentCompany;
+
+    @Inject
     ShopPageService pageService;
 
     // Same text for unknown and unreachable shops, so the public API does not reveal existence.
@@ -141,10 +144,14 @@ public class PartnerShopService {
     // Company partner table: one row per existing shop, status computed with two queries
     // instead of one enablement count per partner. Partners without a record have no shop yet.
     public List<CompanyShopOverviewDto> overview() {
+        var company = currentCompany.resolve();
         Set<Long> withArticles = new HashSet<>(ProductEnablement.getEntityManager().createQuery(
-                "select distinct e.partner.id from ProductEnablement e where e.product.available = true", Long.class)
+                "select distinct e.partner.id from ProductEnablement e where e.product.available = true"
+                        + " and e.partner.company = ?1", Long.class)
+                .setParameter(1, company)
                 .getResultList());
-        return PartnerShop.<PartnerShop>find("select s from PartnerShop s join fetch s.partner").list().stream()
+        return PartnerShop.<PartnerShop>find("select s from PartnerShop s join fetch s.partner where s.partner.company = ?1",
+                        company).list().stream()
                 .map(shop -> new CompanyShopOverviewDto(shop.partner.id, shop.kennung,
                         status(shop, withArticles.contains(shop.partner.id))))
                 .toList();

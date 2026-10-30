@@ -4,6 +4,8 @@ import at.papo.partnerportal.category.Category;
 import at.papo.partnerportal.category.CategoryNames;
 import at.papo.partnerportal.category.CategoryService;
 import at.papo.partnerportal.product.Product;
+import at.papo.partnerportal.product.ProductImage;
+import at.papo.partnerportal.security.CurrentCompany;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -25,6 +27,14 @@ public class ProductImportDefinition implements ImportDefinition {
 
     @Inject
     CategoryService categoryService;
+
+    @Inject
+    CurrentCompany currentCompany;
+
+    // Internal image reference as stored on products ("/product-images/{id}"); only images of
+    // the importing company may be referenced (add-company-tenancy).
+    private static final java.util.regex.Pattern INTERNAL_IMAGE_URL =
+            java.util.regex.Pattern.compile("^/product-images/(\\d+)$");
 
     private static final List<ImportField> FIELDS = List.of(
             new ImportField("name", "Name", true, List.of("artikel", "artikelname", "bezeichnung", "produktname")),
@@ -48,7 +58,7 @@ public class ProductImportDefinition implements ImportDefinition {
             if (normalizedName == null) {
                 continue;
             }
-            Category category = Category.find("normalizedName", normalizedName).firstResult();
+            Category category = Category.find("company = ?1 and normalizedName = ?2", currentCompany.resolve(), normalizedName).firstResult();
             if (category != null) {
                 categoryIds.add(category.id);
             }
@@ -86,11 +96,16 @@ public class ProductImportDefinition implements ImportDefinition {
 
     @Override
     public List<String> validatePreparedRow(Map<String, String> mappedValues) {
+        java.util.regex.Matcher image = INTERNAL_IMAGE_URL.matcher(String.valueOf(blankToNull(mappedValues.get("imageUrl"))));
+        if (image.matches() && ProductImage.count("id = ?1 and company = ?2",
+                Long.valueOf(image.group(1)), currentCompany.resolve()) == 0) {
+            return List.of("Bild nicht gefunden.");
+        }
         String normalizedName = normalizedCategory(mappedValues.get("category"));
         if (normalizedName == null) {
             return isBlank(mappedValues.get("category")) ? List.of() : List.of("Artikelkategorie ist ungültig.");
         }
-        Category category = Category.find("normalizedName", normalizedName).firstResult();
+        Category category = Category.find("company = ?1 and normalizedName = ?2", currentCompany.resolve(), normalizedName).firstResult();
         if (category == null) {
             return List.of("Artikelkategorie ist unbekannt.");
         }
@@ -107,12 +122,14 @@ public class ProductImportDefinition implements ImportDefinition {
 
     @Override
     public boolean existsInDb(String identifierValue) {
-        return Product.count("lower(name) = ?1", identifierValue.toLowerCase()) > 0;
+        return Product.count("company = ?1 and lower(name) = ?2", currentCompany.resolve(),
+                identifierValue.toLowerCase()) > 0;
     }
 
     @Override
     public void persist(Map<String, String> mappedValues) {
         Product product = new Product();
+        product.company = currentCompany.resolve();
         product.name = mappedValues.get("name").trim();
         product.price = parseDecimal(mappedValues.get("price"));
         product.description = blankToNull(mappedValues.get("description"));
@@ -120,7 +137,8 @@ public class ProductImportDefinition implements ImportDefinition {
         product.available = available == null || available;
         String categoryName = blankToNull(mappedValues.get("category"));
         product.articleCategory = categoryName == null ? null
-                : Category.find("normalizedName", CategoryNames.normalized(categoryName)).firstResult();
+                : Category.find("company = ?1 and normalizedName = ?2", product.company,
+                        CategoryNames.normalized(categoryName)).firstResult();
         product.imageUrl = blankToNull(mappedValues.get("imageUrl"));
         product.persist();
     }

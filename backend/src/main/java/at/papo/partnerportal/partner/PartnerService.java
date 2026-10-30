@@ -1,7 +1,9 @@
 package at.papo.partnerportal.partner;
 
 import at.papo.partnerportal.business.BusinessTaxIdentifierValidator;
+import at.papo.partnerportal.business.CompanyProfile;
 import at.papo.partnerportal.common.ApiException;
+import at.papo.partnerportal.security.CurrentCompany;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -17,8 +19,15 @@ public class PartnerService {
     @Inject
     BusinessTaxIdentifierValidator taxIdentifierValidator;
 
+    @Inject
+    CurrentCompany currentCompany;
+
     public List<CompanyPartnerDto> list() {
-        List<Partner> partners = Partner.listAll();
+        return list(currentCompany.resolve());
+    }
+
+    public List<CompanyPartnerDto> list(CompanyProfile company) {
+        List<Partner> partners = Partner.list("company", company);
         if (partners.isEmpty()) {
             return List.of();
         }
@@ -37,9 +46,11 @@ public class PartnerService {
 
     @Transactional
     public CompanyPartnerDto create(PartnerRequest request) {
+        CompanyProfile company = currentCompany.resolve();
         String partnerNumber = PartnerNumber.canonicalize(request.partnerNumber());
-        assertPartnerNumberFree(partnerNumber, null);
+        assertPartnerNumberFree(company, partnerNumber, null);
         Partner partner = new Partner();
+        partner.company = company;
         partner.partnerNumber = partnerNumber;
         applyCompanyFields(partner, request);
         partner.persist();
@@ -50,7 +61,7 @@ public class PartnerService {
     public CompanyPartnerDto update(Long id, PartnerRequest request) {
         Partner partner = findOrThrow(id);
         String partnerNumber = PartnerNumber.canonicalize(request.partnerNumber());
-        assertPartnerNumberFree(partnerNumber, id);
+        assertPartnerNumberFree(partner.company, partnerNumber, id);
         partner.partnerNumber = partnerNumber;
         applyCompanyFields(partner, request);
         return CompanyPartnerDto.from(partner);
@@ -68,9 +79,9 @@ public class PartnerService {
     // Case-insensitive to match the importer's duplicate check (PartnerImportDefinition),
     // so "P-1001" and "p-1001" can't coexist depending on which path created the partner.
     // Locale.ROOT to match PartnerNumber.canonicalize's case-folding (avoids the Turkish-I trap).
-    private void assertPartnerNumberFree(String partnerNumber, Long excludingId) {
-        Partner existing = Partner.find("lower(partnerNumber) = ?1", partnerNumber.toLowerCase(Locale.ROOT))
-                .firstResult();
+    private void assertPartnerNumberFree(CompanyProfile company, String partnerNumber, Long excludingId) {
+        Partner existing = Partner.find("company = ?1 and lower(partnerNumber) = ?2", company,
+                partnerNumber.toLowerCase(Locale.ROOT)).firstResult();
         if (existing != null && !existing.id.equals(excludingId)) {
             throw new ApiException(409, "Partnernummer bereits vergeben.");
         }
@@ -92,8 +103,9 @@ public class PartnerService {
         partner.active = request.active() == null || request.active();
     }
 
+    // Company-side lookup: a partner of another company is indistinguishable from a missing one.
     public Partner findOrThrow(Long id) {
-        Partner partner = Partner.findById(id);
+        Partner partner = Partner.find("id = ?1 and company = ?2", id, currentCompany.resolve()).firstResult();
         if (partner == null) {
             throw new ApiException(404, "Partner nicht gefunden.");
         }

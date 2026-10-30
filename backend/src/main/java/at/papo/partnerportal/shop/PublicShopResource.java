@@ -1,7 +1,6 @@
 package at.papo.partnerportal.shop;
 
 import at.papo.partnerportal.business.CompanyProfile;
-import at.papo.partnerportal.business.CompanyProfileService;
 import at.papo.partnerportal.common.ApiException;
 import at.papo.partnerportal.product.ProductImage;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -36,9 +35,6 @@ public class PublicShopResource {
     @Inject
     ShopAssetService assetService;
 
-    @Inject
-    CompanyProfileService companyProfileService;
-
     @GET
     public PublicShopDto get(@PathParam("kennung") String kennung) {
         return PublicShopDto.from(onlineShop(kennung));
@@ -54,7 +50,7 @@ public class PublicShopResource {
     @Path("/navigation")
     public PublicNavigationDto navigation(@PathParam("kennung") String kennung) {
         PartnerShop shop = onlineShop(kennung);
-        CompanyProfile seller = companyProfileService.findCurrent();
+        CompanyProfile seller = shop.partner.company;
         return new PublicNavigationDto(
                 pageService.navigation(shop).stream().map(PublicNavigationDto.Item::from).toList(),
                 pageService.legalPages(shop).stream().map(PublicNavigationDto.Item::from).toList(),

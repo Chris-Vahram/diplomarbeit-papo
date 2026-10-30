@@ -1,5 +1,9 @@
 package at.papo.partnerportal.product;
 
+import at.papo.partnerportal.business.CompanyProfile;
+import at.papo.partnerportal.security.CurrentCompany;
+import at.papo.partnerportal.security.CurrentPartner;
+import io.quarkus.security.identity.SecurityIdentity;
 import at.papo.partnerportal.common.UploadLimits;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -32,9 +36,18 @@ public class ProductImageResource {
     @Inject
     ProductImageService productImageService;
 
+    @Inject
+    CurrentCompany currentCompany;
+
+    @Inject
+    CurrentPartner currentPartner;
+
+    @Inject
+    SecurityIdentity identity;
+
     @GET
     public List<ProductImageDto> list() {
-        return productImageService.list();
+        return productImageService.list(currentCompany.resolve());
     }
 
     @POST
@@ -42,22 +55,25 @@ public class ProductImageResource {
     public ProductImageDto upload(@RestForm("file") FileUpload file) throws IOException {
         UploadLimits.rejectIfLarger(file.uploadedFile(), UploadLimits.PRODUCT_IMAGE_BYTES,
                 "Bild ist zu groß (maximal 2 MiB erlaubt).");
-        return productImageService.upload(Files.readAllBytes(file.uploadedFile()), file.fileName());
+        return productImageService.upload(currentCompany.resolve(), Files.readAllBytes(file.uploadedFile()),
+                file.fileName());
     }
 
-    // Accepted risk (2026-07-09 security review): any authenticated partner can read any
-    // image id, independent of product enablement - ids are sequential/enumerable. Not
-    // fixed because product images are non-sensitive (gallery assets, not partner data);
-    // revisit with an enablement check if image confidentiality ever matters.
+    // Readable only within the owning company (add-company-tenancy); a partner sees all images
+    // of its own company, independent of enablement (gallery assets, not partner data).
+    // private, no-store: browser caches ignore Authorization, a cached image would survive a
+    // login switch to another company.
     @GET
     @Path("/{id}")
     @RolesAllowed({ "company", "partner" })
     @Produces(MediaType.WILDCARD)
     public Response get(@PathParam("id") Long id) {
-        ProductImage image = productImageService.findOrThrow(id);
+        CompanyProfile company = identity.hasRole("company") ? currentCompany.resolve()
+                : currentPartner.resolve().company;
+        ProductImage image = productImageService.findOrThrow(company, id);
         return Response.ok(image.data)
                 .type(image.contentType)
-                .header("Cache-Control", "public, max-age=31536000, immutable")
+                .header("Cache-Control", "private, no-store")
                 .header("Content-Disposition", "inline; filename=\"product-image-" + id + extensionFor(image.contentType) + "\"")
                 .build();
     }
