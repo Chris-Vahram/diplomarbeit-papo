@@ -2,7 +2,7 @@
 
 ### Vorrangiger Next-Session-Orchesterstand — 29.10.2026
 
-- Einstieg: `Specification/CONTINUATION_PROMPT.md`, Abschnitt „Stand 30.10.2026 — hier einsteigen“. Release A (Mandantenfähigkeit) ist live, `company-demo` gebunden. Nächstes: Backup-Skript + Cron auf der VM, Mail-Testbestellung, dann Release B (Task 3.4). Antworten an Chris kurz, ein Befehl pro Codeblock (`/i-have-adhd`).
+- Einstieg: `Specification/CONTINUATION_PROMPT.md`, Abschnitt „Stand 30.10.2026 (Nachmittag)“. Mandantenfähigkeit (Release A+B) live und archiviert, Firma 2 auf der VM angelegt. Nächstes: Backup-Cron, Mail-Testbestellung, Demo-Logins vor echten Daten entfernen. Antworten an Chris kurz, ein Befehl pro Codeblock (`/i-have-adhd`).
 
 ### Vorheriger Orchesterstand — 22.10.2026
 
