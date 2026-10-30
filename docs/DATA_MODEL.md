@@ -27,7 +27,6 @@ erDiagram
 
     COMPANY_PROFILE {
         Long id PK
-        String singletonKey UK "CURRENT; genau ein aktives Portalprofil"
         String businessName
         String taxCountry "ISO-3166-1 Alpha-2"
         BusinessTaxIdentifierType taxIdentifierType "VAT_ID oder NATIONAL_TAX_ID"
@@ -201,8 +200,8 @@ Die Firma ist der Mandant (`add-company-tenancy`). `Partner`, `Product`,
 `ArticleCategory` und `ProductImage` tragen `company_id`; alle übrigen Daten hängen über
 Partner, Bestellung oder Shop an genau einer Firma. Firmenbenutzer lesen und ändern nur
 ihr eigenes Profil (Firmenname, Steueridentifikation, Registerkennung, „E-Mail für
-Bestellhinweise“ `orderNoticeEmail`) über `/api/company/profile`. `singletonKey=CURRENT`
-bleibt bis Release B nur als Kompatibilität für ein zurückgerolltes Image auf Firma 1.
+Bestellhinweise“ `orderNoticeEmail`) über `/api/company/profile`. Migrierte Datenbanken behalten
+die Altspalte `singletonkey` (nullable, Firma 1 = `CURRENT`) nur für ein zurückgerolltes Release-A-Image.
 Partnernummer und Kategoriename sind je Firma eindeutig. Demo-Werte sind synthetisch.
 
 ### CompanyLogin (Tabelle `company_login`)

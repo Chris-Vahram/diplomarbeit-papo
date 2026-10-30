@@ -67,17 +67,16 @@ public class BusinessTaxIdentifierMigrationService {
     }
 
     private void initializeCompanyProfile(List<Partner> partners, boolean demoDataEnabled) {
-        CompanyProfile current = CompanyProfile.find("singletonKey", CompanyProfile.CURRENT_KEY).firstResult();
-        if (current != null) {
-            validate(current.taxIdentifier, "Firmenprofil");
+        List<CompanyProfile> profiles = CompanyProfile.listAll();
+        if (!profiles.isEmpty()) {
+            profiles.forEach(profile -> validate(profile.taxIdentifier, "Firmenprofil"));
             return;
         }
-        if (CompanyProfile.count() != 0 || !demoDataEnabled || !isVerifiedDemoDataset(partners)) {
+        if (!demoDataEnabled || !isVerifiedDemoDataset(partners)) {
             throw new IllegalStateException("Steueridentifikations-Übernahme abgebrochen: Firmenprofil ist inkonsistent.");
         }
 
         CompanyProfile profile = new CompanyProfile();
-        profile.singletonKey = CompanyProfile.CURRENT_KEY;
         profile.businessName = "Huemer GmbH";
         profile.taxIdentifier = new BusinessTaxIdentifier(
                 "AT", BusinessTaxIdentifierType.VAT_ID, "ATU87654321");

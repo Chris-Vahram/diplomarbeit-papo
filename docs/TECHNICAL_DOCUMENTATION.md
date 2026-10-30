@@ -32,8 +32,9 @@ Das Frontend spricht ausschließlich über die vorhandene `apiFetch`-Schicht mit
 Backend. Der Router schützt Rollen auf UI-Ebene; jede geschützte REST-Methode prüft die Rolle
 zusätzlich serverseitig. Partnerbezogene Abfragen lösen den Partner über `CurrentPartner` aus
 dem Login auf. Kunden, Bestellungen und freigeschaltete Artikel werden dadurch partnerbezogen
-begrenzt. Das Datenmodell enthält derzeit keine explizite Partner-Unternehmen-Fremdschlüssel-
-Beziehung und bildet keine Mandantentrennung ab; das Portalprofil ist ein Singleton.
+begrenzt. Die Firma ist der Mandant: Firmenbenutzer werden über `CompanyLogin` und
+`CurrentCompany` ihrer Firma zugeordnet; Partner, Artikel, Kategorien und Bilder tragen
+`company_id` (NOT NULL), alle Firmenabfragen filtern danach (`add-company-tenancy`).
 
 ## 3. Fachliche Module und wichtige Pfade
 

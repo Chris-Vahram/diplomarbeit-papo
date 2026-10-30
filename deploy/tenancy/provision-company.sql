@@ -7,8 +7,8 @@
 --     psql -v ON_ERROR_STOP=1 -v subject="'<keycloak-user-id>'" -v company_id=<id> \
 --          -v operator="'chris'" -f provision-company.sql partnerportal
 --
---   Create a new company and bind its first login (ONLY after Release B is live; in Release A
---   the NOT NULL singleton column makes this insert fail on purpose):
+--   Create a new company and bind its first login (ONLY after Release B is live; on a Release A
+--   schema the NOT NULL singleton column makes this insert fail on purpose):
 --     psql -v ON_ERROR_STOP=1 -v subject="'<keycloak-user-id>'" -v company_id=0 \
 --          -v operator="'chris'" -v business_name="'Testfirma Zwei GmbH'" \
 --          -v tax_value="'ATU22222222'" -v register_value="'87654321'" -f provision-company.sql partnerportal

@@ -100,7 +100,7 @@ public class DemoDataSeeder {
             }
         }
         businessTaxIdentifierMigrationService.migrate(launchMode != LaunchMode.NORMAL || seedDemoData);
-        companyTenancyMigrationService.expand();
+        companyTenancyMigrationService.contract();
     }
 
     static boolean shouldSeed(LaunchMode launchMode, long partnerCount) {
@@ -179,14 +179,17 @@ public class DemoDataSeeder {
 
     private void seedCompanyProfile() {
         if (!shouldSeedCompanyProfile(CompanyProfile.count())) {
-            company = CompanyProfile.find("singletonKey", CompanyProfile.CURRENT_KEY).firstResult();
+            company = CompanyProfile.find("order by id").firstResult();
             return;
         }
         CompanyProfile profile = new CompanyProfile();
-        profile.singletonKey = CompanyProfile.CURRENT_KEY;
         profile.businessName = "Huemer GmbH";
         profile.taxIdentifier = new BusinessTaxIdentifier("AT", BusinessTaxIdentifierType.VAT_ID, "ATU87654321");
         profile.tradeRegisterIdentifier = new TradeRegisterIdentifier("AT", TradeRegisterIdentifierType.GISA, "12345678");
+        // Dev/test recipient of company order notices; on a deployment the company sets it in its profile.
+        if (LaunchMode.current() != LaunchMode.NORMAL) {
+            profile.orderNoticeEmail = "firma@example.test";
+        }
         profile.persist();
         company = profile;
     }

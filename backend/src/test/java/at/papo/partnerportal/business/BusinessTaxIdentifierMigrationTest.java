@@ -33,6 +33,7 @@ class BusinessTaxIdentifierMigrationTest {
     // company logins, so the profile can be deleted like before add-company-tenancy.
     private void detachTenancy() {
         for (String table : new String[] { "partner", "product", "article_categories", "productimage" }) {
+            entityManager.createNativeQuery("alter table " + table + " alter column company_id drop not null").executeUpdate();
             entityManager.createNativeQuery("update " + table + " set company_id = null").executeUpdate();
         }
         entityManager.createNativeQuery("delete from company_login").executeUpdate();
@@ -81,7 +82,7 @@ class BusinessTaxIdentifierMigrationTest {
             assertEquals("ATU12345678", partner("PARTNER-DEMO").taxIdentifier.value);
             assertEquals("DE123456789", partner("P-1002").taxIdentifier.value);
             assertEquals("ATU34567890", partner("P-1003").taxIdentifier.value);
-            assertEquals(1, CompanyProfile.count("singletonKey", CompanyProfile.CURRENT_KEY));
+            assertEquals(1, CompanyProfile.count());
             assertEquals(3, requiredTaxColumnCount("partner"));
             assertEquals(3, requiredTaxColumnCount("companyprofile"));
         });
@@ -103,7 +104,7 @@ class BusinessTaxIdentifierMigrationTest {
         QuarkusTransaction.requiringNew().run(() -> {
             assertEquals("Elektro Huber GmbH", partner("PARTNER-DEMO").name);
             assertEquals("ATU12345678", partner("PARTNER-DEMO").taxIdentifier.value);
-            assertEquals(1, CompanyProfile.count("singletonKey", CompanyProfile.CURRENT_KEY));
+            assertEquals(1, CompanyProfile.count());
         });
     }
 
