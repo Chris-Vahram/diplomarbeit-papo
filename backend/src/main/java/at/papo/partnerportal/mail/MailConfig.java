@@ -14,8 +14,6 @@ public interface MailConfig {
 
     Optional<String> from();
 
-    Optional<String> companyRecipient();
-
     Optional<String> redirectTo();
 
     @WithDefault("false")

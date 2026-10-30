@@ -10,12 +10,8 @@ import jakarta.persistence.Entity;
 @Entity
 public class CompanyProfile extends PanacheEntity {
 
-    // The company is the tenant (add-company-tenancy). singletonKey is kept, nullable and unused,
-    // only so a restored pre-tenancy image still finds company 1 ('CURRENT'); Release B drops it.
-    public static final String CURRENT_KEY = "CURRENT";
-
-    @Column(unique = true, length = 16)
-    public String singletonKey;
+    // The company is the tenant (add-company-tenancy). The legacy column singletonkey stays in
+    // migrated databases (nullable, company 1 keeps 'CURRENT') only for a restored Release A image.
 
     @Column(nullable = false, length = 255)
     public String businessName;

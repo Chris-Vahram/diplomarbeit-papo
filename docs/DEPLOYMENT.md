@@ -171,8 +171,17 @@ das nicht zum Schema passt (der Gateway setzt SQL nie zurück):
   ohne Firma der einzigen Firma zu (`CompanyTenancyMigrationService.expand()`); `company_id`
   bleibt optional, Singleton-Schlüssel `CURRENT` und alte Unique-Constraints bleiben. Das
   vorige Image läuft auf diesem Schema weiter (lokal geprüft mit beiden JARs).
-- **Release B (contract):** erst nach A und gebundenem `company-demo`; setzt NOT NULL und
-  Eindeutigkeit je Firma. Erst danach Firma 2 anlegen.
+- **Release B (contract):** erst nach A und gebundenem `company-demo`
+  (`CompanyTenancyMigrationService.contract()`): setzt `company_id` auf NOT NULL, entfernt die
+  globalen Unique-Constraints auf `partner.partnernumber`, `article_categories.normalized_name`
+  und `companyprofile.singletonkey` und macht `singletonkey` optional. Partnernummer und
+  Kategoriename sind danach nur noch je Firma eindeutig. Das A-Image läuft auf diesem Schema
+  weiter. Erst danach Firma 2 anlegen.
+
+**Rollout Release B:** wie A Schritt 1–2 (Backup, SHA notieren, Merge → Deploy), danach als
+`company-demo` und `partner-demo` anmelden und prüfen. Prüfen des Schemas auf der VM:
+`select pg_get_constraintdef(oid) from pg_constraint where conrelid = 'partner'::regclass and contype = 'u';`
+zeigt nur noch `UNIQUE (company_id, partnernumber)`.
 
 **Rollout Release A:**
 
@@ -198,8 +207,8 @@ das nicht zum Schema passt (der Gateway setzt SQL nie zurück):
    Änderung ab, wenn das Login schon (als Firma oder Partner) verknüpft ist.
 4. Als `company-demo` anmelden und Partner, Artikel, Bestellungen, Dashboard prüfen (der
    Gateway prüft nur eine unauthentifizierte 401, dieser Check ist Pflicht). Unter
-   „Firmenprofil“ die „E-Mail für Bestellhinweise“ kontrollieren: ein gesetzter
-   `PAPO_MAIL_COMPANY_RECIPIENT` wurde beim ersten Start einmalig übernommen.
+   „Firmenprofil“ die „E-Mail für Bestellhinweise“ kontrollieren (seit Release B die einzige
+   Quelle; `PAPO_MAIL_COMPANY_RECIPIENT` wird nicht mehr gelesen).
 
 **Rollback:** Nach A jederzeit das vorige Image (Gateway-Restore oder `IMAGE_TAG=<sha>`), ohne
 SQL. Sobald nach Release B eine zweite Firma existiert, nie mehr ein Image vor Release A
@@ -218,8 +227,8 @@ Bestellungen zeigen dann „E-Mail-Versand ist nicht aktiviert“. Einschalten a
 
 1. SMTP-Daten der Firma in `.env.prod` eintragen (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`,
    `SMTP_PASSWORD`, `SMTP_START_TLS` bzw. `SMTP_TLS`) — nie in Git, nie in Chat/Issues.
-2. `PAPO_MAIL_FROM`, `PAPO_MAIL_COMPANY_RECIPIENT` und **`PAPO_MAIL_REDIRECT_TO`** (Testpostfach)
-   setzen, dann `PAPO_MAIL_ENABLED=true`. Ohne Umleitung startet das Backend nur mit
+2. `PAPO_MAIL_FROM` und **`PAPO_MAIL_REDIRECT_TO`** (Testpostfach) setzen, die Firmenadresse
+   im Portal unter „Firmenprofil“ → „E-Mail für Bestellhinweise“ eintragen, dann `PAPO_MAIL_ENABLED=true`. Ohne Umleitung startet das Backend nur mit
    `PAPO_MAIL_ALLOW_REAL_RECIPIENTS=true` — das bleibt aus, solange die VM Demo-Daten und
    bekannte Demo-Logins hat.
 3. Backend mit dem **aktiven Release** neu starten und mit einer Testbestellung prüfen; der Status
