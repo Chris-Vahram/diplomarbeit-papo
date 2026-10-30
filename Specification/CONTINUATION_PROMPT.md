@@ -5,9 +5,16 @@ Stabile Regeln stehen in `AGENTS.md` und `CLAUDE.md`. Der beschlossene/noch zu
 beschließende Ausbau ist in [PRODUCT_COMPLETION_PLAN.md](PRODUCT_COMPLETION_PLAN.md)
 geordnet. Dieses Dokument bleibt der einzige operative Session-Handoff.
 
-## Stand 29.10.2026 — hier einsteigen (Mandantenfähigkeit Release A wartet auf Merge)
+## Stand 30.10.2026 — hier einsteigen (Release A live, company-demo gebunden)
 
-**Offen, in dieser Reihenfolge:**
+**Erledigt 30.10.:** VM-Backup manuell erstellt (`deploy/backup/*-20261030-013703.dump`), PR #68
+(Backup-Fix) und PR #66 (Release A) gemergt und deployt, `company-demo` (Keycloak-ID `3755bf72-…`)
+an Firma 1 „Huemer GmbH“ gebunden (Provisionierungsskript, COMMIT). Firmenpostfach existiert noch
+nicht → „E-Mail für Bestellhinweise“ im Firmenprofil leer; Chris trägt es später im Portal ein
+(nicht mehr in `.env.prod`). Punkte 1–3 unten sind damit erledigt bis auf Backup-Skript auf die VM
+kopieren + Cron einrichten.
+
+**Ursprüngliche Reihenfolge (Stand 29.10.):**
 1. **Backup auf der VM** (Chris). `backup.sh` brach ab (`.env.prod` Zeile 11 mit Sonderzeichen,
    Skript las die ganze Datei per `.`). Fix = PR #68 (`fix/backup-env-parsing`, liest nur `DB_USER`).
    Es gibt **kein** `backup.log` → der nächtliche Cron war nie eingerichtet; es existieren keine

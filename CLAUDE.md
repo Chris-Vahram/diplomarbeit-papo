@@ -2,7 +2,7 @@
 
 ### Vorrangiger Next-Session-Orchesterstand — 29.10.2026
 
-- Einstieg: `Specification/CONTINUATION_PROMPT.md`, Abschnitt „Stand 29.10.2026 — hier einsteigen“. Reihenfolge: VM-Backup (PR #68) → PR #66 mergen (Mandantenfähigkeit Release A) → sofort `company-demo` binden → erst dann Release B. Antworten an Chris kurz, ein Befehl pro Codeblock.
+- Einstieg: `Specification/CONTINUATION_PROMPT.md`, Abschnitt „Stand 30.10.2026 — hier einsteigen“. Release A (Mandantenfähigkeit) ist live, `company-demo` gebunden. Nächstes: Backup-Skript + Cron auf der VM, Mail-Testbestellung, dann Release B (Task 3.4). Antworten an Chris kurz, ein Befehl pro Codeblock (`/i-have-adhd`).
 
 ### Vorheriger Orchesterstand — 22.10.2026
 
