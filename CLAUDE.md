@@ -1,8 +1,8 @@
 # CLAUDE.md – Partnerportal (Diplomarbeit)
 
-### Vorrangiger Next-Session-Orchesterstand — 29.10.2026
+### Vorrangiger Next-Session-Orchesterstand — 31.10.2026
 
-- Einstieg: `Specification/CONTINUATION_PROMPT.md`, Abschnitt „Stand 30.10.2026 (Nachmittag)“. Mandantenfähigkeit (Release A+B) live und archiviert, Firma 2 auf der VM angelegt. Nächstes: Backup-Cron, Mail-Testbestellung, Demo-Logins vor echten Daten entfernen. Antworten an Chris kurz, ein Befehl pro Codeblock (`/i-have-adhd`).
+- Einstieg: `Specification/CONTINUATION_PROMPT.md`, Abschnitt „Stand 31.10.2026 — hier einsteigen“. Mandantenfähigkeit A+B live und archiviert (2 Firmen auf der VM), nächtliches Backup läuft, Bestell-Mails werden zugestellt (Umleitung an bis echte Daten). Nächster Kandidat: `add-article-tax-rate`; Checkliste „Vor echten Daten“ im Handoff. Antworten an Chris kurz, ein Befehl pro Codeblock (`/i-have-adhd`).
 
 ### Vorheriger Orchesterstand — 22.10.2026
 
@@ -31,7 +31,7 @@ der Handoff trennt davon menschliche Thesis-/UI-Abnahme und die SSH-Negativmatri
 
 ## Aktueller Orchesterstatus — 25.09.2026
 
-Aktive OpenSpec-Changes (Stand 22.10.2026): `send-order-emails` 5/6,
+Aktive OpenSpec-Changes (Stand 31.10.2026; `add-company-tenancy` am 30.10. archiviert): `send-order-emails` 5/6 (wartet auf echte Empfänger), `add-article-tax-rate` 0/17,
 `complete-thesis-documentation` 4/6, `decouple-partner-number-from-login` 0/4, `add-unique-bmd-article-number` 0/6, dazu Tobias' 9 offene Shop-Changes (`add-shop-page-renderer` und `add-shop-builder-editor` am 20.10. archiviert).
 `harden-tax-identifier-rollout` ist vollständig und archiviert. Die vollständige offene Liste, Protokollauswertung und der Startprompt stehen in
 `Specification/CONTINUATION_PROMPT.md`. Chris hat Push auf `main` samt Deploy für
