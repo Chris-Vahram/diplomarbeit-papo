@@ -1,11 +1,38 @@
 # PAPO – Next-Session-Context
 
-**Stand:** 29.10.2026. Operative Übergabe; volatile Angaben beim Start prüfen.
+**Stand:** 31.10.2026. Operative Übergabe; volatile Angaben beim Start prüfen.
 Stabile Regeln stehen in `AGENTS.md` und `CLAUDE.md`. Der beschlossene/noch zu
 beschließende Ausbau ist in [PRODUCT_COMPLETION_PLAN.md](PRODUCT_COMPLETION_PLAN.md)
 geordnet. Dieses Dokument bleibt der einzige operative Session-Handoff.
 
-## Stand 30.10.2026 (Nachmittag) — hier einsteigen (Mandantenfähigkeit komplett, archiviert)
+## Stand 31.10.2026 — hier einsteigen (Handoff-Liste abgearbeitet)
+
+**Live auf paportal.at (alles geprüft):**
+- Mandantenfähigkeit A+B archiviert (PR #66/#71/#72). Firma 1 „Huemer GmbH“ (`company-demo`,
+  `partner-demo`), Firma 2 „Testfirma Zwei GmbH“ (`company-zwei`, `partner-zwei` → Partner `P-1002`;
+  Zufallspasswörter in Vaultwarden, standen aber im Chatprotokoll → vor echten Daten rotieren).
+- Backup: Cron `0 3 * * *` auf der VM läuft (erste Dumps 31.10. 03:00). `backup.log` bleibt bei Erfolg
+  leer; Kontrolle über das Datum der neuesten `*.dump`.
+- Bestell-E-Mails: SMTP `mail.paportal.at:465` (TLS, STARTTLS aus), Login = Absender
+  `no-reply@paportal.at`, `PAPO_MAIL_REDIRECT_TO` = Chris' HTL-Postfach. Firmenprofil Firma 1:
+  „E-Mail für Bestellhinweise“ = `test@paportal.at`. Testbestellungen 301/351/401/402 zugestellt
+  (Partner + Firma). Details `docs/DEPLOYMENT.md` „Bestell-E-Mails“ (PR #73).
+
+**Entscheidung Chris (31.10.):** Echte Empfänger erst, wenn echte Daten kommen; bis dahin nur Demos,
+Umleitung bleibt an. `send-order-emails` bleibt deshalb 5/6 offen (nur 4.2-Entscheidung fehlt).
+
+**Vor echten Daten (Checkliste):** Demo-Logins deaktivieren, Hinweis „Passwort = Benutzername“ auf der
+Login-Seite entfernen, Passwörter `company-zwei`/`partner-zwei` rotieren, Umleitung abschalten
+(`PAPO_MAIL_ALLOW_REAL_RECIPIENTS=true`), echte Firmenadresse im Firmenprofil, dann
+`send-order-emails` archivieren. Drei GitHub-Tokens im KI-Roharchiv widerrufen (seit 16.10. offen).
+
+**Nächster Arbeitsblock (Kandidaten):** `add-article-tax-rate` 0/17 (Chris übernimmt, sobald Tobias
+bestätigt; Voraussetzung für `add-shop-guest-checkout`). Sonst wartet alles auf Externe: BMD-Daten
+(`decouple-partner-number-from-login`, `add-unique-bmd-article-number`), Thesis-Abnahme
+(`complete-thesis-documentation` 4/6), Tobias' Shop-Changes. Tobias hat am 31.10. eine Kurzinfo zu
+Mandantenfähigkeit/Mail/Backup bekommen (Shop-Code muss Firmendaten über die Firma des Partners lesen).
+
+## Stand 30.10.2026 (Nachmittag) — Mandantenfähigkeit komplett, archiviert
 
 **Erledigt:** Release B (PR #71, contract-Migration, `singletonKey` und `PAPO_MAIL_COMPANY_RECIPIENT`
 entfernt) live; Firma 2 „Testfirma Zwei GmbH“ mit `company-zwei`/`partner-zwei` (Zufallspasswörter →
