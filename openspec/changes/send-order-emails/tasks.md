@@ -15,3 +15,5 @@
 
 - [x] 4.1 Run focused tests, full `./mvnw test`, `./mvnw package`, `node --check`, `openspec validate send-order-emails --strict`, `git diff --check`, partnerportal-quality and an independent security/Java review; manual Mailpit check of all four mail types with umlauts.
 - [ ] 4.2 Decisions taken 2026-10-15 (neutral completion mail, functional company mailbox, 90-day address removal for failed mails). After SMTP data and a test inbox from the company: set VM secrets, enable with `redirect-to` a test inbox, verify delivery, decide with Chris when real recipients are allowed.
+
+- 4.2 progress (30.10.2026): VM sends via `mail.paportal.at:465` (TLS), login and sender `no-reply@paportal.at`, `redirect-to` Chris' HTL inbox. Test orders 301, 351, 401 (partner-demo) delivered to the test inbox with redirect note; earlier failures were a wrong host (object storage), closed port 587 and a login/sender mismatch (`REJECTED`). Open: company "E-Mail für Bestellhinweise" for Huemer GmbH (company notice is SKIPPED `NO_RECIPIENT`), decision on real recipients (only after demo logins are removed), then archive.

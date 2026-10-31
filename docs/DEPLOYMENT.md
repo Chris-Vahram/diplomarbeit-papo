@@ -227,6 +227,11 @@ Bestellungen zeigen dann „E-Mail-Versand ist nicht aktiviert“. Einschalten a
 
 1. SMTP-Daten der Firma in `.env.prod` eintragen (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`,
    `SMTP_PASSWORD`, `SMTP_START_TLS` bzw. `SMTP_TLS`) — nie in Git, nie in Chat/Issues.
+   Für paportal.at (geprüft 30.10.2026): `SMTP_HOST=mail.paportal.at`, `SMTP_PORT=465`,
+   `SMTP_TLS=true`, `SMTP_START_TLS=DISABLED` (Port 587 ist von der VM aus zu),
+   `SMTP_USERNAME=no-reply@paportal.at` — Login und Absender (`PAPO_MAIL_FROM`) müssen dasselbe
+   Postfach sein, sonst lehnt der Server ab (`REJECTED`). `*.your-objectstorage.com` ist der
+   Hetzner-Objektspeicher, kein SMTP-Server.
 2. `PAPO_MAIL_FROM` und **`PAPO_MAIL_REDIRECT_TO`** (Testpostfach) setzen, die Firmenadresse
    im Portal unter „Firmenprofil“ → „E-Mail für Bestellhinweise“ eintragen, dann `PAPO_MAIL_ENABLED=true`. Ohne Umleitung startet das Backend nur mit
    `PAPO_MAIL_ALLOW_REAL_RECIPIENTS=true` — das bleibt aus, solange die VM Demo-Daten und
