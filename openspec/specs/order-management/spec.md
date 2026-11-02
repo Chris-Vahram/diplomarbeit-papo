@@ -2,9 +2,7 @@
 
 ## Purpose
 Partner-driven orders for end customers with automatic partner assignment, the status flow submitted -> reviewed -> fulfilled, shipping confirmation, and guards against inactive partners, double submission and unrealistic quantities.
-
 ## Requirements
-
 ### Requirement: Shipping confirmation on fulfilment
 When the company advances an order to `fulfilled`, the system SHALL render a simulated shipping confirmation in-app (no real e-mail send), consistent with the simulated order confirmation shown on submission. This satisfies the shipping-confirmation half of FR-17, which is currently missing.
 
@@ -94,11 +92,15 @@ The system SHALL automatically assign each order to the partner who created it.
 - **THEN** the stored order's assigned partner is that partner, with no manual assignment step
 
 ### Requirement: Order storage
-The system SHALL store per order at least: order identifier, order date, assigned partner, end customer, ordered articles with quantities (order items, with a unit-price snapshot), order status, and derived order value.
+The system SHALL store per order at least: order identifier, order date, assigned partner, end customer, ordered articles with quantities (order items, with a gross unit-price snapshot and a tax-rate snapshot), order status, derived gross order value, derived net order value and derived tax amount.
 
 #### Scenario: Order record completeness
 - **WHEN** an order is created
-- **THEN** the stored order contains all listed fields and each order item keeps the unit price at time of order
+- **THEN** the stored order contains all listed fields and each order item keeps the gross unit price and tax rate at time of order
+
+#### Scenario: Later price change does not alter orders
+- **WHEN** the company changes an article's price or tax rate after an order was placed
+- **THEN** the existing order's items, totals and commission remain unchanged
 
 ### Requirement: Order visibility
 The system SHALL show the company all orders of its own partners and only its own orders to each partner. Orders of another company's partners SHALL be invisible and unchangeable for the company.
