@@ -1,10 +1,12 @@
 import { escapeHtml } from "../lib/html.js";
 import { COLOR_ROLES } from "./block-schema.js";
+import { findingsHtml } from "./assistant/assistant-view.js";
 
 // "Design" tab (shop-builder spec "Design tab"): all theme colours with picker and hex input,
 // heading and body font from the curated list. Edits dispatch "theme-change" ({ theme, key });
 // the builder saves the draft and shows it in the preview. "Design veröffentlichen"
-// dispatches "theme-publish".
+// dispatches "theme-publish". The design assistant's theme findings (contrast of the colour
+// pairs) stand above the publish button, and the colours concerned are marked.
 
 const HEX = /^#[0-9a-f]{6}$/i;
 // Form presets of the shop renderer (shop.css [data-form]); themes without form mean "klar".
@@ -17,14 +19,42 @@ const FORMS = [
 class ShopDesignPanel extends HTMLElement {
   #theme = null;
   #fonts = [];
+  #findings = [];
 
   // dto = ShopThemeDto from the server; draft = the editor's current theme draft.
-  set data({ draft, fonts, draftChanged }) {
+  set data({ draft, fonts, draftChanged, findings = [] }) {
     const first = this.#theme === null;
     this.#theme = draft;
     this.#fonts = fonts;
+    this.#findings = findings;
     if (first || !this.contains(document.activeElement)) this.#render();
     this.#renderState(draftChanged);
+    this.#renderFindings();
+  }
+
+  // Keyboard focus on a colour named by a finding ("Zum Problem springen").
+  focusColor(role) {
+    const input = this.querySelector(`[data-color-hex="${CSS.escape(role)}"]`);
+    input?.scrollIntoView({ block: "center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    input?.focus({ preventScroll: true });
+    input?.select();
+  }
+
+  #renderFindings() {
+    const container = this.querySelector("[data-findings]");
+    if (!container) return;
+    container.hidden = !this.#findings.length;
+    container.innerHTML = this.#findings.length ? findingsHtml(this.#findings) : "";
+    const flagged = new Map();
+    this.#findings.forEach((finding) => {
+      if (finding.role && !flagged.has(finding.role)) flagged.set(finding.role, finding.severity);
+    });
+    this.querySelectorAll(".builder-color").forEach((row) => {
+      const severity = flagged.get(row.querySelector("[data-color]")?.dataset.color);
+      if (severity) row.dataset.flag = severity;
+      else delete row.dataset.flag;
+    });
+    window.lucide?.createIcons();
   }
 
   connectedCallback() {
@@ -63,6 +93,7 @@ class ShopDesignPanel extends HTMLElement {
             <input type="text" data-color-hex="${role}" value="${escapeHtml(value.toUpperCase())}" maxlength="7" aria-label="${escapeHtml(label)} als Hex-Wert" />
           </div>`;
         }).join("")}
+        <div class="assistant-inline" data-findings hidden></div>
         <h4 class="builder-props__group">Schriften</h4>
         <div class="builder-field"><label for="theme-heading-font">Überschriften</label>
           <select id="theme-heading-font" data-font="headingFont">${fontOptions(this.#theme.headingFont)}</select></div>

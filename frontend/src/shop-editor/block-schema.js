@@ -15,6 +15,7 @@ export const BLOCK_TYPES = {
     label: "Hero/Banner",
     description: "Großer Einstieg mit Titel, Text und Schaltfläche",
     fields: [
+      { name: "logoId", label: "Logo", kind: "image" },
       text("title", "Titel", 120, { required: true }),
       text("text", "Text", 400, { multiline: true }),
       { name: "imageId", label: "Hintergrundbild", kind: "image" },
@@ -154,7 +155,7 @@ export function newBlock(type) {
   return { id: crypto.randomUUID(), type, config: structuredClone(BLOCK_TYPES[type].defaults ?? {}) };
 }
 
-function isEmpty(value) {
+export function isEmpty(value) {
   return value === undefined || value === null || (typeof value === "string" && !value.trim())
     || (Array.isArray(value) && value.length === 0);
 }

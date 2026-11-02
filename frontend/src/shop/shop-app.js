@@ -80,6 +80,7 @@ async function startPreview() {
   window.addEventListener("message", (event) => {
     if (event.origin !== location.origin || event.source !== window.parent) return;
     if (event.data?.type === PREVIEW_DATA) renderPreview(event.data.payload);
+    else if (event.data?.type === "papo-shop-focus") previewTools?.focusBlock(event.data.blockId);
   });
   // Links lead nowhere in the preview; a click on a block selects it in the editor instead.
   root.addEventListener("click", (event) => {
@@ -104,14 +105,14 @@ function renderPreview(data) {
     root.className = "shop-root shop-root--bare shop-root--preview";
     root.innerHTML = `<main class="shop-main"></main>`;
     const view = document.createElement("shop-page-view");
-    view.data = { blocks: data.page.blocks, context: { api, article: data.article } };
+    view.data = { blocks: data.page.blocks, context: { api, article: data.article, shopName: data.shop.displayName } };
     root.querySelector("main").append(view);
     // Lets the editor measure the drawn block (palette hover preview).
     window.parent.postMessage({ type: "papo-shop-rendered" }, location.origin);
     return;
   }
   const layoutKey = JSON.stringify([data.shop, data.navigation, data.page.path]);
-  const contextKey = JSON.stringify([data.assetUrls, data.imageUrls, data.article?.id ?? null,
+  const contextKey = JSON.stringify([data.assetUrls, data.imageUrls, data.article?.id ?? null, data.shop.displayName,
     data.articles.map((article) => article.id)]);
   if (previewState?.layoutKey !== layoutKey) {
     const scrollY = window.scrollY;
@@ -124,7 +125,7 @@ function renderPreview(data) {
   }
   if (previewState.contextKey !== contextKey) {
     previewState.contextKey = contextKey;
-    previewState.context = { api, article: data.article };
+    previewState.context = { api, article: data.article, shopName: data.shop.displayName };
   }
   const { view } = previewState;
   view.update({ blocks: data.page.blocks, context: previewState.context });
@@ -132,7 +133,7 @@ function renderPreview(data) {
   if (data.selectedBlockId) {
     view.querySelector(`[data-block-id="${CSS.escape(data.selectedBlockId)}"]`)?.classList.add("shop-block--selected");
   }
-  previewTools?.afterRender(view, data.selectedBlockId);
+  previewTools?.afterRender(view, data.selectedBlockId, data.markers);
 }
 
 async function start() {
@@ -179,7 +180,7 @@ async function start() {
       document.head.append(meta);
     }
     const view = document.createElement("shop-page-view");
-    view.data = { blocks: page.blocks, context: { api, article } };
+    view.data = { blocks: page.blocks, context: { api, article, shopName: shop.displayName } };
     main.append(view);
   } catch {
     document.title = shop.displayName;
@@ -221,7 +222,7 @@ function startDemo() {
     document.title = article ? `${article.name} – ${demo.shop.displayName}` : demo.shop.displayName;
     const main = renderLayout(api, demo.shop, demo.navigation, isDetail ? "artikel" : key);
     const view = document.createElement("shop-page-view");
-    view.data = { blocks: demo.pages[key].blocks, context: { api, article } };
+    view.data = { blocks: demo.pages[key].blocks, context: { api, article, shopName: demo.shop.displayName } };
     main.append(view);
     window.scrollTo(0, 0);
   }

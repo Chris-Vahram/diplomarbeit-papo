@@ -127,12 +127,12 @@ class ShopBlockValidatorTest {
                 page(block("hero", "{\"buttonPage\":7}")), ShopPageSlot.HOME, REFS, false));
     }
 
-    // ShopAssetService.isPublished searches published pages for "imageId" in the database.
+    // ShopAssetService.isPublished searches published pages for "imageId" and "logoId" in the database.
     @Test
-    void everyImageFieldIsNamedImageId() {
+    void everyImageFieldIsImageIdOrLogoId() {
         for (ShopBlockType type : ShopBlockType.values()) {
             type.fields.values().stream().filter(field -> field.kind() == ShopBlockField.Kind.IMAGE)
-                    .forEach(field -> assertEquals("imageId", field.name(), type.id));
+                    .forEach(field -> assertTrue(Set.of("imageId", "logoId").contains(field.name()), type.id));
         }
     }
 

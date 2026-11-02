@@ -271,6 +271,9 @@ h2.shop-heading { font-size: clamp(1.625rem, 2.8vw, 2.375rem); }
 .shop-align-center .shop-hero__content { margin-inline: auto; }
 .shop-hero .shop-text { font-size: clamp(1.0625rem, 1.4vw, 1.25rem); line-height: 1.55; }
 .shop-hero h1.shop-heading { margin-bottom: 1.25rem; }
+/* Partner logo above the hero title; any aspect, never wider than a short word mark. */
+.shop-hero__logo { display: block; width: auto; max-width: min(14rem, 60%); max-height: 4.5rem; margin-bottom: 1.5rem; object-fit: contain; }
+.shop-align-center .shop-hero__logo { margin-inline: auto; }
 .shop-hero__media img { width: 100%; height: 100%; object-fit: cover; }
 
 /* ---- Image and image + text --------------------------------------------------------- */

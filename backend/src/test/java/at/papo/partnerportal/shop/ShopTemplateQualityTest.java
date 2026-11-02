@@ -11,11 +11,12 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-// shop-templates spec "Template quality", provisional until add-shop-design-assistant exists:
-// every template is checked with its own theme suggestion and with the default theme against
-// the assistant's contrast thresholds (Warnung below 4.5:1, Blocker below 3:1) and alt-text rule.
-// Required fields and references are already enforced when the catalogue loads (see
-// ShopTemplateCatalogTest). Switch this test to the assistant's rule units once they exist.
+// shop-templates spec "Template quality": every template is checked with its own theme
+// suggestion and with the default theme against the design assistant's contrast thresholds
+// (Warnung below 4.5:1, Blocker below 3:1, formula from ShopContrast) and alt-text rule.
+// Templates must not even raise a Warnung, so this is stricter than ShopDesignRules, which only
+// re-checks blockers on publish. Required fields and references are already enforced when the
+// catalogue loads (see ShopTemplateCatalogTest).
 class ShopTemplateQualityTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -128,34 +129,15 @@ class ShopTemplateQualityTest {
         }
     }
 
-    // Same choice as onColor in frontend/src/shop/shop-theme.js.
-    static String onColor(String hex) {
-        return contrast("#111111", hex) > contrast("#FFFFFF", hex) ? "#111111" : "#ffffff";
+    private static String onColor(String hex) {
+        return ShopContrast.onColor(hex);
     }
 
-    static double contrast(String a, String b) {
-        double la = luminance(a);
-        double lb = luminance(b);
-        return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+    private static double contrast(String a, String b) {
+        return ShopContrast.contrast(a, b);
     }
 
-    private static double luminance(String hex) {
-        double[] rgb = new double[3];
-        for (int i = 0; i < 3; i++) {
-            double value = Integer.parseInt(hex.substring(1 + 2 * i, 3 + 2 * i), 16) / 255.0;
-            rgb[i] = value <= 0.03928 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4);
-        }
-        return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
-    }
-
-    // color-mix(in srgb, a share%, b) as used for --shop-muted.
     private static String mix(String a, String b, double share) {
-        StringBuilder out = new StringBuilder("#");
-        for (int i = 0; i < 3; i++) {
-            int x = Integer.parseInt(a.substring(1 + 2 * i, 3 + 2 * i), 16);
-            int y = Integer.parseInt(b.substring(1 + 2 * i, 3 + 2 * i), 16);
-            out.append(String.format("%02x", Math.round(x * share + y * (1 - share))));
-        }
-        return out.toString();
+        return ShopContrast.mix(a, b, share);
     }
 }

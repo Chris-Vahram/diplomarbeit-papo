@@ -4692,3 +4692,181 @@ shop-demo-viewer[hidden] { display: none; }
 @media (max-width: 1199px) {
   .builder-frame[data-device="mobile"] { width: 24.375rem; max-width: 100%; height: auto; }
 }
+
+/* ============================================================
+   Design assistant in the shop builder (add-shop-design-assistant)
+   Severity always as icon plus word: Blocker (error), Warnung (warning), Tipp (info).
+   ============================================================ */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Status in the page bar: what the assistant currently says about the page. */
+.assistant-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  height: 2rem;
+  padding: 0 var(--spacing-3);
+  border: 0.0625rem solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-in-out), transform 100ms ease-out;
+}
+.assistant-status:hover { background: var(--bg-subtle); }
+.assistant-status:active { transform: scale(0.97); }
+.assistant-status svg { width: 1rem; height: 1rem; flex-shrink: 0; }
+.assistant-status[data-severity="none"] svg { color: var(--color-success-700); }
+.assistant-status[data-severity="tip"] svg { color: var(--color-info-800); }
+.assistant-status[data-severity="warning"] { border-color: var(--color-warning-100); background: var(--color-warning-50); color: var(--color-warning-800); }
+.assistant-status[data-severity="blocker"] { border-color: var(--color-error-100); background: var(--color-error-50); color: var(--color-error-700); }
+.assistant-status[data-severity="warning"]:hover { background: var(--color-warning-100); }
+.assistant-status[data-severity="blocker"]:hover { background: var(--color-error-100); }
+
+.assistant-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
+  padding: 0.125rem 0.5rem 0.125rem 0.375rem;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1.5;
+}
+.assistant-badge svg { width: 0.875rem; height: 0.875rem; }
+.assistant-badge--blocker { background: var(--color-error-100); color: var(--color-error-700); }
+.assistant-badge--warning { background: var(--color-warning-100); color: var(--color-warning-800); }
+.assistant-badge--tip { background: var(--color-info-100); color: var(--color-info-800); }
+
+.assistant-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin: 0 0 var(--spacing-1);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+.assistant-summary svg { width: 1.125rem; height: 1.125rem; color: var(--color-success-700); }
+
+/* Findings separate by hairlines, not cards: the inspector is already a panel. */
+.assistant-list { list-style: none; margin: var(--spacing-3) 0 0; padding: 0; }
+.assistant-item {
+  display: grid;
+  gap: var(--spacing-1);
+  padding: var(--spacing-3) 0;
+  border-top: 0.0625rem solid var(--border-default);
+  font-size: var(--font-size-sm);
+}
+.assistant-item:first-child { border-top: 0; padding-top: 0; }
+/* Missing alt text: the emphasised Warnung (spec "Alt-text rule"). */
+.assistant-item.is-emphasis {
+  padding: var(--spacing-3);
+  border: 0.0625rem solid var(--color-warning-100);
+  border-radius: var(--radius-md);
+  background: var(--color-warning-50);
+}
+.assistant-item.is-emphasis + .assistant-item { border-top: 0; }
+.assistant-item__head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2); }
+.assistant-item__place { color: var(--text-secondary); font-size: var(--font-size-xs); }
+.assistant-item__title { margin: var(--spacing-1) 0 0; font-weight: var(--font-weight-semibold); color: var(--text-primary); }
+.assistant-item__why,
+.assistant-item__fix { margin: 0; line-height: 1.5; }
+.assistant-item__why { color: var(--text-secondary); }
+.assistant-item__fix { color: var(--text-primary); }
+.assistant-item__jump {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  margin-top: var(--spacing-1);
+  padding: var(--spacing-1) 0;
+  border: 0;
+  background: none;
+  color: var(--text-brand);
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color var(--duration-fast) var(--ease-in-out);
+}
+.assistant-item__jump:hover { text-decoration-color: currentColor; }
+.assistant-item__jump svg { width: 0.875rem; height: 0.875rem; transition: transform var(--duration-fast) var(--ease-in-out); }
+.assistant-item__jump:hover svg { transform: translateX(0.125rem); }
+.assistant-item__jump:focus-visible { outline: none; box-shadow: var(--shadow-focus-ring); border-radius: var(--radius-sm); }
+
+.assistant-tips { margin-top: var(--spacing-3); border-top: 0.0625rem solid var(--border-default); padding-top: var(--spacing-3); }
+.assistant-tips:first-child { margin-top: var(--spacing-2); border-top: 0; padding-top: 0; }
+.assistant-tips > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-label);
+  list-style: none;
+}
+.assistant-tips > summary::-webkit-details-marker { display: none; }
+.assistant-tips > summary svg { width: 1rem; height: 1rem; flex-shrink: 0; color: var(--color-info-800); }
+.assistant-tips > summary::after {
+  content: "";
+  width: 0.4375rem;
+  height: 0.4375rem;
+  margin-left: auto;
+  border-right: 0.125rem solid currentColor;
+  border-bottom: 0.125rem solid currentColor;
+  transform: rotate(45deg) translate(-0.125rem, -0.125rem);
+  transition: transform var(--duration-fast) var(--ease-in-out);
+}
+.assistant-tips[open] > summary::after { transform: rotate(225deg) translate(-0.0625rem, -0.0625rem); }
+.assistant-tips > summary:focus-visible { outline: none; box-shadow: var(--shadow-focus-ring); border-radius: var(--radius-sm); }
+
+/* Block inspector and Design tab: the block's or the design's own findings above the fields. */
+.assistant-inline { margin-bottom: var(--spacing-4); padding-bottom: var(--spacing-3); border-bottom: 0.0625rem solid var(--border-default); }
+.assistant-inline .assistant-list { margin-top: 0; }
+shop-design-panel .assistant-inline { margin: var(--spacing-1) 0 0; padding: var(--spacing-3); border: 0.0625rem solid var(--border-default); border-radius: var(--radius-md); background: var(--bg-subtle); }
+.assistant-select-hint { margin-top: var(--spacing-4); }
+
+/* Inline markers at fields, colours and block rows. */
+.builder-field[data-flag="warning"] :is(input, textarea, select) { border-color: var(--color-warning-600); }
+.builder-field[data-flag="blocker"] :is(input, textarea, select) { border-color: var(--color-error-600); }
+.builder-field[data-flag="warning"] > label::after,
+.builder-field[data-flag="blocker"] > label::after {
+  content: " · Hinweis";
+  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-xs);
+}
+.builder-field[data-flag="warning"] > label::after { color: var(--color-warning-800); }
+.builder-field[data-flag="blocker"] > label::after { content: " · muss ausgefüllt sein"; color: var(--color-error-700); }
+.builder-color[data-flag="warning"] input[type="text"] { border-color: var(--color-warning-600); }
+.builder-color[data-flag="blocker"] input[type="text"] { border-color: var(--color-error-600); }
+.block-row__flag { display: inline-flex; vertical-align: -0.125rem; margin-left: var(--spacing-1); }
+.block-row__flag svg { width: 0.875rem; height: 0.875rem; }
+.block-row__flag--warning { color: var(--color-warning-800); }
+.block-row__flag--blocker { color: var(--color-error-700); }
+
+/* Publish dialog: the list scrolls, the decision stays in view. */
+.publish-check > p:first-child { margin-top: 0; }
+.publish-check .assistant-list { max-height: min(50vh, 26rem); overflow-y: auto; padding-right: var(--spacing-1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .assistant-status,
+  .assistant-item__jump svg,
+  .assistant-tips > summary::after { transition: none; }
+}

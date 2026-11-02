@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "frontend/src/shop-editor/block-properties.js"
+        ],
+        "createdAt": "2026-10-26T19:36:14.483Z",
+        "reason": "Claude: thumbnail stays hidden until the authenticated object URL has loaded (src set in #loadThumbs)"
+      }
+    ]
+  }
+}

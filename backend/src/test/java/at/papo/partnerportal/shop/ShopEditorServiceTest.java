@@ -321,6 +321,28 @@ class ShopEditorServiceTest {
         assertTrue(publishedPage.contains("#0A5C36"));
     }
 
+    // shop-design-assistant "Publish gating": the server re-checks contrast blockers.
+    @Test
+    void unreadableTextStopsPageAndDesignPublishing() throws Exception {
+        long partnerId = createPartner();
+        ShopPageDto home = tx(() -> pageBySegment(partnerId, "startseite"));
+        ShopPageDto grey = saveDraft(partnerId, home,
+                block("heading-text", "{\"heading\":\"Hallo\",\"background\":\"surface\",\"colors\":{\"text\":\"#BBBBBB\"}}"));
+        String pageRejection = rejection(() -> editorService.publish(partner(partnerId), grey.id(), grey.version()));
+        assertTrue(pageRejection.startsWith("Text ist kaum lesbar, deshalb kann diese Seite nicht veröffentlicht werden."),
+                pageRejection);
+        assertFalse(tx(() -> ShopPage.<ShopPage>findById(home.id()).publishedContent).contains("#BBBBBB"));
+
+        ShopThemeDto theme = tx(() -> editorService.theme(partner(partnerId)));
+        ObjectNode draft = theme.draft().deepCopy();
+        ((ObjectNode) draft.get("colors")).put("text", "#DDDDDD");
+        ShopThemeDto savedTheme = tx(() -> editorService.saveThemeDraft(partner(partnerId),
+                new ShopEditorRequests.ThemeDraft(draft, theme.version())));
+        String themeRejection = rejection(() -> editorService.publishTheme(partner(partnerId), savedTheme.version()));
+        assertTrue(themeRejection.contains("Text auf dem Seitenhintergrund: Kontrast"), themeRejection);
+        assertEquals(theme.published(), tx(() -> editorService.theme(partner(partnerId))).published());
+    }
+
     @Test
     void republishingUnchangedContentKeepsTheRestorePoint() throws Exception {
         long partnerId = createPartner();

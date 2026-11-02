@@ -36,6 +36,14 @@ class ShopPageManager extends HTMLElement {
     this.#renderList();
   }
 
+  // Design assistant "Zum Problem springen" for page settings (SEO title).
+  openSettings(id, field = "seoTitle") {
+    const page = this.#list?.pages.find((candidate) => candidate.id === id);
+    if (!page) return;
+    this.#openSettings(page);
+    this.querySelector("#page-settings-form")[field]?.focus();
+  }
+
   connectedCallback() {
     this.innerHTML = `
       <div class="page-manager">
