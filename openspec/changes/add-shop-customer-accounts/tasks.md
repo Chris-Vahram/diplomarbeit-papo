@@ -1,13 +1,13 @@
 ## 1. Identity (essential)
 
-- [ ] 1.1 Realm export `papo-shop`: public client with PKCE, registration, verify e-mail, reset, password policy, brute-force protection, SMTP from secrets
-- [ ] 1.2 Quarkus OIDC tenant `papo-shop` for `/api/shop-customer/*`; tests that portal APIs reject shop tokens and vice versa
+- [x] 1.1 Realm export `papo-shop`: public client with PKCE, registration, verify e-mail, reset, password policy, brute-force protection, SMTP from secrets
+- [x] 1.2 Quarkus OIDC tenant `papo-shop` for `/api/shop-customer/*`; tests that portal APIs reject shop tokens and vice versa
 
 ## 2. Backend (essential)
 
-- [ ] 2.1 `ShopCustomerAccount` profile endpoints
-- [ ] 2.2 Link checkout orders/Kunde to account subject; own orders endpoint with ownership check
-- [ ] 2.3 Data export and account deletion (restricted service account); tests
+- [x] 2.1 `ShopCustomerAccount` profile endpoints
+- [x] 2.2 Link checkout orders/Kunde to account subject; own orders endpoint with ownership check
+- [x] 2.3 Data export and account deletion (restricted service account); tests
 
 ## 3. Frontend (essential)
 

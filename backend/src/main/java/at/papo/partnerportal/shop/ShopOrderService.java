@@ -66,6 +66,13 @@ public class ShopOrderService {
     }
 
     public ShopOrderConfirmationDto submit(PartnerShop shop, ShopOrderRequest request, String clientIp) {
+        return submit(shop, request, clientIp, null);
+    }
+
+    // accountSubject: papo-shop subject of a logged-in customer (add-shop-customer-accounts),
+    // null for a guest. Validation, pricing and the created Kunde are the same either way.
+    public ShopOrderConfirmationDto submit(PartnerShop shop, ShopOrderRequest request, String clientIp,
+                                           String accountSubject) {
         if (!rateLimiter.tryAcquire(clientIp)) {
             throw new ApiException(429, "Zu viele Bestellungen. Bitte kurz warten.");
         }
@@ -81,14 +88,15 @@ public class ShopOrderService {
         KundeRequest customer = customer(request.customer());
         List<OrderItemRequest> items = items(request.items());
         try {
-            return QuarkusTransaction.requiringNew().call(() -> create(shop.id, key, customer, items));
+            return QuarkusTransaction.requiringNew().call(() -> create(shop.id, key, customer, items, accountSubject));
         } catch (PersistenceException e) {
             // A concurrent submit with the same key won the unique constraint: answer with its order.
             return previous(shop.id, key).orElseThrow(() -> e);
         }
     }
 
-    private ShopOrderConfirmationDto create(long shopId, String key, KundeRequest customer, List<OrderItemRequest> items) {
+    private ShopOrderConfirmationDto create(long shopId, String key, KundeRequest customer, List<OrderItemRequest> items,
+                                            String accountSubject) {
         PartnerShop shop = PartnerShop.findById(shopId);
         // Stale key of the same shop past its lifetime (cleanup not yet run): free it for reuse.
         ShopOrderKey.delete("shop = ?1 and requestKey = ?2 and createdAt < ?3", shop, key, Instant.now().minus(KEY_LIFETIME));
@@ -99,6 +107,7 @@ public class ShopOrderService {
             }
         }
         Kunde kunde = kundeService.createEntity(shop.partner, customer, KundeOrigin.SHOP);
+        kunde.accountSubject = accountSubject;
         OrderService.CreatedOrder created = orderService.createOrder(shop.partner, kunde, items, OrderOrigin.SHOP);
         ShopOrderKey entry = new ShopOrderKey();
         entry.shop = shop;

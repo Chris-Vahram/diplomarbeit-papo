@@ -45,7 +45,7 @@ public class ShopStatisticsService {
     static final int TOP_REFERRERS = 10;
 
     // System segments that are pages of every shop without a ShopPage of their own.
-    private static final Set<String> SYSTEM_PAGES = Set.of("warenkorb", "kasse");
+    private static final Set<String> SYSTEM_PAGES = Set.of("warenkorb", "kasse", "konto");
     private static final Pattern SEGMENT = Pattern.compile("^[a-z0-9]+(-[a-z0-9]+)*$");
     private static final Pattern VISITOR = Pattern.compile("^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$");
     private static final String UPSERT = "insert into shop_stat_daily (shop_id, stat_day, metric, dimension, amount) "
