@@ -1,6 +1,7 @@
 import { apiFetch } from "../lib/api.js";
 import { formatNumber, formatDate } from "../lib/format.js";
 import { renderOrderDetailsHtml } from "../lib/order-details.js";
+import { nameWithOriginHtml, originFilter } from "../lib/origin.js";
 
 const STATUSES = ["SUBMITTED", "REVIEWED", "FULFILLED"];
 const STATUS_LABELS = { SUBMITTED: "Eingereicht", REVIEWED: "Geprüft", FULFILLED: "Abgeschlossen" };
@@ -22,7 +23,7 @@ class PartnerOrderListPage extends HTMLElement {
     this.table = this.querySelector("#order-table");
     this.table.columns = [
       { key: "orderDate", label: "Datum", mobile: "meta" },
-      { key: "kundeName", label: "Endkunde", mobile: "title" },
+      { key: "kundeCell", label: "Endkunde", html: true, mobile: "title" },
       { key: "orderValueLabel", label: "Wert brutto (€)", mobile: "amount" },
       { key: "commissionLabel", label: "Provision (€)" },
       { key: "statusBadge", label: "Status", html: true, mobile: "status" },
@@ -35,6 +36,7 @@ class PartnerOrderListPage extends HTMLElement {
       { key: "kundeName", type: "text", label: "Endkunde" },
       { key: "orderDateIso", type: "daterange", label: "Datum" },
       { key: "status", type: "select", label: "Status", options: STATUSES.map((s) => ({ value: s, label: STATUS_LABELS[s] })) },
+      originFilter("INTERNAL"),
     ];
     this.table.rowKey = "id";
     this.table.addEventListener("row-click", (event) => this.openDetails(event.detail.id));
@@ -59,6 +61,8 @@ class PartnerOrderListPage extends HTMLElement {
         orderDateIso: o.orderDate,
         status: o.status,
         kundeName: `${o.kunde.firstName ? o.kunde.firstName + " " : ""}${o.kunde.lastName}`,
+        kundeCell: nameWithOriginHtml(`${o.kunde.firstName ? o.kunde.firstName + " " : ""}${o.kunde.lastName}`, o.origin),
+        origin: o.origin,
         orderValueLabel: formatNumber(o.orderValue),
         commissionLabel: o.commissionValue != null ? formatNumber(o.commissionValue) : "–",
         statusBadge: `<status-badge status="${o.status.toLowerCase()}"></status-badge>`,

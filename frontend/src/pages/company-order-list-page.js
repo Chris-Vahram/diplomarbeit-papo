@@ -3,6 +3,7 @@ import { showToast } from "../components/toast-notice.js";
 import { escapeHtml } from "../lib/html.js";
 import { formatNumber, formatDate } from "../lib/format.js";
 import { renderOrderDetailsHtml } from "../lib/order-details.js";
+import { nameWithOriginHtml, originFilter } from "../lib/origin.js";
 import { refreshOrdersBadge } from "../lib/router.js";
 import {
   kundePickerHtml,
@@ -70,7 +71,7 @@ class CompanyOrderListPage extends HTMLElement {
     this.table.columns = [
       { key: "orderDate", label: "Datum", html: true, mobile: "meta" },
       { key: "partnerName", label: "Partner" },
-      { key: "kundeName", label: "Endkunde", mobile: "title" },
+      { key: "kundeCell", label: "Endkunde", html: true, mobile: "title" },
       { key: "orderValueLabel", label: "Wert brutto (€)", mobile: "amount" },
       { key: "commissionLabel", label: "Provision (€)" },
       { key: "statusSelect", label: "Status", html: true, mobile: "status" },
@@ -108,6 +109,7 @@ class CompanyOrderListPage extends HTMLElement {
         { key: "kundeName", type: "text", label: "Endkunde" },
         { key: "orderDateIso", type: "daterange", label: "Datum" },
         { key: "status", type: "select", label: "Status", options: STATUSES.map((s) => ({ value: s, label: STATUS_LABELS[s] })) },
+        originFilter("INTERNAL"),
       ];
       this.renderRows();
     } catch (error) {
@@ -139,6 +141,8 @@ class CompanyOrderListPage extends HTMLElement {
       partnerId: o.partnerId,
       partnerName: o.partnerName,
       kundeName: `${o.kunde.firstName ? o.kunde.firstName + " " : ""}${o.kunde.lastName}`,
+      kundeCell: nameWithOriginHtml(`${o.kunde.firstName ? o.kunde.firstName + " " : ""}${o.kunde.lastName}`, o.origin),
+      origin: o.origin,
       orderValueLabel: formatNumber(o.orderValue),
       commissionLabel: o.commissionValue != null ? formatNumber(o.commissionValue) : "–",
       statusSelect: `<select class="status-select status-select--${o.status.toLowerCase()}" data-order-id="${o.id}">${STATUSES.map(

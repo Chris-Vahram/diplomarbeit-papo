@@ -14,7 +14,7 @@
 
 ## 3. Portal (essential)
 
-- [ ] 3.1 Origin badge and filter in partner and company order lists; origin in customer list
+- [x] 3.1 Origin badge and filter in partner and company order lists; origin in customer list
 
 ## 4. Verification
 

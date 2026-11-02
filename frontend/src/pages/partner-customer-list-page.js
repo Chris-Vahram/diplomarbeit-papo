@@ -2,6 +2,7 @@ import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import { formatAddress, formatDate } from "../lib/format.js";
 import { addressFieldsHtml, readAddress, fillAddress } from "../lib/address-fields.js";
+import { nameWithOriginHtml, originFilter } from "../lib/origin.js";
 
 // Decided (Chris, 2026-07-13): 60 days for now, revisit with the client at the
 // next Termin (design.md, decision 5).
@@ -61,7 +62,7 @@ class PartnerCustomerListPage extends HTMLElement {
 
     this.table = this.querySelector("#customer-table");
     this.table.columns = [
-      { key: "name", label: "Name", mobile: "title" },
+      { key: "nameCell", label: "Name", html: true, mobile: "title" },
       { key: "addressLabel", label: "Adresse" },
       { key: "lastOrderCell", label: "Letzte Bestellung", html: true, mobile: "meta" },
       { key: "actions", label: "", html: true },
@@ -76,6 +77,7 @@ class PartnerCustomerListPage extends HTMLElement {
           { value: "aktiv", label: "Kürzlich bestellt" },
         ],
       },
+      originFilter("PORTAL"),
     ];
     this.table.emptyMessage = "Noch keine Endkunden angelegt.";
     this.table.retry = () => this.load();
@@ -246,6 +248,8 @@ class PartnerCustomerListPage extends HTMLElement {
           return {
             id: k.id,
             name: `${k.firstName ? k.firstName + " " : ""}${k.lastName}`,
+            nameCell: nameWithOriginHtml(`${k.firstName ? k.firstName + " " : ""}${k.lastName}`, k.origin),
+            origin: k.origin,
             addressLabel: formatAddress(k.address),
             lastOrderCell: `${dateText}${badge}`,
             lastOrderDate: k.lastOrderDate,
