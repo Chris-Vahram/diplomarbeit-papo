@@ -12,6 +12,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -99,10 +100,21 @@ public class ProductService {
     private void applyRequest(Product product, ProductRequest request, Category category) {
         product.name = request.name();
         product.price = request.price();
+        product.taxRatePercent = taxRate(request.taxRatePercent(), product.taxRatePercent);
         product.description = request.description();
         product.available = request.available() == null || request.available();
         product.articleCategory = category;
         applyImage(product, request.imageUrl());
+    }
+
+    private static BigDecimal taxRate(BigDecimal requested, BigDecimal current) {
+        if (requested == null) {
+            return current != null ? current : ArticleTax.normalized(ArticleTax.DEFAULT_RATE);
+        }
+        if (!ArticleTax.isAllowed(requested)) {
+            throw new ApiException(400, ArticleTax.INVALID_RATE_MESSAGE);
+        }
+        return ArticleTax.normalized(requested);
     }
 
     private void applyImage(Product product, String imageUrl) {

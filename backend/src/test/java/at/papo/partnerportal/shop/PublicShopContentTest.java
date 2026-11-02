@@ -137,6 +137,25 @@ class PublicShopContentTest {
     }
 
     @Test
+    void catalogueCarriesTheArticlesOwnTaxRate() {
+        String name = "Buch ermäßigt " + UUID.randomUUID().toString().substring(0, 8);
+        QuarkusTransaction.requiringNew().run(() -> {
+            Product product = new Product();
+            product.company = TestCompanies.one();
+            product.name = name;
+            product.price = new BigDecimal("22.00");
+            product.taxRatePercent = new BigDecimal("10.00");
+            product.persist();
+        });
+        String kennung = releasedShop(createPartner(name));
+
+        visitor().when().get("/api/shop/" + kennung + "/articles")
+                .then().statusCode(200)
+                .body("find { it.name == '" + name + "' }.grossPrice", is(22.00f))
+                .body("find { it.name == '" + name + "' }.taxRatePercent", is(10));
+    }
+
+    @Test
     void catalogueHasOnlyEnabledAvailableArticlesWithGrossPrice() {
         String kennung = releasedShop(createPartner(WITH_UPLOAD, WITH_ASSET, UNAVAILABLE));
         long imageId = uploadedImageId(WITH_UPLOAD);

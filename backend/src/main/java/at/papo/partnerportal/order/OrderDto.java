@@ -16,6 +16,8 @@ public record OrderDto(
         KundeDto kunde,
         OrderStatus status,
         BigDecimal orderValue,
+        BigDecimal netValue,
+        BigDecimal taxValue,
         List<OrderItemDto> items,
         BigDecimal commissionPercentUsed,
         BigDecimal commissionValue,
@@ -27,6 +29,7 @@ public record OrderDto(
     public static OrderDto from(Order order, CommissionRecord commission) {
         return new OrderDto(order.id, order.orderDate, order.partner.id, order.partner.name,
                 KundeDto.from(order.kunde), order.status, order.orderValue,
+                order.netValue, order.taxValue,
                 order.items.stream().map(OrderItemDto::from).toList(),
                 commission != null ? commission.commissionPercentUsed : null,
                 commission != null ? commission.commissionValue : null,
@@ -34,7 +37,7 @@ public record OrderDto(
     }
 
     public OrderDto withNotice(String notice) {
-        return new OrderDto(id, orderDate, partnerId, partnerName, kunde, status, orderValue, items,
+        return new OrderDto(id, orderDate, partnerId, partnerName, kunde, status, orderValue, netValue, taxValue, items,
                 commissionPercentUsed, commissionValue, seenByCompany, notice);
     }
 }

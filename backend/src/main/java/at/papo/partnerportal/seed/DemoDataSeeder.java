@@ -19,6 +19,7 @@ import at.papo.partnerportal.order.OrderItem;
 import at.papo.partnerportal.order.OrderStatus;
 import at.papo.partnerportal.partner.Partner;
 import at.papo.partnerportal.partner.PartnerLogin;
+import at.papo.partnerportal.product.ArticleTaxMigrationService;
 import at.papo.partnerportal.product.DemoPngGenerator;
 import at.papo.partnerportal.product.Product;
 import at.papo.partnerportal.product.ProductImage;
@@ -61,6 +62,9 @@ public class DemoDataSeeder {
     @Inject
     CompanyTenancyMigrationService companyTenancyMigrationService;
 
+    @Inject
+    ArticleTaxMigrationService articleTaxMigrationService;
+
     // Company 1 of the current seed run (set by seedCompanyProfile).
     private CompanyProfile company;
 
@@ -101,6 +105,7 @@ public class DemoDataSeeder {
         }
         businessTaxIdentifierMigrationService.migrate(launchMode != LaunchMode.NORMAL || seedDemoData);
         companyTenancyMigrationService.contract();
+        articleTaxMigrationService.migrate();
     }
 
     static boolean shouldSeed(LaunchMode launchMode, long partnerCount) {
@@ -382,17 +387,16 @@ public class DemoDataSeeder {
         order.orderDate = LocalDate.now().minusDays(daysAgo);
         order.status = status;
 
-        BigDecimal total = BigDecimal.ZERO;
         for (OrderLine l : lines) {
             OrderItem item = new OrderItem();
             item.order = order;
             item.product = l.product();
             item.quantity = l.quantity();
             item.unitPriceSnapshot = l.product().price;
+            item.taxRatePercentSnapshot = l.product().taxRatePercent;
             order.items.add(item);
-            total = total.add(l.product().price.multiply(BigDecimal.valueOf(l.quantity())));
         }
-        order.orderValue = total;
+        order.applyTotalsFromItems();
         order.persist();
 
         // Commission is snapshotted at order creation in the real flow — mirror that

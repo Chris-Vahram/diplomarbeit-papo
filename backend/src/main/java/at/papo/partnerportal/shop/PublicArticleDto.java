@@ -4,7 +4,7 @@ import at.papo.partnerportal.product.Product;
 
 import java.math.BigDecimal;
 
-// Public article (shop-public-catalog spec): no commission, purchase data or enablement metadata.
+// Public article (shop-public-catalog spec): gross price plus the article's USt rate; no commission, purchase data or enablement metadata.
 // Uploaded images go through the shop's own image endpoint, same-origin frontend assets stay
 // as they are; external URLs and protected portal API paths are dropped, so the shop never
 // loads third-party resources.
@@ -18,15 +18,11 @@ public record PublicArticleDto(
         BigDecimal grossPrice,
         int taxRatePercent
 ) {
-    // Product.price is the gross price. Until add-article-tax-rate adds Product.taxRatePercent,
-    // every article carries the standard Austrian rate that change uses as its default.
-    static final int DEFAULT_TAX_RATE_PERCENT = 20;
-
     static PublicArticleDto from(Product product, String kennung) {
         return new PublicArticleDto(product.id, product.name, product.description,
                 product.articleCategory == null ? null : product.articleCategory.id,
                 product.articleCategory == null ? null : product.articleCategory.name,
-                imageUrl(product, kennung), product.price, DEFAULT_TAX_RATE_PERCENT);
+                imageUrl(product, kennung), product.price, product.taxRatePercent.intValue());
     }
 
     // Editor preview of a not yet public shop: uploaded images through the authenticated

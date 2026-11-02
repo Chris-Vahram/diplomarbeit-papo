@@ -2,6 +2,7 @@ package at.papo.partnerportal.order;
 
 import at.papo.partnerportal.customer.Kunde;
 import at.papo.partnerportal.partner.Partner;
+import at.papo.partnerportal.product.ArticleTax;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -40,6 +41,15 @@ public class Order extends PanacheEntity {
     @Column(nullable = false, precision = 10, scale = 2)
     public BigDecimal orderValue;
 
+    // Net value and USt amount derived at creation from the item snapshots (orderValue = gross,
+    // netValue + taxValue = orderValue). Nullable in DDL for Hibernate update on existing rows;
+    // ArticleTaxMigrationService backfills them.
+    @Column(precision = 10, scale = 2)
+    public BigDecimal netValue;
+
+    @Column(precision = 10, scale = 2)
+    public BigDecimal taxValue;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("id")
     public List<OrderItem> items = new ArrayList<>();
@@ -48,4 +58,14 @@ public class Order extends PanacheEntity {
     // company role exists, so a single flag is enough — see design.md.
     @Column(nullable = false)
     public boolean seenByCompany = false;
+
+    // Sets gross/net/tax from the item snapshots (unitPriceSnapshot + taxRatePercentSnapshot).
+    public void applyTotalsFromItems() {
+        ArticleTax.Totals totals = ArticleTax.totals(items.stream()
+                .map(item -> new ArticleTax.Line(item.unitPriceSnapshot, item.quantity, item.taxRatePercentSnapshot))
+                .toList());
+        orderValue = totals.gross();
+        netValue = totals.net();
+        taxValue = totals.tax();
+    }
 }

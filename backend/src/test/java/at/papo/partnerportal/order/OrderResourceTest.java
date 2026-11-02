@@ -51,10 +51,70 @@ class OrderResourceTest {
                 .then().statusCode(200)
                 .body("status", is("SUBMITTED"))
                 .body("orderValue", is(258.0f))
+                .body("netValue", is(215.0f))
+                .body("taxValue", is(43.0f))
+                .body("items[0].taxRatePercentSnapshot", is(20.0f))
                 .body("commissionPercentUsed", is(10.0f))
-                .body("commissionValue", is(25.8f))
+                .body("commissionValue", is(21.5f))
                 .body("kunde.lastName", is("Mustermann"))
                 .body("items.size()", is(1));
+    }
+
+    // Creates an article with the given gross price/rate and enables it for partner-demo.
+    private int enabledArticle(String name, String price, int taxRate) {
+        String companyToken = tokens.tokenFor("company-demo", "company-demo");
+        int id = given().auth().oauth2(companyToken).contentType("application/json")
+                .body("{\"name\":\"" + name + "\",\"price\":" + price + ",\"available\":true,\"taxRatePercent\":"
+                        + taxRate + "}")
+                .when().post("/api/company/products")
+                .then().statusCode(200).extract().path("id");
+        given().auth().oauth2(companyToken)
+                .when().put("/api/company/partners/" + partner1001Id() + "/products/" + id)
+                .then().statusCode(204);
+        return id;
+    }
+
+    private int orderOne(int productId) {
+        return given().auth().oauth2(tokens.tokenFor("partner-demo", "partner-demo")).contentType("application/json")
+                .body("{\"newKunde\":{\"lastName\":\"Steuer\",\"address\":" + ADDRESS_JSON + "},"
+                        + "\"items\":[{\"productId\":" + productId + ",\"quantity\":1}]}")
+                .when().post("/api/partner/orders")
+                .then().statusCode(200).extract().path("id");
+    }
+
+    @Test
+    void commissionIsCalculatedOnTheNetOrderValue() {
+        int productId = enabledArticle("Provisionstest 120", "120.00", 20);
+        int orderId = orderOne(productId);
+
+        given().auth().oauth2(tokens.tokenFor("partner-demo", "partner-demo"))
+                .when().get("/api/partner/orders")
+                .then().statusCode(200)
+                .body("find { it.id == " + orderId + " }.orderValue", is(120.0f))
+                .body("find { it.id == " + orderId + " }.netValue", is(100.0f))
+                .body("find { it.id == " + orderId + " }.taxValue", is(20.0f))
+                .body("find { it.id == " + orderId + " }.commissionValue", is(10.0f));
+    }
+
+    @Test
+    void laterPriceAndRateChangesLeaveOrderAndCommissionUnchanged() {
+        int productId = enabledArticle("Snapshottest 113", "113.00", 13);
+        int orderId = orderOne(productId);
+
+        given().auth().oauth2(tokens.tokenFor("company-demo", "company-demo")).contentType("application/json")
+                .body("{\"name\":\"Snapshottest 113\",\"price\":200.00,\"available\":true,\"taxRatePercent\":0}")
+                .when().put("/api/company/products/" + productId)
+                .then().statusCode(200);
+
+        given().auth().oauth2(tokens.tokenFor("partner-demo", "partner-demo"))
+                .when().get("/api/partner/orders")
+                .then().statusCode(200)
+                .body("find { it.id == " + orderId + " }.orderValue", is(113.0f))
+                .body("find { it.id == " + orderId + " }.netValue", is(100.0f))
+                .body("find { it.id == " + orderId + " }.taxValue", is(13.0f))
+                .body("find { it.id == " + orderId + " }.items[0].unitPriceSnapshot", is(113.0f))
+                .body("find { it.id == " + orderId + " }.items[0].taxRatePercentSnapshot", is(13.0f))
+                .body("find { it.id == " + orderId + " }.commissionValue", is(10.0f));
     }
 
     @Test

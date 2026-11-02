@@ -14,6 +14,8 @@ public record ProductRequest(
         Boolean available,
         String category,
         String imageUrl,
-        Long categoryId
+        Long categoryId,
+        // Optional; null means 20 % on create and "unchanged" on update (article-tax spec).
+        BigDecimal taxRatePercent
 ) {
 }

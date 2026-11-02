@@ -27,6 +27,11 @@ public class Product extends PanacheEntity {
     @Column(nullable = false, precision = 10, scale = 2)
     public BigDecimal price;
 
+    // USt rate in percent (article-tax spec): price is gross, net/tax are derived. Nullable in DDL so
+    // Hibernate update can add it to existing rows; ArticleTaxMigrationService backfills 20.
+    @Column(precision = 5, scale = 2)
+    public BigDecimal taxRatePercent = ArticleTax.normalized(ArticleTax.DEFAULT_RATE);
+
     @Column(length = 2000)
     public String description;
 

@@ -21,6 +21,8 @@ public class CommissionRecord extends PanacheEntity {
 
     // Calculation basis and percentage are snapshotted at creation time so later
     // changes to Partner.commissionPercent don't retroactively alter past records.
+    // orderValue holds the basis: the net order value since add-article-tax-rate,
+    // the gross value for records created before (never recalculated).
     @Column(nullable = false, precision = 10, scale = 2)
     public BigDecimal orderValue;
 

@@ -47,7 +47,8 @@ public class CsvExportService {
         List<Order> orders = Order.list("partner.company = ?1 order by id", currentCompany.resolve());
         Map<Long, CommissionRecord> commissionsByOrderId = commissionService.findForOrders(orders);
 
-        return writeCsv(new String[] { "Datum", "Partner", "Kunde", "Wert", "Provision %", "Provision", "Status" },
+        return writeCsv(new String[] { "Datum", "Partner", "Kunde", "Wert brutto", "Netto", "USt", "Provision %",
+                        "Provision", "Status" },
                 orders, order -> {
                     CommissionRecord commission = commissionsByOrderId.get(order.id);
                     return new String[] {
@@ -55,6 +56,8 @@ public class CsvExportService {
                             sanitizeFormula(order.partner.name),
                             sanitizeFormula(kundeName(order)),
                             formatMoney(order.orderValue),
+                            formatMoney(order.netValue),
+                            formatMoney(order.taxValue),
                             commission != null ? formatMoney(commission.commissionPercentUsed) : "",
                             commission != null ? formatMoney(commission.commissionValue) : "",
                             STATUS_LABELS.get(order.status),
@@ -63,13 +66,18 @@ public class CsvExportService {
     }
 
     // Only orders with a commission record - settlement-ready sheet, not an order log (design.md).
+    // Basiswert is the stored commission basis: net since add-article-tax-rate, gross on older records.
     public byte[] exportCommissions() {
         List<CommissionRecord> records = CommissionRecord.list("partner.company = ?1 order by id", currentCompany.resolve());
 
-        return writeCsv(new String[] { "Partner", "Bestell-Nr", "Basiswert", "Provision %", "Provision" },
+        return writeCsv(new String[] { "Partner", "Bestell-Nr", "Wert brutto", "Netto", "USt", "Basiswert",
+                        "Provision %", "Provision" },
                 records, record -> new String[] {
                         sanitizeFormula(record.partner.name),
                         String.valueOf(record.order.id),
+                        formatMoney(record.order.orderValue),
+                        formatMoney(record.order.netValue),
+                        formatMoney(record.order.taxValue),
                         formatMoney(record.orderValue),
                         formatMoney(record.commissionPercentUsed),
                         formatMoney(record.commissionValue),

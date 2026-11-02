@@ -24,4 +24,9 @@ public class OrderItem extends PanacheEntity {
     // and commission from later central price changes, see design.md.
     @Column(nullable = false, precision = 10, scale = 2)
     public BigDecimal unitPriceSnapshot;
+
+    // Tax rate at the moment of ordering (article-tax spec); unitPriceSnapshot is gross. Nullable in
+    // DDL for Hibernate update on existing rows; ArticleTaxMigrationService backfills 20.
+    @Column(precision = 5, scale = 2)
+    public BigDecimal taxRatePercentSnapshot;
 }
