@@ -135,6 +135,24 @@ class ShopCustomerAccountTest {
         }
     }
 
+    // A customer token must not reach portal resources through a path that only looks like the
+    // customer namespace (dot segments, encoded dot segments).
+    @Test
+    void dotSegmentsDoNotSmuggleCustomerTokensIntoPortalApis() throws Exception {
+        String shopToken = shopToken("kundin-eins@example.test", "kundin-eins-pw");
+        java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
+        for (String path : List.of("/api/shop-customer/../partner/orders", "/api/shop-customer/%2e%2e/partner/orders",
+                "/api/shop-customer/..%2fpartner/orders", "/api/shop-customer/../company/partners")) {
+            java.net.http.HttpResponse<String> response = client.send(java.net.http.HttpRequest.newBuilder(
+                            java.net.URI.create(io.restassured.RestAssured.baseURI + ":" + io.restassured.RestAssured.port + path))
+                    .header("Authorization", "Bearer " + shopToken).GET().build(),
+                    java.net.http.HttpResponse.BodyHandlers.ofString());
+            assertTrue(response.statusCode() == 401 || response.statusCode() == 403 || response.statusCode() == 404,
+                    path + " -> " + response.statusCode() + " " + response.body());
+            assertTrue(!response.body().contains("\"orderValue\"") && !response.body().contains("\"partnerNumber\""), path);
+        }
+    }
+
     @Test
     void portalTokensAndMissingTokensAreRejectedOnCustomerApi() {
         given().when().get("/api/shop-customer/profile").then().statusCode(401);

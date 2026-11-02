@@ -29,7 +29,7 @@
   "smtpServer": {
     "host": "${SMTP_HOST:localhost}",
     "port": "${SMTP_PORT:587}",
-    "from": "noreply@__DOMAIN__",
+    "from": "${SMTP_USERNAME:no-reply@__DOMAIN__}",
     "fromDisplayName": "PAPO Shop",
     "auth": "true",
     "user": "${SMTP_USERNAME:}",

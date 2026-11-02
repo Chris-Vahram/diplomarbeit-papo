@@ -254,6 +254,30 @@ Bestellungen zeigen dann „E-Mail-Versand ist nicht aktiviert“. Einschalten a
 „Abgeschlossen“ ein (Entscheidung 15.10.2026). Absender: `no-reply@paportal.at`. Änderungen an Umleitung/Aktivierung wirken auch auf wartende Mails:
 diese werden dann nicht mehr gesendet („Konfiguration geändert“).
 
+## Endkundenkonten im Shop (`add-shop-customer-accounts`)
+
+Optionale Kundenkonten liegen im **eigenen Keycloak-Realm `papo-shop`** derselben Instanz. Das
+Backend nimmt Tokens dieses Realms nur unter `/api/shop-customer/*` an (OIDC-Tenant per Pfad);
+alle Firmen- und Partner-Endpunkte lehnen sie ab, und Portal-Tokens gelten dort nicht.
+Standard: **aus** (`SHOP_ACCOUNTS_ENABLED=false`); die Gastbestellung ist davon unabhängig.
+
+1. SMTP muss funktionieren (siehe „Bestell-E-Mails“): Keycloak verschickt Bestätigungs- und
+   Passwort-Mails selbst mit `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`; der
+   Absender ist `SMTP_USERNAME`. Für Port 465: `SHOP_SMTP_SSL=true`, `SHOP_SMTP_STARTTLS=false`.
+2. `SHOP_ADMIN_CLIENT_SECRET` (mindestens 32 Zeichen, z. B. `openssl rand -hex 32`) in
+   `.env.prod` setzen. Nur dann importiert `render-and-start.sh` den Realm; der Service-Account
+   `papo-shop-admin` darf ausschließlich Benutzer dieses Realms verwalten (Kontolöschung).
+3. Keycloak neu starten (`--import-realm` legt fehlende Realms an, bestehende bleiben
+   unverändert — ein später geändertes Secret muss in der Admin-Konsole nachgezogen werden),
+   dann `SHOP_ACCOUNTS_ENABLED=true` setzen und das Backend mit dem aktiven Release neu starten
+   (Befehl wie oben).
+4. Prüfen: Konto im Shop unter „Anmelden“ registrieren, Bestätigungsmail öffnen, bestellen,
+   Bestellung unter „Mein Konto“ sehen, Konto löschen.
+
+Ohne importierten Realm startet das Backend trotzdem; `/api/shop-customer/*` antwortet dann 401.
+Rückweg: `SHOP_ACCOUNTS_ENABLED=false` blendet die Anmeldung aus; Gastbestellungen laufen weiter.
+Aufbewahrung von Kundendaten in Bestellungen nach einer Kontolöschung legt die Firma fest.
+
 ## Rollback nach `derive-product-category-from-catalog`
 
 Ab diesem Release schreibt die App den Kategorietext nicht mehr. Vor einem Rollback auf

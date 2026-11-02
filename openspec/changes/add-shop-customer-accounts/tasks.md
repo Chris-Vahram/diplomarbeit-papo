@@ -17,6 +17,6 @@
 
 ## 4. Verification
 
-- [ ] 4.1 Tests + package; `git diff --check`
+- [x] 4.1 Tests + package; `git diff --check`
 - [x] 4.2 Browser: register → verify (test mailbox) → order → see order → delete account
-- [ ] 4.3 Security review of realm separation; update traceability
+- [x] 4.3 Security review of realm separation; update traceability
