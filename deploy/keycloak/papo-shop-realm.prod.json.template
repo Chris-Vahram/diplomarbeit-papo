@@ -1,0 +1,85 @@
+{
+  "realm": "papo-shop",
+  "displayName": "PAPO Kundenkonto",
+  "enabled": true,
+  "registrationAllowed": true,
+  "registrationEmailAsUsername": true,
+  "verifyEmail": true,
+  "resetPasswordAllowed": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "editUsernameAllowed": false,
+  "rememberMe": false,
+  "sslRequired": "external",
+  "internationalizationEnabled": true,
+  "supportedLocales": ["de"],
+  "defaultLocale": "de",
+  "passwordPolicy": "length(10) and maxLength(128) and notUsername and notEmail",
+  "bruteForceProtected": true,
+  "permanentLockout": false,
+  "failureFactor": 5,
+  "waitIncrementSeconds": 60,
+  "minimumQuickLoginWaitSeconds": 60,
+  "quickLoginCheckMilliSeconds": 1000,
+  "maxFailureWaitSeconds": 900,
+  "maxDeltaTimeSeconds": 43200,
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "smtpServer": {
+    "host": "${SMTP_HOST:localhost}",
+    "port": "${SMTP_PORT:587}",
+    "from": "noreply@__DOMAIN__",
+    "fromDisplayName": "PAPO Shop",
+    "auth": "true",
+    "user": "${SMTP_USERNAME:}",
+    "password": "${SMTP_PASSWORD:}",
+    "ssl": "${SHOP_SMTP_SSL:false}",
+    "starttls": "${SHOP_SMTP_STARTTLS:true}"
+  },
+  "roles": {
+    "realm": []
+  },
+  "clients": [
+    {
+      "clientId": "papo-shop-frontend",
+      "name": "PAPO Shop",
+      "publicClient": true,
+      "enabled": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["https://__DOMAIN__/shop/*"],
+      "webOrigins": ["https://__DOMAIN__"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "https://__DOMAIN__/shop/*"
+      }
+    },
+    {
+      "clientId": "papo-shop-admin",
+      "name": "PAPO Backend (Kontolöschung)",
+      "publicClient": false,
+      "enabled": true,
+      "protocol": "openid-connect",
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${SHOP_ADMIN_CLIENT_SECRET}",
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true
+    }
+  ],
+  "users": [
+    {
+      "username": "service-account-papo-shop-admin",
+      "enabled": true,
+      "serviceAccountClientId": "papo-shop-admin",
+      "clientRoles": {
+        "realm-management": ["manage-users", "view-users"]
+      }
+    }
+  ]
+}
