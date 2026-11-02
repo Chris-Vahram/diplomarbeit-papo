@@ -14,6 +14,7 @@ import {
   setQuantity,
   summarize,
 } from "./shop-cart.js";
+import { accountRequest, currentCustomer, startLogin } from "./shop-account.js";
 
 const PAYMENT_NOTE = "Die Rechnung erhalten Sie mit der Lieferung.";
 const UNAVAILABLE = "Nicht mehr verfügbar";
@@ -26,6 +27,12 @@ const ICONS = {
   check: '<path d="M20 6 9 17l-5-5"/>',
   print: '<path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/>',
   bag: '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/>',
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  download: '<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>',
+  logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
+  key: '<circle cx="7.5" cy="15.5" r="4.5"/><path d="m10.7 12.3 9.8-9.8M17 6l3 3M14 9l2 2"/>',
+  chevron: '<path d="m6 9 6 6 6-6"/>',
+  receipt: '<path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 8h6M9 12h6"/>',
 };
 
 export function icon(name, size = 18) {
@@ -186,7 +193,7 @@ function announce(section, text) {
 
 // ---- Checkout ---------------------------------------------------------------------------
 
-const FIELDS = [
+export const FIELDS = [
   { name: "firstName", label: "Vorname", optional: true, autocomplete: "given-name", max: 120 },
   { name: "lastName", label: "Nachname", autocomplete: "family-name", max: 120, missing: "Bitte einen Nachnamen angeben." },
   { name: "street", label: "Straße", autocomplete: "address-line1", max: 120, missing: "Bitte eine Straße angeben.", wide: true },
@@ -207,10 +214,11 @@ function newKey() {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
-function fieldHtml(field) {
-  const id = `co-${field.name}`;
+// prefix keeps ids unique when the account page renders the same fields.
+export function fieldHtml(field, prefix = "co") {
+  const id = `${prefix}-${field.name}`;
   return `<div class="shop-field${field.wide ? " shop-field--wide" : ""}${field.narrow ? " shop-field--narrow" : ""}" data-field="${field.name}">
-    <label for="${id}">${escapeHtml(field.label)}${field.optional ? ' <span class="shop-field__optional">optional</span>' : ""}</label>
+    <label for="${id}">${escapeHtml(field.label)}${field.optional && !field.quiet ? ' <span class="shop-field__optional">optional</span>' : ""}</label>
     <input id="${id}" name="${field.name}" type="${field.type ?? "text"}" autocomplete="${field.autocomplete}"
       maxlength="${field.max}" ${field.inputmode ? `inputmode="${field.inputmode}"` : ""}
       ${field.optional ? "" : 'required aria-required="true"'} aria-describedby="${id}-error"
@@ -245,19 +253,37 @@ export async function renderCheckoutPage(main, { api, shop, navigation }) {
     return;
   }
 
+  // Logged-in customers (shop-customer-accounts spec): the form starts from the profile and
+  // the order is linked to the account. A profile that cannot load leaves the form empty.
+  const customer = shop.accountsEnabled ? currentCustomer() : null;
+  let profile = null;
+  if (customer) {
+    profile = await accountRequest("/profile").catch(() => null);
+  }
+  const account = customer && profile ? customer : null;
+  const fields = FIELDS.map((field) => {
+    const stored = profile?.[field.name] || (field.name === "email" ? profile?.loginEmail : null);
+    return stored ? { ...field, value: stored } : field;
+  });
+  const lead = account
+    ? `Angemeldet als <strong>${escapeHtml(account.email)}</strong>. Ihre Daten aus dem Kundenkonto sind eingetragen.`
+    : `Bestellung als Gast – ohne Kundenkonto.${shop.accountsEnabled
+      ? ' <button type="button" class="shop-inline-link" data-login>Anmelden</button> und Ihre Daten werden eingetragen.'
+      : ""}`;
+
   // One key per checkout attempt: a retry after a lost response cannot create a second order.
   const key = newKey();
-  section.innerHTML = `${pageHead("Kasse", "Bestellung als Gast – ohne Kundenkonto.")}
+  section.innerHTML = `${pageHead("Kasse", lead)}
     <form class="shop-checkout__layout" novalidate>
       <div class="shop-panel shop-checkout__form">
         <fieldset>
           <legend class="shop-checkout__legend">Lieferadresse</legend>
-          <div class="shop-fields">${FIELDS.slice(0, 7).map(fieldHtml).join("")}</div>
+          <div class="shop-fields">${fields.slice(0, 7).map((field) => fieldHtml(field)).join("")}</div>
         </fieldset>
         <fieldset>
           <legend class="shop-checkout__legend">Kontakt</legend>
           <p class="shop-checkout__hint">Für Rückfragen zur Bestellung und die Bestellbestätigung.</p>
-          <div class="shop-fields">${FIELDS.slice(7).map(fieldHtml).join("")}</div>
+          <div class="shop-fields">${fields.slice(7).map((field) => fieldHtml(field)).join("")}</div>
         </fieldset>
         <div class="shop-inquiry__trap" aria-hidden="true">
           <label for="co-website">Website</label>
@@ -294,7 +320,11 @@ export async function renderCheckoutPage(main, { api, shop, navigation }) {
   });
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-    submit(form, section, { api, shop, key, summary });
+    submit(form, section, { api, shop, key, summary, account });
+  });
+  section.querySelector("[data-login]")?.addEventListener("click", (event) => {
+    event.currentTarget.disabled = true;
+    startLogin(api.kennung, { returnTo: "kasse" });
   });
 }
 
@@ -316,7 +346,7 @@ function legalChecksHtml(api) {
       zum Umgang mit Ihren Daten in der ${link("datenschutz", "Datenschutzerklärung")}.</p>`;
 }
 
-function problemOf(form, field) {
+export function problemOf(form, field) {
   const input = form.elements[field.name];
   const value = input.value.trim();
   if (!value) return field.optional ? null : field.missing;
@@ -325,7 +355,7 @@ function problemOf(form, field) {
   return null;
 }
 
-function setError(form, name, text) {
+export function setError(form, name, text) {
   const wrapper = form.querySelector(`[data-field="${name}"]`);
   if (!wrapper) return;
   const error = wrapper.querySelector(".shop-field__error");
@@ -334,7 +364,7 @@ function setError(form, name, text) {
   wrapper.querySelector("input").toggleAttribute("aria-invalid", Boolean(text));
 }
 
-async function submit(form, section, { api, shop, key, summary }) {
+async function submit(form, section, { api, shop, key, summary, account }) {
   const status = form.querySelector("[data-status]");
   status.hidden = true;
   const problems = FIELDS.map((field) => [field.name, problemOf(form, field)]);
@@ -354,21 +384,26 @@ async function submit(form, section, { api, shop, key, summary }) {
   form.elements.terms.disabled = true;
   const value = (name) => form.elements[name].value.trim();
   try {
-    const confirmation = await api.placeOrder({
+    const body = {
       idempotencyKey: key,
       website: form.elements.website.value,
       customer: Object.fromEntries(FIELDS.map((field) => [field.name, value(field.name)])),
       items: summary.available.map((line) => ({ articleId: line.id, quantity: line.quantity })),
-    });
+    };
+    const confirmation = account
+      ? await accountRequest(`/shops/${encodeURIComponent(api.kennung)}/orders`, { method: "POST", body })
+      : await api.placeOrder(body);
     clearCart(api.kennung);
-    renderConfirmation(section, { api, shop, confirmation });
+    renderConfirmation(section, { api, shop, confirmation, account });
   } catch (error) {
     button.disabled = false;
     button.textContent = "Zahlungspflichtig bestellen";
     form.removeAttribute("aria-busy");
     fieldsets.forEach((fieldset) => { fieldset.disabled = false; });
     form.elements.terms.disabled = false;
-    status.textContent = error.status ? error.serverMessage ?? SEND_FAILED : SEND_FAILED;
+    status.textContent = error.status === 401 && account
+      ? "Ihre Anmeldung ist abgelaufen. Bitte laden Sie die Seite neu und melden Sie sich erneut an oder bestellen Sie als Gast."
+      : error.status ? error.serverMessage ?? SEND_FAILED : SEND_FAILED;
     status.hidden = false;
     // The catalogue changed under the visitor: the cart page marks the affected lines.
     if (error.status === 409) {
@@ -395,7 +430,7 @@ function mailNotice(confirmation) {
   return "Eine Bestätigung per E-Mail wird derzeit noch nicht versendet. Bitte drucken oder speichern Sie diesen Beleg.";
 }
 
-export function renderConfirmation(section, { api, shop, confirmation }) {
+export function renderConfirmation(section, { api, shop, confirmation, account = null }) {
   document.title = `Bestellung ${confirmation.orderNumber} – ${shop.displayName}`;
   const { contact, seller } = confirmation;
   section.innerHTML = `
@@ -406,6 +441,7 @@ export function renderConfirmation(section, { api, shop, confirmation }) {
       <p class="shop-muted shop-done__text">${mailNotice(confirmation)}</p>
       <div class="shop-done__actions">
         <button type="button" class="shop-button shop-button--plain" data-print>${icon("print")}Beleg drucken</button>
+        ${account ? `<a class="shop-link-back" href="${escapeHtml(api.href("konto"))}">Zu meinen Bestellungen</a>` : ""}
         <a class="shop-link-back" href="${escapeHtml(api.href("artikel"))}">Weiter einkaufen</a>
       </div>
     </div>

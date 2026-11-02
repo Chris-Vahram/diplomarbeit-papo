@@ -11,12 +11,12 @@
 
 ## 3. Frontend (essential)
 
-- [ ] 3.1 Shop login/registration via redirect flow; logout
-- [ ] 3.2 "Mein Konto": profile, own orders, export, delete
-- [ ] 3.3 Prefilled checkout for logged-in customers
+- [x] 3.1 Shop login/registration via redirect flow; logout
+- [x] 3.2 "Mein Konto": profile, own orders, export, delete
+- [x] 3.3 Prefilled checkout for logged-in customers
 
 ## 4. Verification
 
 - [ ] 4.1 Tests + package; `git diff --check`
-- [ ] 4.2 Browser: register → verify (test mailbox) → order → see order → delete account
+- [x] 4.2 Browser: register → verify (test mailbox) → order → see order → delete account
 - [ ] 4.3 Security review of realm separation; update traceability
