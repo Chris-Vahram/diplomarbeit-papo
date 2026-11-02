@@ -50,11 +50,12 @@ die Reihenfolge und Fragen stehen in `PRODUCT_COMPLETION_PLAN.md`.
 **Trigger:** "implement B-04".
 **Implemented 2026-10-15:** `send-order-emails` — outbox with retries, order confirmation/partner/company notices, optional completion mail on `fulfilled`, company status view with retry, disabled by default, redirect enforced while real recipients are not allowed, customer mails without prices; dev via Mailpit. Decided 2026-10-15: neutral completion mail on `fulfilled`, functional company mailbox, addresses of failed mails removed after 90 days, sender `no-reply@paportal.at`. Open: SMTP credentials (Vaultwarden links had expired) and a test inbox from Herr Bachl, then activation on the VM with redirect.
 
-## B-05 — Shop inquiry auto-forward (Anfragen)  `PLANNED`
+## B-05 — Shop inquiry auto-forward (Anfragen)  `IMPLEMENTED`
 **What full version is:** Inquiries coming from the external shop auto-forward to the responsible partner; other inquiries partner enters manually in portal (Prozess 1).
 **Why cut:** Auto-forward half depends on B-01 (shop). Manual entry part = already covered by MVP core order flow.
 **Trigger:** "implement B-05". Needs B-01.
 **Planning (2026-10-15):** Fields name, e-mail or phone, message, consent; honeypot + rate limit, no external CAPTCHA; partner inbox only. Vorläufige Detailentscheidungen (15.10.2026, Vorbehalt Firmenmeeting): `ENDKUNDENSHOP_DECISIONS.md`.
+**Implemented 2026-11-02:** `add-shop-inquiries` — builder block "Anfrageformular", honeypot, signed render timestamp (≥ 3 s) and a separate rate limit, partner inbox "Anfragen" with unread badge, done and permanent delete. No IP stored, no retention period invented. Open: retention period with the company; e-mail notification once B-04 is active.
 
 ## B-06 — BMD interface  `REOPENED FOR DECISION`
 **What:** Direct BMD accounting-system interface.

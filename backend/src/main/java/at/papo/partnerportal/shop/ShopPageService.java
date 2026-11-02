@@ -175,6 +175,15 @@ public class ShopPageService {
                 + "order by position, id", shop, ShopPageKind.SYSTEM, ShopPageSlot.ARTICLE_DETAIL);
     }
 
+    // Published content only: a form still in a draft is not reachable for visitors yet.
+    public Optional<ShopPage> inquiryPage(PartnerShop shop) {
+        return navigation(shop).stream()
+                .filter(page -> page.publishedContent != null)
+                .filter(page -> parse(page.publishedContent).path("blocks").findValuesAsText("type")
+                        .contains(ShopBlockType.INQUIRY_FORM.id))
+                .findFirst();
+    }
+
     public Optional<ShopPage> onlinePage(PartnerShop shop, String segment) {
         return ShopPage.<ShopPage>find("shop = ?1 and segment = ?2 and online = true and kind <> ?3",
                 shop, segment, ShopPageKind.SYSTEM).firstResultOptional();

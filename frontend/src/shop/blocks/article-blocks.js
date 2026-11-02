@@ -66,8 +66,26 @@ class ArticleDetailBlock extends ShopBlock {
         <h1 class="shop-heading">${escapeHtml(article.name)}</h1>
         ${priceHtml(article)}
         ${article.description ? `<p class="shop-text">${escapeHtml(article.description)}</p>` : ""}
+        <div class="shop-detail__actions" data-detail-actions></div>
       </div>
     </article>`;
+    this.#inquiryLink(api, article);
+  }
+
+  // "Weitere Fragen?" only when an online page carries the inquiry form (shop-inquiries);
+  // the form preselects the article from ?artikel=. The actions area is where the cart
+  // button goes later, above this link.
+  #inquiryLink(api, article) {
+    const renderedFor = article.id;
+    api.navigation?.()
+      .then((navigation) => {
+        const path = navigation?.inquiryPath;
+        const actions = this.querySelector("[data-detail-actions]");
+        if (path == null || !actions || this.context.article?.id !== renderedFor || actions.querySelector(".shop-detail__ask")) return;
+        actions.insertAdjacentHTML("beforeend", `<p class="shop-detail__ask">Weitere Fragen?
+          <a href="${escapeHtml(api.href(`${path}?artikel=${encodeURIComponent(article.id)}`))}">Schreiben Sie uns eine Nachricht</a></p>`);
+      })
+      .catch(() => {});
   }
 }
 

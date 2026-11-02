@@ -100,6 +100,16 @@ export const BLOCK_TYPES = {
     ],
     defaults: { heading: "Ihr Ansprechpartner", name: "" },
   },
+  "inquiry-form": {
+    label: "Anfrageformular",
+    description: "Besucher senden Ihnen Fragen oder Angebotswünsche",
+    // The form fields themselves are fixed (Name, E-Mail/Telefon, Artikel, Nachricht, Datenschutz).
+    fields: [
+      text("heading", "Überschrift", 120),
+      text("text", "Einleitung", 1000, { multiline: true }),
+    ],
+    defaults: { heading: "Ihre Anfrage", text: "" },
+  },
   spacer: {
     label: "Abstand/Trennlinie",
     description: "Luft zwischen Abschnitten, optional mit Linie",
@@ -141,6 +151,7 @@ const SAMPLES = {
   "featured-articles": { heading: "Empfehlungen", columns: "3" },
   "contact-person": { heading: "Ihr Ansprechpartner", name: "Maria Muster", role: "Beratung und Verkauf",
     email: "maria@example.at", phone: "+43 732 123456" },
+  "inquiry-form": { heading: "Fragen Sie uns", text: "Sie suchen einen Artikel oder brauchen ein Angebot? Schreiben Sie uns." },
   spacer: { size: "medium", divider: true },
 };
 

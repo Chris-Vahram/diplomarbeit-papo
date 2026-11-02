@@ -6,6 +6,22 @@ export function createShopApi(kennung) {
   const base = `${API_BASE}/shop/${encodeURIComponent(kennung)}`;
   let articles;
 
+  // Errors carry the server's German message (inquiry form shows it as is).
+  async function send(path, body) {
+    const response = await fetch(base + path, {
+      method: "POST",
+      credentials: "omit",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+      const error = new Error(`HTTP ${response.status}`);
+      error.status = response.status;
+      error.serverMessage = await response.json().then((data) => data?.message).catch(() => null);
+      throw error;
+    }
+  }
+
   async function get(path) {
     const response = await fetch(base + path, { credentials: "omit" });
     if (!response.ok) {
@@ -18,12 +34,17 @@ export function createShopApi(kennung) {
 
   return {
     kennung,
+    // Only the public shop sends inquiries; preview and template demo never do.
+    live: true,
     shop: () => get(""),
     theme: () => get("/theme"),
     navigation: () => get("/navigation"),
     page: (segment) => get(`/pages/${encodeURIComponent(segment)}`),
     article: (id) => get(`/articles/${encodeURIComponent(id)}`),
     articles: () => (articles ??= get("/articles")),
+    // Signed render timestamp, then the submission (shop-inquiries spec).
+    inquiryToken: () => get("/inquiries/token").then((data) => data.token),
+    sendInquiry: (body) => send("/inquiries", body),
     // Block images are the shop's own uploads (shop-assets spec).
     assetUrl: (assetId) => `${base}/assets/${encodeURIComponent(assetId)}`,
     // Backend URLs ("/api/...") must go through API_BASE (separate backend port in local dev).
@@ -47,6 +68,9 @@ export function createPreviewApi(data) {
     page: async () => data.page,
     article: async () => data.article,
     articles: async () => data.articles,
+    // Nothing is sent from the preview; the form shows it is a preview instead.
+    inquiryToken: async () => null,
+    sendInquiry: async () => {},
     assetUrl: (assetId) => data.assetUrls?.[assetId] ?? "",
     resolveUrl: (url) => data.imageUrls?.[url] ?? (url?.startsWith("/api/") ? "" : url),
     href: (path = "") => `#${path}`,

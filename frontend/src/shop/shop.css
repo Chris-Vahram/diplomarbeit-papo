@@ -359,6 +359,20 @@ h2.shop-heading { font-size: clamp(1.625rem, 2.8vw, 2.375rem); }
 .shop-detail h1.shop-heading { font-size: clamp(2rem, 4vw, 3.25rem); }
 .shop-detail .shop-price { padding: 0.5rem 0 1.5rem; margin: 0 0 1.5rem; border-bottom: 1px solid var(--shop-border); }
 .shop-detail .shop-price__value { font-size: 1.75rem; }
+.shop-detail__actions:empty { display: none; }
+.shop-detail__actions { margin-top: 2rem; }
+.shop-detail__ask { margin: 0; color: var(--shop-muted); font-size: 0.9375rem; }
+.shop-detail__ask a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2.75rem;
+  color: var(--shop-text);
+  font-weight: 650;
+  text-decoration-color: color-mix(in srgb, var(--shop-accent) 70%, transparent);
+  text-decoration-thickness: 2px;
+}
+.shop-detail__ask a:hover { text-decoration-color: currentColor; }
 
 /* ---- Contact person ----------------------------------------------------------------- */
 .shop-contact__card { max-width: 40rem; }
@@ -378,6 +392,243 @@ h2.shop-heading { font-size: clamp(1.625rem, 2.8vw, 2.375rem); }
   overflow-wrap: anywhere;
 }
 .shop-contact__links a:hover { border-color: currentColor; }
+
+/* ---- Inquiry form ------------------------------------------------------------------- */
+/* Intro left, form on its own surface panel right. The panel resets the colours, so the form
+   stays readable on a primary or accent block background. */
+.shop-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.shop-inquiry {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+}
+.shop-inquiry__intro { position: sticky; top: 6rem; padding-top: 0.25rem; }
+.shop-inquiry__recipient { margin: 1.5rem 0 0; color: var(--shop-muted); font-size: 0.9375rem; overflow-wrap: anywhere; }
+.shop-inquiry__recipient strong { color: inherit; font-weight: 650; }
+
+.shop-inquiry__panel {
+  --shop-muted: color-mix(in srgb, var(--shop-text) 68%, var(--shop-surface));
+  --shop-border: color-mix(in srgb, var(--shop-text) 14%, var(--shop-surface));
+  /* Field outlines need 3:1 against the panel (WCAG 1.4.11). */
+  --inquiry-line: color-mix(in srgb, var(--shop-text) 52%, var(--shop-surface));
+  --inquiry-error: color-mix(in srgb, #d92d20 75%, var(--shop-text));
+  --inquiry-radius: calc(min(var(--shop-radius), 12px) * 0.6);
+  container-type: inline-size;
+  padding: clamp(1.25rem, 3vw, 2.25rem);
+  background: var(--shop-surface);
+  color: var(--shop-text);
+  border: 1px solid var(--shop-border);
+  border-radius: var(--shop-radius);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--shop-text) 5%, transparent),
+    0 18px 40px -24px color-mix(in srgb, var(--shop-text) 22%, transparent);
+}
+
+.shop-inquiry__form fieldset {
+  display: grid;
+  gap: 1.25rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.shop-inquiry__preview {
+  margin: 0;
+  padding: 0.625rem 0.875rem;
+  border: 1px dashed var(--inquiry-line);
+  border-radius: var(--inquiry-radius);
+  color: var(--shop-muted);
+  font-size: 0.875rem;
+}
+
+.shop-inquiry__field { display: grid; gap: 0.375rem; min-width: 0; }
+.shop-inquiry__field > label { font-size: 0.875rem; font-weight: 600; line-height: 1.4; }
+
+.shop-inquiry__field :is(input, select, textarea) {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.6875rem 0.875rem;
+  border: 1px solid var(--inquiry-line);
+  border-radius: var(--inquiry-radius);
+  background: var(--shop-surface);
+  color: var(--shop-text);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+  caret-color: var(--shop-accent);
+  transition: border-color 160ms ease, box-shadow 200ms var(--shop-ease);
+}
+.shop-inquiry__field :is(input, select, textarea):hover { border-color: color-mix(in srgb, var(--shop-text) 72%, var(--shop-surface)); }
+.shop-inquiry__field :is(input, select, textarea):focus-visible {
+  outline: none;
+  border-color: var(--shop-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--shop-accent) 30%, transparent);
+}
+.shop-inquiry__field :is(input, select, textarea)[aria-invalid] { border-color: var(--inquiry-error); }
+.shop-inquiry__field textarea { min-height: 9.5rem; resize: vertical; }
+.shop-inquiry__field select {
+  appearance: none;
+  padding-right: 2.75rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7075' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.875rem center;
+  background-size: 1.125rem;
+  text-overflow: ellipsis;
+}
+
+.shop-inquiry__pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.375rem 1rem;
+}
+.shop-inquiry__pair > p { grid-column: 1 / -1; }
+.shop-inquiry__hint { margin: 0; color: var(--shop-muted); font-size: 0.8125rem; }
+
+.shop-inquiry__count {
+  justify-self: end;
+  color: var(--shop-muted);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.shop-inquiry__error {
+  margin: 0;
+  color: var(--inquiry-error);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+/* Wide panel (desktop): rows instead of one long column, so the whole form and its button
+   fit one desktop viewport. Name | E-Mail | Telefon, then Artikel, Nachricht, and consent
+   next to the button. Narrow panels keep the single column above. */
+@container (min-width: 32rem) {
+  .shop-inquiry__form fieldset {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    gap: 1.125rem 1rem;
+  }
+  .shop-inquiry__form fieldset > * { grid-column: 1 / -1; }
+  .shop-inquiry__form fieldset > [data-field-name="name"] { grid-column: 1; }
+  .shop-inquiry__form fieldset > .shop-inquiry__pair { grid-column: 2 / -1; }
+  .shop-inquiry__field textarea { min-height: 0; height: 7.5rem; }
+  .shop-inquiry__form fieldset > .shop-inquiry__consent { grid-column: 1 / 3; align-self: center; }
+  .shop-inquiry__form fieldset > .shop-inquiry__submit {
+    grid-column: 3;
+    justify-self: end;
+    align-self: center;
+    margin-top: 0;
+  }
+}
+
+/* Honeypot: off-screen for people and screen readers, still in the DOM for bots. */
+.shop-inquiry__trap { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+.shop-inquiry__consent {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.25rem 0.75rem;
+  align-items: start;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+.shop-inquiry__consent input {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0.125rem 0 0;
+  accent-color: var(--shop-accent);
+}
+.shop-inquiry__consent label { cursor: pointer; }
+.shop-inquiry__consent a { font-weight: 600; }
+.shop-inquiry__consent .shop-inquiry__error { grid-column: 2; }
+
+.shop-inquiry__status {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--inquiry-error) 45%, transparent);
+  border-radius: var(--inquiry-radius);
+  background: color-mix(in srgb, var(--inquiry-error) 8%, var(--shop-surface));
+  color: var(--inquiry-error);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.shop-inquiry__submit {
+  justify-self: start;
+  margin-top: 0.25rem;
+  border: 0;
+  font-family: inherit;
+  cursor: pointer;
+}
+.shop-inquiry__form fieldset:disabled .shop-inquiry__submit { cursor: default; opacity: 0.6; }
+.shop-inquiry__form[aria-busy] .shop-inquiry__submit { cursor: progress; opacity: 0.75; }
+.shop-inquiry__form[aria-busy] .shop-inquiry__submit::after { animation: shop-inquiry-nudge 900ms var(--shop-ease) infinite; }
+
+/* The one authored moment: the confirmation settles into the panel the form left. */
+.shop-inquiry__sent {
+  display: grid;
+  justify-items: start;
+  gap: 0.5rem;
+  padding-block: clamp(0.5rem, 2vw, 1.5rem);
+  outline: none;
+  animation: shop-inquiry-in 520ms var(--shop-ease) both;
+}
+.shop-inquiry__sent-icon {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 0.5rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--shop-accent) 16%, var(--shop-surface));
+  color: color-mix(in srgb, var(--shop-accent) 70%, var(--shop-text));
+}
+.shop-inquiry__sent-title {
+  margin: 0;
+  font-family: var(--shop-heading-font);
+  font-size: 1.375rem;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.shop-inquiry__next {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+  margin-top: 1.25rem;
+}
+.shop-inquiry__next .shop-button { margin-top: 0; }
+/* Back: the arrow leads the label and points (and nudges) the way back. */
+.shop-button--back::after { order: -1; transform: scaleX(-1); }
+.shop-button--back:hover::after { transform: scaleX(-1) translateX(3px); }
+.shop-inquiry__again {
+  min-height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+@keyframes shop-inquiry-in {
+  from { opacity: 0; transform: translateY(10px); filter: blur(6px); }
+}
+@keyframes shop-inquiry-nudge {
+  50% { transform: translateX(4px); }
+}
 
 /* ---- Spacer and divider ------------------------------------------------------------- */
 .shop-spacer--small { min-height: 0.5rem; }
@@ -584,6 +835,18 @@ h2.shop-heading { font-size: clamp(1.625rem, 2.8vw, 2.375rem); }
 
 [data-form="kraeftig"] .shop-footer { background: var(--shop-primary); color: color-mix(in srgb, var(--shop-on-primary) 80%, transparent); border-top: 0; }
 
+/* Inquiry form per form preset. */
+[data-form="handwerk"] .shop-inquiry__panel { padding: clamp(1.5rem, 3.5vw, 2.75rem); }
+[data-form="handwerk"] .shop-inquiry__sent-title { font-weight: 700; }
+[data-form="kraeftig"] .shop-inquiry__panel { box-shadow: none; border-color: var(--inquiry-line); }
+[data-form="kraeftig"] .shop-inquiry__field > label {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+[data-form="kraeftig"] .shop-inquiry__sent-title { font-weight: 800; text-transform: uppercase; letter-spacing: 0; }
+
 /* ---- Responsive --------------------------------------------------------------------- */
 @media (max-width: 900px) {
   .shop-grid--cols-3,
@@ -592,8 +855,16 @@ h2.shop-heading { font-size: clamp(1.625rem, 2.8vw, 2.375rem); }
   [data-form="klar"] .shop-hero__media { order: 0; aspect-ratio: 4 / 3; }
 }
 
+@media (max-width: 800px) {
+  .shop-inquiry { grid-template-columns: 1fr; gap: 1.75rem; }
+  .shop-inquiry__intro { position: static; }
+}
+
 @media (max-width: 600px) {
   body { font-size: 1rem; }
+  .shop-inquiry__pair { grid-template-columns: 1fr; row-gap: 1.25rem; }
+  .shop-inquiry__hint { margin-top: -0.875rem; }
+  .shop-inquiry__submit { justify-self: stretch; justify-content: center; }
   .shop-split { grid-template-columns: 1fr; }
   .shop-split--image-right .shop-split__image,
   .shop-split--image-right .shop-detail__media { order: 0; }
@@ -623,7 +894,11 @@ h2.shop-heading { font-size: clamp(1.625rem, 2.8vw, 2.375rem); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0.01ms !important; }
   .shop-card__link:hover .shop-card__image { transform: none; }
+  .shop-inquiry__sent { animation: shop-inquiry-fade 200ms ease both; }
+  .shop-inquiry__form[aria-busy] .shop-inquiry__submit::after { animation: none; }
 }
+
+@keyframes shop-inquiry-fade { from { opacity: 0; } }
 
 /* Editor preview (shop.html?preview): blocks are clickable to select them in the editor. */
 .shop-root--preview .shop-header { position: static; }
