@@ -1,6 +1,7 @@
 // Self-check for the shop design assistant: `node tools/check_shop_assistant.mjs`
 // Runs the shared contrast vectors (also used by the backend's ShopContrastTest) and the
-// scenarios of the shop-design-assistant spec against the client-side rules.
+// scenarios of the shop-design-assistant spec against the client-side rules, then every shop
+// template (shop-templates spec "Template quality").
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { contrast, mix, onColor, suggestForeground } from "../frontend/src/shop/contrast.js";
@@ -81,5 +82,29 @@ assert.equal(gated.warnings.length, 1);
 // Spec "Adding a rule": a new unit appears without touching the others.
 const extra = { id: "demo", severity: "tip", scope: "page", check: () => [{}], explain: () => ({ title: "t", why: "w", fix: "f" }) };
 assert.deepEqual(ids(evaluate({ page, blocks: [block("heading-text", {})], theme, images: {} }, [...RULES, extra])), ["demo/tip"]);
+
+// shop-templates spec "Template quality": no template raises a Blocker or Warnung with its own
+// theme suggestion or the default theme; free pages are checked in every style's theme.
+const templateDir = new URL("../backend/src/main/resources/shop-templates/", import.meta.url);
+const readTemplate = (name) => JSON.parse(readFileSync(new URL(name, templateDir)));
+const SLOTS = { startseite: "HOME", artikel: "ARTICLES", artikeldetail: "ARTICLE_DETAIL", frei: "FREE" };
+const defaultTheme = readTemplate("theme.json");
+const templates = readTemplate("index.json").map((entry) => ({ ...entry, ...readTemplate(`${entry.id}.json`) }));
+const styleThemes = templates.filter((template) => template.theme).map((template) => [template.id, template.theme]);
+const problems = [];
+for (const template of templates) {
+  const themes = [["Standard-Theme", defaultTheme], ...(template.theme ? [["eigenes Theme", template.theme]] : styleThemes)];
+  const blocks = template.blocks.map((candidate, index) => ({ id: `b${index + 1}`, ...candidate }));
+  for (const [themeName, templateTheme] of themes) {
+    const findings = evaluate({
+      page: { slot: SLOTS[template.page], online: true, seoTitle: template.name },
+      blocks, theme: templateTheme, images: {},
+    });
+    for (const finding of findings.filter((candidate) => candidate.severity !== "tip")) {
+      problems.push(`${template.id} (${themeName}) ${finding.blockId ?? ""}: ${finding.severity} ${finding.title}`);
+    }
+  }
+}
+assert.deepEqual(problems, []);
 
 console.log("shop design assistant ok");
