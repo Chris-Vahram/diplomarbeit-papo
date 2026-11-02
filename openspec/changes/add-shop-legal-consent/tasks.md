@@ -16,4 +16,4 @@
 
 - [x] 3.1 Tests + package; `git diff --check`
 - [x] 3.2 Browser: decline consent → no optional storage; keyboard operation of banner
-- [ ] 3.3 Update traceability
+- [x] 3.3 Update traceability
