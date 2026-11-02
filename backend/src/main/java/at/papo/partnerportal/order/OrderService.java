@@ -8,7 +8,9 @@ import at.papo.partnerportal.customer.KundeService;
 import at.papo.partnerportal.enablement.EnablementService;
 import at.papo.partnerportal.mail.OrderEmailService;
 import at.papo.partnerportal.partner.Partner;
+import at.papo.partnerportal.partner.PartnerService;
 import at.papo.partnerportal.product.Product;
+import at.papo.partnerportal.security.CurrentCompany;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -40,6 +42,12 @@ public class OrderService {
     @Inject
     OrderEmailService orderEmailService;
 
+    @Inject
+    PartnerService partnerService;
+
+    @Inject
+    CurrentCompany currentCompany;
+
     // join fetch + distinct: one query instead of 1+N+N+N (items/partner/kunde each
     // loaded per order without it). distinct collapses the duplicate parent rows the
     // items join produces (one row per item) back to one Order per id.
@@ -57,7 +65,7 @@ public class OrderService {
     public List<OrderDto> listAll() {
         List<Order> orders = Order.find(
                 "select distinct o from Order o join fetch o.items join fetch o.partner join fetch o.kunde "
-                        + "order by o.id").list();
+                        + "where o.partner.company = ?1 order by o.id", currentCompany.resolve()).list();
         Map<Long, CommissionRecord> commissionsByOrderId = commissionService.findForOrders(orders);
         return orders.stream()
                 .map(order -> OrderDto.from(order, commissionsByOrderId.get(order.id)))
@@ -65,7 +73,7 @@ public class OrderService {
     }
 
     public long countUnseen() {
-        return Order.count("seenByCompany = false");
+        return Order.count("seenByCompany = false and partner.company = ?1", currentCompany.resolve());
     }
 
     // Manual order creation by the company (order-management spec): resolves the
@@ -73,10 +81,7 @@ public class OrderService {
     // (enablement, availability, commission snapshot) is identical to the partner's own flow.
     @Transactional
     public OrderDto createForPartnerId(Long partnerId, CompanyOrderRequest request) {
-        Partner partner = Partner.findById(partnerId);
-        if (partner == null) {
-            throw new ApiException(404, "Partner nicht gefunden.");
-        }
+        Partner partner = partnerService.findOrThrow(partnerId);
         // FR-23: an inactive partner may not receive new orders, including manual
         // orders created by the company on the partner's behalf.
         if (!partner.active) {
@@ -94,7 +99,8 @@ public class OrderService {
         BigDecimal total = BigDecimal.ZERO;
         for (OrderItemRequest itemRequest : request.items()) {
             Product product = Product.findById(itemRequest.productId());
-            if (product == null) {
+            // An article of another company is reported like a missing one.
+            if (product == null || !product.company.id.equals(partner.company.id)) {
                 throw new ApiException(404, "Artikel nicht gefunden.");
             }
             if (!enablementService.isEnabledForPartner(partner, product.id)) {
@@ -128,10 +134,7 @@ public class OrderService {
 
     @Transactional
     public OrderDto updateStatus(Long orderId, OrderStatus status) {
-        Order order = Order.findById(orderId);
-        if (order == null) {
-            throw new ApiException(404, "Bestellung nicht gefunden.");
-        }
+        Order order = findOwnOrThrow(orderId);
         OrderStatus current = order.status;
         if (!status.equals(NEXT_STATUS.get(current))) {
             throw new ApiException(400, "Status kann nur schrittweise vorwärts geändert werden "
@@ -151,13 +154,20 @@ public class OrderService {
     // (order-notifications spec: "opening details" is the seen trigger).
     @Transactional
     public OrderDto markSeen(Long orderId) {
+        Order order = findOwnOrThrow(orderId);
         // Targeted update of the flag only, so it never overwrites a concurrent status change.
-        if (Order.update("seenByCompany = true where id = ?1", orderId) == 0) {
-            throw new ApiException(404, "Bestellung nicht gefunden.");
-        }
-        Order order = Order.findById(orderId);
+        Order.update("seenByCompany = true where id = ?1", orderId);
         Order.getEntityManager().refresh(order);
         return OrderDto.from(order, commissionService.findForOrder(order));
+    }
+
+    // Company-side lookup: an order of another company is indistinguishable from a missing one.
+    public Order findOwnOrThrow(Long orderId) {
+        Order order = Order.find("id = ?1 and partner.company = ?2", orderId, currentCompany.resolve()).firstResult();
+        if (order == null) {
+            throw new ApiException(404, "Bestellung nicht gefunden.");
+        }
+        return order;
     }
 
     private Kunde resolveKunde(Partner partner, OrderRequest request) {

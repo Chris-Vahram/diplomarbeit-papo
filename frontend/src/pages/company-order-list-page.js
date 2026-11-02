@@ -37,6 +37,7 @@ const EMAIL_REASONS = {
   INVALID_ADDRESS: "ungültige Adresse",
   CONFIG_CHANGED: "Konfiguration geändert",
   RECIPIENT_CHANGED: "Empfänger geändert",
+  NO_RECIPIENT: "keine E-Mail für Bestellhinweise im Firmenprofil",
 };
 
 class CompanyOrderListPage extends HTMLElement {

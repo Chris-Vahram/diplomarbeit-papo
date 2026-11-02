@@ -1,6 +1,8 @@
 package at.papo.partnerportal.partner;
 
+import at.papo.partnerportal.business.CompanyLogin;
 import at.papo.partnerportal.common.ApiException;
+import at.papo.partnerportal.security.LoginSubjectLock;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -19,6 +21,9 @@ public class PartnerLoginService {
     @Inject
     JsonWebToken jwt;
 
+    @Inject
+    PartnerService partnerService;
+
     public List<PartnerLoginDto> list(Long partnerId) {
         Partner partner = findPartner(partnerId);
         return PartnerLogin.<PartnerLogin>find("partner = ?1 order by id", partner).stream()
@@ -30,13 +35,12 @@ public class PartnerLoginService {
     public PartnerLoginDto add(Long partnerId, PartnerLoginRequest request) {
         Partner partner = findPartner(partnerId);
         String subject = request.oidcSubject().trim();
-        // Serialises concurrent adds/reactivations of the same subject until commit, so the
-        // check below is race-free and the unique constraint never fires (no subject in
-        // Hibernate's JDBC error log, no swallowed unrelated persistence errors).
-        PartnerLogin.getEntityManager()
-                .createNativeQuery("select pg_advisory_xact_lock(hashtext(?1))")
-                .setParameter(1, "partner_login:" + subject)
-                .getSingleResult();
+        // Serialises concurrent bindings of the same subject (partner and company side share the
+        // key) until commit, so the checks below are race-free and no unique constraint fires.
+        LoginSubjectLock.lock(subject);
+        if (CompanyLogin.count("oidcSubject", subject) > 0) {
+            throw new ApiException(409, "Dieses Login ist bereits mit einem Firmenkonto verknüpft.");
+        }
         PartnerLogin existing = PartnerLogin.find("oidcSubject", subject).firstResult();
         if (existing != null) {
             // Re-adding a revoked subject of the same partner reactivates it; anything else collides.
@@ -57,6 +61,7 @@ public class PartnerLoginService {
 
     @Transactional
     public void revoke(Long partnerId, Long loginId) {
+        findPartner(partnerId);
         PartnerLogin login = PartnerLogin.findById(loginId);
         if (login == null || !login.partner.id.equals(partnerId)) {
             throw new ApiException(404, "Login nicht gefunden.");
@@ -67,11 +72,7 @@ public class PartnerLoginService {
         }
     }
 
-    private static Partner findPartner(Long partnerId) {
-        Partner partner = Partner.findById(partnerId);
-        if (partner == null) {
-            throw new ApiException(404, "Partner nicht gefunden.");
-        }
-        return partner;
+    private Partner findPartner(Long partnerId) {
+        return partnerService.findOrThrow(partnerId);
     }
 }

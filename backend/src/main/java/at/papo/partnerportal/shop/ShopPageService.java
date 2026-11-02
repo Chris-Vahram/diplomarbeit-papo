@@ -211,7 +211,8 @@ public class ShopPageService {
 
             @Override
             public boolean categoryExists(long categoryId) {
-                return Category.findById(categoryId) != null;
+                // Only categories of the shop partner's own company (add-company-tenancy).
+                return Category.count("id = ?1 and company = ?2", categoryId, shop.partner.company) > 0;
             }
 
             @Override

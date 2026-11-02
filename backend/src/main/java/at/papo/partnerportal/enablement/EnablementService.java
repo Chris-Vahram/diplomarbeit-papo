@@ -2,9 +2,12 @@ package at.papo.partnerportal.enablement;
 
 import at.papo.partnerportal.common.ApiException;
 import at.papo.partnerportal.partner.Partner;
+import at.papo.partnerportal.partner.PartnerService;
 import at.papo.partnerportal.product.Product;
 import at.papo.partnerportal.product.ProductDto;
+import at.papo.partnerportal.security.CurrentCompany;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
@@ -13,12 +16,19 @@ import java.util.Set;
 @ApplicationScoped
 public class EnablementService {
 
+    @Inject
+    PartnerService partnerService;
+
+    @Inject
+    CurrentCompany currentCompany;
+
     public List<EnablementDto> listForPartner(Long partnerId) {
         Partner partner = findPartnerOrThrow(partnerId);
         Set<Long> enabledProductIds = ProductEnablement.<ProductEnablement>list("partner", partner).stream()
                 .map(e -> e.product.id)
                 .collect(java.util.stream.Collectors.toSet());
-        return Product.<Product>find("select p from Product p left join fetch p.articleCategory order by p.id").list().stream()
+        return Product.<Product>find("select p from Product p left join fetch p.articleCategory"
+                        + " where p.company = ?1 order by p.id", partner.company).list().stream()
                 .map(product -> EnablementDto.from(product, enabledProductIds.contains(product.id)))
                 .toList();
     }
@@ -60,15 +70,12 @@ public class EnablementService {
     }
 
     private Partner findPartnerOrThrow(Long partnerId) {
-        Partner partner = Partner.findById(partnerId);
-        if (partner == null) {
-            throw new ApiException(404, "Partner nicht gefunden.");
-        }
-        return partner;
+        return partnerService.findOrThrow(partnerId);
     }
 
+    // Only articles of the caller's company can be enabled (partner and article in one company).
     private Product findProductOrThrow(Long productId) {
-        Product product = Product.findById(productId);
+        Product product = Product.find("id = ?1 and company = ?2", productId, currentCompany.resolve()).firstResult();
         if (product == null) {
             throw new ApiException(404, "Artikel nicht gefunden.");
         }

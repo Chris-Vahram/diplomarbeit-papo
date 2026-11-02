@@ -7,6 +7,7 @@ import at.papo.partnerportal.common.Address;
 import at.papo.partnerportal.common.ApiException;
 import at.papo.partnerportal.partner.Partner;
 import at.papo.partnerportal.partner.PartnerNumber;
+import at.papo.partnerportal.security.CurrentCompany;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -23,6 +24,9 @@ import static at.papo.partnerportal.importer.ImportValueParsing.parseDecimal;
 
 @ApplicationScoped
 public class PartnerImportDefinition implements ImportDefinition {
+
+    @Inject
+    CurrentCompany currentCompany;
 
     @Inject
     BusinessTaxIdentifierValidator taxIdentifierValidator;
@@ -126,12 +130,14 @@ public class PartnerImportDefinition implements ImportDefinition {
     // PartnerNumber.canonicalize's case-folding (avoids the Turkish-I trap).
     @Override
     public boolean existsInDb(String identifierValue) {
-        return Partner.count("lower(partnerNumber) = ?1", identifierValue.toLowerCase(Locale.ROOT)) > 0;
+        return Partner.count("company = ?1 and lower(partnerNumber) = ?2", currentCompany.resolve(),
+                identifierValue.toLowerCase(Locale.ROOT)) > 0;
     }
 
     @Override
     public void persist(Map<String, String> mappedValues) {
         Partner partner = new Partner();
+        partner.company = currentCompany.resolve();
         partner.partnerNumber = PartnerNumber.canonicalize(mappedValues.get("partnerNumber"));
         partner.name = mappedValues.get("name").trim();
         partner.address = new Address(mappedValues.get("street").trim(), mappedValues.get("houseNumber").trim(),

@@ -3,11 +3,14 @@ package at.papo.partnerportal.business;
 import at.papo.partnerportal.partner.Partner;
 import io.quarkus.narayana.jta.QuarkusTransaction;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.QuarkusTestProfile;
+import io.quarkus.test.junit.TestProfile;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -15,7 +18,26 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @QuarkusTest
+@TestProfile(BusinessTaxIdentifierMigrationTest.SingleCompany.class)
 class BusinessTaxIdentifierMigrationTest {
+
+    // The pre-tax-identifier VM state had exactly the three demo partners of one company.
+    public static class SingleCompany implements QuarkusTestProfile {
+        @Override
+        public Map<String, String> getConfigOverrides() {
+            return Map.of("papo.seed.second-company", "false");
+        }
+    }
+
+    // Back to the pre-tenancy state the old migration ran on: no company assignment, no
+    // company logins, so the profile can be deleted like before add-company-tenancy.
+    private void detachTenancy() {
+        for (String table : new String[] { "partner", "product", "article_categories", "productimage" }) {
+            entityManager.createNativeQuery("alter table " + table + " alter column company_id drop not null").executeUpdate();
+            entityManager.createNativeQuery("update " + table + " set company_id = null").executeUpdate();
+        }
+        entityManager.createNativeQuery("delete from company_login").executeUpdate();
+    }
 
     private static final String UNKNOWN_PARTNER_NUMBER = "MIGRATION-UNKNOWN";
 
@@ -49,6 +71,7 @@ class BusinessTaxIdentifierMigrationTest {
             partner("P-1002").taxIdentifier = new BusinessTaxIdentifier(
                     "DE", BusinessTaxIdentifierType.VAT_ID, "DE123456789");
             partner("P-1003").taxIdentifier = null;
+            detachTenancy();
             CompanyProfile.deleteAll();
         });
 
@@ -59,7 +82,7 @@ class BusinessTaxIdentifierMigrationTest {
             assertEquals("ATU12345678", partner("PARTNER-DEMO").taxIdentifier.value);
             assertEquals("DE123456789", partner("P-1002").taxIdentifier.value);
             assertEquals("ATU34567890", partner("P-1003").taxIdentifier.value);
-            assertEquals(1, CompanyProfile.count("singletonKey", CompanyProfile.CURRENT_KEY));
+            assertEquals(1, CompanyProfile.count());
             assertEquals(3, requiredTaxColumnCount("partner"));
             assertEquals(3, requiredTaxColumnCount("companyprofile"));
         });
@@ -72,6 +95,7 @@ class BusinessTaxIdentifierMigrationTest {
             Partner legacyDemo = partner("PARTNER-DEMO");
             legacyDemo.name = "Elektro Huber GmbH";
             legacyDemo.taxIdentifier = null;
+            detachTenancy();
             CompanyProfile.deleteAll();
         });
 
@@ -80,7 +104,7 @@ class BusinessTaxIdentifierMigrationTest {
         QuarkusTransaction.requiringNew().run(() -> {
             assertEquals("Elektro Huber GmbH", partner("PARTNER-DEMO").name);
             assertEquals("ATU12345678", partner("PARTNER-DEMO").taxIdentifier.value);
-            assertEquals(1, CompanyProfile.count("singletonKey", CompanyProfile.CURRENT_KEY));
+            assertEquals(1, CompanyProfile.count());
         });
     }
 
@@ -93,6 +117,7 @@ class BusinessTaxIdentifierMigrationTest {
             Partner unknown = partner("P-1003");
             unknown.partnerNumber = UNKNOWN_PARTNER_NUMBER;
             unknown.taxIdentifier = null;
+            detachTenancy();
             CompanyProfile.deleteAll();
         });
 
@@ -123,7 +148,10 @@ class BusinessTaxIdentifierMigrationTest {
 
     @Test
     void missingProfileOutsideVerifiedDemoDataAborts() {
-        QuarkusTransaction.requiringNew().run(() -> CompanyProfile.deleteAll());
+        QuarkusTransaction.requiringNew().run(() -> {
+            detachTenancy();
+            CompanyProfile.deleteAll();
+        });
 
         assertThrows(IllegalStateException.class, () -> migrationService.migrate(false));
     }

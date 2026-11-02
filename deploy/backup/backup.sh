@@ -12,8 +12,14 @@ RETENTION_COUNT=14
 BACKUP_DIR="$(cd "$(dirname "$0")" && pwd)"
 COMPOSE_DIR="$(cd "$BACKUP_DIR/../.." && pwd)"
 
-# shellcheck disable=SC1091
-. "$COMPOSE_DIR/.env.prod"
+# Read only DB_USER instead of sourcing .env.prod: secrets such as SMTP_PASSWORD may contain
+# shell metacharacters that docker compose accepts but sh cannot parse (and the script needs
+# no other variable).
+DB_USER="$(grep '^DB_USER=' "$COMPOSE_DIR/.env.prod" | head -n 1 | cut -d= -f2-)"
+if [ -z "$DB_USER" ]; then
+	echo "DB_USER fehlt in $COMPOSE_DIR/.env.prod" >&2
+	exit 1
+fi
 
 STAMP="$(date +%Y%m%d-%H%M%S)"
 

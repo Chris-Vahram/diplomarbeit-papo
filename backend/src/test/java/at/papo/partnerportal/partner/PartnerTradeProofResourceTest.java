@@ -1,5 +1,6 @@
 package at.papo.partnerportal.partner;
 
+import at.papo.partnerportal.support.TestCompanies;
 import at.papo.partnerportal.common.Address;
 import at.papo.partnerportal.business.BusinessTaxIdentifier;
 import at.papo.partnerportal.business.BusinessTaxIdentifierType;
@@ -203,6 +204,7 @@ class PartnerTradeProofResourceTest {
         String secondPartnerToken = tokens.tokenFor("partner-second", "partner-second");
         long secondPartnerId = QuarkusTransaction.requiringNew().call(() -> {
             Partner partner = new Partner();
+            partner.company = TestCompanies.one();
             partner.partnerNumber = "PARTNER-SECOND";
             partner.name = "Testpartner Zwei";
             partner.address = new Address("Teststraße", "2", "4020", "Linz", "Österreich");
@@ -247,10 +249,11 @@ class PartnerTradeProofResourceTest {
 
     @Test
     void companyPartnerListLoadsAllProofMetadataInOneBatch() {
+        var company = QuarkusTransaction.requiringNew().call(TestCompanies::one);
         var statistics = entityManagerFactory.unwrap(SessionFactory.class).getStatistics();
         statistics.clear();
 
-        partnerService.list();
+        partnerService.list(company);
 
         assertEquals(2, statistics.getQueryExecutionCount(),
                 "Partnerliste und Nachweis-Metadaten sollen je eine Abfrage benötigen");
@@ -260,6 +263,7 @@ class PartnerTradeProofResourceTest {
     void companyPartnerListMarksMissingProofAsAbsent() {
         long partnerId = QuarkusTransaction.requiringNew().call(() -> {
             Partner partner = new Partner();
+            partner.company = TestCompanies.one();
             partner.partnerNumber = "PARTNER-NO-PROOF";
             partner.name = "Partner ohne Nachweis";
             partner.address = new Address("Teststraße", "3", "4020", "Linz", "Österreich");

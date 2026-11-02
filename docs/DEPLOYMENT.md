@@ -162,6 +162,64 @@ Nach dem Deploy von Release A einmalig auf der VM:
 Erst danach Release B (Fallback entfernt) deployen. Rollback B → A ist sicher; A → davor
 nur, solange kein Login entfernt, kein Keycloak-Benutzer umbenannt und keine
 Partnernummer geändert wurde.
+## Mandantenfähigkeit (`add-company-tenancy`)
+
+Ausgeliefert in zwei Releases, damit der automatische Gateway-Restore nie ein Image startet,
+das nicht zum Schema passt (der Gateway setzt SQL nie zurück):
+
+- **Release A (expand):** ordnet beim Start alle Partner, Artikel, Kategorien und Bilder
+  ohne Firma der einzigen Firma zu (`CompanyTenancyMigrationService.expand()`); `company_id`
+  bleibt optional, Singleton-Schlüssel `CURRENT` und alte Unique-Constraints bleiben. Das
+  vorige Image läuft auf diesem Schema weiter (lokal geprüft mit beiden JARs).
+- **Release B (contract):** erst nach A und gebundenem `company-demo`
+  (`CompanyTenancyMigrationService.contract()`): setzt `company_id` auf NOT NULL, entfernt die
+  globalen Unique-Constraints auf `partner.partnernumber`, `article_categories.normalized_name`
+  und `companyprofile.singletonkey` und macht `singletonkey` optional. Partnernummer und
+  Kategoriename sind danach nur noch je Firma eindeutig. Das A-Image läuft auf diesem Schema
+  weiter. Erst danach Firma 2 anlegen.
+
+**Rollout Release B:** wie A Schritt 1–2 (Backup, SHA notieren, Merge → Deploy), danach als
+`company-demo` und `partner-demo` anmelden und prüfen. Prüfen des Schemas auf der VM:
+`select pg_get_constraintdef(oid) from pg_constraint where conrelid = 'partner'::regclass and contype = 'u';`
+zeigt nur noch `UNIQUE (company_id, partnernumber)`.
+
+**Rollout Release A:**
+
+1. Vor dem Merge auf der VM: `deploy/backup/backup.sh`, aktuelle Image-SHA notieren.
+2. Merge → Deploy. Firmenbenutzer bekommen jetzt 403 „Kein Firmenkonto mit diesem Login
+   verknüpft.“, bis sie gebunden sind (kein Übergangs-Fallback).
+3. Sofort `company-demo` binden: In der Keycloak-Administration den Benutzer `company-demo`
+   öffnen, die **ID** kopieren, dann auf der VM (Firma 1 hat die ID aus der Ausgabe von
+   `select id, businessname from companyprofile;`):
+
+   ```bash
+   # lokal: Skript auf die VM kopieren
+   scp deploy/tenancy/provision-company.sql papo@<VM_HOST>:~/papo-deploy/
+   # auf der VM
+   cd ~/papo-deploy
+   DBU=$(grep '^DB_USER=' .env.prod | cut -d= -f2)
+   docker compose -f docker-compose.prod.yml --env-file .env.prod cp provision-company.sql postgres:/tmp/p.sql
+   docker compose -f docker-compose.prod.yml --env-file .env.prod exec postgres \
+     psql -U "$DBU" -v ON_ERROR_STOP=1 -v subject="'<ID>'" -v company_id=<Firma-1-ID> \
+     -v operator="'chris'" -f /tmp/p.sql partnerportal
+   ```
+   Das Skript liegt im Repo unter `deploy/tenancy/provision-company.sql`; es bricht ohne
+   Änderung ab, wenn das Login schon (als Firma oder Partner) verknüpft ist.
+4. Als `company-demo` anmelden und Partner, Artikel, Bestellungen, Dashboard prüfen (der
+   Gateway prüft nur eine unauthentifizierte 401, dieser Check ist Pflicht). Unter
+   „Firmenprofil“ die „E-Mail für Bestellhinweise“ kontrollieren (seit Release B die einzige
+   Quelle; `PAPO_MAIL_COMPANY_RECIPIENT` wird nicht mehr gelesen).
+
+**Rollback:** Nach A jederzeit das vorige Image (Gateway-Restore oder `IMAGE_TAG=<sha>`), ohne
+SQL. Sobald nach Release B eine zweite Firma existiert, nie mehr ein Image vor Release A
+starten (es würde allen Firmenbenutzern alle Daten zeigen): stattdessen Backup einspielen
+oder vorwärts korrigieren.
+
+**Weitere Firma (nur nach Release B):** Keycloak-Benutzer für Firma und Partner anlegen, IDs
+kopieren, das Skript mit `company_id=0` und `business_name`, `tax_value`, `register_value`
+ausführen (Kopf des Skripts), dann als neuer Firmenbenutzer den Partner anlegen und dessen
+Login im Dialog „Logins“ verknüpfen.
+
 ## Bestell-E-Mails (`PAPO_MAIL_*`, `SMTP_*`)
 
 Echter Versand von Bestellbestätigungen (B-04). Standard: **aus** (`PAPO_MAIL_ENABLED=false`),
@@ -169,8 +227,13 @@ Bestellungen zeigen dann „E-Mail-Versand ist nicht aktiviert“. Einschalten a
 
 1. SMTP-Daten der Firma in `.env.prod` eintragen (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`,
    `SMTP_PASSWORD`, `SMTP_START_TLS` bzw. `SMTP_TLS`) — nie in Git, nie in Chat/Issues.
-2. `PAPO_MAIL_FROM`, `PAPO_MAIL_COMPANY_RECIPIENT` und **`PAPO_MAIL_REDIRECT_TO`** (Testpostfach)
-   setzen, dann `PAPO_MAIL_ENABLED=true`. Ohne Umleitung startet das Backend nur mit
+   Für paportal.at (geprüft 30.10.2026): `SMTP_HOST=mail.paportal.at`, `SMTP_PORT=465`,
+   `SMTP_TLS=true`, `SMTP_START_TLS=DISABLED` (Port 587 ist von der VM aus zu),
+   `SMTP_USERNAME=no-reply@paportal.at` — Login und Absender (`PAPO_MAIL_FROM`) müssen dasselbe
+   Postfach sein, sonst lehnt der Server ab (`REJECTED`). `*.your-objectstorage.com` ist der
+   Hetzner-Objektspeicher, kein SMTP-Server.
+2. `PAPO_MAIL_FROM` und **`PAPO_MAIL_REDIRECT_TO`** (Testpostfach) setzen, die Firmenadresse
+   im Portal unter „Firmenprofil“ → „E-Mail für Bestellhinweise“ eintragen, dann `PAPO_MAIL_ENABLED=true`. Ohne Umleitung startet das Backend nur mit
    `PAPO_MAIL_ALLOW_REAL_RECIPIENTS=true` — das bleibt aus, solange die VM Demo-Daten und
    bekannte Demo-Logins hat.
 3. Backend mit dem **aktiven Release** neu starten und mit einer Testbestellung prüfen; der Status

@@ -1,9 +1,11 @@
 package at.papo.partnerportal.product;
 
+import at.papo.partnerportal.business.CompanyProfile;
 import at.papo.partnerportal.category.Category;
 import at.papo.partnerportal.category.CategoryNames;
 import at.papo.partnerportal.category.CategoryService;
 import at.papo.partnerportal.common.ApiException;
+import at.papo.partnerportal.security.CurrentCompany;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -34,8 +36,12 @@ public class ProductService {
     @Inject
     EntityManager entityManager;
 
+    @Inject
+    CurrentCompany currentCompany;
+
     public List<ProductDto> list() {
-        return Product.<Product>find("select p from Product p left join fetch p.articleCategory order by p.id")
+        return Product.<Product>find("select p from Product p left join fetch p.articleCategory"
+                + " where p.company = ?1 order by p.id", currentCompany.resolve())
                 .list().stream().map(ProductDto::from).toList();
     }
 
@@ -53,6 +59,7 @@ public class ProductService {
             throw new ApiException(400, "Artikelkategorie ist deaktiviert.");
         }
         Product product = new Product();
+        product.company = currentCompany.resolve();
         applyRequest(product, request, category);
         product.persist();
         return ProductDto.from(product);
@@ -106,7 +113,7 @@ public class ProductService {
         }
         Matcher matcher = INTERNAL_IMAGE_URL.matcher(imageUrl);
         if (matcher.matches()) {
-            ProductImage image = productImageService.findOrThrow(Long.valueOf(matcher.group(1)));
+            ProductImage image = productImageService.findOrThrow(product.company, Long.valueOf(matcher.group(1)));
             product.image = image;
             product.imageUrl = "/product-images/" + image.id;
         } else {
@@ -116,7 +123,7 @@ public class ProductService {
     }
 
     Product findOrThrow(Long id) {
-        Product product = Product.findById(id);
+        Product product = Product.find("id = ?1 and company = ?2", id, currentCompany.resolve()).firstResult();
         if (product == null) {
             throw new ApiException(404, "Artikel nicht gefunden.");
         }
@@ -124,7 +131,7 @@ public class ProductService {
     }
 
     private Product lockProduct(Long id) {
-        Product product = Product.<Product>find("id = ?1", id)
+        Product product = Product.<Product>find("id = ?1 and company = ?2", id, currentCompany.resolve())
                 .withLock(LockModeType.PESSIMISTIC_WRITE).firstResult();
         if (product == null) {
             throw new ApiException(404, "Artikel nicht gefunden.");
@@ -135,7 +142,8 @@ public class ProductService {
 
     private Product findForReadOrThrow(Long id) {
         Product product = Product.<Product>find(
-                "select p from Product p left join fetch p.articleCategory where p.id = ?1", id)
+                "select p from Product p left join fetch p.articleCategory where p.id = ?1 and p.company = ?2",
+                id, currentCompany.resolve())
                 .firstResult();
         if (product == null) {
             throw new ApiException(404, "Artikel nicht gefunden.");

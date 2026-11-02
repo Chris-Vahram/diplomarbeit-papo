@@ -25,7 +25,7 @@ final class OrderEmailContent {
 
     static Mail build(OrderEmail email, String to, boolean redirected) {
         Order order = email.order;
-        String sender = senderName();
+        String sender = senderName(order.partner.company);
         String subject;
         StringBuilder body = new StringBuilder();
         if (redirected) {
@@ -108,8 +108,8 @@ final class OrderEmailContent {
         return (kunde.firstName != null && !kunde.firstName.isBlank() ? kunde.firstName + " " : "") + kunde.lastName;
     }
 
-    private static String senderName() {
-        CompanyProfile profile = CompanyProfile.find("singletonKey", CompanyProfile.CURRENT_KEY).firstResult();
+    // Signed by the order's own company (add-company-tenancy D6), never by a singleton profile.
+    private static String senderName(CompanyProfile profile) {
         return profile != null && profile.businessName != null ? profile.businessName : "PAPO Partnerportal";
     }
 

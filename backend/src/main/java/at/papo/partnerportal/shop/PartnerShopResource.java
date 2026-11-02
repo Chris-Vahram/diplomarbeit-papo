@@ -1,7 +1,6 @@
 package at.papo.partnerportal.shop;
 
 import at.papo.partnerportal.business.CompanyProfile;
-import at.papo.partnerportal.business.CompanyProfileService;
 import at.papo.partnerportal.partner.Partner;
 import at.papo.partnerportal.security.CurrentPartner;
 import jakarta.annotation.security.RolesAllowed;
@@ -38,9 +37,6 @@ public class PartnerShopResource {
 
     @Inject
     ShopCatalogService catalogService;
-
-    @Inject
-    CompanyProfileService companyProfileService;
 
     @Inject
     ShopTemplateCatalog templateCatalog;
@@ -98,7 +94,7 @@ public class PartnerShopResource {
     public ShopPreviewDto preview() {
         PartnerShop shop = shopService.findOrCreate(currentPartner.resolve());
         Partner partner = shop.partner;
-        CompanyProfile seller = companyProfileService.findCurrent();
+        CompanyProfile seller = partner.company;
         PublicNavigationDto navigation = new PublicNavigationDto(
                 pageService.navigation(shop).stream().map(PublicNavigationDto.Item::from).toList(),
                 pageService.legalPages(shop).stream().map(PublicNavigationDto.Item::from).toList(),

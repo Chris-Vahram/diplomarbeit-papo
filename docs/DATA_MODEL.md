@@ -27,7 +27,6 @@ erDiagram
 
     COMPANY_PROFILE {
         Long id PK
-        String singletonKey UK "CURRENT; genau ein aktives Portalprofil"
         String businessName
         String taxCountry "ISO-3166-1 Alpha-2"
         BusinessTaxIdentifierType taxIdentifierType "VAT_ID oder NATIONAL_TAX_ID"
@@ -173,7 +172,8 @@ jedem partnerbezogenen Request. Der Login-Link läuft über `PartnerLogin`
 (siehe unten): `resolve()` sucht die Bindung zum verifizierten OIDC-Subject
 (`sub`, Keycloak-Benutzer-ID). `partnerNumber` wird bei jedem Schreibzugriff
 (Anlage/Bearbeitung/Import) auf Großschreibung kanonisiert, damit der
-case-sensitive DB-Unique-Constraint Groß-/Kleinschreibungs-Duplikate verhindert.
+case-sensitive Unique-Constraint je Firma (`company_id`, `partnerNumber`)
+Groß-/Kleinschreibungs-Duplikate verhindert.
 Ohne aktive Bindung ist kein Partner-Login möglich (Release B, kein Benutzername-Fallback mehr).
 `internalNote` ist eine optionale Plain-Text-Notiz mit maximal 4.000 Zeichen,
 die ausschließlich in Company-Partnerantworten enthalten ist. Partner-
@@ -195,13 +195,21 @@ Entfernen ist weich (`revokedAt`): ein entfernter Login löst nie mehr auf, und 
 Partner mit irgendeiner (auch entfernten) Bindung bekommt keinen Benutzername-Fallback.
 Verwaltet nur von der Firma (`/api/company/partners/{id}/logins`, Dialog „Logins“).
 
-### CompanyProfile
-Das `CompanyProfile` ist ein Singleton für die aktuell einzige Portal-Firma.
-`singletonKey=CURRENT` verhindert eine zweite aktive Profilzeile; es gibt keine
-Mandanten-, Subdomain- oder Routing-Beziehung. Firmenrollen lesen und ändern
-Firmenname, Steueridentifikation und Registerkennung über
-`/api/company/profile`. Partnerrollen erhalten keinen Zugriff. Demo-Werte sind
-synthetisch.
+### CompanyProfile (Tabelle `companyprofile`)
+Die Firma ist der Mandant (`add-company-tenancy`). `Partner`, `Product`,
+`ArticleCategory` und `ProductImage` tragen `company_id`; alle übrigen Daten hängen über
+Partner, Bestellung oder Shop an genau einer Firma. Firmenbenutzer lesen und ändern nur
+ihr eigenes Profil (Firmenname, Steueridentifikation, Registerkennung, „E-Mail für
+Bestellhinweise“ `orderNoticeEmail`) über `/api/company/profile`. Migrierte Datenbanken behalten
+die Altspalte `singletonkey` (nullable, Firma 1 = `CURRENT`) nur für ein zurückgerolltes Release-A-Image.
+Partnernummer und Kategoriename sind je Firma eindeutig. Demo-Werte sind synthetisch.
+
+### CompanyLogin (Tabelle `company_login`)
+Bindet ein verifiziertes OIDC-Subject (eindeutig) an genau eine Firma, gleiche Form wie
+`PartnerLogin`. `CurrentCompany.resolve()` ermittelt daraus die Firma jedes
+Firmen-Requests; Header, Host, Query und Body wählen nie die Firma. Ein Subject ist
+entweder als Firma oder als Partner gebunden, nie beides (gemeinsame Sperre
+`login_subject:<sub>`). Angelegt nur über `deploy/tenancy/provision-company.sql`.
 
 ### PartnerTradeProof
 `PartnerTradeProof` ist eine optionale 1:1-Beziehung zu `Partner` für genau das

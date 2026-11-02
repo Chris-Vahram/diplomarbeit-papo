@@ -1,11 +1,99 @@
 # PAPO – Next-Session-Context
 
-**Stand:** 22.10.2026. Operative Übergabe; volatile Angaben beim Start prüfen.
+**Stand:** 31.10.2026. Operative Übergabe; volatile Angaben beim Start prüfen.
 Stabile Regeln stehen in `AGENTS.md` und `CLAUDE.md`. Der beschlossene/noch zu
 beschließende Ausbau ist in [PRODUCT_COMPLETION_PLAN.md](PRODUCT_COMPLETION_PLAN.md)
 geordnet. Dieses Dokument bleibt der einzige operative Session-Handoff.
 
-## Stand 22.10.2026 — hier einsteigen
+## Stand 31.10.2026 — hier einsteigen (Handoff-Liste abgearbeitet)
+
+**Live auf paportal.at (alles geprüft):**
+- Mandantenfähigkeit A+B archiviert (PR #66/#71/#72). Firma 1 „Huemer GmbH“ (`company-demo`,
+  `partner-demo`), Firma 2 „Testfirma Zwei GmbH“ (`company-zwei`, `partner-zwei` → Partner `P-1002`;
+  Zufallspasswörter in Vaultwarden, standen aber im Chatprotokoll → vor echten Daten rotieren).
+- Backup: Cron `0 3 * * *` auf der VM läuft (erste Dumps 31.10. 03:00). `backup.log` bleibt bei Erfolg
+  leer; Kontrolle über das Datum der neuesten `*.dump`.
+- Bestell-E-Mails: SMTP `mail.paportal.at:465` (TLS, STARTTLS aus), Login = Absender
+  `no-reply@paportal.at`, `PAPO_MAIL_REDIRECT_TO` = Chris' HTL-Postfach. Firmenprofil Firma 1:
+  „E-Mail für Bestellhinweise“ = `test@paportal.at`. Testbestellungen 301/351/401/402 zugestellt
+  (Partner + Firma). Details `docs/DEPLOYMENT.md` „Bestell-E-Mails“ (PR #73).
+
+**Entscheidung Chris (31.10.):** Echte Empfänger erst, wenn echte Daten kommen; bis dahin nur Demos,
+Umleitung bleibt an. `send-order-emails` bleibt deshalb 5/6 offen (nur 4.2-Entscheidung fehlt).
+
+**Vor echten Daten (Checkliste):** Demo-Logins deaktivieren, Hinweis „Passwort = Benutzername“ auf der
+Login-Seite entfernen, Passwörter `company-zwei`/`partner-zwei` rotieren, Umleitung abschalten
+(`PAPO_MAIL_ALLOW_REAL_RECIPIENTS=true`), echte Firmenadresse im Firmenprofil, dann
+`send-order-emails` archivieren. Drei GitHub-Tokens im KI-Roharchiv widerrufen (seit 16.10. offen).
+
+**Nächster Arbeitsblock (Kandidaten):** `add-article-tax-rate` 0/17 (Chris übernimmt, sobald Tobias
+bestätigt; Voraussetzung für `add-shop-guest-checkout`). Sonst wartet alles auf Externe: BMD-Daten
+(`decouple-partner-number-from-login`, `add-unique-bmd-article-number`), Thesis-Abnahme
+(`complete-thesis-documentation` 4/6), Tobias' Shop-Changes. Tobias hat am 31.10. eine Kurzinfo zu
+Mandantenfähigkeit/Mail/Backup bekommen (Shop-Code muss Firmendaten über die Firma des Partners lesen).
+
+## Stand 30.10.2026 (Nachmittag) — Mandantenfähigkeit komplett, archiviert
+
+**Erledigt:** Release B (PR #71, contract-Migration, `singletonKey` und `PAPO_MAIL_COMPANY_RECIPIENT`
+entfernt) live; Firma 2 „Testfirma Zwei GmbH“ mit `company-zwei`/`partner-zwei` (Zufallspasswörter →
+Vaultwarden) angelegt, Partner `P-1002` in Firma 2 an `partner-zwei` gebunden, Trennung live mit echten
+Tokens geprüft. `add-company-tenancy` archiviert (`openspec/changes/archive/2026-10-30-add-company-tenancy/`).
+
+**Als Nächstes:** 1. Backup-Cron auf der VM einrichten (`backup.sh` liegt jetzt in der gefixten Fassung
+dort; Zeile aus docs/DEPLOYMENT.md „Backups“). 2. `send-order-emails` 4.2: Firmen-E-Mail im Firmenprofil
+eintragen, Testbestellung, dann archivieren. 3. Vor echten Daten: Demo-Logins deaktivieren, Hinweis
+„Passwort = Benutzername“ auf der Login-Seite entfernen, Passwörter von `company-zwei`/`partner-zwei`
+rotieren (standen im Chatprotokoll).
+
+## Stand 30.10.2026 (Vormittag) — Release A live, company-demo gebunden
+
+**Erledigt 30.10.:** VM-Backup manuell erstellt (`deploy/backup/*-20261030-013703.dump`), PR #68
+(Backup-Fix) und PR #66 (Release A) gemergt und deployt, `company-demo` (Keycloak-ID `3755bf72-…`)
+an Firma 1 „Huemer GmbH“ gebunden (Provisionierungsskript, COMMIT). Firmenpostfach existiert noch
+nicht → „E-Mail für Bestellhinweise“ im Firmenprofil leer; Chris trägt es später im Portal ein
+(nicht mehr in `.env.prod`). Punkte 1–3 unten sind damit erledigt bis auf Backup-Skript auf die VM
+kopieren + Cron einrichten.
+
+**Ursprüngliche Reihenfolge (Stand 29.10.):**
+1. **Backup auf der VM** (Chris). `backup.sh` brach ab (`.env.prod` Zeile 11 mit Sonderzeichen,
+   Skript las die ganze Datei per `.`). Fix = PR #68 (`fix/backup-env-parsing`, liest nur `DB_USER`).
+   Es gibt **kein** `backup.log` → der nächtliche Cron war nie eingerichtet; es existieren keine
+   regelmäßigen Backups. Nach Merge #68: Skript per scp auf die VM, Cron laut docs/DEPLOYMENT.md
+   „Backups“ einrichten.
+2. **PR #66 mergen** = Release A (expand) von `add-company-tenancy` (Branch
+   `feat/company-tenancy-release-a`, main inkl. Tobias' PR #67 eingemergt, 263/263 Tests grün).
+   Merge deployt sofort; danach bekommen Firmenbenutzer 403 bis zur Bindung.
+3. **Direkt danach `company-demo` binden** (DEPLOYMENT.md „Mandantenfähigkeit“, Schritt 3):
+   Keycloak-ID von `company-demo` kopieren, `deploy/tenancy/provision-company.sql` per scp auf die VM,
+   im Postgres-Container mit `subject`, `company_id` (aus `select id, businessname from companyprofile`)
+   und `operator` ausführen, als `company-demo` anmelden und prüfen.
+4. **Erst danach Release B** (Task 3.4 in `openspec/changes/add-company-tenancy/tasks.md`): eigener
+   Branch/PR — `contract()` (NOT NULL, alte Unique-Constraints `partner.partnernumber`,
+   `article_categories.normalized_name`, `companyprofile.singletonkey` per `pg_constraint` droppen,
+   `singletonkey` nullable), Entity ohne `singletonKey`, `papo.mail.company-recipient` entfernen,
+   Kompatibilitätscheck A-Image auf B-Schema (gleiches Vorgehen wie bei A: `git archive` + beide JARs
+   gegen Scratch-DB). Dann 7.4b (VM, Firma 2 anlegen), 7.5 (Purpose `company-profile`), Archiv.
+
+**Was Release A enthält:** `CompanyLogin` + `security/CurrentCompany`, alle Firmen-Services filtern
+nach Firma (fremde IDs 404), `company_id` an Partner/Product/Category/ProductImage,
+`CompanyTenancyMigrationService.expand()`, gemeinsame Sperre `LoginSubjectLock`, Mail-Absender/
+Empfänger je Firma (`CompanyProfile.orderNoticeEmail`, „“ = bewusst geleert, null = nie gesetzt),
+Bilder `private, no-store` + Frontend `cache: "no-store"` + Generationszähler, Testfirma 2
+(`company-zwei`/`partner-zwei`, feste Realm-IDs `c0a1d2e3-0000-4000-8000-00000000000{1,2,3}`).
+Tests: `business/CompanyTenancyResourceTest`, `CompanyTenancyMigrationTest`, `support/TestCompanies`.
+Zwei Codex-Adversarial-Reviews (Spec + Diff) eingearbeitet. Details: tasks.md „Implementation notes“.
+
+**Sonst offen:** `send-order-emails` 4.2 — SMTP auf VM aktiv (Image läuft mit mailer/scheduler),
+Testbestellung + Firmen-Empfänger (kommt nach Release A übers Firmenprofil) noch zu prüfen, dann
+archivieren. Leitkennzahl Firma = Umsatz bestätigen lassen. Drei GitHub-Tokens im KI-Roharchiv
+widerrufen (seit 16.10. offen). Tobias' Branch `docs/impeccable-product-context` kann weg.
+
+**Lokale Umgebung:** Tests mit `./mvnw -o test -Dquarkus.http.test-port=8091` (Dev Services gehen).
+Lokaler Keycloak nach `--force-recreate` braucht `kcadm … update realms/partnerportal -s sslRequired=NONE`
+(Docker-Desktop-Netz). Ausgabewunsch Chris: kurz, ein Befehl pro Codeblock, Schritte nummeriert
+(Plugin `i-have-adhd` installiert, mit `/i-have-adhd` aktivieren).
+
+## Stand 22.10.2026
 
 - `refine-portal-frontend` gemergt (PR #59), live, von Tobias abgenommen und archiviert
   (`openspec/changes/archive/2026-10-22-refine-portal-frontend/`, Spec `portal-visual-design`).
