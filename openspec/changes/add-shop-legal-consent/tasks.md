@@ -1,8 +1,8 @@
 ## 1. Backend (essential)
 
-- [ ] 1.1 Legal text fields on `CompanyProfile`, validation, missing-text indicator
-- [ ] 1.2 Public legal endpoint per shop; placeholders when empty
-- [ ] 1.3 `papo.environment` flag; release gate and production offline rule; tests
+- [x] 1.1 Legal text fields on `CompanyProfile`, validation, missing-text indicator
+- [x] 1.2 Public legal endpoint per shop; placeholders when empty
+- [x] 1.3 `papo.environment` flag; release gate and production offline rule; tests
 
 ## 2. Frontend (essential)
 

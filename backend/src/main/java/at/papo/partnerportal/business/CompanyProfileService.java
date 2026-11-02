@@ -1,5 +1,6 @@
 package at.papo.partnerportal.business;
 
+import at.papo.partnerportal.common.ApiException;
 import at.papo.partnerportal.security.CurrentCompany;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -33,5 +34,31 @@ public class CompanyProfileService {
             profile.orderNoticeEmail = request.orderNoticeEmail().trim();
         }
         return CompanyProfileDto.from(profile);
+    }
+
+    public CompanyLegalTextsDto legalTexts() {
+        return CompanyLegalTextsDto.from(currentCompany.resolve());
+    }
+
+    // Stored as typed; only surrounding blank lines go. Markup is never interpreted here or in
+    // the shop renderer, so no sanitising is needed on the way in.
+    @Transactional
+    public CompanyLegalTextsDto updateLegalTexts(CompanyLegalTextsRequest request) {
+        if (request == null) {
+            throw new ApiException(400, "Bitte die Rechtstexte mitsenden.");
+        }
+        CompanyProfile profile = currentCompany.resolve();
+        profile.legalImpressum = normalizeLegal(request.impressum());
+        profile.legalAgb = normalizeLegal(request.agb());
+        profile.legalDatenschutz = normalizeLegal(request.datenschutz());
+        profile.legalWiderruf = normalizeLegal(request.widerruf());
+        return CompanyLegalTextsDto.from(profile);
+    }
+
+    private static String normalizeLegal(String text) {
+        if (text == null || text.isBlank()) {
+            return null;
+        }
+        return text.replace("\r\n", "\n").strip();
     }
 }

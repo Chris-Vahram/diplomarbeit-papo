@@ -1,5 +1,6 @@
 package at.papo.partnerportal.shop;
 
+import at.papo.partnerportal.business.LegalText;
 import at.papo.partnerportal.common.ApiException;
 import at.papo.partnerportal.product.ProductImage;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -73,6 +74,16 @@ public class PublicShopResource {
                 .orElseThrow(() -> new ApiException(404, "Diese Seite gibt es nicht."));
         return new PublicPageDto(page.segment, page.menuName, page.slot, page.seoTitle, page.seoDescription,
                 pageService.parse(page.publishedContent).get("blocks"));
+    }
+
+    // Legal system pages (shop-legal spec): the company's texts, or a marked placeholder.
+    @GET
+    @Path("/legal/{segment}")
+    public PublicLegalTextDto legal(@PathParam("kennung") String kennung, @PathParam("segment") String segment) {
+        PartnerShop shop = onlineShop(kennung);
+        LegalText kind = LegalText.bySegment(segment)
+                .orElseThrow(() -> new ApiException(404, "Diese Seite gibt es nicht."));
+        return PublicLegalTextDto.of(kind, shop.partner.company);
     }
 
     @GET
