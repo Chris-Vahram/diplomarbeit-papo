@@ -14,12 +14,15 @@ let formCount = 0;
 class InquiryFormBlock extends ShopBlock {
   #renderId = 0;
   #token = null;
+  #fromArticle = null;
 
   render(config) {
     const renderId = ++this.#renderId;
     const { api, article, shopName } = this.context;
     const id = `inq-${++formCount}`;
     const live = Boolean(api?.live);
+    // Coming from an article page ("Weitere Fragen?"): preselect it and lead back there.
+    this.#fromArticle = live ? /^\d+$/.exec(new URLSearchParams(location.search).get("artikel") ?? "")?.[0] ?? null : null;
     this.innerHTML = `<div class="shop-inner shop-inquiry">
       <div class="shop-inquiry__intro">
         ${textField(api, "h2", "shop-heading", "heading", config.heading)}
@@ -92,7 +95,8 @@ class InquiryFormBlock extends ShopBlock {
       select.innerHTML = `<option value="">Kein bestimmter Artikel</option>${(articles ?? [])
         .map((entry) => `<option value="${escapeHtml(entry.id)}">${escapeHtml(entry.name)}</option>`)
         .join("")}`;
-      select.value = chosen || (article ? String(article.id) : "");
+      select.value = chosen || (article ? String(article.id) : this.#fromArticle ?? "");
+      if (select.selectedIndex < 0) select.value = "";
     }).catch(() => {});
 
     if (!live) {
@@ -186,6 +190,16 @@ class InquiryFormBlock extends ShopBlock {
     }
   }
 
+  // The article the visitor came from (link on the article page, or the form placed on it).
+  #backTarget() {
+    return this.#fromArticle ?? (this.context.article ? String(this.context.article.id) : null);
+  }
+
+  #backHref() {
+    const articleId = this.#backTarget();
+    return this.context.api.href(articleId ? `artikel/${encodeURIComponent(articleId)}` : "");
+  }
+
   #showSent() {
     const panel = this.querySelector("[data-panel]");
     const shopName = this.context.shopName;
@@ -193,7 +207,10 @@ class InquiryFormBlock extends ShopBlock {
       <span class="shop-inquiry__sent-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
       <h3 class="shop-inquiry__sent-title">Danke, Ihre Anfrage ist angekommen.</h3>
       <p class="shop-muted">Sie wurde an ${escapeHtml(shopName ?? "den Shop")} übermittelt.</p>
-      <button type="button" class="shop-inquiry__again" data-again>Weitere Anfrage senden</button>
+      <div class="shop-inquiry__next">
+        <a class="shop-button shop-button--back" href="${escapeHtml(this.#backHref())}">${this.#backTarget() ? "Zurück zum Artikel" : "Zurück zur Startseite"}</a>
+        <button type="button" class="shop-inquiry__again" data-again>Weitere Anfrage senden</button>
+      </div>
     </div>`;
     const sent = panel.firstElementChild;
     sent.focus();

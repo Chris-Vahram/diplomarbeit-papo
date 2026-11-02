@@ -8,6 +8,7 @@
 
 - [x] 2.1 Block "Anfrageformular" (renderer + builder properties)
 - [x] 2.2 Partner page "Anfragen" with badge in navigation
+- [x] 2.3 Article detail link to the form (article preselected) and "Zurück" after sending
 
 ## 3. Verification
 

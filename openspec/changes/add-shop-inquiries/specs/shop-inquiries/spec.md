@@ -11,6 +11,17 @@ The builder SHALL offer a block "Anfrageformular" with configurable heading and 
 - **WHEN** the consent box is not ticked
 - **THEN** the form is not sent
 
+### Requirement: Inquiry path from an article and back
+When an online page of the shop carries the inquiry form, the article detail SHALL show "Weitere Fragen? Schreiben Sie uns eine Nachricht" linking to that page with the article preselected. After a successful submission the visitor SHALL get a way back: to the article when the form was reached from one, otherwise to the Startseite.
+
+#### Scenario: Question about an article
+- **WHEN** a visitor opens the link on an article page
+- **THEN** the form opens with that article selected, and after sending, "Zurück zum Artikel" leads back to it
+
+#### Scenario: No form page
+- **WHEN** no online page carries the inquiry form
+- **THEN** the article detail shows no inquiry link
+
 ### Requirement: Spam protection without external services
 Inquiry submission SHALL be rate-limited, SHALL be discarded if the honeypot field is filled or the form was submitted less than 3 seconds after rendering, and SHALL NOT use external CAPTCHA services.
 

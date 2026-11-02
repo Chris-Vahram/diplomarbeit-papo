@@ -183,6 +183,35 @@ class ShopInquiryResourceTest {
                 .then().statusCode(429);
     }
 
+    // The article detail links to the first online page carrying the form (published content only).
+    @Test
+    void navigationNamesThePageWithTheForm() {
+        String kennung = demoShop();
+        String token = partnerToken();
+        String segment = "anfrage-" + UUID.randomUUID().toString().substring(0, 8);
+        Map<String, Object> created = given().auth().oauth2(token).contentType(ContentType.JSON)
+                .body(Map.of("menuName", "Anfrage", "segment", segment))
+                .when().post("/api/partner/shop/pages")
+                .then().statusCode(200).extract().path("page");
+        long pageId = ((Number) created.get("id")).longValue();
+        String draft = "{\"content\":{\"blocks\":[{\"id\":\"" + UUID.randomUUID()
+                + "\",\"type\":\"inquiry-form\",\"config\":{\"heading\":\"Fragen?\"}}]},\"version\":" + created.get("version") + "}";
+        int version = given().auth().oauth2(token).contentType(ContentType.JSON).body(draft)
+                .when().put("/api/partner/shop/pages/" + pageId + "/draft")
+                .then().statusCode(200).extract().path("version");
+        visitor().when().get("/api/shop/" + kennung + "/navigation")
+                .then().statusCode(200).body("inquiryPath", not(is(segment)));
+
+        given().auth().oauth2(token).contentType(ContentType.JSON).body(Map.of("version", version))
+                .when().post("/api/partner/shop/pages/" + pageId + "/publish").then().statusCode(200);
+        try {
+            visitor().when().get("/api/shop/" + kennung + "/navigation")
+                    .then().statusCode(200).body("inquiryPath", is(segment));
+        } finally {
+            given().auth().oauth2(token).when().delete("/api/partner/shop/pages/" + pageId).then().statusCode(204);
+        }
+    }
+
     @Test
     void unknownShopGetsNeutral404() {
         visitor().when().get("/api/shop/gibt-es-nicht/inquiries/token").then().statusCode(404);
