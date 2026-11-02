@@ -11,6 +11,6 @@
 
 ## 3. Verification
 
-- [ ] 3.1 Tests + package; `git diff --check`
-- [ ] 3.2 Browser: submit in shop → partner inbox
-- [ ] 3.3 Update traceability and B-05 status
+- [x] 3.1 Tests + package; `git diff --check`
+- [x] 3.2 Browser: submit in shop → partner inbox
+- [x] 3.3 Update traceability and B-05 status
