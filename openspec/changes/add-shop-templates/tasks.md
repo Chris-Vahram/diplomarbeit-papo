@@ -7,7 +7,7 @@
 
 - [x] 2.1 Manifest loading and startup validation; exclude invalid templates with log
 - [x] 2.2 Template list endpoint and picker UI with confirmation and "Farben und Schriften übernehmen"
-- [ ] 2.3 Automated quality test running assistant rules over all templates (provisional `ShopTemplateQualityTest` with the spec's contrast and alt-text thresholds is in place; switch it to the assistant's rule units once `add-shop-design-assistant` exists)
+- [x] 2.3 Automated quality test running assistant rules over all templates (`ShopTemplateQualityTest` runs the server blocker rules of `ShopDesignRules`; `tools/check_shop_assistant.mjs` runs all assistant rules and finds no Blocker or Warnung, own and default theme, free pages in every style's theme)
 - [x] 2.4 First-time setup: setup state, `POST /api/partner/shop/setup`, "Shop einrichten" dialog with style choice and "Überspringen"
 - [x] 2.5 Demo shop per template: "Vorlage ansehen" in setup dialog and picker, renderer demo mode with page navigation, brand hint, "Diese Vorlage wählen"
 - [x] 2.6 Theme `form` (klar/handwerk/kraeftig): validation, design-tab selection, renderer forms
