@@ -1,4 +1,5 @@
 import { escapeHtml } from "../../lib/html.js";
+import { MAX_QUANTITY, addToCart } from "../shop-cart.js";
 import { articleCardsHtml, imageHtml, priceHtml } from "./article-card.js";
 import { ShopBlock } from "./shop-block.js";
 import { textField } from "./text-field.js";
@@ -66,15 +67,49 @@ class ArticleDetailBlock extends ShopBlock {
         <h1 class="shop-heading">${escapeHtml(article.name)}</h1>
         ${priceHtml(article)}
         ${article.description ? `<p class="shop-text">${escapeHtml(article.description)}</p>` : ""}
-        <div class="shop-detail__actions" data-detail-actions></div>
+        <div class="shop-detail__actions" data-detail-actions>${buyHtml(article)}</div>
       </div>
     </article>`;
+    this.#wireBuy(api, article);
     this.#inquiryLink(api, article);
   }
 
+  // Quantity and "In den Warenkorb" (shop-checkout "Shop cart"). The editor preview shows the
+  // same controls so the page looks as published, but only the live shop stores anything.
+  #wireBuy(api, article) {
+    const form = this.querySelector("[data-buy]");
+    if (!form) return;
+    const input = form.elements.quantity;
+    const status = form.querySelector("[data-buy-status]");
+    form.addEventListener("click", (event) => {
+      const step = event.target.closest("[data-step]");
+      if (!step) return;
+      const next = Math.min(MAX_QUANTITY, Math.max(1, (Number(input.value) || 1) + Number(step.dataset.step)));
+      input.value = String(next);
+    });
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!api.live) return;
+      const quantity = Math.min(MAX_QUANTITY, Math.max(1, Math.trunc(Number(input.value)) || 1));
+      if (!addToCart(api.kennung, article.id, quantity)) {
+        status.innerHTML = "Der Warenkorb ist voll. Bitte bestellen Sie zuerst die vorhandenen Artikel.";
+        return;
+      }
+      input.value = "1";
+      const button = form.querySelector("[type=submit]");
+      button.classList.add("shop-buy__button--done");
+      button.querySelector("[data-label]").textContent = "Im Warenkorb";
+      clearTimeout(this.buyTimer);
+      this.buyTimer = setTimeout(() => {
+        button.classList.remove("shop-buy__button--done");
+        button.querySelector("[data-label]").textContent = "In den Warenkorb";
+      }, 1800);
+      status.innerHTML = `${escapeHtml(quantity)} × hinzugefügt. <a href="${escapeHtml(api.href("warenkorb"))}">Zum Warenkorb</a>`;
+    });
+  }
+
   // "Weitere Fragen?" only when an online page carries the inquiry form (shop-inquiries);
-  // the form preselects the article from ?artikel=. The actions area is where the cart
-  // button goes later, above this link.
+  // the form preselects the article from ?artikel=. It sits below the cart controls.
   #inquiryLink(api, article) {
     const renderedFor = article.id;
     api.navigation?.()
@@ -87,6 +122,22 @@ class ArticleDetailBlock extends ShopBlock {
       })
       .catch(() => {});
   }
+}
+
+function buyHtml(article) {
+  const id = `buy-${article.id}`;
+  return `<form class="shop-buy" data-buy novalidate>
+    <div class="shop-buy__row">
+      <div class="shop-stepper" role="group" aria-labelledby="${id}-label">
+        <span class="shop-visually-hidden" id="${id}-label">Menge</span>
+        <button type="button" data-step="-1" aria-label="Eins weniger"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+        <input type="number" name="quantity" inputmode="numeric" min="1" max="${MAX_QUANTITY}" value="1" aria-label="Menge" />
+        <button type="button" data-step="1" aria-label="Eins mehr"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+      </div>
+      <button type="submit" class="shop-button shop-buy__button"><svg class="shop-buy__check" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span data-label>In den Warenkorb</span></button>
+    </div>
+    <p class="shop-buy__status" role="status" data-buy-status></p>
+  </form>`;
 }
 
 customElements.define("shop-block-article-grid", ArticleGridBlock);

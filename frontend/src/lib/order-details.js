@@ -5,6 +5,7 @@ import { escapeHtml } from "./html.js";
 import { formatEuro, formatNumber, formatDate, formatAddress } from "./format.js";
 import { itemsTableFragment } from "./order-form.js";
 import { orderTotalsHtml } from "./price.js";
+import { ORIGIN_LABELS } from "./origin.js";
 
 export function renderOrderDetailsHtml(order, { showPartner = false } = {}) {
   const kundeName = `${order.kunde.firstName ? escapeHtml(order.kunde.firstName) + " " : ""}${escapeHtml(order.kunde.lastName)}`;
@@ -33,6 +34,7 @@ export function renderOrderDetailsHtml(order, { showPartner = false } = {}) {
           <dt>Datum</dt><dd>${formatDate(order.orderDate)}</dd>
           ${showPartner ? `<dt>Partner</dt><dd>${escapeHtml(order.partnerName)}</dd>` : ""}
           <dt>Endkunde</dt><dd>${kundeName}, ${escapeHtml(formatAddress(order.kunde.address))}</dd>
+          <dt>Herkunft</dt><dd>${ORIGIN_LABELS[order.origin] ?? "Portal"}${order.origin === "SHOP" ? " (Bestellung im Webshop)" : ""}</dd>
           <dt>Status</dt><dd><status-badge status="${order.status.toLowerCase()}"></status-badge></dd>
           ${order.commissionValue != null ? `<dt>Provision</dt><dd>${formatNumber(order.commissionPercentUsed)}% (${formatEuro(order.commissionValue)})</dd>` : ""}
         </dl>

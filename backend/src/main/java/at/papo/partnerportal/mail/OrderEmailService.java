@@ -37,6 +37,12 @@ public class OrderEmailService {
         return notice(customer);
     }
 
+    // Notice of an already queued order confirmation, e.g. for a repeated shop checkout.
+    public String customerConfirmationNotice(Order order) {
+        return notice(OrderEmail.find("order = ?1 and type = ?2 and recipientRole = ?3",
+                order, Type.ORDER_CONFIRMATION, RecipientRole.CUSTOMER).firstResult());
+    }
+
     public String queueShipping(Order order) {
         if (!config.shippingEnabled()) {
             return "DISABLED";

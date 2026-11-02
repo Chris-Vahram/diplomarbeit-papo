@@ -43,6 +43,9 @@ public class PublicShopResource {
     @Inject
     ShopInquiryService inquiryService;
 
+    @Inject
+    ShopOrderService orderService;
+
     @Context
     HttpServerRequest httpRequest;
 
@@ -144,6 +147,18 @@ public class PublicShopResource {
         }
         inquiryService.submit(onlineShop(kennung), request, PublicShopFilter.clientIp(forwarded, httpRequest));
         return Response.status(201).build();
+    }
+
+    // Guest checkout (shop-checkout spec). 201 for a new order and for a repeated submit of the
+    // same idempotency key, which returns the original order's receipt.
+    @POST
+    @Path("/orders")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response order(@PathParam("kennung") String kennung, @HeaderParam("X-Forwarded-For") String forwarded,
+                          ShopOrderRequest request) {
+        ShopOrderConfirmationDto confirmation = orderService.submit(onlineShop(kennung), request,
+                PublicShopFilter.clientIp(forwarded, httpRequest));
+        return Response.status(201).entity(confirmation).build();
     }
 
     private PartnerShop onlineShop(String kennung) {
