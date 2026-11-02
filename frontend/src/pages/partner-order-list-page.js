@@ -23,7 +23,7 @@ class PartnerOrderListPage extends HTMLElement {
     this.table.columns = [
       { key: "orderDate", label: "Datum", mobile: "meta" },
       { key: "kundeName", label: "Endkunde", mobile: "title" },
-      { key: "orderValueLabel", label: "Wert (€)", mobile: "amount" },
+      { key: "orderValueLabel", label: "Wert brutto (€)", mobile: "amount" },
       { key: "commissionLabel", label: "Provision (€)" },
       { key: "statusBadge", label: "Status", html: true, mobile: "status" },
     ];

@@ -18,14 +18,14 @@
 
 ## 4. Frontend (essential)
 
-- [ ] 4.1 Company article form: tax-rate select (20/13/10/0), label price as "Bruttopreis (inkl. USt)"
-- [ ] 4.2 Partner catalog, cart, order details and print document: gross with net below
-- [ ] 4.3 Import page: price-column net/gross choice
+- [x] 4.1 Company article form: tax-rate select (20/13/10/0), label price as "Bruttopreis (inkl. USt)"
+- [x] 4.2 Partner catalog, cart, order details and print document: gross with net below
+- [x] 4.3 Import page: price-column net/gross choice
 - [x] 4.4 Order/commission CSV export includes net and tax columns
 - [x] 4.5 Public shop catalogue: replace `PublicArticleDto.DEFAULT_TAX_RATE_PERCENT` with the article's `taxRatePercent`; adjust `PublicShopContentTest` (interim state from `add-shop-page-renderer`)
 
 ## 5. Verification
 
 - [ ] 5.1 Backend tests and package green; `git diff --check`
-- [ ] 5.2 Browser check desktop/mobile of catalog, cart, article form
+- [x] 5.2 Browser check desktop/mobile of catalog, cart, article form
 - [ ] 5.3 Update `REQUIREMENTS_TRACEABILITY.md` and data-model documentation

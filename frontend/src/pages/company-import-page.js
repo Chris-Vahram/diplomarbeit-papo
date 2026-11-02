@@ -2,6 +2,10 @@ import { apiFetchForm } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
 import { escapeHtml } from "../lib/html.js";
 
+function looksNet(header) {
+  return /netto|\bnet\b/i.test(header ?? "");
+}
+
 class CompanyImportPage extends HTMLElement {
   connectedCallback() {
     this.classList.add("area--company");
@@ -68,6 +72,7 @@ class CompanyImportPage extends HTMLElement {
               </select>
             </label>
           </div>
+          ${this.currentEntity === "products" && field.key === "price" ? this.priceTypeRowHtml(preview.suggestedMapping.price) : ""}
         `
       )
       .join("");
@@ -85,6 +90,36 @@ class CompanyImportPage extends HTMLElement {
       <button type="button" id="commit-btn" class="button-primary">Import bestätigen</button>
     `;
     this.querySelector("#commit-btn").addEventListener("click", () => this.commitImport());
+    this.wirePriceType();
+  }
+
+  // Article import (data-import spec): the company says whether the mapped price column holds
+  // net or gross prices; net prices are converted with the row's tax rate (default 20 %).
+  priceTypeRowHtml(suggestedHeader) {
+    const net = looksNet(suggestedHeader);
+    return `
+      <div class="import-field-row import-field-row--sub">
+        <label>
+          Preisspalte enthält
+          <select id="price-type-select">
+            <option value="GROSS" ${net ? "" : "selected"}>Bruttopreise (inkl. USt)</option>
+            <option value="NET" ${net ? "selected" : ""}>Nettopreise (ohne USt)</option>
+          </select>
+        </label>
+        <p class="import-field-row__hint">Nettopreise werden mit dem Steuersatz der Zeile in Bruttopreise umgerechnet, ohne Steuersatz mit 20 %. Im Portal wird immer der Bruttopreis gespeichert.</p>
+      </div>`;
+  }
+
+  // Follows the price-column choice ("Preis netto" -> Nettopreise) until the company picks a type itself.
+  wirePriceType() {
+    const typeSelect = this.content.querySelector("#price-type-select");
+    const priceSelect = this.content.querySelector('[data-field-key="price"]');
+    if (!typeSelect || !priceSelect) return;
+    let chosen = false;
+    typeSelect.addEventListener("change", () => { chosen = true; });
+    priceSelect.addEventListener("change", () => {
+      if (!chosen) typeSelect.value = looksNet(priceSelect.value) ? "NET" : "GROSS";
+    });
   }
 
   async commitImport() {
@@ -96,6 +131,8 @@ class CompanyImportPage extends HTMLElement {
     const formData = new FormData();
     formData.append("file", this.currentFile);
     formData.append("mapping", JSON.stringify(mapping));
+    const priceType = this.content.querySelector("#price-type-select");
+    if (priceType) formData.append("priceType", priceType.value);
 
     try {
       const report = await apiFetchForm(`/company/import/${this.currentEntity}/commit`, formData);

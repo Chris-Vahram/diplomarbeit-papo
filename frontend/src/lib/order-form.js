@@ -5,6 +5,7 @@ import { escapeHtml } from "./html.js";
 import { formatEuro, formatNumber, formatAddress, formatDate } from "./format.js";
 import { addressFieldsHtml, readAddress, setAddressRequired } from "./address-fields.js";
 import { toCents, commissionCentsHalfUp } from "./money.js";
+import { cartTotals, orderTotalsHtml, priceStackHtml } from "./price.js";
 
 const MAX_SUGGESTIONS = 20;
 const percentFormat = new Intl.NumberFormat("de-AT", { maximumFractionDigits: 2 });
@@ -182,7 +183,8 @@ function wireComboboxLine(lineEl, products, lineId, notify) {
     const quantity = Number(quantityInput.value) || 0;
     if (product) {
       unitPriceEl.textContent = formatEuro(product.price);
-      lineTotalEl.textContent = formatEuro((toCents(product.price) * quantity) / 100);
+      const line = cartTotals([{ product, quantity }]);
+      lineTotalEl.innerHTML = priceStackHtml(line.gross, line.net);
     } else {
       unitPriceEl.textContent = "–";
       lineTotalEl.textContent = "–";
@@ -393,28 +395,32 @@ export function readItemsPayload(form) {
 }
 
 // Shared by the post-submit confirmation and the live order summary, so the two
-// can't drift apart (design.md risk note). `items` is [{name, quantity, unitPrice, lineTotal}].
-function itemsTableFragment(items) {
+// can't drift apart (design.md risk note).
+// `items` is [{name, quantity, unitPrice, unitNet, lineTotal, lineNet}], prices gross.
+export function itemsTableFragment(items) {
   const rows = items
     .map(
       (i) =>
-        `<tr><td>${escapeHtml(i.name)}</td><td>${i.quantity}</td><td>${formatNumber(i.unitPrice)}</td><td>${formatNumber(i.lineTotal)}</td></tr>`,
+        `<tr><td>${escapeHtml(i.name)}</td><td>${i.quantity}</td>`
+        + `<td>${priceStackHtml(i.unitPrice, i.unitNet, { euro: false })}</td>`
+        + `<td>${priceStackHtml(i.lineTotal, i.lineNet, { euro: false })}</td></tr>`,
     )
     .join("");
   return `
     <div class="data-table__scroll">
-      <table class="data-table">
-        <thead><tr><th>Artikel</th><th>Menge</th><th>Preis (€)</th><th>Summe (€)</th></tr></thead>
+      <table class="data-table order-items-table">
+        <thead><tr><th>Artikel</th><th>Menge</th><th>Preis inkl. USt (€)</th><th>Summe (€)</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>`;
 }
 
-function commissionLineHtml(percent, totalCents) {
-  const commissionCents = commissionCentsHalfUp(totalCents, percent);
+// Commission preview on the net value (commission spec), same rounding as the backend.
+function commissionLineHtml(percent, netCents) {
+  const commissionCents = commissionCentsHalfUp(netCents, percent);
   return `
     <p class="order-summary__commission">
-      Ihre Provision (${percentFormat.format(percent)} %): ${formatEuro(commissionCents / 100)}
+      Ihre Provision (${percentFormat.format(percent)} % vom Nettowert): ${formatEuro(commissionCents / 100)}
       <span class="order-summary__estimate-hint">(Vorschau)</span>
     </p>`;
 }
@@ -422,21 +428,27 @@ function commissionLineHtml(percent, totalCents) {
 // Live order-summary panel (order-form-experience spec): tracks the composed
 // order as the partner/company works. `commissionPercent` is null until known
 // (company flow, before a partner is chosen) - the commission line is then omitted.
-export function renderOrderSummaryHtml({ items, totalCents, commissionPercent }) {
+export function renderOrderSummaryHtml({ items, commissionPercent }) {
   if (items.length === 0) {
     return `<div class="order-summary order-summary--empty"><p>Noch keine Artikel</p></div>`;
   }
-  const rows = items.map((i) => ({
-    name: i.product.name,
-    quantity: i.quantity,
-    unitPrice: i.product.price,
-    lineTotal: i.lineTotalCents / 100,
-  }));
+  const rows = items.map((i) => {
+    const line = cartTotals([i]);
+    return {
+      name: i.product.name,
+      quantity: i.quantity,
+      unitPrice: i.product.price,
+      unitNet: cartTotals([{ product: i.product, quantity: 1 }]).net,
+      lineTotal: line.gross,
+      lineNet: line.net,
+    };
+  });
+  const totals = cartTotals(items);
   return `
     <div class="order-summary">
       ${itemsTableFragment(rows)}
-      <p class="order-summary__total"><strong>Gesamtwert: <span aria-live="polite">${formatEuro(totalCents / 100)}</span></strong></p>
-      ${commissionPercent != null ? commissionLineHtml(commissionPercent, totalCents) : ""}
+      ${orderTotalsHtml(totals, { live: true })}
+      ${commissionPercent != null ? commissionLineHtml(commissionPercent, totals.netCents) : ""}
     </div>`;
 }
 
@@ -472,7 +484,9 @@ export function renderOrderConfirmationHtml(order, { showPartner = false, action
     name: item.productName,
     quantity: item.quantity,
     unitPrice: item.unitPriceSnapshot,
+    unitNet: item.unitNetPrice,
     lineTotal: item.lineTotal,
+    lineNet: item.lineNetTotal,
   }));
   const kundeName = `${order.kunde.firstName ? escapeHtml(order.kunde.firstName) + " " : ""}${escapeHtml(order.kunde.lastName)}`;
 
@@ -491,7 +505,7 @@ export function renderOrderConfirmationHtml(order, { showPartner = false, action
         ${showPartner ? `<p>Partner: ${escapeHtml(order.partnerName)}</p>` : ""}
         <p>Endkunde: ${kundeName}, ${escapeHtml(formatAddress(order.kunde.address))}</p>
         ${itemsTableFragment(items)}
-        <p><strong>Gesamtwert: ${formatEuro(order.orderValue)}</strong></p>
+        ${orderTotalsHtml({ gross: order.orderValue, net: order.netValue, tax: order.taxValue })}
         ${order.commissionValue != null ? `<p class="print-only">Provision (${percentFormat.format(order.commissionPercentUsed)} %): ${formatEuro(order.commissionValue)}</p>` : ""}
       </div>
       <button type="button" class="print-button" data-action="print">Beleg drucken</button>

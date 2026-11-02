@@ -4,7 +4,8 @@
 // verbatim so the preview matches the stored CommissionRecord to the cent.
 import { escapeHtml } from "./html.js";
 import { formatEuro } from "./format.js";
-import { toCents, commissionCentsHalfUp } from "./money.js";
+import { commissionCentsHalfUp } from "./money.js";
+import { cartTotals, netOf, orderTotalsHtml, priceStackHtml } from "./price.js";
 
 // Demo data is tiny; at the reference ~800 articles this caps the rendered grid
 // so search/category narrowing (not a full-catalog render) becomes the normal
@@ -42,7 +43,7 @@ function productCardHtml(product) {
       <div class="product-card__body">
         <div class="product-card__name">${escapeHtml(product.name)}</div>
         ${product.category ? `<div class="product-card__category">${escapeHtml(product.category)}</div>` : ""}
-        <div class="product-card__price">${formatEuro(product.price)}</div>
+        <div class="product-card__price">${priceStackHtml(product.price, product.netPrice ?? netOf(product.price, product.taxRatePercent), { taxLabel: true })}</div>
       </div>
       ${
         disabled
@@ -88,37 +89,38 @@ export function catalogStepHtml(products) {
     </div>`;
 }
 
+// Line total as gross with the line's net value below (article-tax spec).
+function lineTotalHtml(product, quantity) {
+  const { gross, net } = cartTotals([{ product, quantity }]);
+  return priceStackHtml(gross, net);
+}
+
 function cartLineHtml({ product, quantity }) {
-  const lineTotalCents = toCents(product.price) * quantity;
   return `
     <div class="cart-line" data-product-id="${product.id}">
       ${thumbHtml(product.imageUrl, "cart-line__thumb")}
       <div class="cart-line__name">${escapeHtml(product.name)}</div>
       <span class="cart-line__unit-price">${formatEuro(product.price)}</span>
       <input type="number" class="cart-line__quantity" data-quantity min="1" step="1" value="${quantity}" aria-label="Menge" />
-      <span class="cart-line__total" data-line-total>${formatEuro(lineTotalCents / 100)}</span>
+      <span class="cart-line__total" data-line-total>${lineTotalHtml(product, quantity)}</span>
       <button type="button" class="cart-line__remove" data-remove>Entfernen</button>
     </div>`;
 }
 
-// Integer cents throughout, no float round-trip (matches wireArticleLines's
-// notifyChange() in order-form.js exactly) - the same pattern used for the
-// existing order-form live totals, so this preview matches the backend to the cent.
-function cartTotalCents(cart) {
-  return cart.reduce((sum, i) => sum + toCents(i.product.price) * i.quantity, 0);
-}
-
+// Integer cents + one exact net rounding (price.js cartTotals mirrors ArticleTax.totals),
+// so gross, net and the commission preview match the stored order to the cent.
+// Commission is calculated on the net value (commission spec).
 function cartTotalsHtml(cart, commissionPercent) {
-  const totalCents = cartTotalCents(cart);
+  const totals = cartTotals(cart);
   const commissionHtml =
     commissionPercent != null
       ? `<p class="order-summary__commission">
-           Ihre Provision (${percentFormat.format(commissionPercent)} %): ${formatEuro(commissionCentsHalfUp(totalCents, commissionPercent) / 100)}
+           Ihre Provision (${percentFormat.format(commissionPercent)} % vom Nettowert): ${formatEuro(commissionCentsHalfUp(totals.netCents, commissionPercent) / 100)}
            <span class="order-summary__estimate-hint">(Vorschau)</span>
          </p>`
       : "";
   return `
-    <p class="order-summary__total"><strong>Gesamtwert: <span aria-live="polite">${formatEuro(totalCents / 100)}</span></strong></p>
+    ${orderTotalsHtml(totals, { live: true })}
     ${commissionHtml}`;
 }
 
@@ -136,13 +138,12 @@ export function cartStepHtml(cart, commissionPercent, { showSubmit = true } = {}
 }
 
 function cartSummaryLineHtml({ product, quantity }) {
-  const lineTotalCents = toCents(product.price) * quantity;
   return `
     <div class="cart-summary-line">
       ${thumbHtml(product.imageUrl, "cart-summary-line__thumb")}
       <span class="cart-summary-line__name">${escapeHtml(product.name)}</span>
       <span class="cart-summary-line__qty">× ${quantity}</span>
-      <span class="cart-summary-line__total">${formatEuro(lineTotalCents / 100)}</span>
+      <span class="cart-summary-line__total">${lineTotalHtml(product, quantity)}</span>
     </div>`;
 }
 
@@ -274,7 +275,7 @@ export function wireCartStep(root, cart, commissionPercent, onCartChange, { show
     if (quantityInput.value !== String(quantity)) quantityInput.value = quantity;
     // Update just this line's total + the overall totals, not the whole cart
     // panel, so the quantity input doesn't lose focus while the partner types.
-    line.querySelector("[data-line-total]").textContent = formatEuro((toCents(item.product.price) * quantity) / 100);
+    line.querySelector("[data-line-total]").innerHTML = lineTotalHtml(item.product, quantity);
     root.querySelector(".cart__totals").innerHTML = cartTotalsHtml(cart, commissionPercent);
     onCartChange();
   });

@@ -36,7 +36,7 @@ class CompanyDashboardPage extends HTMLElement {
     this.table.columns = [
       { key: "partnerName", label: "Partner", mobile: "title" },
       { key: "fulfilledOrderCount", label: "Abgeschlossene Bestellungen" },
-      { key: "revenueLabel", label: "Umsatz (€)" },
+      { key: "revenueLabel", label: "Umsatz brutto (€)" },
       { key: "commissionLabel", label: "Provision (€)", mobile: "amount" },
     ];
     this.table.emptyMessage = "Noch keine Partner angelegt.";
@@ -95,7 +95,7 @@ class CompanyDashboardPage extends HTMLElement {
     const monthly = monthlyRevenue(this.orders, keys);
 
     this.metricRow.innerHTML = `
-      <metric-card lead label="Umsatz (abgeschlossen)" value="${formatEuro(revenue)}" icon="trending-up" tone="positive" ${trendAttrs(trends.revenueTrend)}></metric-card>
+      <metric-card lead label="Umsatz brutto (abgeschlossen)" value="${formatEuro(revenue)}" icon="trending-up" tone="positive" ${trendAttrs(trends.revenueTrend)}></metric-card>
       <metric-card label="Provision (abgeschlossen)" value="${formatEuro(commission)}" icon="percent" tone="positive" ${trendAttrs(trends.commissionTrend)}></metric-card>
       <metric-card label="Abgeschlossene Bestellungen" value="${count}" icon="check-circle" tone="positive" ${trendAttrs(trends.countTrend)}></metric-card>
       <metric-card label="Ø Bestellwert" value="${formatEuro(avgOrderValue)}" icon="receipt" tone="positive" ${trendAttrs(trends.avgTrend)}></metric-card>
