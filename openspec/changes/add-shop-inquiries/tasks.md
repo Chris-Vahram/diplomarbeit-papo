@@ -6,8 +6,8 @@
 
 ## 2. Frontend (essential)
 
-- [ ] 2.1 Block "Anfrageformular" (renderer + builder properties)
-- [ ] 2.2 Partner page "Anfragen" with badge in navigation
+- [x] 2.1 Block "Anfrageformular" (renderer + builder properties)
+- [x] 2.2 Partner page "Anfragen" with badge in navigation
 
 ## 3. Verification
 

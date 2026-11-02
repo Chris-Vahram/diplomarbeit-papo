@@ -20,6 +20,7 @@ const routes = {
   "/partner/orders/new": { tag: "partner-order-new-page", role: "partner", title: "Neue Bestellung" },
   "/partner/customers": { tag: "partner-customer-list-page", role: "partner", title: "Meine Endkunden" },
   "/partner/shop": { tag: "partner-shop-page", role: "partner", title: "Mein Webshop" },
+  "/partner/shop/inquiries": { tag: "partner-shop-inquiries-page", role: "partner", title: "Anfragen" },
   "/partner/shop/editor": { tag: "partner-shop-editor-page", role: "partner", title: "Shop bearbeiten", fullscreen: true },
   "/partner/profile": { tag: "partner-profile-page", role: "partner", title: "Mein Profil" },
 };
@@ -37,6 +38,7 @@ const NAV_ICONS = {
   "/partner/orders": "shopping-cart",
   "/partner/customers": "contact",
   "/partner/shop": "store",
+  "/partner/shop/inquiries": "inbox",
   "/partner/profile": "circle-user",
 };
 
@@ -152,13 +154,15 @@ function renderNav() {
         ["/partner/customers", "Meine Endkunden"],
         ["/partner/products", "Meine Artikel"],
         ["/partner/shop", "Mein Webshop"],
+        // Sub-item of "Mein Webshop" (shop-inquiries spec), indented in the sidebar.
+        ["/partner/shop/inquiries", "Anfragen", "nav-sub"],
       ];
 
   const path = currentPath();
-  for (const [href, label] of links) {
+  for (const [href, label, extraClass] of links) {
     const link = document.createElement("a");
     link.href = `#${href}`;
-    link.className = href === path ? "is-active" : "";
+    link.className = [href === path ? "is-active" : "", extraClass ?? ""].join(" ").trim();
     link.innerHTML = `<i data-lucide="${NAV_ICONS[href]}"></i><span>${label}</span>`;
     appNav.appendChild(link);
   }
@@ -206,6 +210,7 @@ function renderNav() {
 
   window.lucide?.createIcons();
   refreshOrdersBadge();
+  refreshInquiriesBadge();
 }
 
 function setPartnerPortalLabel(name) {
@@ -242,18 +247,31 @@ async function loadPartnerPortalLabel(generation) {
 // order list, which this runs on every nav re-render) — no polling/websocket, per design.md.
 export async function refreshOrdersBadge() {
   const session = getSession();
-  const link = appNav.querySelector('a[href="#/company/orders"]');
-  if (!session?.isCompany || !link) return;
+  if (!session?.isCompany) return;
+  await refreshNavBadge("#/company/orders", "/company/orders/unseen-count", "neue Bestellungen");
+}
+
+// Unread shop inquiries on "Anfragen" (shop-inquiries spec), same pattern as above.
+export async function refreshInquiriesBadge() {
+  const session = getSession();
+  if (!session?.isPartner) return;
+  await refreshNavBadge("#/partner/shop/inquiries", "/partner/shop/inquiries/unread-count", "ungelesene Anfragen");
+}
+
+async function refreshNavBadge(href, countPath, srLabel) {
+  const link = appNav.querySelector(`a[href="${href}"]`);
+  if (!link) return;
   try {
-    const unseenCount = await apiFetch("/company/orders/unseen-count");
+    const count = await apiFetch(countPath);
     let badge = link.querySelector(".nav-badge");
-    if (unseenCount > 0) {
+    if (count > 0) {
       if (!badge) {
         badge = document.createElement("span");
         badge.className = "nav-badge";
         link.appendChild(badge);
       }
-      badge.textContent = unseenCount > 99 ? "99+" : String(unseenCount);
+      badge.textContent = count > 99 ? "99+" : String(count);
+      badge.setAttribute("aria-label", `${count} ${srLabel}`);
     } else {
       badge?.remove();
     }
@@ -325,6 +343,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   import("../pages/partner-customer-list-page.js");
   import("../pages/partner-profile-page.js");
   import("../pages/partner-shop-page.js");
+  import("../pages/partner-shop-inquiries-page.js");
   import("../pages/partner-shop-editor-page.js");
   window.addEventListener("hashchange", render);
   render();
