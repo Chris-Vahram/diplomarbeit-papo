@@ -119,6 +119,11 @@ async function installConsent(api) {
   });
 }
 
+// Anonymous statistics for the rendered page (shop-statistics spec); loaded only by the live shop.
+function trackVisit(api, page, articleId = null) {
+  import("./shop-stats.js").then(({ trackShopVisit }) => trackShopVisit(api, { page, articleId })).catch(() => {});
+}
+
 // Cart in the header of the live shop only (preview and template demo have no cart).
 function cartLinkHtml(api, currentPath) {
   const current = currentPath === "warenkorb" ? ' aria-current="page"' : "";
@@ -247,12 +252,14 @@ async function start() {
     const { renderCartPage, renderCheckoutPage } = await import("./shop-checkout.js");
     const render = route.segment === "warenkorb" ? renderCartPage : renderCheckoutPage;
     await render(main, { api, shop, navigation });
+    trackVisit(api, route.segment);
     return;
   }
 
   const legalPage = navigation.legal.find((item) => item.segment === route.segment);
   if (legalPage && !route.articleId) {
     await renderLegalPage(main, { api, shop, item: legalPage });
+    trackVisit(api, legalPage.segment);
     return;
   }
 
@@ -276,6 +283,7 @@ async function start() {
     const view = document.createElement("shop-page-view");
     view.data = { blocks: page.blocks, context: { api, article, shopName: shop.displayName } };
     main.append(view);
+    trackVisit(api, segment, article?.id ?? null);
   } catch {
     document.title = shop.displayName;
     renderMessage(main, "Diese Seite gibt es nicht.");

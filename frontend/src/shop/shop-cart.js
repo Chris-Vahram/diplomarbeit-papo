@@ -39,7 +39,8 @@ export function readCart(kennung) {
   return sanitize(memory.get(kennung) ?? []);
 }
 
-function writeCart(kennung, lines, added = false) {
+// addedId: article just added (header bump, statistics event "In den Warenkorb").
+function writeCart(kennung, lines, addedId = null) {
   const clean = sanitize(lines);
   memory.set(kennung, clean);
   try {
@@ -48,7 +49,7 @@ function writeCart(kennung, lines, added = false) {
   } catch {
     // memory copy is enough for this page view
   }
-  window.dispatchEvent(new CustomEvent(CART_EVENT, { detail: { kennung, added } }));
+  window.dispatchEvent(new CustomEvent(CART_EVENT, { detail: { kennung, added: addedId !== null, articleId: addedId } }));
   return clean;
 }
 
@@ -59,7 +60,7 @@ export function addToCart(kennung, id, quantity = 1) {
   if (line) line.quantity = clampQuantity(line.quantity + clampQuantity(quantity));
   else if (lines.length >= MAX_LINES) return false;
   else lines.push({ id, quantity: clampQuantity(quantity) });
-  writeCart(kennung, lines, true);
+  writeCart(kennung, lines, id);
   return true;
 }
 
