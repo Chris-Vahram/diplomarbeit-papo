@@ -2,9 +2,7 @@
 
 ## Purpose
 Partner-scoped end customers: overview with last order date and dormancy marker, creation from the overview with safe submission and clear feedback.
-
 ## Requirements
-
 ### Requirement: Last order date per end customer
 The partner's end-customer list (`GET /api/partner/customers`) SHALL include, per Endkunde, the date of that Endkunde's most recent order as a nullable `lastOrderDate`. An Endkunde with no orders SHALL have `lastOrderDate = null`. The value SHALL be produced by a single bounded, partner-scoped query with no per-Endkunde lookups (no N+1), and the endpoint SHALL continue to resolve the calling partner server-side (`CurrentPartner.resolve()`), never from a client-supplied partner id. (The specific query shape is a design/implementation detail — see design.md.)
 
@@ -188,3 +186,14 @@ A partner SHALL be able to edit the last name, first name, address, e-mail and p
 #### Scenario: Double submission
 - **WHEN** the partner clicks save repeatedly while the update is pending
 - **THEN** only one update request is sent
+
+### Requirement: Customer origin
+Every Kunde SHALL have an origin `PORTAL` or `SHOP`. Existing records SHALL be migrated to `PORTAL`. A shop order SHALL always create a new Kunde owned by the shop's partner with origin `SHOP`, including the e-mail address; it SHALL NOT match or modify existing Kunde records. The partner customer list SHALL show the origin.
+
+#### Scenario: Repeat shop customer
+- **WHEN** the same person orders twice in a shop
+- **THEN** two Kunde records with origin "Shop" exist and no existing record was changed
+
+#### Scenario: Shop customer stays partner-scoped
+- **WHEN** a shop order creates a Kunde
+- **THEN** only the shop's partner (and the company via the order) can see it
