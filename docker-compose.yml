@@ -24,6 +24,8 @@ services:
       - ./backend/src/main/resources/keycloak/partnerportal-realm.json:/opt/keycloak/data/import/partnerportal-realm.json
       # End-customer realm (add-shop-customer-accounts); verification mails go to Mailpit.
       - ./backend/src/main/resources/keycloak/papo-shop-realm.json:/opt/keycloak/data/import/papo-shop-realm.json
+      # PAPO login theme of the papo-shop realm; start-dev does not cache themes, edits show on reload.
+      - ./deploy/keycloak/themes/papo:/opt/keycloak/themes/papo:ro
 
   # Dev-only mail catcher for order e-mails (send-order-emails): SMTP 1025, web UI
   # http://localhost:8025. Bound to loopback so it is not reachable from the network.

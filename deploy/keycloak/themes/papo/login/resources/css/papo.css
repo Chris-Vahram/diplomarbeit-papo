@@ -1,0 +1,401 @@
+/* PAPO login theme for the end-customer realm papo-shop (add-shop-customer-accounts).
+   PAPO tokens from DESIGN.md (Page Mist, Surface White, sage borders and text, Plus Jakarta Sans,
+   0.375rem controls, 0.75rem card) with a neutral ink accent: customers arrive from many partner
+   shops with their own colours, so this page carries no company/partner role colour.
+   Decided by Tobias 02.11.2026 ("Neutral Ink"). */
+
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("../fonts/plus-jakarta-sans-latin.woff2") format("woff2");
+  font-weight: 200 800;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("../fonts/plus-jakarta-sans-latin-ext.woff2") format("woff2");
+  font-weight: 200 800;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+:root {
+  --mist: #f6f9f7;
+  --surface: #ffffff;
+  --sage: #edf2ee;
+  --border: #d6e1d8;
+  --border-strong: #b5c8b9;
+  --text: #0b110c;
+  --text-label: #3d4f43;
+  --text-secondary: #52675a;
+  --ink: #0b110c;
+  --ink-hover: #26332a;
+  --ring: rgb(171 199 196 / 0.75); /* Calm Teal */
+  --success: #15803d;
+  --success-tint: #e9f8ef;
+  --warning: #92400e;
+  --warning-tint: #fef3c7;
+  --error: #b91c1c;
+  --error-tint: #fee2e2;
+  --radius-control: 0.375rem;
+  --radius-card: 0.75rem;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html.papo {
+  background: var(--mist);
+  -webkit-text-size-adjust: 100%;
+}
+
+body.papo-body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text);
+  background:
+    radial-gradient(60rem 30rem at 50% -10rem, rgb(171 199 196 / 0.22), transparent 70%),
+    var(--mist);
+}
+
+::selection { background: rgb(171 199 196 / 0.55); color: var(--text); }
+
+a {
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgb(11 17 12 / 0.3);
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color 160ms ease;
+}
+a:hover { text-decoration-color: currentColor; }
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+/* ---- Frame: wordmark, one card, a quiet footer ---------------------------------------- */
+.papo-page {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 1.5rem;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: clamp(2rem, 9vh, 5.5rem) 1rem 2rem;
+}
+
+.papo-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.625rem;
+  color: var(--text);
+}
+.papo-brand__mark {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.papo-brand__name {
+  padding-left: 0.625rem;
+  border-left: 1px solid var(--border-strong);
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.papo-card {
+  width: 100%;
+  max-width: 27rem;
+  padding: clamp(1.5rem, 5vw, 2.25rem);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: 0 1px 2px rgb(52 78 61 / 0.06), 0 22px 48px -28px rgb(52 78 61 / 0.32);
+}
+
+.papo-card__head { margin-bottom: 1.5rem; }
+#kc-page-title {
+  margin: 0;
+  font-size: 1.625rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+.papo-required-hint { margin: 0.5rem 0 0; color: var(--text-secondary); font-size: 0.8125rem; }
+.required { color: var(--error); }
+
+.papo-username {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.625rem 0.75rem;
+  background: var(--sage);
+  border-radius: var(--radius-control);
+  font-size: 0.875rem;
+}
+.papo-username__label { color: var(--text-secondary); }
+.papo-username__value { font-weight: 600; overflow-wrap: anywhere; }
+.papo-username__change { margin-left: auto; font-size: 0.8125rem; }
+
+.papo-footer {
+  max-width: 27rem;
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  text-align: center;
+}
+.papo-footer p { margin: 0; }
+
+/* ---- Forms ------------------------------------------------------------------------------ */
+#kc-form-login,
+.papo-form,
+#kc-reset-password-form,
+#kc-passwd-update-form { display: grid; gap: 1.125rem; margin: 0; }
+
+.papo-group { display: grid; gap: 0.375rem; margin: 0; }
+.papo-label-wrap { display: flex; align-items: baseline; gap: 0.25rem; color: var(--error); }
+.papo-label,
+.papo-group > label {
+  color: var(--text-label);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.papo-input-wrap { display: grid; gap: 0.375rem; }
+
+.papo-input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  font: inherit;
+  font-size: 1rem; /* 16px keeps iOS from zooming into the field */
+  caret-color: var(--ink);
+  transition: border-color 160ms ease, box-shadow 200ms var(--ease);
+}
+.papo-input:hover { border-color: #8ca594; }
+.papo-input:focus,
+.papo-input:focus-visible {
+  outline: none;
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+.papo-input[aria-invalid="true"] { border-color: var(--error); }
+.papo-input[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px rgb(185 28 28 / 0.2); }
+.papo-input[readonly],
+.papo-input:disabled { background: var(--sage); color: var(--text-secondary); }
+
+.papo-error { color: var(--error); font-size: 0.8125rem; font-weight: 600; line-height: 1.4; }
+.papo-help { color: var(--text-secondary); font-size: 0.8125rem; }
+
+/* Password with show/hide inside the field. */
+.papo-input-group { position: relative; display: flex; }
+.papo-input-group .papo-input { padding-right: 3rem; }
+.papo-eye-button {
+  position: absolute;
+  inset: 0 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0 var(--radius-control) var(--radius-control) 0;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.papo-eye-button:hover { color: var(--text); }
+.papo-eye {
+  display: block;
+  width: 1.25rem;
+  height: 1.25rem;
+  background: currentColor;
+  -webkit-mask: var(--icon) center / contain no-repeat;
+  mask: var(--icon) center / contain no-repeat;
+}
+.papo-eye--show {
+  --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E");
+}
+.papo-eye--hide {
+  --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10.7 5.1A10.9 10.9 0 0 1 12 5c6.5 0 10 7 10 7a17.6 17.6 0 0 1-2.2 3.2M6.6 6.6C3.6 8.6 2 12 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2M2 2l20 20'/%3E%3C/svg%3E");
+}
+
+/* Options row: "Passwort vergessen?" on the login, "Zurück zur Anmeldung" elsewhere. */
+.papo-group--settings { margin-top: -0.375rem; }
+#kc-form-options:empty { display: none; }
+.papo-options__links { display: flex; justify-content: flex-end; font-size: 0.875rem; }
+.papo-options,
+#kc-form-options { font-size: 0.875rem; }
+.papo-options a,
+#kc-form-options a { color: var(--text-secondary); }
+.papo-options a:hover,
+#kc-form-options a:hover { color: var(--text); }
+
+.papo-check { display: flex; align-items: flex-start; gap: 0.625rem; font-size: 0.9375rem; }
+.papo-check__input,
+.checkbox input { width: 1.125rem; height: 1.125rem; margin: 0.1875rem 0 0; accent-color: var(--ink); }
+
+/* Register / reset / update pages put options and buttons in one group: buttons first visually. */
+#kc-register-form .papo-group:last-of-type,
+#kc-reset-password-form .papo-group:last-of-type,
+#kc-passwd-update-form .papo-group:last-of-type { display: flex; flex-direction: column-reverse; gap: 0.875rem; }
+#kc-register-form #kc-form-options,
+#kc-reset-password-form #kc-form-options { text-align: center; }
+
+/* ---- Buttons ---------------------------------------------------------------------------- */
+.papo-button,
+input.papo-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.625rem 1.25rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 650;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: background-color 160ms ease, transform 120ms var(--ease), box-shadow 160ms ease;
+}
+.papo-button:active { transform: scale(0.98); transition-duration: 60ms; }
+.papo-button--primary {
+  background: var(--ink);
+  color: #ffffff;
+  box-shadow: 0 1px 2px rgb(11 17 12 / 0.2);
+}
+.papo-button--primary:hover { background: var(--ink-hover); }
+.papo-button--secondary {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+.papo-button--secondary:hover { background: var(--sage); }
+.papo-button--block { width: 100%; }
+.papo-button--large { min-height: 3rem; font-size: 1rem; }
+.papo-button:disabled { opacity: 0.6; cursor: progress; transform: none; }
+#kc-form-buttons { margin-top: 0.25rem; }
+.papo-buttons { display: grid; gap: 0.625rem; }
+
+.papo-link-button {
+  padding: 0;
+  margin-top: 1rem;
+  background: none;
+  border: 0;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+/* ---- Messages --------------------------------------------------------------------------- */
+.papo-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  margin: 0 0 1.25rem;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid;
+  border-radius: var(--radius-control);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+.papo-alert__icon { flex: none; margin-top: 0.0625rem; }
+.papo-alert__text { overflow-wrap: anywhere; }
+.papo-alert--success { background: var(--success-tint); border-color: rgb(21 128 61 / 0.35); color: #14532d; }
+.papo-alert--warning { background: var(--warning-tint); border-color: rgb(146 64 14 / 0.3); color: var(--warning); }
+.papo-alert--error { background: var(--error-tint); border-color: rgb(185 28 28 / 0.3); color: var(--error); }
+.papo-alert--info { background: #eff5f6; border-color: rgb(55 78 84 / 0.25); color: #374e54; }
+
+/* ---- Sign-up link under the form -------------------------------------------------------- */
+.papo-signup {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  text-align: center;
+}
+
+/* ---- Text pages: verify e-mail, info, errors -------------------------------------------- */
+.instruction { margin: 0 0 1rem; color: var(--text-label); font-size: 0.9375rem; line-height: 1.6; }
+.instruction:last-child { margin-bottom: 0; }
+#kc-info-message,
+.papo-info { display: grid; gap: 1rem; }
+.papo-info .instruction { margin: 0; color: var(--text); font-size: 1rem; }
+.papo-info__icon {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 999px;
+  background: var(--success-tint);
+  color: var(--success);
+  animation: papo-check 420ms 140ms var(--ease) both;
+}
+@keyframes papo-check {
+  from { opacity: 0; transform: scale(0.6); }
+}
+.papo-info__icon--mail { background: var(--sage); color: var(--text); animation: none; }
+.papo-info__address {
+  margin: -0.5rem 0 0;
+  padding: 0.625rem 0.75rem;
+  background: var(--sage);
+  border-radius: var(--radius-control);
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.papo-info__next { margin: 0; color: var(--text-secondary); font-size: 0.9375rem; }
+#kc-error-message p { margin: 0 0 1rem; }
+
+/* ---- Small screens ---------------------------------------------------------------------- */
+@media (max-width: 30rem) {
+  .papo-page { padding-top: 1.5rem; gap: 1.25rem; }
+  .papo-card { padding: 1.5rem 1.25rem; }
+  #kc-page-title { font-size: 1.5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .papo-info__icon { animation: papo-fade 200ms ease both; }
+  .papo-button,
+  .papo-input { transition: none; }
+}
+@keyframes papo-fade { from { opacity: 0; } }
+
+@media (prefers-contrast: more) {
+  :root { --border: #8ca594; --border-strong: #52675a; }
+}
+
+/* "Passwort zurücksetzen": Keycloak prints the explanation after the form; read it first. */
+#kc-content:has(#kc-reset-password-form) { display: flex; flex-direction: column; }
+#kc-content:has(#kc-reset-password-form) .papo-signup {
+  order: -1;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  border: 0;
+  text-align: left;
+}

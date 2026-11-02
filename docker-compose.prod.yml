@@ -68,6 +68,7 @@ services:
     volumes:
       - ./deploy/keycloak/partnerportal-realm.prod.json.template:/opt/keycloak/partnerportal-realm.json.template:ro
       - ./deploy/keycloak/papo-shop-realm.prod.json.template:/opt/keycloak/papo-shop-realm.json.template:ro
+      - ./deploy/keycloak/themes/papo:/opt/keycloak/themes/papo:ro
       - ./deploy/keycloak/render-and-start.sh:/opt/keycloak/render-and-start.sh:ro
     # Render the realm template with the real DOMAIN before importing it (design.md
     # Decision 4 status note: redirectUris/webOrigins/KC_HOSTNAME must come from one
