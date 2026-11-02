@@ -21,6 +21,7 @@ const routes = {
   "/partner/customers": { tag: "partner-customer-list-page", role: "partner", title: "Meine Endkunden" },
   "/partner/shop": { tag: "partner-shop-page", role: "partner", title: "Mein Webshop" },
   "/partner/shop/inquiries": { tag: "partner-shop-inquiries-page", role: "partner", title: "Anfragen" },
+  "/partner/shop/statistics": { tag: "partner-shop-statistics-page", role: "partner", title: "Webshop-Statistik" },
   "/partner/shop/editor": { tag: "partner-shop-editor-page", role: "partner", title: "Shop bearbeiten", fullscreen: true },
   "/partner/profile": { tag: "partner-profile-page", role: "partner", title: "Mein Profil" },
 };
@@ -39,6 +40,7 @@ const NAV_ICONS = {
   "/partner/customers": "contact",
   "/partner/shop": "store",
   "/partner/shop/inquiries": "inbox",
+  "/partner/shop/statistics": "chart-column",
   "/partner/profile": "circle-user",
 };
 
@@ -156,6 +158,8 @@ function renderNav() {
         ["/partner/shop", "Mein Webshop"],
         // Sub-item of "Mein Webshop" (shop-inquiries spec), indented in the sidebar.
         ["/partner/shop/inquiries", "Anfragen", "nav-sub"],
+        // Sub-item "Webshop-Statistik" (shop-statistics spec).
+        ["/partner/shop/statistics", "Statistik", "nav-sub"],
       ];
 
   const path = currentPath();
@@ -344,6 +348,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   import("../pages/partner-profile-page.js");
   import("../pages/partner-shop-page.js");
   import("../pages/partner-shop-inquiries-page.js");
+  import("../pages/partner-shop-statistics-page.js");
   import("../pages/partner-shop-editor-page.js");
   window.addEventListener("hashchange", render);
   render();

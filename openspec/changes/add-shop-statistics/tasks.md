@@ -8,7 +8,7 @@
 ## 2. Frontend (essential)
 
 - [x] 2.1 Shop event sender respecting consent
-- [ ] 2.2 Page "Webshop-Statistik": period select, KPIs with comparison, chart, top articles, referrers, devices
+- [x] 2.2 Page "Webshop-Statistik": period select, KPIs with comparison, chart, top articles, referrers, devices
 
 ## 3. Verification
 
