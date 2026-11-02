@@ -2,6 +2,8 @@
 // PKCE against the separate Keycloak realm papo-shop: registration, e-mail verification and
 // password reset all happen on Keycloak's pages. Never imports portal modules and never reads
 // the portal session ("papo.auth"); its own tokens live in sessionStorage under SESSION_KEY.
+// The open login attempts live in localStorage instead: the confirmation link in the
+// registration mail usually opens a new tab, which must still finish the login.
 import { API_BASE, KEYCLOAK_BASE } from "../lib/config.js";
 
 const REALM = "papo-shop";
@@ -9,34 +11,52 @@ const CLIENT_ID = "papo-shop-frontend";
 const OIDC = `${KEYCLOAK_BASE}/realms/${REALM}/protocol/openid-connect`;
 const SESSION_KEY = "papo.shop.session";
 const PENDING_KEY = "papo.shop.login";
+// Matches Keycloak's default lifetime of the verification link's login session.
+const PENDING_TTL_MS = 30 * 60_000;
 // Refresh a little early so a request never leaves with a token that expires in flight.
 const EARLY_MS = 30_000;
 
 export const ACCOUNT_EVENT = "papo:shop-account";
 
-function storage() {
+function storage(kind = "sessionStorage") {
   try {
-    return window.sessionStorage;
+    return window[kind];
   } catch {
     return null; // blocked storage: login simply stays unavailable for this visit
   }
 }
 
-function read(key) {
+function read(key, kind) {
   try {
-    return JSON.parse(storage()?.getItem(key) ?? "null");
+    return JSON.parse(storage(kind)?.getItem(key) ?? "null");
   } catch {
     return null;
   }
 }
 
-function write(key, value) {
+function write(key, value, kind) {
   try {
-    if (value == null) storage()?.removeItem(key);
-    else storage()?.setItem(key, JSON.stringify(value));
+    if (value == null) storage(kind)?.removeItem(key);
+    else storage(kind)?.setItem(key, JSON.stringify(value));
   } catch {
     // ignore: quota or blocked storage
   }
+}
+
+// Open login attempts by state, so two tabs never overwrite each other's attempt.
+function pendingLogins() {
+  const all = read(PENDING_KEY, "localStorage");
+  const now = Date.now();
+  return Object.fromEntries(Object.entries(all && typeof all === "object" ? all : {})
+    .filter(([, entry]) => entry && now - entry.at < PENDING_TTL_MS));
+}
+
+function takePending(state) {
+  const all = pendingLogins();
+  const entry = state ? all[state] ?? null : null;
+  delete all[state];
+  write(PENDING_KEY, Object.keys(all).length ? all : null, "localStorage");
+  return entry;
 }
 
 function base64url(bytes) {
@@ -103,7 +123,7 @@ export async function startLogin(kennung, { returnTo = "konto", action = "login"
   const verifier = randomString(48);
   const state = randomString(16);
   const nonce = randomString(16);
-  write(PENDING_KEY, { verifier, state, nonce, kennung, returnTo, at: Date.now() });
+  write(PENDING_KEY, { ...pendingLogins(), [state]: { verifier, nonce, kennung, returnTo, action, at: Date.now() } }, "localStorage");
   const params = new URLSearchParams({
     client_id: CLIENT_ID,
     redirect_uri: redirectUri(kennung),
@@ -120,17 +140,22 @@ export async function startLogin(kennung, { returnTo = "konto", action = "login"
   location.assign(`${OIDC}/${action === "register" ? "registrations" : "auth"}?${params}`);
 }
 
-// Runs on /konto when Keycloak sends the visitor back. Returns { returnTo } after a successful
-// login, { error } when it failed or was cancelled, or null when this is no login return.
+// Runs on /konto when Keycloak sends the visitor back. Returns { returnTo, action } after a
+// successful login, { error } when it failed or was cancelled, or null when this is no login
+// return. "elsewhere": Keycloak sent a valid answer, but the attempt was started in another
+// browser (e.g. the confirmation link opened on the phone) - the account is fine, only this
+// browser still has to log in.
 export async function completeLogin(kennung) {
   const query = new URLSearchParams(location.search);
   if (!query.has("state") || (!query.has("code") && !query.has("error"))) return null;
-  const pending = read(PENDING_KEY);
-  write(PENDING_KEY, null);
+  const pending = takePending(query.get("state"));
   history.replaceState(null, "", location.pathname);
-  if (query.get("error") || !pending || pending.state !== query.get("state") || pending.kennung !== kennung) {
+  if (query.get("error")) {
     const cancelled = query.get("error") === "access_denied" || query.get("kc_action_status") === "cancelled";
     return { error: cancelled ? "cancelled" : "failed", returnTo: pending?.returnTo ?? "konto" };
+  }
+  if (!pending || pending.kennung !== kennung) {
+    return { error: "elsewhere", returnTo: "konto" };
   }
   try {
     const response = await fetch(`${OIDC}/token`, {
@@ -150,7 +175,7 @@ export async function completeLogin(kennung) {
     if (claimsOf(tokens.id_token)?.nonce !== pending.nonce) throw new Error("nonce");
     store(tokens);
     announce();
-    return { returnTo: pending.returnTo };
+    return { returnTo: pending.returnTo, action: pending.action };
   } catch {
     return { error: "failed", returnTo: pending.returnTo };
   }

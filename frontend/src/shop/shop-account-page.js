@@ -40,6 +40,8 @@ export async function renderAccountPage(main, { api, shop }) {
     location.replace(api.href(returned.returnTo));
     return;
   }
+  // First login right after registration: the confirmation link worked.
+  const welcome = returned?.action === "register" && !returned.error;
 
   const customer = currentCustomer();
   if (!customer) {
@@ -63,7 +65,7 @@ export async function renderAccountPage(main, { api, shop }) {
     }
     return;
   }
-  renderSignedIn(section, { api, shop, customer, profile, orders });
+  renderSignedIn(section, { api, shop, customer, profile, orders, welcome });
 }
 
 // ---- Signed out -----------------------------------------------------------------------------
@@ -71,6 +73,7 @@ export async function renderAccountPage(main, { api, shop }) {
 const PROBLEMS = {
   cancelled: "Die Anmeldung wurde abgebrochen.",
   failed: "Die Anmeldung hat nicht geklappt. Bitte versuchen Sie es erneut.",
+  elsewhere: "Ihre E-Mail-Adresse ist bestätigt. Bitte melden Sie sich jetzt mit Ihrer E-Mail-Adresse und Ihrem Passwort an.",
   expired: "Ihre Anmeldung ist abgelaufen. Bitte melden Sie sich erneut an.",
 };
 
@@ -84,13 +87,14 @@ function renderSignedOut(section, { api, problem }) {
         <li>Sie sehen Ihre Bestellungen in diesem Shop und deren Stand.</li>
         <li>Sie können Ihre Daten jederzeit herunterladen oder Ihr Konto löschen.</li>
       </ul>
-      ${problem ? `<p class="shop-note shop-note--warn" role="status">${escapeHtml(PROBLEMS[problem] ?? PROBLEMS.failed)}</p>` : ""}
+      ${problem ? `<p class="shop-note ${problem === "elsewhere" ? "shop-note--success" : "shop-note--warn"}" role="status">${problem === "elsewhere" ? icon("check", 18) : ""}<span>${escapeHtml(PROBLEMS[problem] ?? PROBLEMS.failed)}</span></p>` : ""}
       <div class="shop-account__entry">
         <button type="button" class="shop-button shop-button--plain shop-button--block" data-login>Anmelden</button>
         <button type="button" class="shop-account__secondary" data-register>Neues Konto erstellen</button>
       </div>
       <p class="shop-panel__foot">Anmeldung und Registrierung laufen über das PAPO-Kundenkonto. Nach der Registrierung
-        bestätigen Sie Ihre E-Mail-Adresse über den Link, den wir Ihnen senden. Bestellen geht auch ohne Konto.</p>
+        bekommen Sie eine E-Mail mit einem Bestätigungslink – einfach anklicken, einen Code brauchen Sie nicht.
+        Bestellen geht auch ohne Konto.</p>
     </div>`;
   section.querySelector("[data-login]").addEventListener("click", (event) => {
     busy(event.currentTarget, "Weiter zur Anmeldung …");
@@ -109,11 +113,14 @@ function busy(button, text) {
 
 // ---- Signed in ------------------------------------------------------------------------------
 
-function renderSignedIn(section, { api, shop, customer, profile, orders }) {
+function renderSignedIn(section, { api, shop, customer, profile, orders, welcome = false }) {
   const actions = `<button type="button" class="shop-account__logout" data-logout>${icon("logout")}<span>Abmelden</span></button>`;
   const greeting = profile.firstName || customer.firstName;
   section.innerHTML = `${pageHead(greeting ? `Hallo, ${greeting}` : "Mein Konto",
       `Angemeldet als <strong>${escapeHtml(profile.loginEmail ?? customer.email)}</strong>`, actions)}
+    ${welcome ? `<p class="shop-note shop-note--success shop-account__welcome-note" role="status">${icon("check", 18)}
+      <span><strong>Ihre E-Mail-Adresse ist bestätigt.</strong> Ihr Kundenkonto ist bereit – tragen Sie unten Ihre
+      Lieferdaten ein, dann ist die Kasse beim nächsten Einkauf schon ausgefüllt.</span></p>` : ""}
     <div class="shop-checkout__layout shop-account__layout">
       <div class="shop-account__main">
         <section class="shop-account__orders" aria-labelledby="account-orders">

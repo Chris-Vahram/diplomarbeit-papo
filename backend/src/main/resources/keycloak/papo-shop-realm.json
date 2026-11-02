@@ -14,6 +14,23 @@
   "internationalizationEnabled": true,
   "supportedLocales": ["de"],
   "defaultLocale": "de",
+  "localizationTexts": {
+    "de": {
+      "emailVerifyTitle": "E-Mail-Adresse bestätigen",
+      "verifyEmailMessage": "Fast geschafft: Bitte bestätigen Sie noch Ihre E-Mail-Adresse.",
+      "confirmEmailAddressVerification": "Bitte bestätigen Sie, dass die E-Mail-Adresse {0} Ihnen gehört.",
+      "proceedWithAction": "E-Mail-Adresse jetzt bestätigen",
+      "emailVerifiedAlreadyMessage": "Ihre E-Mail-Adresse ist bereits bestätigt. Sie können sich im Shop anmelden.",
+      "backToApplication": "Zurück zum Shop",
+      "emailVerifyInstruction1": "Wir haben Ihnen eine E-Mail an {0} geschickt. Klicken Sie auf den Link in dieser E-Mail, um Ihre Adresse zu bestätigen. Sie müssen keinen Code eingeben.",
+      "emailVerifyInstruction2": "Keine E-Mail bekommen? Sehen Sie bitte auch im Spam-Ordner nach oder",
+      "emailVerifyInstruction3": "um die E-Mail noch einmal zu senden.",
+      "emailVerifiedMessage": "Ihre E-Mail-Adresse ist bestätigt. Sie können sich jetzt im Shop anmelden.",
+      "emailVerificationSubject": "Bitte bestätigen Sie Ihre E-Mail-Adresse",
+      "emailVerificationBody": "Sie haben ein PAPO-Kundenkonto mit dieser E-Mail-Adresse erstellt. Bitte bestätigen Sie die Adresse, indem Sie diesen Link öffnen:\n\n{0}\n\nSie müssen keinen Code eingeben. Der Link ist {3} gültig.\n\nFalls Sie kein Konto erstellt haben, können Sie diese E-Mail ignorieren.",
+      "emailVerificationBodyHtml": "<p>Sie haben ein PAPO-Kundenkonto mit dieser E-Mail-Adresse erstellt. Bitte bestätigen Sie die Adresse mit einem Klick auf diesen Link:</p><p><a href=\"{0}\">E-Mail-Adresse bestätigen</a></p><p>Sie müssen keinen Code eingeben. Der Link ist {3} gültig.</p><p>Falls Sie kein Konto erstellt haben, können Sie diese E-Mail ignorieren.</p>"
+    }
+  },
   "passwordPolicy": "length(10) and maxLength(128) and notUsername and notEmail",
   "bruteForceProtected": true,
   "permanentLockout": false,
