@@ -1,6 +1,9 @@
 package at.papo.partnerportal.shop;
 
+import at.papo.partnerportal.business.CompanyProfile;
+import at.papo.partnerportal.business.LegalText;
 import at.papo.partnerportal.common.ApiException;
+import at.papo.partnerportal.common.DeploymentEnvironment;
 import at.papo.partnerportal.enablement.ProductEnablement;
 import at.papo.partnerportal.partner.Partner;
 import io.quarkus.narayana.jta.QuarkusTransaction;
@@ -27,6 +30,11 @@ public class PartnerShopService {
     @ConfigProperty(name = "papo.shop.public-enabled")
     boolean publicEnabled;
 
+    // papo.environment: production refuses releases and takes shops offline while any legal
+    // text of the selling company is missing (shop-legal spec "release gate").
+    @ConfigProperty(name = "papo.environment")
+    DeploymentEnvironment environment;
+
     @Inject
     at.papo.partnerportal.security.CurrentCompany currentCompany;
 
@@ -35,6 +43,7 @@ public class PartnerShopService {
 
     // Same text for unknown and unreachable shops, so the public API does not reveal existence.
     public static final String NOT_REACHABLE = "Dieser Shop ist derzeit nicht erreichbar.";
+    public static final String LEGAL_MISSING = "Bitte zuerst alle Rechtstexte im Firmenprofil hinterlegen.";
 
     // The record is created lazily from plain GETs, so company and partner may race on the
     // first visit, and two equally named partners may race on the same identifier. The insert
@@ -82,15 +91,18 @@ public class PartnerShopService {
     }
 
     public ShopStatus status(PartnerShop shop) {
-        return status(shop, hasAvailableArticles(shop.partner));
+        return status(shop, hasAvailableArticles(shop.partner), legalBlocked(shop.partner.company));
     }
 
-    private ShopStatus status(PartnerShop shop, boolean hasAvailableArticles) {
+    private ShopStatus status(PartnerShop shop, boolean hasAvailableArticles, boolean legalBlocked) {
         if (shop.releasedAt == null) {
             return ShopStatus.NOT_RELEASED;
         }
         if (shop.offlineByCompany) {
             return ShopStatus.OFFLINE_COMPANY;
+        }
+        if (legalBlocked) {
+            return ShopStatus.OFFLINE_LEGAL;
         }
         if (!shop.partner.active) {
             return ShopStatus.OFFLINE_INACTIVE;
@@ -102,7 +114,13 @@ public class PartnerShopService {
     }
 
     public PartnerShopDto toDto(PartnerShop shop) {
-        return PartnerShopDto.from(shop, status(shop), publicEnabled);
+        return PartnerShopDto.from(shop, status(shop), publicEnabled,
+                LegalText.missing(shop.partner.company).size(), environment == DeploymentEnvironment.PRODUCTION);
+    }
+
+    // Only production deployments enforce the gate; staging releases with placeholders.
+    boolean legalBlocked(CompanyProfile company) {
+        return environment == DeploymentEnvironment.PRODUCTION && !LegalText.missing(company).isEmpty();
     }
 
     @Transactional
@@ -122,6 +140,9 @@ public class PartnerShopService {
     @Transactional
     public PartnerShopDto release(Partner partner) {
         PartnerShop shop = findOrCreate(partner);
+        if (legalBlocked(partner.company)) {
+            throw new ApiException(409, LEGAL_MISSING);
+        }
         if (shop.releasedAt == null) {
             shop.releasedAt = Instant.now();
         }
@@ -145,6 +166,7 @@ public class PartnerShopService {
     // instead of one enablement count per partner. Partners without a record have no shop yet.
     public List<CompanyShopOverviewDto> overview() {
         var company = currentCompany.resolve();
+        boolean legalBlocked = legalBlocked(company);
         Set<Long> withArticles = new HashSet<>(ProductEnablement.getEntityManager().createQuery(
                 "select distinct e.partner.id from ProductEnablement e where e.product.available = true"
                         + " and e.partner.company = ?1", Long.class)
@@ -153,7 +175,7 @@ public class PartnerShopService {
         return PartnerShop.<PartnerShop>find("select s from PartnerShop s join fetch s.partner where s.partner.company = ?1",
                         company).list().stream()
                 .map(shop -> new CompanyShopOverviewDto(shop.partner.id, shop.kennung,
-                        status(shop, withArticles.contains(shop.partner.id))))
+                        status(shop, withArticles.contains(shop.partner.id), legalBlocked)))
                 .toList();
     }
 

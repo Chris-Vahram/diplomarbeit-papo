@@ -2,9 +2,7 @@
 
 ## Purpose
 Provides the profile of each tenant company (business name, tax and register identifiers, order-notice e-mail); the profile is the tenant root of `company-tenancy`. Subdomain routing remains out of scope.
-
 ## Requirements
-
 ### Requirement: Company users manage current company profile
 Authenticated company-role users SHALL read and update the profile of their own company, including its business name, tax identifier and optional order-notice e-mail address. Each company SHALL have exactly one profile. Partner-role users SHALL not read or modify this administrative profile.
 
@@ -56,3 +54,14 @@ Company profile updates SHALL reject business names longer than 255 characters b
 #### Scenario: Business name exceeds column length
 - **WHEN** a company-role user submits a 256-character business name
 - **THEN** the request is rejected with no stored profile change
+
+### Requirement: Company maintains shop legal texts
+Company users SHALL maintain Impressum, AGB, Datenschutzerklärung and Widerrufsbelehrung (incl. Muster-Widerrufsformular) in the company profile as plain text with paragraphs, headings, lists and links only (max. 30,000 characters each). The profile SHALL show which texts are missing.
+
+#### Scenario: Save AGB
+- **WHEN** a company user saves an AGB text
+- **THEN** the text is stored and shown on the AGB page of all its partners' shops
+
+#### Scenario: Unsafe markup
+- **WHEN** a legal text contains HTML tags
+- **THEN** they are shown as text and not interpreted

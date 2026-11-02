@@ -9,6 +9,8 @@ const STATUS = {
     hint: "Der Shop ist öffentlich erreichbar." },
   OFFLINE_COMPANY: { badge: "Offline – vom Unternehmen", tone: "offline",
     hint: "Vom Unternehmen offline genommen." },
+  OFFLINE_LEGAL: { badge: "Offline – Rechtstexte fehlen", tone: "offline",
+    hint: "Im Firmenprofil fehlen Rechtstexte, daher ist der Shop offline." },
   OFFLINE_INACTIVE: { badge: "Offline – Partner inaktiv", tone: "offline",
     hint: "Der Partner ist deaktiviert, daher ist der Shop offline." },
   OFFLINE_NO_ARTICLES: { badge: "Offline – keine Artikel", tone: "offline",
@@ -44,6 +46,7 @@ export function shopActionButton(partnerId, status) {
 const NOT_VISIBLE = {
   NOT_RELEASED: "Ihr Shop ist noch nicht öffentlich sichtbar, weil das Unternehmen ihn noch nicht freigegeben hat.",
   OFFLINE_COMPANY: "Ihr Shop ist derzeit nicht öffentlich sichtbar, weil das Unternehmen ihn offline genommen hat.",
+  OFFLINE_LEGAL: "Ihr Shop ist derzeit nicht öffentlich sichtbar, weil das Unternehmen noch nicht alle Rechtstexte hinterlegt hat.",
   OFFLINE_INACTIVE: "Ihr Shop ist derzeit nicht öffentlich sichtbar, weil Ihr Partnerzugang deaktiviert ist.",
   OFFLINE_NO_ARTICLES: "Ihr Shop ist derzeit nicht öffentlich sichtbar, weil keine Artikel für Sie freigeschaltet sind.",
 };

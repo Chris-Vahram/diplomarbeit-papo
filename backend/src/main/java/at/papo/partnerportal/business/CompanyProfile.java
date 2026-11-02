@@ -36,4 +36,18 @@ public class CompanyProfile extends PanacheEntity {
     // setting), "" = deliberately cleared; both skip the company mail (NO_RECIPIENT).
     @Column(length = 254)
     public String orderNoticeEmail;
+
+    // Shop legal texts (add-shop-legal-consent): restricted Markdown, rendered escaped by the
+    // shop. null = not yet provided; the shop then shows a marked placeholder (LegalText).
+    @Column(columnDefinition = "text")
+    public String legalImpressum;
+
+    @Column(columnDefinition = "text")
+    public String legalAgb;
+
+    @Column(columnDefinition = "text")
+    public String legalDatenschutz;
+
+    @Column(columnDefinition = "text")
+    public String legalWiderruf;
 }

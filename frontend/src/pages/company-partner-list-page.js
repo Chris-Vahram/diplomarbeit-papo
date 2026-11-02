@@ -114,6 +114,7 @@ class CompanyPartnerListPage extends HTMLElement {
               <button type="button" id="shop-release" hidden>Freigeben</button>
               <button type="button" id="shop-takedown-open" class="button-danger" hidden>Offline nehmen</button>
             </div>
+            <p id="shop-legal-hint" class="shop-panel__legal" hidden></p>
             <form id="shop-takedown-form" class="entity-form" hidden>
               <form-field label="Grund (für den Partner sichtbar)" name="reason" required>
                 <textarea name="reason" minlength="10" maxlength="500" rows="3"></textarea>
@@ -413,10 +414,25 @@ class CompanyPartnerListPage extends HTMLElement {
     this.shopTakedownForm.hidden = true;
     this.shopTakedownForm.reset();
     this.querySelector("#shop-release-section").hidden = false;
+    this.renderLegalHint(shop);
 
     this.shopKennungForm.elements.kennung.value = shop.kennung;
     this.querySelector("#shop-kennung-warning").hidden = true;
     this.querySelector("#shop-kennung-section").hidden = false;
+  }
+
+  // Release gate (shop-legal spec): production refuses release while legal texts are missing;
+  // staging releases with marked placeholders, which the dialog says plainly.
+  renderLegalHint(shop) {
+    const hint = this.querySelector("#shop-legal-hint");
+    const missing = shop.missingLegalTexts ?? 0;
+    hint.hidden = missing === 0;
+    this.querySelector("#shop-release").disabled = Boolean(shop.legalGate) && missing > 0;
+    if (!missing) return;
+    const count = missing === 1 ? "1 Rechtstext fehlt" : `${missing} Rechtstexte fehlen`;
+    hint.innerHTML = shop.legalGate
+      ? `${count} im <a href="#/company/profile">Firmenprofil</a>. Erst danach lässt sich der Shop freigeben.`
+      : `${count} im <a href="#/company/profile">Firmenprofil</a>. Der Shop zeigt dafür markierte Platzhalter; auf dieser Testumgebung ist die Freigabe trotzdem möglich.`;
   }
 
   changeShopKennung(event) {

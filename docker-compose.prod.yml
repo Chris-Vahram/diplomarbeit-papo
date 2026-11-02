@@ -89,6 +89,9 @@ services:
       # Public partner shops (/shop/*, /api/shop/*): off until the shop legal texts are live
       # (add-shop-legal-consent); enable only deliberately in .env.prod (docs/DEPLOYMENT.md).
       SHOP_PUBLIC_ENABLED: ${SHOP_PUBLIC_ENABLED:-false}
+      # staging | production (add-shop-legal-consent). production refuses shop releases and
+      # takes shops offline while a company legal text is missing; staging allows placeholders.
+      PAPO_ENVIRONMENT: ${PAPO_ENVIRONMENT:-staging}
       # Order e-mails (send-order-emails): off unless enabled in .env.prod. Without
       # PAPO_MAIL_REDIRECT_TO the app refuses to start unless PAPO_MAIL_ALLOW_REAL_RECIPIENTS=true.
       PAPO_MAIL_ENABLED: ${PAPO_MAIL_ENABLED:-false}

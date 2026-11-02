@@ -28,4 +28,18 @@ public class CompanyProfileResource {
     public CompanyProfileDto update(@Valid CompanyProfileRequest request) {
         return companyProfileService.update(request);
     }
+
+    // Shop legal texts (shop-legal spec); separate from the profile form so saving one never
+    // overwrites the other.
+    @GET
+    @Path("/legal-texts")
+    public CompanyLegalTextsDto legalTexts() {
+        return companyProfileService.legalTexts();
+    }
+
+    @PUT
+    @Path("/legal-texts")
+    public CompanyLegalTextsDto updateLegalTexts(@Valid CompanyLegalTextsRequest request) {
+        return companyProfileService.updateLegalTexts(request);
+    }
 }

@@ -7,7 +7,13 @@ import java.util.List;
 // Generated shop navigation plus the fixed footer data. path is relative to /shop/<kennung>;
 // the Startseite is the shop root (""). inquiryPath: first online page with an
 // "Anfrageformular" block, so the article detail can link to it (null without one).
-public record PublicNavigationDto(List<Item> items, List<Item> legal, String sellerName, String inquiryPath) {
+// contact: the partner as commercial contact person for the fixed legal footer (shop-legal spec);
+// business contact only, never partner number, address or commission.
+public record PublicNavigationDto(List<Item> items, List<Item> legal, String sellerName, String inquiryPath,
+                                  Contact contact) {
+
+    public record Contact(String name, String email, String phone) {
+    }
 
     public record Item(String segment, String menuName, String path) {
 
@@ -22,6 +28,11 @@ public record PublicNavigationDto(List<Item> items, List<Item> legal, String sel
                 pageService.navigation(shop).stream().map(Item::from).toList(),
                 pageService.legalPages(shop).stream().map(Item::from).toList(),
                 seller == null ? null : seller.businessName,
-                pageService.inquiryPage(shop).map(page -> Item.from(page).path()).orElse(null));
+                pageService.inquiryPage(shop).map(page -> Item.from(page).path()).orElse(null),
+                new Contact(shop.partner.name, blankToNull(shop.partner.email), blankToNull(shop.partner.phone)));
+    }
+
+    private static String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value.strip();
     }
 }
