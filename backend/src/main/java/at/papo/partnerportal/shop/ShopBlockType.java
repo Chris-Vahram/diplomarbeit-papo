@@ -41,6 +41,9 @@ public enum ShopBlockType {
     CONTACT_PERSON("contact-person", "Ansprechpartner",
             text("heading", 120), requiredText("name", 120), text("role", 120), text("text", 1000),
             text("email", 254), text("phone", 40)),
+    // Form fields are fixed (shop-inquiries spec); only heading and intro are configurable.
+    INQUIRY_FORM("inquiry-form", "Anfrageformular",
+            text("heading", 120), text("text", 1000)),
     SPACER("spacer", "Abstand/Trennlinie",
             choice("size", "small", "medium", "large"), of("divider", BOOLEAN));
 
