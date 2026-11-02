@@ -26,4 +26,4 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 ## Notes
 - Sample photos: CC0 from Wikimedia Commons (Unsplash uploads), provenance in backend/src/main/resources/shop-templates/images/index.json; partners replace them.
 - Signature interaction: product tiles respond on press (image settles, price stays put); header material blurs content scrolling under it.
-- Every section ends in something the visitor can do with today's shop (browse, open an article); no copy promises online ordering until guest checkout ships.
+- Every section ends in something the visitor can do with today's shop (browse, open an article, add to the cart). Guest checkout shipped 2026-11-02 (`/warenkorb`, `/kasse`): same panel material as the inquiry form, cart count in the header, one authored moment on the confirmation.

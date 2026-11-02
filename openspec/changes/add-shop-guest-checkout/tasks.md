@@ -18,6 +18,6 @@
 
 ## 4. Verification
 
-- [ ] 4.1 Tests + package; `git diff --check`
-- [ ] 4.2 Browser end-to-end desktop/mobile: shop order → partner sees it → company advances status
-- [ ] 4.3 Update traceability and B-01 status
+- [x] 4.1 Tests + package; `git diff --check`
+- [x] 4.2 Browser end-to-end desktop/mobile: shop order → partner sees it → company advances status
+- [x] 4.3 Update traceability and B-01 status
