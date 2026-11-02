@@ -261,6 +261,15 @@ Backend nimmt Tokens dieses Realms nur unter `/api/shop-customer/*` an (OIDC-Ten
 alle Firmen- und Partner-Endpunkte lehnen sie ab, und Portal-Tokens gelten dort nicht.
 Standard: **aus** (`SHOP_ACCOUNTS_ENABLED=false`); die Gastbestellung ist davon unabhängig.
 
+0. Dateien auf die VM kopieren (siehe „Verzeichnis auf der VM“): `docker-compose.prod.yml`,
+   `deploy/keycloak/render-and-start.sh`, `deploy/keycloak/papo-shop-realm.prod.json.template`
+   und den Theme-Ordner `deploy/keycloak/themes/papo/` (PAPO-Anmeldeseiten; der Realm setzt
+   `loginTheme=papo`, ohne den Ordner zeigt Keycloak für diesen Realm keine Anmeldeseite):
+
+   ```bash
+   scp -r deploy/keycloak <vm>:~/papo-deploy/deploy/
+   scp docker-compose.prod.yml <vm>:~/papo-deploy/docker-compose.prod.yml
+   ```
 1. SMTP muss funktionieren (siehe „Bestell-E-Mails“): Keycloak verschickt Bestätigungs- und
    Passwort-Mails selbst mit `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`; der
    Absender ist `SMTP_USERNAME`. Für Port 465: `SHOP_SMTP_SSL=true`, `SHOP_SMTP_STARTTLS=false`.
@@ -277,6 +286,9 @@ Standard: **aus** (`SHOP_ACCOUNTS_ENABLED=false`); die Gastbestellung ist davon 
 Ohne importierten Realm startet das Backend trotzdem; `/api/shop-customer/*` antwortet dann 401.
 Rückweg: `SHOP_ACCOUNTS_ENABLED=false` blendet die Anmeldung aus; Gastbestellungen laufen weiter.
 Aufbewahrung von Kundendaten in Bestellungen nach einer Kontolöschung legt die Firma fest.
+Theme-Änderungen: Ordner erneut kopieren und Keycloak neu starten (Produktion cached Themes).
+Texte der Anmeldeseiten stehen in `themes/papo/login/messages/messages_de.properties`, die der
+Bestätigungsmail in `localizationTexts` des Realm-Templates.
 
 ## Rollback nach `derive-product-category-from-catalog`
 
