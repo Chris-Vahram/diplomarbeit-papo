@@ -12,7 +12,7 @@ Consent infrastructure exists since `add-shop-legal-consent` (`hasConsent('stati
 
 1. **Daily aggregate table `shop_stat_daily(shop, day, metric, dimension, count)`** with upsert increments on event receipt; no raw event table. Device class derived from user-agent in memory, then discarded.
 2. **Unique visitors via in-memory per-day sets** (or a temporary table cleared after nightly aggregation) of random ids; only counts persist.
-3. **Events batched with `navigator.sendBeacon`**, max. 20 per request.
+3. **Events batched**, max. 20 per request. Implemented with `fetch(..., { keepalive: true, credentials: "omit" })` and `text/plain` instead of `navigator.sendBeacon`: same survival on page leave, but no cookies are sent and no CORS preflight is needed. A visit is the first page view whose referrer is not the shop's own origin (no storage needed without consent).
 4. **Revenue/orders read from `orders`** to stay consistent with the portal.
 5. **Period logic reuses the dashboard's previous-period approach** (client-side comparison pattern from B-08 stub, server delivers both periods).
 

@@ -12,6 +12,6 @@
 
 ## 3. Verification
 
-- [ ] 3.1 Tests + package; `git diff --check`
-- [ ] 3.2 Browser: consent declined/accepted flows; statistics page desktop/mobile
-- [ ] 3.3 Update traceability
+- [x] 3.1 Tests + package; `git diff --check`
+- [x] 3.2 Browser: consent declined/accepted flows; statistics page desktop/mobile
+- [x] 3.3 Update traceability
