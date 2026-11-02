@@ -1,10 +1,10 @@
 ## 1. Backend (essential)
 
-- [ ] 1.1 Add `Order.origin` and `Kunde.origin` with migration defaults
-- [ ] 1.2 Extract shared order-creation core from `OrderService`; keep internal behaviour unchanged (existing tests green)
-- [ ] 1.3 `ShopOrderService` + `POST /api/shop/{kennung}/orders` (server prices, enablement, availability, quantity bound)
-- [ ] 1.4 Idempotency table and 24 h cleanup; honeypot; rate limit
-- [ ] 1.5 Tests: manipulated price, foreign article, unreachable shop, double submit, honeypot, commission created
+- [x] 1.1 Add `Order.origin` and `Kunde.origin` with migration defaults
+- [x] 1.2 Extract shared order-creation core from `OrderService`; keep internal behaviour unchanged (existing tests green)
+- [x] 1.3 `ShopOrderService` + `POST /api/shop/{kennung}/orders` (server prices, enablement, availability, quantity bound)
+- [x] 1.4 Idempotency table and 24 h cleanup; honeypot; rate limit
+- [x] 1.5 Tests: manipulated price, foreign article, unreachable shop, double submit, honeypot, commission created
 
 ## 2. Shop frontend (essential)
 

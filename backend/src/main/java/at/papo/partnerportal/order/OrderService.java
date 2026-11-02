@@ -91,11 +91,25 @@ public class OrderService {
 
     @Transactional
     public OrderDto createForPartner(Partner partner, OrderRequest request) {
+        CreatedOrder created = createOrder(partner, resolveKunde(partner, request), request.items(), OrderOrigin.INTERNAL);
+        return OrderDto.from(created.order(), created.commission()).withNotice(created.customerEmailNotice());
+    }
+
+    // The new order plus what the create response needs besides it.
+    public record CreatedOrder(Order order, CommissionRecord commission, String customerEmailNotice) {
+    }
+
+    // Shared order-creation core for portal and shop orders (add-shop-guest-checkout design D1):
+    // enablement, availability, price/tax snapshots, commission and mail outbox are identical for
+    // both origins. Prices always come from the article, never from the caller.
+    @Transactional
+    public CreatedOrder createOrder(Partner partner, Kunde kunde, List<OrderItemRequest> items, OrderOrigin origin) {
         Order order = new Order();
         order.partner = partner;
-        order.kunde = resolveKunde(partner, request);
+        order.kunde = kunde;
+        order.origin = origin;
 
-        for (OrderItemRequest itemRequest : request.items()) {
+        for (OrderItemRequest itemRequest : items) {
             Product product = Product.findById(itemRequest.productId());
             // An article of another company is reported like a missing one.
             if (product == null || !product.company.id.equals(partner.company.id)) {
@@ -127,7 +141,7 @@ public class OrderService {
         CommissionRecord commission = commissionService.createForOrder(order, partner);
         // Outbox rows in the same transaction: a rolled-back order never mails (order-emails spec).
         String notice = orderEmailService.queueForNewOrder(order);
-        return OrderDto.from(order, commission).withNotice(notice);
+        return new CreatedOrder(order, commission, notice);
     }
 
     @Transactional

@@ -6,6 +6,8 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.ManyToOne;
 
 @Entity
@@ -26,4 +28,10 @@ public class Kunde extends PanacheEntity {
     // Creating/owning partner — Kunde records are scoped per partner, see design.md.
     @ManyToOne(optional = false)
     public Partner ownerPartner;
+
+    // PORTAL or SHOP (customer-management "Customer origin"). Nullable in DDL for Hibernate update on
+    // existing rows; OriginMigrationService backfills PORTAL.
+    @Enumerated(EnumType.STRING)
+    @Column(length = 16)
+    public KundeOrigin origin = KundeOrigin.PORTAL;
 }

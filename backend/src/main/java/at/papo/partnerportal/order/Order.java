@@ -59,6 +59,12 @@ public class Order extends PanacheEntity {
     @Column(nullable = false)
     public boolean seenByCompany = false;
 
+    // INTERNAL or SHOP (order-management "Order origin"). Nullable in DDL for Hibernate update on
+    // existing rows; OriginMigrationService backfills INTERNAL.
+    @Enumerated(EnumType.STRING)
+    @Column(length = 16)
+    public OrderOrigin origin = OrderOrigin.INTERNAL;
+
     // Sets gross/net/tax from the item snapshots (unitPriceSnapshot + taxRatePercentSnapshot).
     public void applyTotalsFromItems() {
         ArticleTax.Totals totals = ArticleTax.totals(items.stream()

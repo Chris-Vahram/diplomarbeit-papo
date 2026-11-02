@@ -11,7 +11,8 @@ public record KundeDto(
         AddressRequest address,
         String email,
         String phone,
-        LocalDate lastOrderDate
+        LocalDate lastOrderDate,
+        KundeOrigin origin
 ) {
     public static KundeDto from(Kunde kunde) {
         return from(kunde, null);
@@ -19,6 +20,6 @@ public record KundeDto(
 
     public static KundeDto from(Kunde kunde, LocalDate lastOrderDate) {
         return new KundeDto(kunde.id, kunde.lastName, kunde.firstName, AddressRequest.from(kunde.address),
-                kunde.email, kunde.phone, lastOrderDate);
+                kunde.email, kunde.phone, lastOrderDate, kunde.origin);
     }
 }

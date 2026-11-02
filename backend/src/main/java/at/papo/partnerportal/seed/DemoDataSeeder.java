@@ -17,6 +17,7 @@ import at.papo.partnerportal.enablement.ProductEnablement;
 import at.papo.partnerportal.order.Order;
 import at.papo.partnerportal.order.OrderItem;
 import at.papo.partnerportal.order.OrderStatus;
+import at.papo.partnerportal.order.OriginMigrationService;
 import at.papo.partnerportal.partner.Partner;
 import at.papo.partnerportal.partner.PartnerLogin;
 import at.papo.partnerportal.product.ArticleTaxMigrationService;
@@ -72,6 +73,9 @@ public class DemoDataSeeder {
     ArticleTaxMigrationService articleTaxMigrationService;
 
     @Inject
+    OriginMigrationService originMigrationService;
+
+    @Inject
     ShopPageService shopPageService;
 
     // Company 1 of the current seed run (set by seedCompanyProfile).
@@ -119,6 +123,7 @@ public class DemoDataSeeder {
         businessTaxIdentifierMigrationService.migrate(launchMode != LaunchMode.NORMAL || seedDemoData);
         companyTenancyMigrationService.contract();
         articleTaxMigrationService.migrate();
+        originMigrationService.migrate();
     }
 
     static boolean shouldSeed(LaunchMode launchMode, long partnerCount) {

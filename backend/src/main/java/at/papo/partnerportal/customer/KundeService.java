@@ -37,8 +37,16 @@ public class KundeService {
 
     @Transactional
     public Kunde createEntity(Partner partner, KundeRequest request) {
+        return createEntity(partner, request, KundeOrigin.PORTAL);
+    }
+
+    // Shop orders always create a new record (customer-management "Customer origin"): no
+    // matching against existing customers, so a visitor can never change partner data.
+    @Transactional
+    public Kunde createEntity(Partner partner, KundeRequest request, KundeOrigin origin) {
         Kunde kunde = new Kunde();
         kunde.ownerPartner = partner;
+        kunde.origin = origin;
         kunde.lastName = request.lastName();
         kunde.address = request.address().toEntity();
         kunde.firstName = request.firstName();
