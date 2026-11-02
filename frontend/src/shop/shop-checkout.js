@@ -276,6 +276,7 @@ export async function renderCheckoutPage(main, { api, shop, navigation }) {
             <p class="shop-pay__title">Zahlung</p>
             <p class="shop-pay__text">${escapeHtml(PAYMENT_NOTE)}</p>
           </div>
+          ${legalChecksHtml(api)}
           <p class="shop-note shop-note--error" role="alert" data-status hidden></p>
           <button type="submit" class="shop-button shop-button--block shop-button--submit">Zahlungspflichtig bestellen</button>
           <p class="shop-panel__foot">Ihre Bestellung geht an ${escapeHtml(shop.displayName)}${navigation?.sellerName && navigation.sellerName !== shop.displayName ? `, Verkauf durch ${escapeHtml(navigation.sellerName)}` : ""}.</p>
@@ -295,6 +296,24 @@ export async function renderCheckoutPage(main, { api, shop, navigation }) {
     event.preventDefault();
     submit(form, section, { api, shop, key, summary });
   });
+}
+
+// Checkout legal elements (shop-legal spec), directly above the order button. The links open in
+// a new tab so reading the AGB never loses the entered address.
+const TERMS_MISSING = "Bitte die AGB akzeptieren.";
+
+function legalChecksHtml(api) {
+  const link = (segment, label) =>
+    `<a href="${escapeHtml(api.href(segment))}" target="_blank" rel="noopener">${label}</a>`;
+  return `<div class="shop-terms" data-field="terms">
+      <div class="shop-check">
+        <input id="co-terms" type="checkbox" name="terms" required aria-required="true" aria-describedby="co-terms-error" />
+        <label for="co-terms">Ich akzeptiere die ${link("agb", "AGB")}.</label>
+      </div>
+      <p class="shop-field__error" id="co-terms-error" hidden></p>
+    </div>
+    <p class="shop-terms__note">Informationen zu Ihrem Widerrufsrecht finden Sie in der ${link("widerruf", "Widerrufsbelehrung")},
+      zum Umgang mit Ihren Daten in der ${link("datenschutz", "Datenschutzerklärung")}.</p>`;
 }
 
 function problemOf(form, field) {
@@ -319,6 +338,7 @@ async function submit(form, section, { api, shop, key, summary }) {
   const status = form.querySelector("[data-status]");
   status.hidden = true;
   const problems = FIELDS.map((field) => [field.name, problemOf(form, field)]);
+  problems.push(["terms", form.elements.terms.checked ? null : TERMS_MISSING]);
   problems.forEach(([name, text]) => setError(form, name, text));
   const first = problems.find(([, text]) => text);
   if (first) {
@@ -331,6 +351,7 @@ async function submit(form, section, { api, shop, key, summary }) {
   button.textContent = "Bestellung wird gesendet …";
   form.setAttribute("aria-busy", "true");
   fieldsets.forEach((fieldset) => { fieldset.disabled = true; });
+  form.elements.terms.disabled = true;
   const value = (name) => form.elements[name].value.trim();
   try {
     const confirmation = await api.placeOrder({
@@ -346,6 +367,7 @@ async function submit(form, section, { api, shop, key, summary }) {
     button.textContent = "Zahlungspflichtig bestellen";
     form.removeAttribute("aria-busy");
     fieldsets.forEach((fieldset) => { fieldset.disabled = false; });
+    form.elements.terms.disabled = false;
     status.textContent = error.status ? error.serverMessage ?? SEND_FAILED : SEND_FAILED;
     status.hidden = false;
     // The catalogue changed under the visitor: the cart page marks the affected lines.

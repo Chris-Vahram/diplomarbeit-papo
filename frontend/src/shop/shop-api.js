@@ -42,6 +42,8 @@ export function createShopApi(kennung) {
     theme: () => get("/theme"),
     navigation: () => get("/navigation"),
     page: (segment) => get(`/pages/${encodeURIComponent(segment)}`),
+    // Company legal text of one system page (shop-legal spec), placeholder flag included.
+    legal: (segment) => get(`/legal/${encodeURIComponent(segment)}`),
     article: (id) => get(`/articles/${encodeURIComponent(id)}`),
     articles: () => (articles ??= get("/articles")),
     // Signed render timestamp, then the submission (shop-inquiries spec).

@@ -95,7 +95,7 @@ class ShopLegalTextsTest {
             given().when().get("/api/shop/" + kennung + "/legal/impressum")
                     .then().statusCode(200)
                     .body("placeholder", is(true))
-                    .body("text", containsString("Platzhalter – kein gültiger Rechtstext"));
+                    .body("text", containsString("Diesen Text hinterlegt Huemer GmbH im Firmenprofil."));
             given().when().get("/api/shop/" + kennung + "/legal/kasse")
                     .then().statusCode(404);
 

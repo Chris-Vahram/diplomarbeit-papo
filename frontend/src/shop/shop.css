@@ -188,6 +188,33 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
 .shop-footer a { text-decoration: none; }
 .shop-footer a:hover { text-decoration: underline; }
 
+/* Legal footer (shop-legal spec): who sells and who to talk to on the left, the legal pages
+   and the consent settings on the right. Partners cannot remove any of it. */
+.shop-footer__inner { align-items: end; }
+.shop-footer__parties { display: grid; gap: 0.25rem; min-width: 0; }
+.shop-footer__seller strong { color: var(--shop-text); font-weight: 650; }
+[data-form="kraeftig"] .shop-footer__seller strong { color: var(--shop-on-primary); }
+.shop-footer__contact { overflow-wrap: anywhere; }
+.shop-footer__ways a::before { content: "·"; display: inline-block; margin-inline: 0.5em; text-decoration: none; }
+.shop-footer__links a,
+.shop-footer__cookies {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+}
+.shop-footer__links a[aria-current="page"] { color: var(--shop-text); text-decoration: underline; }
+[data-form="kraeftig"] .shop-footer__links a[aria-current="page"] { color: var(--shop-on-primary); }
+.shop-footer__cookies {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.shop-footer__cookies:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+.shop-main:focus { outline: none; }
+
 /* ---- Blocks: stacked sections ------------------------------------------------------- */
 .shop-block { display: block; color: var(--shop-text); }
 .shop-block[hidden] { display: none; }
@@ -1304,8 +1331,268 @@ a.shop-cart__name:hover { text-decoration: underline; }
   body { font-size: 11pt; background: #fff; }
   .shop-header,
   .shop-footer,
+  shop-consent,
   .shop-done { display: none !important; }
   .shop-checkout { padding: 0; }
   .shop-receipt { max-width: none; padding: 0; border: 0; box-shadow: none; animation: none; }
   .shop-receipt__items tr { break-inside: avoid; }
+}
+
+/* ---- Legal system pages (shop-legal spec) --------------------------------------------- */
+.shop-legal {
+  max-width: calc(46rem + 2 * var(--shop-gutter));
+  padding-block: clamp(2rem, 5vw, 4rem) var(--shop-section);
+}
+.shop-legal__head { display: grid; gap: 1rem; justify-items: start; margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
+.shop-legal__title.shop-heading { margin: 0; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.05; }
+.shop-legal__mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.5rem 0.875rem;
+  border: 1px dashed color-mix(in srgb, #b45309 60%, transparent);
+  border-radius: var(--shop-radius-small);
+  background: color-mix(in srgb, #b45309 9%, var(--shop-surface));
+  color: color-mix(in srgb, #92400e 80%, var(--shop-text));
+  font-size: 0.9375rem;
+  font-weight: 650;
+}
+.shop-legal__mark svg { flex: none; }
+.shop-legal--placeholder .shop-prose { color: var(--shop-muted); }
+
+/* Company text: reading measure, quiet hierarchy, long URLs and IBANs wrap. */
+.shop-prose { max-width: 68ch; overflow-wrap: anywhere; }
+.shop-prose > :first-child { margin-top: 0; }
+.shop-prose p,
+.shop-prose ul,
+.shop-prose ol { margin: 0 0 1rem; }
+.shop-prose ul,
+.shop-prose ol { padding-left: 1.25rem; }
+.shop-prose li + li { margin-top: 0.25rem; }
+.shop-prose :is(h2, h3, h4) {
+  margin: 2.25rem 0 0.625rem;
+  font-family: var(--shop-heading-font);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.shop-prose h2 { font-size: 1.375rem; font-weight: 700; }
+.shop-prose h3 { font-size: 1.125rem; font-weight: 650; }
+.shop-prose h4 { font-size: 1rem; font-weight: 650; }
+.shop-prose a { color: var(--shop-text); text-decoration-color: color-mix(in srgb, var(--shop-accent) 70%, transparent); text-decoration-thickness: 2px; }
+.shop-prose a:hover { text-decoration-color: currentColor; }
+
+/* ---- Checkout legal elements ---------------------------------------------------------- */
+.shop-terms { display: grid; gap: 0.25rem; }
+.shop-check {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: start;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+.shop-check input {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0.125rem 0 0;
+  accent-color: var(--shop-accent);
+}
+.shop-check label { cursor: pointer; }
+.shop-check a,
+.shop-terms__note a { color: var(--shop-text); font-weight: 600; }
+.shop-check input[aria-invalid] { outline: 2px solid var(--inquiry-error); outline-offset: 2px; }
+.shop-terms .shop-field__error { padding-left: 2rem; }
+.shop-terms__note { margin: 0; color: var(--shop-muted); font-size: 0.875rem; line-height: 1.5; }
+
+/* ---- Consent (shop-consent spec) ------------------------------------------------------ */
+/* Room for the banner, so the end of the page (order button, footer) never hides under it. */
+.shop-root { padding-bottom: var(--shop-consent-space, 0); }
+
+.shop-consent {
+  --shop-muted: color-mix(in srgb, var(--shop-text) 70%, var(--shop-surface));
+  position: fixed;
+  z-index: 30;
+  inset: auto var(--shop-gutter) max(var(--shop-gutter), env(safe-area-inset-bottom));
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  max-width: 58rem;
+  margin-inline: auto;
+  padding: 1.125rem 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--shop-text) 14%, transparent);
+  border-radius: var(--shop-radius);
+  background: color-mix(in srgb, var(--shop-surface) 94%, transparent);
+  color: var(--shop-text);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--shop-text) 8%, transparent),
+    0 24px 48px -20px color-mix(in srgb, var(--shop-text) 34%, transparent);
+  /* Enters from the bottom edge and leaves the same way. */
+  opacity: 0;
+  transform: translateY(calc(100% + 2rem));
+  transition: transform 460ms var(--shop-ease), opacity 260ms ease;
+}
+.shop-consent[hidden] { display: none; }
+.shop-consent--in { opacity: 1; transform: none; }
+
+@supports (backdrop-filter: blur(1px)) {
+  .shop-consent {
+    background: color-mix(in srgb, var(--shop-surface) 80%, transparent);
+    backdrop-filter: blur(20px) saturate(160%);
+  }
+}
+
+.shop-consent__body { flex: 1 1 22rem; min-width: 0; }
+.shop-consent__title {
+  margin: 0 0 0.25rem;
+  font-family: var(--shop-heading-font);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.shop-consent__text { margin: 0; color: var(--shop-muted); font-size: 0.9375rem; line-height: 1.5; }
+.shop-consent__text a { color: var(--shop-text); font-weight: 600; white-space: nowrap; }
+
+.shop-consent__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+
+/* Both choices: same size, same weight, neither preselected or highlighted. */
+.shop-consent__choice {
+  flex: 1 1 8rem;
+  min-height: 2.75rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--shop-text) 24%, transparent);
+  border-radius: var(--shop-radius-small);
+  background: color-mix(in srgb, var(--shop-text) 6%, var(--shop-surface));
+  color: var(--shop-text);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 650;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 160ms ease, transform 120ms var(--shop-ease);
+}
+.shop-consent__choice:hover { background: color-mix(in srgb, var(--shop-text) 11%, var(--shop-surface)); }
+.shop-consent__choice:active { transform: scale(0.97); transition-duration: 60ms; }
+.shop-consent__more {
+  flex-basis: 100%;
+  min-height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--shop-muted);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+.shop-consent__more:hover { color: var(--shop-text); }
+/* Dialog: the two equal choices side by side, saving the own selection below across both. */
+.shop-consent__actions--dialog { display: grid; grid-template-columns: 1fr 1fr; }
+.shop-consent__actions--dialog [data-choice="selection"] { grid-column: 1 / -1; grid-row: 2; }
+
+@media (min-width: 52em) {
+  .shop-consent { flex-wrap: nowrap; padding: 1.25rem 1.5rem; }
+  .shop-consent__actions:not(.shop-consent__actions--dialog) { flex: none; }
+  .shop-consent__actions:not(.shop-consent__actions--dialog) .shop-consent__choice { flex: 0 0 11rem; }
+  .shop-consent__more { flex-basis: auto; order: -1; margin-right: 0.5rem; }
+}
+
+/* Settings: a native modal dialog (focus stays inside, Escape closes). */
+.shop-consent-dialog {
+  width: min(34rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  padding: 0;
+  border: 0;
+  border-radius: var(--shop-radius);
+  background: var(--shop-surface);
+  color: var(--shop-text);
+  box-shadow: 0 32px 64px -24px color-mix(in srgb, #000 45%, transparent);
+}
+.shop-consent-dialog::backdrop { background: color-mix(in srgb, #0b0d10 46%, transparent); }
+.shop-consent-dialog[open] { animation: shop-consent-dialog-in 320ms var(--shop-ease); }
+.shop-consent-dialog[open]::backdrop { animation: shop-inquiry-fade 240ms ease; }
+@keyframes shop-consent-dialog-in { from { opacity: 0; transform: translateY(12px) scale(0.98); } }
+
+.shop-consent-dialog__panel { display: grid; gap: 1.25rem; padding: clamp(1.25rem, 4vw, 1.75rem); }
+.shop-consent-dialog__head { display: flex; align-items: start; justify-content: space-between; gap: 1rem; }
+.shop-consent-dialog__head .shop-consent__title { font-size: 1.375rem; margin: 0.375rem 0 0; }
+.shop-consent-dialog__close {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin: -0.25rem -0.5rem 0 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--shop-text);
+  cursor: pointer;
+}
+.shop-consent-dialog__close:hover { background: color-mix(in srgb, var(--shop-text) 8%, transparent); }
+
+.shop-consent-dialog__list { display: grid; margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--shop-border); }
+.shop-consent-dialog__item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "label switch" "label always";
+  gap: 0.25rem 1.25rem;
+  align-items: start;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--shop-border);
+}
+.shop-consent-dialog__label { grid-area: label; }
+.shop-consent-dialog__label label { font-weight: 650; cursor: pointer; }
+.shop-consent-dialog__label p { margin: 0.25rem 0 0; color: var(--shop-muted); font-size: 0.875rem; line-height: 1.5; }
+.shop-consent-dialog__always { grid-area: always; justify-self: end; color: var(--shop-muted); font-size: 0.8125rem; font-weight: 600; }
+.shop-consent__date { margin: -0.5rem 0 0; color: var(--shop-muted); font-size: 0.8125rem; }
+.shop-consent__date[hidden] { display: none; }
+
+/* Switch: a checkbox with role="switch"; on/off also reads from the knob position. */
+.shop-switch {
+  grid-area: switch;
+  appearance: none;
+  position: relative;
+  flex: none;
+  width: 3rem;
+  height: 1.75rem;
+  margin: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--shop-text) 22%, var(--shop-surface));
+  cursor: pointer;
+  transition: background-color 200ms ease;
+}
+.shop-switch::before {
+  content: "";
+  position: absolute;
+  top: 0.1875rem;
+  left: 0.1875rem;
+  width: 1.375rem;
+  height: 1.375rem;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+  transition: transform 260ms var(--shop-ease);
+}
+.shop-switch:checked { background: var(--shop-primary); }
+.shop-switch:checked::before { transform: translateX(1.25rem); }
+.shop-switch:disabled { cursor: not-allowed; opacity: 0.6; }
+
+@media (prefers-reduced-motion: reduce) {
+  .shop-consent { transform: none; transition: opacity 200ms ease; }
+  .shop-consent-dialog[open] { animation: shop-inquiry-fade 200ms ease; }
+  .shop-switch,
+  .shop-switch::before { transition: none; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .shop-consent { background: var(--shop-surface); backdrop-filter: none; }
+}
+
+@media (prefers-contrast: more) {
+  .shop-consent,
+  .shop-consent__choice { border-color: var(--shop-text); }
 }

@@ -5,10 +5,11 @@ import { escapeHtml } from "../lib/html.js";
 import { createPreviewApi, createShopApi } from "./shop-api.js";
 import { applyTheme } from "./shop-theme.js";
 import { CART_EVENT, cartCount } from "./shop-cart.js";
+import { renderLegalText } from "./legal-text.js";
 import "./shop-page-view.js";
 
 const NOT_REACHABLE = "Dieser Shop ist derzeit nicht erreichbar.";
-const LEGAL_PENDING = "Dieser Rechtstext wird gerade vorbereitet.";
+const PLACEHOLDER_MARK = "Platzhalter – kein gültiger Rechtstext";
 
 // Every shop lives under /shop/<kennung>; Caddy (prod) and tools/dev_frontend_server.py (dev)
 // answer all of these paths with shop.html:
@@ -44,7 +45,10 @@ function renderLayout(api, shop, navigation, currentPath) {
     })
     .join("");
   const legal = navigation.legal
-    .map((item) => `<li><a href="${escapeHtml(api.href(item.path))}">${escapeHtml(item.menuName)}</a></li>`)
+    .map((item) => {
+      const current = item.path === currentPath ? ' aria-current="page"' : "";
+      return `<li><a href="${escapeHtml(api.href(item.path))}"${current}>${escapeHtml(item.menuName)}</a></li>`;
+    })
     .join("");
   root.className = "shop-root";
   root.innerHTML = `
@@ -55,14 +59,64 @@ function renderLayout(api, shop, navigation, currentPath) {
         ${api.live ? cartLinkHtml(api, currentPath) : ""}
       </div>
     </header>
-    <main class="shop-main" id="shop-main"></main>
+    <main class="shop-main" id="shop-main" tabindex="-1"></main>
     <footer class="shop-footer">
       <div class="shop-footer__inner">
-        <nav aria-label="Rechtliches"><ul class="shop-footer__links">${legal}</ul></nav>
-        ${navigation.sellerName ? `<p>Verkauf durch ${escapeHtml(navigation.sellerName)}</p>` : ""}
+        <div class="shop-footer__parties">
+          ${navigation.sellerName ? `<p class="shop-footer__seller">Verkauf durch <strong>${escapeHtml(navigation.sellerName)}</strong></p>` : ""}
+          ${contactHtml(navigation.contact)}
+        </div>
+        <nav aria-label="Rechtliches">
+          <ul class="shop-footer__links">${legal}
+            <li><button type="button" class="shop-footer__cookies" data-cookie-settings>Cookie-Einstellungen</button></li>
+          </ul>
+        </nav>
       </div>
     </footer>`;
   return root.querySelector("#shop-main");
+}
+
+// Fixed legal footer (shop-legal spec): the partner is the commercial contact, the company sells.
+function contactHtml(contact) {
+  if (!contact?.name) return "";
+  const ways = [
+    contact.email ? `<a href="mailto:${escapeHtml(contact.email)}">${escapeHtml(contact.email)}</a>` : "",
+    contact.phone ? `<a href="tel:${escapeHtml(contact.phone.replace(/[^0-9+]/g, ""))}">${escapeHtml(contact.phone)}</a>` : "",
+  ].filter(Boolean);
+  return `<p class="shop-footer__contact">Ihr Kontakt: ${escapeHtml(contact.name)}${ways.length ? `<span class="shop-footer__ways">${ways.join("")}</span>` : ""}</p>`;
+}
+
+// Legal system page with the company's text; a missing text shows the marked placeholder.
+async function renderLegalPage(main, { api, shop, item }) {
+  document.title = `${item.menuName} – ${shop.displayName}`;
+  let legal;
+  try {
+    legal = await api.legal(item.segment);
+  } catch {
+    renderMessage(main, "Dieser Text konnte nicht geladen werden. Bitte laden Sie die Seite neu.");
+    return;
+  }
+  main.innerHTML = `<article class="shop-legal shop-inner${legal.placeholder ? " shop-legal--placeholder" : ""}">
+    <header class="shop-legal__head">
+      <h1 class="shop-heading shop-legal__title">${escapeHtml(legal.title)}</h1>
+      ${legal.placeholder ? `<p class="shop-legal__mark" role="note">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+        ${escapeHtml(PLACEHOLDER_MARK)}</p>` : ""}
+    </header>
+    <div class="shop-prose">${renderLegalText(legal.text, { skipTitle: legal.title })}</div>
+  </article>`;
+}
+
+// Consent banner and the footer's "Cookie-Einstellungen" (live shop only; shop-consent spec).
+async function installConsent(api) {
+  await import("./shop-consent.js");
+  const consent = document.createElement("shop-consent");
+  consent.setAttribute("privacy-href", api.href("datenschutz"));
+  // First in the document, so keyboard users reach the choice before the page.
+  document.body.prepend(consent);
+  root.addEventListener("click", (event) => {
+    if (event.target.closest("[data-cookie-settings]")) consent.openSettings();
+  });
 }
 
 // Cart in the header of the live shop only (preview and template demo have no cart).
@@ -182,6 +236,7 @@ async function start() {
   applyTheme(document.documentElement, theme);
   const isDetail = route.segment === "artikel" && route.articleId;
   const main = renderLayout(api, shop, navigation, isDetail ? "artikel" : route.segment);
+  installConsent(api);
   updateCartLink(api.kennung);
   window.addEventListener(CART_EVENT, (event) => {
     if (event.detail?.kennung === api.kennung) updateCartLink(api.kennung, { bump: event.detail.added });
@@ -197,8 +252,7 @@ async function start() {
 
   const legalPage = navigation.legal.find((item) => item.segment === route.segment);
   if (legalPage && !route.articleId) {
-    document.title = `${legalPage.menuName} – ${shop.displayName}`;
-    renderMessage(main, LEGAL_PENDING);
+    await renderLegalPage(main, { api, shop, item: legalPage });
     return;
   }
 

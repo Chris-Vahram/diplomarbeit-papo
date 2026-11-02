@@ -6,14 +6,14 @@
 
 ## 2. Frontend (essential)
 
-- [ ] 2.1 Company profile section "Rechtstexte für Webshops"
-- [ ] 2.2 Safe restricted-Markdown renderer; legal system pages; placeholder marking
-- [ ] 2.3 Fixed shop footer
-- [ ] 2.4 Checkout: AGB checkbox, withdrawal and privacy notices
-- [ ] 2.5 Consent banner, settings dialog, revocation, `hasConsent` API
+- [x] 2.1 Company profile section "Rechtstexte für Webshops"
+- [x] 2.2 Safe restricted-Markdown renderer; legal system pages; placeholder marking
+- [x] 2.3 Fixed shop footer
+- [x] 2.4 Checkout: AGB checkbox, withdrawal and privacy notices
+- [x] 2.5 Consent banner, settings dialog, revocation, `hasConsent` API
 
 ## 3. Verification
 
-- [ ] 3.1 Tests + package; `git diff --check`
-- [ ] 3.2 Browser: decline consent → no optional storage; keyboard operation of banner
+- [x] 3.1 Tests + package; `git diff --check`
+- [x] 3.2 Browser: decline consent → no optional storage; keyboard operation of banner
 - [ ] 3.3 Update traceability
