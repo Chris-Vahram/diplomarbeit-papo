@@ -26,6 +26,6 @@
 
 ## 5. Verification
 
-- [ ] 5.1 Backend tests and package green; `git diff --check`
+- [x] 5.1 Backend tests and package green; `git diff --check`
 - [x] 5.2 Browser check desktop/mobile of catalog, cart, article form
-- [ ] 5.3 Update `REQUIREMENTS_TRACEABILITY.md` and data-model documentation
+- [x] 5.3 Update `REQUIREMENTS_TRACEABILITY.md` and data-model documentation
