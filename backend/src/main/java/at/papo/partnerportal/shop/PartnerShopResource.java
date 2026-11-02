@@ -1,5 +1,6 @@
 package at.papo.partnerportal.shop;
 
+import at.papo.partnerportal.common.ApiException;
 import at.papo.partnerportal.partner.Partner;
 import at.papo.partnerportal.security.CurrentPartner;
 import jakarta.annotation.security.RolesAllowed;
@@ -11,8 +12,11 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 // Partner's own shop ("Mein Webshop"): status, theme draft, templates and preview data. The identifier
@@ -39,6 +43,9 @@ public class PartnerShopResource {
 
     @Inject
     ShopTemplateCatalog templateCatalog;
+
+    @Inject
+    ShopStatisticsService statisticsService;
 
     @GET
     public PartnerShopDto get() {
@@ -96,5 +103,24 @@ public class PartnerShopResource {
         return new ShopPreviewDto(PublicShopDto.from(shop), PublicNavigationDto.of(shop, pageService),
                 catalogService.articles(partner).stream().map(PublicArticleDto::forPreview).toList(),
                 catalogService.categories(partner));
+    }
+
+    // "Webshop-Statistik" (shop-statistics spec): own shop only; from/to as YYYY-MM-DD,
+    // default the current month.
+    @GET
+    @Path("/statistics")
+    public ShopStatisticsDto statistics(@QueryParam("from") String from, @QueryParam("to") String to) {
+        return statisticsService.statistics(shopService.findOrCreate(currentPartner.resolve()), date(from), date(to));
+    }
+
+    private static LocalDate date(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        try {
+            return LocalDate.parse(value);
+        } catch (DateTimeParseException invalid) {
+            throw new ApiException(400, "Bitte einen gültigen Zeitraum wählen.");
+        }
     }
 }

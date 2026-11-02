@@ -1,9 +1,9 @@
 ## 1. Backend (essential)
 
-- [ ] 1.1 Aggregate table and upsert counting; referrer-domain and device-class reduction
-- [ ] 1.2 Public batched event endpoint with validation, rate limit, bot filter
-- [ ] 1.3 Consent-based unique/returning counting with discard after aggregation
-- [ ] 1.4 Partner statistics endpoint incl. previous period; tests incl. "no IP stored"
+- [x] 1.1 Aggregate table and upsert counting; referrer-domain and device-class reduction
+- [x] 1.2 Public batched event endpoint with validation, rate limit, bot filter
+- [x] 1.3 Consent-based unique/returning counting with discard after aggregation
+- [x] 1.4 Partner statistics endpoint incl. previous period; tests incl. "no IP stored"
 
 ## 2. Frontend (essential)
 

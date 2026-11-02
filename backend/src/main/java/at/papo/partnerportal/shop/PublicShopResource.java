@@ -47,6 +47,9 @@ public class PublicShopResource {
     @Inject
     ShopOrderService orderService;
 
+    @Inject
+    ShopStatisticsService statisticsService;
+
     @Context
     HttpServerRequest httpRequest;
 
@@ -170,6 +173,18 @@ public class PublicShopResource {
         ShopOrderConfirmationDto confirmation = orderService.submit(onlineShop(kennung), request,
                 PublicShopFilter.clientIp(forwarded, httpRequest));
         return Response.status(201).entity(confirmation).build();
+    }
+
+    // Anonymous statistics events (shop-statistics spec). The sender posts text/plain, so no
+    // CORS preflight is needed. Always 204 for a reachable shop: invalid events are dropped
+    // without telling the sender why. User-Agent and Host are read in memory only.
+    @POST
+    @Path("/events")
+    @Consumes({MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON})
+    public Response events(@PathParam("kennung") String kennung, @HeaderParam("User-Agent") String userAgent,
+                           @HeaderParam("Host") String host, String body) {
+        statisticsService.record(onlineShop(kennung), body, userAgent, host);
+        return Response.noContent().build();
     }
 
     private PartnerShop onlineShop(String kennung) {
