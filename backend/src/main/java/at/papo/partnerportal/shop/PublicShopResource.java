@@ -4,16 +4,22 @@ import at.papo.partnerportal.business.CompanyProfile;
 import at.papo.partnerportal.common.ApiException;
 import at.papo.partnerportal.product.ProductImage;
 import com.fasterxml.jackson.databind.JsonNode;
+import io.vertx.core.http.HttpServerRequest;
 import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.util.List;
+import java.util.Map;
 
 // PAPO's only unauthenticated API (shop-public-access spec). The partner is resolved from
 // the identifier alone; unknown and offline shops share one 404 so existence is not revealed.
@@ -34,6 +40,12 @@ public class PublicShopResource {
 
     @Inject
     ShopAssetService assetService;
+
+    @Inject
+    ShopInquiryService inquiryService;
+
+    @Context
+    HttpServerRequest httpRequest;
 
     @GET
     public PublicShopDto get(@PathParam("kennung") String kennung) {
@@ -119,6 +131,25 @@ public class PublicShopResource {
                 .header("Cache-Control", "private, max-age=300")
                 .header("X-Content-Type-Options", "nosniff")
                 .build();
+    }
+
+    // Signed render timestamp for the inquiry form's minimum fill time (shop-inquiries spec).
+    @GET
+    @Path("/inquiries/token")
+    public Map<String, String> inquiryToken(@PathParam("kennung") String kennung) {
+        return Map.of("token", inquiryService.issueToken(onlineShop(kennung)));
+    }
+
+    @POST
+    @Path("/inquiries")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response inquiry(@PathParam("kennung") String kennung, @HeaderParam("X-Forwarded-For") String forwarded,
+                            ShopInquiryRequest request) {
+        if (request == null) {
+            throw new ApiException(400, ShopInquiryService.RETRY);
+        }
+        inquiryService.submit(onlineShop(kennung), request, PublicShopFilter.clientIp(forwarded, httpRequest));
+        return Response.status(201).build();
     }
 
     private PartnerShop onlineShop(String kennung) {

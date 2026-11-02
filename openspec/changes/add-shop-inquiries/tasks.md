@@ -1,8 +1,8 @@
 ## 1. Backend (essential)
 
-- [ ] 1.1 `ShopInquiry` entity and public submission endpoint with validation
-- [ ] 1.2 Honeypot, signed render timestamp (≥ 3 s), rate limit; tests
-- [ ] 1.3 Partner inbox endpoints: list, unread count, mark read/done, delete; access tests
+- [x] 1.1 `ShopInquiry` entity and public submission endpoint with validation
+- [x] 1.2 Honeypot, signed render timestamp (≥ 3 s), rate limit; tests
+- [x] 1.3 Partner inbox endpoints: list, unread count, mark read/done, delete; access tests
 
 ## 2. Frontend (essential)
 

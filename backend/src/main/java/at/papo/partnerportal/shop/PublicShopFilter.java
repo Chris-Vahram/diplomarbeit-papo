@@ -30,7 +30,7 @@ public class PublicShopFilter implements ContainerRequestFilter, ContainerRespon
 
     @Override
     public void filter(ContainerRequestContext request) {
-        if (!rateLimiter.tryAcquire(clientIp(request))) {
+        if (!rateLimiter.tryAcquire(clientIp(request.getHeaderString("X-Forwarded-For"), httpRequest))) {
             request.abortWith(Response.status(429)
                     .type(MediaType.APPLICATION_JSON)
                     .entity(Map.of("message", "Zu viele Anfragen. Bitte kurz warten."))
@@ -48,8 +48,8 @@ public class PublicShopFilter implements ContainerRequestFilter, ContainerRespon
 
     // In prod the backend is reachable only through Caddy, which appends the client address
     // as the right-most X-Forwarded-For entry; earlier entries are client-controlled.
-    private String clientIp(ContainerRequestContext request) {
-        String forwarded = request.getHeaderString("X-Forwarded-For");
+    // Also used by the stricter inquiry limit (ShopInquiryService).
+    static String clientIp(String forwarded, HttpServerRequest httpRequest) {
         if (forwarded != null && !forwarded.isBlank()) {
             String[] parts = forwarded.split(",");
             return parts[parts.length - 1].strip();
