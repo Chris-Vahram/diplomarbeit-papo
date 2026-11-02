@@ -6,7 +6,8 @@ export function createShopApi(kennung) {
   const base = `${API_BASE}/shop/${encodeURIComponent(kennung)}`;
   let articles;
 
-  // Errors carry the server's German message (inquiry form shows it as is).
+  // Errors carry the server's German message (inquiry form and checkout show it as is).
+  // A network failure has no status; the checkout retries those with the same key.
   async function send(path, body) {
     const response = await fetch(base + path, {
       method: "POST",
@@ -20,6 +21,7 @@ export function createShopApi(kennung) {
       error.serverMessage = await response.json().then((data) => data?.message).catch(() => null);
       throw error;
     }
+    return response.status === 204 ? null : response.json().catch(() => null);
   }
 
   async function get(path) {
@@ -45,6 +47,8 @@ export function createShopApi(kennung) {
     // Signed render timestamp, then the submission (shop-inquiries spec).
     inquiryToken: () => get("/inquiries/token").then((data) => data.token),
     sendInquiry: (body) => send("/inquiries", body),
+    // Guest checkout (shop-checkout spec): ids, quantities, customer data and an idempotency key.
+    placeOrder: (body) => send("/orders", body),
     // Block images are the shop's own uploads (shop-assets spec).
     assetUrl: (assetId) => `${base}/assets/${encodeURIComponent(assetId)}`,
     // Backend URLs ("/api/...") must go through API_BASE (separate backend port in local dev).

@@ -8,9 +8,9 @@
 
 ## 2. Shop frontend (essential)
 
-- [ ] 2.1 Cart (localStorage per shop), quantity edit, unavailable lines, gross totals and USt per rate
-- [ ] 2.2 Checkout form with validation, payment note, "Zahlungspflichtig bestellen"
-- [ ] 2.3 Confirmation page and printable receipt
+- [x] 2.1 Cart (localStorage per shop), quantity edit, unavailable lines, gross totals and USt per rate
+- [x] 2.2 Checkout form with validation, payment note, "Zahlungspflichtig bestellen"
+- [x] 2.3 Confirmation page and printable receipt
 
 ## 3. Portal (essential)
 

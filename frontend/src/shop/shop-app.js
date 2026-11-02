@@ -1,9 +1,10 @@
 // Public shop bootstrap. Must never import portal modules (src/lib/auth.js, api.js,
 // router.js, pages/*): the shop runs unauthenticated and only calls /api/shop/<kennung>.
-// Allowed lib modules have no imports of their own: config.js, html.js, format.js.
+// Allowed lib modules have no imports of their own: config.js, html.js, format.js, money.js.
 import { escapeHtml } from "../lib/html.js";
 import { createPreviewApi, createShopApi } from "./shop-api.js";
 import { applyTheme } from "./shop-theme.js";
+import { CART_EVENT, cartCount } from "./shop-cart.js";
 import "./shop-page-view.js";
 
 const NOT_REACHABLE = "Dieser Shop ist derzeit nicht erreichbar.";
@@ -14,6 +15,7 @@ const LEGAL_PENDING = "Dieser Rechtstext wird gerade vorbereitet.";
 //   /shop/<kennung>              Startseite
 //   /shop/<kennung>/<segment>    other online page (or a legal system page)
 //   /shop/<kennung>/artikel/<id> Artikeldetail for one article
+//   /shop/<kennung>/warenkorb    cart, /shop/<kennung>/kasse checkout (reserved system segments)
 function readRoute() {
   const match = location.pathname.match(/^\/shop\/([^/]+)(?:\/([^/]+))?(?:\/([^/]+))?\/?$/);
   if (!match) return null;
@@ -50,6 +52,7 @@ function renderLayout(api, shop, navigation, currentPath) {
       <div class="shop-header__inner">
         <a class="shop-header__name" href="${escapeHtml(api.href())}">${escapeHtml(shop.displayName)}</a>
         <nav class="shop-nav" aria-label="Shop-Navigation"><ul>${links}</ul></nav>
+        ${api.live ? cartLinkHtml(api, currentPath) : ""}
       </div>
     </header>
     <main class="shop-main" id="shop-main"></main>
@@ -60,6 +63,31 @@ function renderLayout(api, shop, navigation, currentPath) {
       </div>
     </footer>`;
   return root.querySelector("#shop-main");
+}
+
+// Cart in the header of the live shop only (preview and template demo have no cart).
+function cartLinkHtml(api, currentPath) {
+  const current = currentPath === "warenkorb" ? ' aria-current="page"' : "";
+  return `<a class="shop-cartlink" href="${escapeHtml(api.href("warenkorb"))}"${current} data-cartlink>
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+    <span class="shop-cartlink__label">Warenkorb</span>
+    <span class="shop-cartlink__count" data-cartcount hidden></span>
+  </a>`;
+}
+
+function updateCartLink(kennung, { bump = false } = {}) {
+  const link = root.querySelector("[data-cartlink]");
+  if (!link) return;
+  const count = cartCount(kennung);
+  const badge = link.querySelector("[data-cartcount]");
+  badge.textContent = count > 99 ? "99+" : String(count);
+  badge.hidden = count === 0;
+  link.setAttribute("aria-label", count ? `Warenkorb, ${count} Artikel` : "Warenkorb, leer");
+  if (bump && count) {
+    link.classList.remove("shop-cartlink--bump");
+    void link.offsetWidth; // restart the animation on repeated adds
+    link.classList.add("shop-cartlink--bump");
+  }
 }
 
 function renderMessage(main, text) {
@@ -154,6 +182,18 @@ async function start() {
   applyTheme(document.documentElement, theme);
   const isDetail = route.segment === "artikel" && route.articleId;
   const main = renderLayout(api, shop, navigation, isDetail ? "artikel" : route.segment);
+  updateCartLink(api.kennung);
+  window.addEventListener(CART_EVENT, (event) => {
+    if (event.detail?.kennung === api.kennung) updateCartLink(api.kennung, { bump: event.detail.added });
+  });
+  window.addEventListener("storage", () => updateCartLink(api.kennung));
+
+  if ((route.segment === "warenkorb" || route.segment === "kasse") && !route.articleId) {
+    const { renderCartPage, renderCheckoutPage } = await import("./shop-checkout.js");
+    const render = route.segment === "warenkorb" ? renderCartPage : renderCheckoutPage;
+    await render(main, { api, shop, navigation });
+    return;
+  }
 
   const legalPage = navigation.legal.find((item) => item.segment === route.segment);
   if (legalPage && !route.articleId) {
