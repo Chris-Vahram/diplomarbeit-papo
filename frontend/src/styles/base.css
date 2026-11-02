@@ -2786,6 +2786,18 @@ legend {
   border-radius: var(--radius-md);
 }
 
+/* Setting that belongs to the mapping row above it (price column: net or gross). */
+.import-field-row--sub {
+  padding-left: var(--spacing-5);
+}
+
+.import-field-row__hint {
+  margin: var(--spacing-1) 0 0;
+  max-width: 65ch;
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+}
+
 .order-line {
   display: flex;
   align-items: center;
@@ -2948,6 +2960,98 @@ legend {
   color: var(--text-secondary);
   font-family: var(--font-sans);
   font-weight: var(--font-weight-regular);
+}
+
+/* ---- Gross/net prices (add-article-tax-rate) ----
+   Gross is the price that counts and keeps the surrounding emphasis; the net value
+   sits directly below in small, regular, muted type. One pattern everywhere:
+   catalog, cart, lists, order details and the printed document. */
+.price-stack {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.125rem;
+  line-height: 1.25;
+  /* Money in tabular figures of the UI font (The Tabular Money Rule); mono stays for IDs. */
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+}
+
+.price-stack__gross {
+  white-space: nowrap;
+}
+
+.price-stack__net,
+.price-stack__tax {
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-regular);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.product-card__price .price-stack {
+  align-items: flex-start;
+}
+
+.product-card__price .price-stack__gross {
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Item tables: price columns read right-aligned like every amount column. */
+.order-items-table :is(th, td):nth-child(n + 3) {
+  text-align: right;
+}
+
+/* Phones: item rows become stacked cards, so prices start at the left edge like the text above. */
+@media (max-width: 39.9375em) {
+  .order-items-table .price-stack { align-items: flex-start; }
+}
+
+/* Totals under item lists: gross line first and strongest, net and USt below it. */
+.price-totals {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--spacing-1) var(--spacing-6);
+  max-width: 22rem;
+  margin: var(--spacing-4) 0 var(--spacing-4) auto;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.price-totals dd {
+  margin: 0;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.price-totals__label,
+.price-totals__gross {
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+}
+
+.price-totals__label .price-stack__tax {
+  margin-left: var(--spacing-1);
+}
+
+.price-totals + .order-summary__commission {
+  margin-top: var(--spacing-2);
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* Live net/USt split under the gross price input of the article form. */
+.price-preview {
+  display: block;
+  margin-top: calc(-1 * var(--spacing-2));
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---- Product catalog + cart (partner-order-cart) ---- */
@@ -3188,7 +3292,8 @@ legend {
 
 .cart-line__unit-price {
   flex-shrink: 0;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
   font-size: var(--font-size-xs);
   color: var(--text-secondary);
   white-space: nowrap;

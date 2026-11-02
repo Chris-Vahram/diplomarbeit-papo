@@ -71,7 +71,7 @@ class CompanyOrderListPage extends HTMLElement {
       { key: "orderDate", label: "Datum", html: true, mobile: "meta" },
       { key: "partnerName", label: "Partner" },
       { key: "kundeName", label: "Endkunde", mobile: "title" },
-      { key: "orderValueLabel", label: "Wert (€)", mobile: "amount" },
+      { key: "orderValueLabel", label: "Wert brutto (€)", mobile: "amount" },
       { key: "commissionLabel", label: "Provision (€)" },
       { key: "statusSelect", label: "Status", html: true, mobile: "status" },
     ];
@@ -246,7 +246,10 @@ class CompanyOrderListPage extends HTMLElement {
       ]);
       const products = enablement
         .filter((p) => p.enabled)
-        .map((p) => ({ id: p.productId, name: p.name, price: p.price, category: p.category, available: p.available }));
+        .map((p) => ({
+          id: p.productId, name: p.name, price: p.price, taxRatePercent: p.taxRatePercent, netPrice: p.netPrice,
+          category: p.category, available: p.available,
+        }));
       if (products.length === 0) {
         container.innerHTML = `
           <p>Für diesen Partner sind noch keine Artikel freigeschaltet.</p>
@@ -275,12 +278,12 @@ class CompanyOrderListPage extends HTMLElement {
       `;
       const form = container.querySelector("#manual-order-form");
       const summaryEl = container.querySelector("#manual-order-summary");
-      const renderSummary = ({ items, totalCents }) => {
-        summaryEl.innerHTML = renderOrderSummaryHtml({ items, totalCents, commissionPercent: partner?.commissionPercent ?? null });
+      const renderSummary = ({ items }) => {
+        summaryEl.innerHTML = renderOrderSummaryHtml({ items, commissionPercent: partner?.commissionPercent ?? null });
       };
       wireKundePicker(form);
       wireArticleLines(form, products, renderSummary);
-      renderSummary({ items: [], totalCents: 0 });
+      renderSummary({ items: [] });
       form.addEventListener("submit", (event) => this.handleManualSubmit(event, partnerId, form));
     } catch (error) {
       showToast(error.message, "error");

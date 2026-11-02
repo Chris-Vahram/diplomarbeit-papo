@@ -73,7 +73,8 @@ final class OrderEmailContent {
         body.append("Bestellnummer: ").append(order.id).append(", Datum: ").append(order.orderDate.format(DATE)).append("\n")
                 .append("Endkunde: ").append(customerName(order.kunde)).append("\n\n");
         appendItems(body, order, true);
-        body.append("\nBestellwert: ").append(eur.format(order.orderValue)).append("\n");
+        body.append("\nBestellwert: ").append(eur.format(order.orderValue)).append(" inkl. USt (netto ")
+                .append(eur.format(order.netValue)).append(")\n");
         CommissionRecord commission = CommissionRecord.find("order", order).firstResult();
         if (commission != null) {
             body.append("Provision: ").append(eur.format(commission.commissionValue))

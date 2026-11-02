@@ -15,7 +15,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -96,7 +95,6 @@ public class OrderService {
         order.partner = partner;
         order.kunde = resolveKunde(partner, request);
 
-        BigDecimal total = BigDecimal.ZERO;
         for (OrderItemRequest itemRequest : request.items()) {
             Product product = Product.findById(itemRequest.productId());
             // An article of another company is reported like a missing one.
@@ -115,11 +113,11 @@ public class OrderService {
             item.product = product;
             item.quantity = itemRequest.quantity();
             item.unitPriceSnapshot = product.price;
+            item.taxRatePercentSnapshot = product.taxRatePercent;
             order.items.add(item);
-            total = total.add(product.price.multiply(BigDecimal.valueOf(itemRequest.quantity())));
         }
 
-        order.orderValue = total;
+        order.applyTotalsFromItems();
         order.persist();
 
         // Partner.commissionPercent is @NotNull/non-nullable end to end (PartnerRequest,

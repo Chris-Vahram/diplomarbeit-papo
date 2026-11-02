@@ -1,6 +1,7 @@
 import { apiFetch, apiDownload } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
-import { formatNumber, formatDate } from "../lib/format.js";
+import { formatDate } from "../lib/format.js";
+import { priceStackHtml } from "../lib/price.js";
 import { escapeHtml } from "../lib/html.js";
 import { addressFieldsHtml, readAddress, fillAddress } from "../lib/address-fields.js";
 import { taxIdentifierFieldsHtml, readTaxIdentifier, fillTaxIdentifier } from "../lib/tax-identifier-fields.js";
@@ -172,7 +173,7 @@ class CompanyPartnerListPage extends HTMLElement {
     this.enablementTable = this.querySelector("#enablement-table");
     this.enablementTable.columns = [
       { key: "name", label: "Name", mobile: "title" },
-      { key: "priceLabel", label: "Preis (€)", mobile: "amount" },
+      { key: "priceLabel", label: "Preis inkl. USt", mobile: "amount", html: true },
       { key: "category", label: "Artikelkategorie", mobile: "meta" },
       { key: "enabledCheckbox", label: "Freigeschaltet", html: true, mobile: "status" },
     ];
@@ -560,7 +561,7 @@ class CompanyPartnerListPage extends HTMLElement {
       const products = await apiFetch(`/company/partners/${this.enablementPartnerId}/products`);
       this.enablementTable.rows = products.map((p) => ({
         name: p.name,
-        priceLabel: formatNumber(p.price),
+        priceLabel: priceStackHtml(p.price, p.netPrice),
         category: p.category ?? "–",
         enabledCheckbox: `<input type="checkbox" data-toggle-product-id="${p.productId}" ${p.enabled ? "checked" : ""} />`,
       }));

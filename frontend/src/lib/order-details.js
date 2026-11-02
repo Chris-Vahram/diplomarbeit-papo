@@ -3,15 +3,19 @@
 // (order-management spec). Uses data the list endpoints already return, no new fetch.
 import { escapeHtml } from "./html.js";
 import { formatEuro, formatNumber, formatDate, formatAddress } from "./format.js";
+import { itemsTableFragment } from "./order-form.js";
+import { orderTotalsHtml } from "./price.js";
 
 export function renderOrderDetailsHtml(order, { showPartner = false } = {}) {
   const kundeName = `${order.kunde.firstName ? escapeHtml(order.kunde.firstName) + " " : ""}${escapeHtml(order.kunde.lastName)}`;
-  const rows = order.items
-    .map(
-      (item) =>
-        `<tr><td>${escapeHtml(item.productName)}</td><td>${item.quantity}</td><td>${formatNumber(item.unitPriceSnapshot)}</td><td>${formatNumber(item.lineTotal)}</td></tr>`,
-    )
-    .join("");
+  const items = order.items.map((item) => ({
+    name: item.productName,
+    quantity: item.quantity,
+    unitPrice: item.unitPriceSnapshot,
+    unitNet: item.unitNetPrice,
+    lineTotal: item.lineTotal,
+    lineNet: item.lineNetTotal,
+  }));
 
   return `
     <section class="order-details">
@@ -32,13 +36,8 @@ export function renderOrderDetailsHtml(order, { showPartner = false } = {}) {
           <dt>Status</dt><dd><status-badge status="${order.status.toLowerCase()}"></status-badge></dd>
           ${order.commissionValue != null ? `<dt>Provision</dt><dd>${formatNumber(order.commissionPercentUsed)}% (${formatEuro(order.commissionValue)})</dd>` : ""}
         </dl>
-        <div class="data-table__scroll">
-          <table class="data-table">
-            <thead><tr><th>Artikel</th><th>Menge</th><th>Preis (€)</th><th>Summe (€)</th></tr></thead>
-            <tbody>${rows}</tbody>
-          </table>
-        </div>
-        <p><strong>Gesamtwert: ${formatEuro(order.orderValue)}</strong></p>
+        ${itemsTableFragment(items)}
+        ${orderTotalsHtml({ gross: order.orderValue, net: order.netValue, tax: order.taxValue })}
       </div>
       <button type="button" class="print-button" data-action="print">Beleg drucken</button>
     </section>

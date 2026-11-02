@@ -19,11 +19,16 @@ import at.papo.partnerportal.order.OrderItem;
 import at.papo.partnerportal.order.OrderStatus;
 import at.papo.partnerportal.partner.Partner;
 import at.papo.partnerportal.partner.PartnerLogin;
+import at.papo.partnerportal.product.ArticleTaxMigrationService;
 import at.papo.partnerportal.product.DemoPngGenerator;
 import at.papo.partnerportal.product.Product;
 import at.papo.partnerportal.product.ProductImage;
 import at.papo.partnerportal.product.ProductImageDto;
 import at.papo.partnerportal.product.ProductImageService;
+import at.papo.partnerportal.shop.PartnerShop;
+import at.papo.partnerportal.shop.ShopKennung;
+import at.papo.partnerportal.shop.ShopPage;
+import at.papo.partnerportal.shop.ShopPageService;
 import io.quarkus.runtime.LaunchMode;
 import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -33,8 +38,10 @@ import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 // Dev/test always seed (LaunchMode DEVELOPMENT/TEST), matching the drop-and-create
 // schema strategy for those profiles (docs/CONVENTIONS.md, docs/SETUP.md). Under
@@ -60,6 +67,12 @@ public class DemoDataSeeder {
 
     @Inject
     CompanyTenancyMigrationService companyTenancyMigrationService;
+
+    @Inject
+    ArticleTaxMigrationService articleTaxMigrationService;
+
+    @Inject
+    ShopPageService shopPageService;
 
     // Company 1 of the current seed run (set by seedCompanyProfile).
     private CompanyProfile company;
@@ -98,9 +111,14 @@ public class DemoDataSeeder {
             if (launchMode == LaunchMode.DEVELOPMENT || launchMode == LaunchMode.NORMAL) {
                 seedOrders();
             }
+            // Dev only: tests build their own shops, and the VM demo shop stays the partner's own.
+            if (launchMode == LaunchMode.DEVELOPMENT) {
+                seedDemoShop();
+            }
         }
         businessTaxIdentifierMigrationService.migrate(launchMode != LaunchMode.NORMAL || seedDemoData);
         companyTenancyMigrationService.contract();
+        articleTaxMigrationService.migrate();
     }
 
     static boolean shouldSeed(LaunchMode launchMode, long partnerCount) {
@@ -365,6 +383,30 @@ public class DemoDataSeeder {
         return kunde;
     }
 
+    // Released shop of partner-demo with a published "Kontakt" page carrying the inquiry form,
+    // so the shop-inquiries flow (article link, form, inbox) works after every dev restart.
+    private void seedDemoShop() {
+        Partner partner = Partner.find("partnerNumber", "PARTNER-DEMO").firstResult();
+        PartnerShop shop = new PartnerShop();
+        shop.partner = partner;
+        shop.kennung = ShopKennung.suggest(partner.name, kennung -> PartnerShop.count("kennung", kennung) > 0);
+        shop.createdAt = Instant.now();
+        shop.releasedAt = shop.createdAt;
+        shop.persist();
+        shopPageService.ensureDefaults(shop);
+
+        ShopPage kontakt = shopPageService.createFreePage(shop, "Kontakt", "kontakt");
+        kontakt.draftContent = """
+                {"blocks": [
+                  {"id": "%s", "type": "heading-text", "config": {"heading": "Kontakt",
+                    "text": "Wir sind gerne für Sie da. Schreiben Sie uns Ihre Frage zu einem Artikel.",
+                    "spacing": "large"}},
+                  {"id": "%s", "type": "inquiry-form", "config": {"heading": "Ihre Anfrage",
+                    "text": "Wir melden uns so bald wie möglich bei Ihnen.", "spacing": "large"}}
+                ]}""".formatted(UUID.randomUUID(), UUID.randomUUID());
+        shopPageService.publish(kontakt);
+    }
+
     private Product product(String name) {
         return Product.find("name", name).firstResult();
     }
@@ -382,17 +424,16 @@ public class DemoDataSeeder {
         order.orderDate = LocalDate.now().minusDays(daysAgo);
         order.status = status;
 
-        BigDecimal total = BigDecimal.ZERO;
         for (OrderLine l : lines) {
             OrderItem item = new OrderItem();
             item.order = order;
             item.product = l.product();
             item.quantity = l.quantity();
             item.unitPriceSnapshot = l.product().price;
+            item.taxRatePercentSnapshot = l.product().taxRatePercent;
             order.items.add(item);
-            total = total.add(l.product().price.multiply(BigDecimal.valueOf(l.quantity())));
         }
-        order.orderValue = total;
+        order.applyTotalsFromItems();
         order.persist();
 
         // Commission is snapshotted at order creation in the real flow — mirror that

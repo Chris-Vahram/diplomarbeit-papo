@@ -2,9 +2,7 @@
 
 ## Purpose
 Central company management of articles: content, price, category, availability, image and validation, with list search and pagination.
-
 ## Requirements
-
 ### Requirement: Product list search, filter, and pagination
 The company product list SHALL support searching by name, filtering by availability, and pagination, to remain usable at the client's catalog scale (~800 articles).
 
@@ -74,23 +72,15 @@ Company article creation and editing SHALL support one optional category identif
 - **THEN** assignment either commits while the category is active or is rejected after deactivation, never bypassing the active-state rule
 
 ### Requirement: Company manages products
-The company SHALL be able to create, view, edit, and manage its own products/articles centrally. Each product SHALL store at least name, price, description, and availability status, and optionally category and image reference; category and image SHALL belong to the same company. Products of other companies SHALL be invisible and unchangeable.
+The company SHALL be able to create, view, edit, and manage products/articles centrally. Each product SHALL store at least name, gross price (incl. USt), tax rate, description, and availability status, and optionally category and image reference.
 
 #### Scenario: Create product
-- **WHEN** the company submits a product with name, price, description, and availability
-- **THEN** the system stores the product for the caller's company and shows a success confirmation
+- **WHEN** the company submits a product with name, gross price, tax rate, description, and availability
+- **THEN** the system stores the product and shows a success confirmation
 
 #### Scenario: Edit product price
-- **WHEN** the company changes a product's price
-- **THEN** the system saves the new price as the single central price used everywhere
-
-#### Scenario: Foreign product
-- **WHEN** a company user lists products or opens or edits a product of another company by id
-- **THEN** it is absent from the list and the request returns 404 without change
-
-#### Scenario: Foreign category or image
-- **WHEN** a company user saves a product with a category or uploaded image of another company
-- **THEN** the save is rejected like an unknown category or image and nothing is stored
+- **WHEN** the company changes a product's gross price or tax rate
+- **THEN** the system saves the new values as the single central price used everywhere; existing orders keep their snapshots
 
 ### Requirement: Central product content control
 Product price and description SHALL be controlled solely by the company. Partners SHALL NOT modify central product master data.

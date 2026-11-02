@@ -81,7 +81,8 @@ erDiagram
     PRODUCT {
         Long id PK
         String name
-        BigDecimal price "10.2"
+        BigDecimal price "10.2, Bruttopreis inkl. USt"
+        BigDecimal taxRatePercent "5.2, 20/13/10/0, Standard 20"
         String description
         boolean available
         Long article_category_id FK "optional"
@@ -127,7 +128,9 @@ erDiagram
         Long partner_id FK "auto-zugewiesen bei Erstellung"
         Long kunde_id FK
         OrderStatus status "SUBMITTED, REVIEWED, FULFILLED"
-        BigDecimal orderValue "10.2, aus OrderItems abgeleitet"
+        BigDecimal orderValue "10.2, brutto, aus OrderItems abgeleitet"
+        BigDecimal netValue "10.2, netto, abgeleitet"
+        BigDecimal taxValue "10.2, USt = brutto - netto"
     }
 
     ORDER_ITEM {
@@ -135,7 +138,8 @@ erDiagram
         Long order_id FK
         Long product_id FK
         int quantity
-        BigDecimal unitPriceSnapshot "10.2, Preis zum Bestellzeitpunkt"
+        BigDecimal unitPriceSnapshot "10.2, Bruttopreis zum Bestellzeitpunkt"
+        BigDecimal taxRatePercentSnapshot "5.2, Steuersatz zum Bestellzeitpunkt"
     }
 
     ORDER_EMAIL {
@@ -152,7 +156,7 @@ erDiagram
         Long id PK
         Long order_id FK "UNIQUE (1:1 mit Order)"
         Long partner_id FK
-        BigDecimal orderValue "10.2, Berechnungsbasis-Snapshot"
+        BigDecimal orderValue "10.2, Berechnungsbasis-Snapshot (netto)"
         BigDecimal commissionPercentUsed "5.2, Prozentsatz-Snapshot"
         BigDecimal commissionValue "10.2, berechneter Betrag"
     }
@@ -242,6 +246,11 @@ der Firma verwalteten Artikelkategorie und die **einzige** Quelle des Kategorien
 (derive-product-category-from-catalog, 16.10.2026). Anfragen und Importe dürfen einen
 Kategorienamen nennen; er wird über den Katalog aufgelöst. Die alte Textspalte `category`
 ist nicht mehr gemappt (bestehende Datenbanken behalten sie ungenutzt, auf der VM leer).
+`price` ist der Bruttopreis inkl. USt, den die Firma eingibt; `taxRatePercent` ist der
+USt-Satz des Artikels (erlaubt 20, 13, 10 oder 0 %, Standard 20 %; add-article-tax-rate,
+vorläufige Entscheidung vom 15.10.2026). Netto = Brutto / (1 + Satz/100), kaufmännisch auf
+zwei Stellen gerundet (`ArticleTax`). Beim Start setzt `ArticleTaxMigrationService` bei
+Bestandsartikeln ohne Satz 20 % und lässt den Preis unverändert als Brutto stehen.
 `imageUrl` bleibt für externe Bild-URLs erhalten; bei einem
 hochgeladenen oder aus der Galerie gewählten Bild verweist `image` optional auf
 einen gespeicherten `ProductImage`-Datensatz.
@@ -276,13 +285,16 @@ indirekt über die Bestelldetails.
 Eine Bestellung, automatisch dem erstellenden Partner zugewiesen (nie ein vom
 Client mitgeschickter Wert). `orderValue` wird bei Erstellung aus den
 `OrderItem`s berechnet und danach nicht mehr neu berechnet — ändert sich
-später der Produktpreis, bleibt der historische Bestellwert unverändert.
+später der Produktpreis oder Steuersatz, bleibt der historische Bestellwert unverändert.
+`orderValue` ist brutto; `netValue` wird aus den ungerundeten Zeilen-Nettowerten summiert
+und einmal gerundet, `taxValue` ist die Differenz (Netto + USt = Brutto). Bestandsbestellungen
+erhalten Netto/USt beim Start mit 20 % (nur Anzeige, Provisionen bleiben unverändert).
 Status-Workflow `SUBMITTED → REVIEWED → FULFILLED`, nur von der Firma
 änderbar.
 
 ### OrderItem
 Eine Bestellzeile (Artikel + Menge). `unitPriceSnapshot` speichert den
-Produktpreis zum Bestellzeitpunkt — schützt historische Bestellungen und
+Bruttopreis, `taxRatePercentSnapshot` den Steuersatz zum Bestellzeitpunkt — schützt historische Bestellungen und
 Provisionen vor späteren zentralen Preisänderungen.
 
 ### CommissionRecord
@@ -290,7 +302,9 @@ Wird einmalig bei Bestellerstellung erzeugt (1:1 mit `Order`). Sowohl die
 Berechnungsbasis (`orderValue`) als auch der verwendete Prozentsatz
 (`commissionPercentUsed`) werden auf dem Record selbst gespeichert
 (Snapshot) — eine spätere Änderung von `Partner.commissionPercent` verändert
-keine bereits existierenden Provisionsdatensätze rückwirkend.
+keine bereits existierenden Provisionsdatensätze rückwirkend. Basis ist seit
+add-article-tax-rate der Nettowert der Bestellung (`Order.netValue`); vorher angelegte
+Records behalten ihre Bruttobasis und werden nicht neu berechnet.
 
 ### OrderEmail (Tabelle `order_email`)
 Outbox für Bestell-E-Mails (B-04, `send-order-emails`): wird in derselben Transaktion wie
@@ -301,7 +315,8 @@ dem Versand bleibt nur die maskierte Adresse (`a***@example.at`), übersprungene
 speichern keine Adresse. Fehlgeschlagene Einträge verlieren die Adresse 90 Tage nach dem Anlegen (Entscheidung 15.10.2026, kein gesetzlicher Wert).
 
 ## Geld-Konvention
-Alle Geldbeträge (`price`, `unitPriceSnapshot`, `orderValue`,
+Alle Geldbeträge (`price`, `unitPriceSnapshot`, `orderValue`, `netValue`, `taxValue`,
+`taxRatePercent`,
 `commissionPercent`, `commissionPercentUsed`, `commissionValue`) sind
 `java.math.BigDecimal` / SQL `numeric` — nie `double`/`float` (siehe
 `docs/CONVENTIONS.md`).

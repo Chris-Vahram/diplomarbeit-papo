@@ -47,6 +47,43 @@ class ProductResourceTest {
     }
 
     @Test
+    void newProductDefaultsToTwentyPercentAndShowsNet() {
+        String token = tokens.tokenFor("company-demo", "company-demo");
+
+        int id = given().auth().oauth2(token).contentType("application/json")
+                .body("{\"name\":\"Steuertest Standard\",\"price\":12.00,\"available\":true}")
+                .when().post("/api/company/products")
+                .then().statusCode(200)
+                .body("taxRatePercent", is(20.0f))
+                .body("netPrice", is(10.0f))
+                .extract().path("id");
+
+        // Update without a rate keeps the stored one; a chosen rate is stored.
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"name\":\"Steuertest Standard\",\"price\":11.30,\"available\":true,\"taxRatePercent\":13}")
+                .when().put("/api/company/products/" + id)
+                .then().statusCode(200)
+                .body("taxRatePercent", is(13.0f))
+                .body("netPrice", is(10.0f));
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"name\":\"Steuertest Standard\",\"price\":11.30,\"available\":true}")
+                .when().put("/api/company/products/" + id)
+                .then().statusCode(200)
+                .body("taxRatePercent", is(13.0f));
+    }
+
+    @Test
+    void invalidTaxRateIsRejected() {
+        String token = tokens.tokenFor("company-demo", "company-demo");
+
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"name\":\"Steuertest Ungültig\",\"price\":5.00,\"taxRatePercent\":19}")
+                .when().post("/api/company/products")
+                .then().statusCode(400)
+                .body("message", is("Bitte einen gültigen Steuersatz wählen."));
+    }
+
+    @Test
     void createWithoutNameIsRejected() {
         String token = tokens.tokenFor("company-demo", "company-demo");
 

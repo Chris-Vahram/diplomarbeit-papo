@@ -17,14 +17,15 @@ public class CommissionService {
 
     // Basis/percentage snapshotted on the record itself (commission spec) - a
     // later change to Partner.commissionPercent must not alter past commissions.
+    // Basis is the net order value, excluding USt (add-article-tax-rate).
     @Transactional
     public CommissionRecord createForOrder(Order order, Partner partner) {
         CommissionRecord record = new CommissionRecord();
         record.order = order;
         record.partner = partner;
-        record.orderValue = order.orderValue;
+        record.orderValue = order.netValue;
         record.commissionPercentUsed = partner.commissionPercent;
-        record.commissionValue = order.orderValue
+        record.commissionValue = order.netValue
                 .multiply(partner.commissionPercent)
                 .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
         record.persist();

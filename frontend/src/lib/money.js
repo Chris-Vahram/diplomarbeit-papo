@@ -24,3 +24,21 @@ export function commissionCentsHalfUp(orderValueCents, percent) {
   const remainder = numerator - quotient * denominator;
   return remainder * 2 >= denominator ? quotient + 1 : quotient;
 }
+
+// Mirrors ArticleTax.totals (backend): net = gross / (1 + rate/100) per line, summed
+// unrounded and rounded half-up once, so the cart preview equals the stored net value
+// to the cent. Exact rational sum in BigInt (rates are percent with up to two decimals);
+// `lines` is [{ grossCents, ratePercent }] with grossCents already multiplied by quantity.
+export function netCentsHalfUp(lines) {
+  let numerator = 0n;
+  let denominator = 1n;
+  for (const { grossCents, ratePercent } of lines) {
+    const lineDenominator = 10000n + BigInt(Math.round(Number(ratePercent ?? 20) * 100));
+    // numerator/denominator + grossCents*10000/lineDenominator
+    numerator = numerator * lineDenominator + BigInt(grossCents) * 10000n * denominator;
+    denominator *= lineDenominator;
+  }
+  const quotient = numerator / denominator;
+  const remainder = numerator - quotient * denominator;
+  return Number(remainder * 2n >= denominator ? quotient + 1n : quotient);
+}

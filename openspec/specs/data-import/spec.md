@@ -2,9 +2,7 @@
 
 ## Purpose
 Excel/CSV import of partners and articles with column mapping, controlled categories, tax-identity checks, bounded file size and a validation report.
-
 ## Requirements
-
 ### Requirement: XLSX header parsing does not shift columns on blank header cells
 When parsing an uploaded XLSX file's header row, the system SHALL read every column position up to the sheet's last used column, including blank header cells, so a blank header cell does not shift the values of later columns into the wrong mapped field.
 
@@ -28,19 +26,23 @@ Article import SHALL resolve a nonblank category name against the known active c
 - **THEN** accepted assignments are protected through persistence and no new assignment commits using an already inactive category
 
 ### Requirement: Import partners and articles
-The company SHALL be able to import partner and article records from an Excel/CSV file, mapping file columns to system fields. Imported records SHALL belong to the caller's company; category lookup and duplicate detection SHALL consider only that company's records.
+The company SHALL be able to import partner and article records from an Excel/CSV file, mapping file columns to system fields. For article imports the company SHALL declare whether the mapped price column contains net or gross prices, and MAY map an optional tax-rate column; rows without a tax rate use 20 percent.
 
 #### Scenario: Successful import
 - **WHEN** the company uploads a valid file and confirms the column mapping
-- **THEN** the system creates the corresponding partner/article records for the caller's company and reports the number of accepted rows
+- **THEN** the system creates the corresponding partner/article records and reports the number of accepted rows
 
 #### Scenario: Column mapping
 - **WHEN** the company uploads a file with columns not matching field names
 - **THEN** the system lets the company map each file column to a system field before importing
 
-#### Scenario: Identifiers of another company
-- **WHEN** company B imports a partner number, article name or category name that exists only in company A
-- **THEN** the row is not reported as a duplicate and company A's records stay unchanged
+#### Scenario: Net price column converted
+- **WHEN** the company declares the price column as net and a row has price 10.00 and tax rate 20
+- **THEN** the article is stored with gross price 12.00 and tax rate 20
+
+#### Scenario: Invalid tax rate in file
+- **WHEN** a row contains a tax rate outside the allowed set
+- **THEN** the row is rejected and the report names the invalid tax rate
 
 ### Requirement: Import validation and reporting
 The import SHALL validate each row and produce a report of accepted and rejected rows, without silently creating inconsistent or partially corrupt data.

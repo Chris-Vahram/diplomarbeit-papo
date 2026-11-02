@@ -59,7 +59,8 @@ class CompanyDashboardResourceTest {
                 .when().get("/api/company/dashboard")
                 .then().statusCode(200)
                 .body("totalRevenue", is(revenueBefore.add(new BigDecimal("12.30")).floatValue()))
-                .body("totalCommission", is(commissionBefore.add(new BigDecimal("1.23")).floatValue()))
+                // 12.30 gross / 20 % USt = 10.25 net; 10 % commission = 1.025 -> 1.03 (HALF_UP)
+                .body("totalCommission", is(commissionBefore.add(new BigDecimal("1.03")).floatValue()))
                 .body("fulfilledOrderCount", is((int) fulfilledCountBefore + 1))
                 .body("settlement.find { it.partnerName == 'Huemer GmbH' }.revenue",
                         is(partnerRevenueBefore.add(new BigDecimal("12.30")).floatValue()))

@@ -1,6 +1,16 @@
 import { apiFetch } from "../lib/api.js";
 import { showToast } from "../components/toast-notice.js";
-import { formatNumber } from "../lib/format.js";
+import { formatEuro } from "../lib/format.js";
+import { netOf, priceStackHtml } from "../lib/price.js";
+
+// Allowed USt rates (article-tax spec); the backend validates the same set.
+const TAX_RATES = [
+  { value: "20", label: "20 % (Normalsatz)" },
+  { value: "13", label: "13 % (ermäßigt)" },
+  { value: "10", label: "10 % (ermäßigt)" },
+  { value: "0", label: "0 % (steuerfrei)" },
+];
+const percentFormat = new Intl.NumberFormat("de-AT", { maximumFractionDigits: 2 });
 import { resolveImageUrls } from "../lib/product-images.js";
 
 class CompanyProductListPage extends HTMLElement {
@@ -18,8 +28,14 @@ class CompanyProductListPage extends HTMLElement {
       <modal-dialog id="product-modal" title="Neuer Artikel">
         <form id="product-form" class="entity-form entity-form--grid">
           <input type="hidden" name="id" />
-          <form-field label="Name" name="name" required></form-field>
-          <form-field label="Preis (€)" name="price" type="number" step="0.01" min="0" required></form-field>
+          <form-field class="form-field--wide" label="Name" name="name" required></form-field>
+          <form-field label="Bruttopreis inkl. USt (€)" name="price" type="number" step="0.01" min="0" required></form-field>
+          <form-field label="Steuersatz" name="taxRatePercent">
+            <select name="taxRatePercent">
+              ${TAX_RATES.map((r) => `<option value="${r.value}">${r.label}</option>`).join("")}
+            </select>
+          </form-field>
+          <output class="price-preview form-field--wide" name="netPreview" for="price taxRatePercent" aria-live="polite"></output>
           <form-field class="form-field--wide" label="Beschreibung" name="description">
             <textarea name="description"></textarea>
           </form-field>
@@ -42,7 +58,8 @@ class CompanyProductListPage extends HTMLElement {
     this.table.columns = [
       { key: "imageUrl", label: "Bild", image: true, mobile: "hide" },
       { key: "name", label: "Name", mobile: "title" },
-      { key: "priceLabel", label: "Preis (€)", mobile: "amount" },
+      { key: "priceLabel", label: "Preis inkl. USt", mobile: "amount", html: true },
+      { key: "taxLabel", label: "USt" },
       { key: "category", label: "Artikelkategorie", mobile: "meta" },
       { key: "availableLabel", label: "Verfügbar", mobile: "status" },
       { key: "actions", label: "", html: true },
@@ -62,6 +79,8 @@ class CompanyProductListPage extends HTMLElement {
       if (button) this.openEdit(button.dataset.editId);
     });
     this.form.addEventListener("submit", (event) => this.handleSubmit(event));
+    this.form.addEventListener("input", () => this.renderNetPreview());
+    this.form.addEventListener("change", () => this.renderNetPreview());
 
     this.load();
   }
@@ -89,7 +108,8 @@ class CompanyProductListPage extends HTMLElement {
       const rows = this.products.map((p) => ({
         imageUrl: p.imageUrl ?? "",
         name: p.name,
-        priceLabel: formatNumber(p.price),
+        priceLabel: priceStackHtml(p.price, p.netPrice),
+        taxLabel: `${percentFormat.format(p.taxRatePercent)} %`,
         category: p.category ?? "–",
         availableLabel: p.available ? "Ja" : "Nein",
         actions: `<button type="button" data-edit-id="${p.id}">Bearbeiten</button>`,
@@ -105,6 +125,8 @@ class CompanyProductListPage extends HTMLElement {
     this.form.elements.id.value = "";
     this.renderCategoryOptions();
     this.imageChooser.reset();
+    this.form.elements.taxRatePercent.value = "20";
+    this.renderNetPreview();
     this.modal.setAttribute("title", "Neuer Artikel");
     this.modal.open();
   }
@@ -115,6 +137,8 @@ class CompanyProductListPage extends HTMLElement {
     this.form.elements.id.value = product.id;
     this.form.elements.name.value = product.name;
     this.form.elements.price.value = product.price;
+    this.form.elements.taxRatePercent.value = String(Number(product.taxRatePercent));
+    this.renderNetPreview();
     this.form.elements.description.value = product.description ?? "";
     this.renderCategoryOptions(product.categoryId ?? "");
     this.imageChooser.value = product.imageUrl ?? "";
@@ -130,6 +154,7 @@ class CompanyProductListPage extends HTMLElement {
     const payload = {
       name: data.get("name"),
       price: Number(data.get("price")),
+      taxRatePercent: Number(data.get("taxRatePercent")),
       description: data.get("description") || null,
       categoryId: data.get("categoryId") ? Number(data.get("categoryId")) : null,
       imageUrl: data.get("imageUrl") || null,
@@ -149,6 +174,19 @@ class CompanyProductListPage extends HTMLElement {
     } catch (error) {
       showToast(error.message, "error");
     }
+  }
+
+  // Live net/USt split of the entered gross price - the company enters what the end customer pays.
+  renderNetPreview() {
+    const output = this.form.elements.netPreview;
+    const raw = this.form.elements.price.value;
+    const gross = Number(raw);
+    if (raw === "" || !Number.isFinite(gross) || gross < 0) {
+      output.textContent = "Netto und USt werden aus dem Bruttopreis berechnet.";
+      return;
+    }
+    const net = netOf(gross, this.form.elements.taxRatePercent.value);
+    output.textContent = `Netto ${formatEuro(net)} · USt ${formatEuro(gross - net)}`;
   }
 
   renderCategoryOptions(selectedId = this.form.elements.categoryId.value) {

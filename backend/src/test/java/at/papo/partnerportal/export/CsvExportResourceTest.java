@@ -43,7 +43,8 @@ class CsvExportResourceTest {
                 .extract().asByteArray();
 
         List<String> lines = decodeCsvLines(csv);
-        assertEquals("\"Datum\";\"Partner\";\"Kunde\";\"Wert\";\"Provision %\";\"Provision\";\"Status\"", lines.get(0));
+        assertEquals("\"Datum\";\"Partner\";\"Kunde\";\"Wert brutto\";\"Netto\";\"USt\";\"Provision %\";"
+                + "\"Provision\";\"Status\"", lines.get(0));
         // company-demo exports only company 1 orders (add-company-tenancy).
         assertEquals(Order.count("partner.company", TestCompanies.one()) + 1, lines.size());
 
@@ -51,7 +52,7 @@ class CsvExportResourceTest {
         String mullerLine = lines.stream().filter(line -> line.contains("Müller")).findFirst()
                 .orElseThrow(() -> new AssertionError("erwartete Umlaut-Zeile (Müller) nicht in Export gefunden"));
         // German-locale Excel: decimal comma, dd.MM.yyyy - not the raw dot-decimal/ISO form.
-        assertEquals("\"" + today + "\";\"Huemer GmbH\";\"Müller\";\"89,90\";\"10,00\";\"8,99\";\"Eingereicht\"",
+        assertEquals("\"" + today + "\";\"Huemer GmbH\";\"Müller\";\"89,90\";\"74,92\";\"14,98\";\"10,00\";\"7,49\";\"Eingereicht\"",
                 mullerLine);
     }
 
@@ -71,7 +72,8 @@ class CsvExportResourceTest {
                 .extract().asByteArray();
 
         List<String> lines = decodeCsvLines(csv);
-        assertEquals("\"Partner\";\"Bestell-Nr\";\"Basiswert\";\"Provision %\";\"Provision\"", lines.get(0));
+        assertEquals("\"Partner\";\"Bestell-Nr\";\"Wert brutto\";\"Netto\";\"USt\";\"Basiswert\";"
+                + "\"Provision %\";\"Provision\"", lines.get(0));
         assertEquals(CommissionRecord.count("partner.company", TestCompanies.one()) + 1, lines.size());
     }
 

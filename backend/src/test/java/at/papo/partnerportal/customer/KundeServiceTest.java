@@ -52,6 +52,8 @@ class KundeServiceTest {
         order.kunde = kunde;
         order.orderDate = LocalDate.now().minusDays(daysAgo);
         order.orderValue = BigDecimal.TEN;
+        order.netValue = BigDecimal.TEN;
+        order.taxValue = BigDecimal.ZERO;
         order.persist();
     }
 

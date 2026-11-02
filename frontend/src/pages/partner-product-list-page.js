@@ -1,5 +1,5 @@
 import { apiFetch } from "../lib/api.js";
-import { formatNumber } from "../lib/format.js";
+import { priceStackHtml } from "../lib/price.js";
 import { resolveImageUrls } from "../lib/product-images.js";
 
 class PartnerProductListPage extends HTMLElement {
@@ -14,7 +14,7 @@ class PartnerProductListPage extends HTMLElement {
     this.table.columns = [
       { key: "imageUrl", label: "Bild", image: true, mobile: "hide" },
       { key: "name", label: "Name", mobile: "title" },
-      { key: "priceLabel", label: "Preis (€)", mobile: "amount" },
+      { key: "priceLabel", label: "Preis inkl. USt", mobile: "amount", html: true },
       { key: "category", label: "Artikelkategorie", mobile: "meta" },
     ];
     this.table.emptyMessage = "Noch keine Artikel für Sie freigeschaltet.";
@@ -36,7 +36,7 @@ class PartnerProductListPage extends HTMLElement {
       const rows = products.map((p) => ({
         imageUrl: p.imageUrl ?? "",
         name: p.name,
-        priceLabel: formatNumber(p.price),
+        priceLabel: priceStackHtml(p.price, p.netPrice),
         category: p.category ?? "–",
       }));
       this.table.rows = await resolveImageUrls(rows);

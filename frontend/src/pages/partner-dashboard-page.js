@@ -52,7 +52,7 @@ class PartnerDashboardPage extends HTMLElement {
     this.table.columns = [
       { key: "orderDate", label: "Datum", mobile: "meta" },
       { key: "kundeName", label: "Endkunde", mobile: "title" },
-      { key: "orderValueLabel", label: "Wert (€)", mobile: "amount" },
+      { key: "orderValueLabel", label: "Wert brutto (€)", mobile: "amount" },
       { key: "statusBadge", label: "Status", html: true, mobile: "status" },
     ];
     this.table.emptyMessage = "Noch keine Bestellungen vorhanden.";
@@ -150,7 +150,7 @@ class PartnerDashboardPage extends HTMLElement {
 
     this.metricRow.innerHTML = `
       <metric-card lead label="Provision (abgeschlossen)" value="${formatEuro(commission)}" icon="percent" ${trendAttrs(commissionTrend)}></metric-card>
-      <metric-card label="Umsatz (abgeschlossen)" value="${formatEuro(revenue)}" icon="trending-up" ${trendAttrs(revenueTrend)}></metric-card>
+      <metric-card label="Umsatz brutto (abgeschlossen)" value="${formatEuro(revenue)}" icon="trending-up" ${trendAttrs(revenueTrend)}></metric-card>
       <metric-card label="Abgeschlossene Bestellungen" value="${count}" icon="check-circle" ${trendAttrs(countTrend)}></metric-card>
       <metric-card label="Freigeschaltete Artikel" value="${this.base.enabledProductCount}" ring="${ringPct}" ring-layout="full" ring-caption="von ${total} Artikeln"></metric-card>
       ${renderMonthChart("Umsatz nach Monat", labels, monthly)}
