@@ -273,6 +273,10 @@ Standard: **aus** (`SHOP_ACCOUNTS_ENABLED=false`); die Gastbestellung ist davon 
 1. SMTP muss funktionieren (siehe „Bestell-E-Mails“): Keycloak verschickt Bestätigungs- und
    Passwort-Mails selbst mit `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`; der
    Absender ist `SMTP_USERNAME`. Für Port 465: `SHOP_SMTP_SSL=true`, `SHOP_SMTP_STARTTLS=false`.
+   `render-and-start.sh` maskiert die Werte vor dem Import (Keycloak setzt sie sonst roh ins
+   JSON; ein `"` oder `\` im Passwort hätte Keycloak samt Portal-Login nicht starten lassen).
+   Achtung: `PAPO_MAIL_REDIRECT_TO` gilt nur für Bestellmails. Bestätigungs- und Passwort-Mails
+   schickt Keycloak an die Adresse, mit der sich jemand registriert.
 2. `SHOP_ADMIN_CLIENT_SECRET` (mindestens 32 Zeichen, z. B. `openssl rand -hex 32`) in
    `.env.prod` setzen. Nur dann importiert `render-and-start.sh` den Realm; der Service-Account
    `papo-shop-admin` darf ausschließlich Benutzer dieses Realms verwalten (Kontolöschung).
@@ -282,6 +286,13 @@ Standard: **aus** (`SHOP_ACCOUNTS_ENABLED=false`); die Gastbestellung ist davon 
    (Befehl wie oben).
 4. Prüfen: Konto im Shop unter „Anmelden“ registrieren, Bestätigungsmail öffnen, bestellen,
    Bestellung unter „Mein Konto“ sehen, Konto löschen.
+
+Lokal geprüft am 02.11.2026 mit einem Wegwerf-Keycloak 26.0 im Produktionsmodus mit genau
+diesem Skript, diesen Vorlagen und diesem Theme: beide Realms importiert; SMTP-Login mit einem
+Passwort voller Sonderzeichen (`"`, `\`, `$`, `${…}`) gegen einen Mailserver mit Pflicht-Login
+klappt und die Bestätigungsmail kommt an; das Admin-Secret stimmt, der Service-Account erhält
+ein Token; nach einem Neustart werden beide Realms übersprungen (angelegte Benutzer bleiben);
+ohne Secret startet Keycloak nur mit `partnerportal`.
 
 Ohne importierten Realm startet das Backend trotzdem; `/api/shop-customer/*` antwortet dann 401.
 Rückweg: `SHOP_ACCOUNTS_ENABLED=false` blendet die Anmeldung aus; Gastbestellungen laufen weiter.

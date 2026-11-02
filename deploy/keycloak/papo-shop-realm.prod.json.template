@@ -35,15 +35,15 @@
   "ssoSessionIdleTimeout": 1800,
   "ssoSessionMaxLifespan": 36000,
   "smtpServer": {
-    "host": "${SMTP_HOST:localhost}",
-    "port": "${SMTP_PORT:587}",
-    "from": "${SMTP_USERNAME:no-reply@__DOMAIN__}",
+    "host": "${SMTP_HOST_JSON}",
+    "port": "${SMTP_PORT_JSON}",
+    "from": "${SMTP_USERNAME_JSON}",
     "fromDisplayName": "PAPO Shop",
     "auth": "true",
-    "user": "${SMTP_USERNAME:}",
-    "password": "${SMTP_PASSWORD:}",
-    "ssl": "${SHOP_SMTP_SSL:false}",
-    "starttls": "${SHOP_SMTP_STARTTLS:true}"
+    "user": "${SMTP_USERNAME_JSON}",
+    "password": "${SMTP_PASSWORD_JSON}",
+    "ssl": "${SHOP_SMTP_SSL_JSON}",
+    "starttls": "${SHOP_SMTP_STARTTLS_JSON}"
   },
   "roles": {
     "realm": []
@@ -73,7 +73,7 @@
       "enabled": true,
       "protocol": "openid-connect",
       "clientAuthenticatorType": "client-secret",
-      "secret": "${SHOP_ADMIN_CLIENT_SECRET}",
+      "secret": "${SHOP_ADMIN_CLIENT_SECRET_JSON}",
       "standardFlowEnabled": false,
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": false,

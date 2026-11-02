@@ -17,8 +17,26 @@ sed "s#__DOMAIN__#${DOMAIN}#g" \
 
 # End-customer realm papo-shop (add-shop-customer-accounts). Imported only when the backend's
 # admin client secret is set: an unset ${SHOP_ADMIN_CLIENT_SECRET} placeholder would otherwise
-# stay as a guessable literal secret. Keycloak resolves the ${...} SMTP/secret placeholders
-# from this container's environment at import; sed only fills in the domain.
+# stay as a guessable literal secret. Keycloak resolves the ${...} placeholders from this
+# container's environment at import; sed only fills in the domain.
+#
+# Keycloak pastes those values into the JSON text unescaped: a '"' or '\' in an SMTP password
+# would break the file and stop Keycloak from starting at all (portal login included; found in
+# the local import test 02.11.2026). The template therefore only reads the *_JSON variants,
+# escaped here for a JSON string; tabs and line breaks are dropped.
+json_escape() {
+	printf '%s' "$1" | tr -d '\r\n\t' | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'
+}
+SMTP_HOST_JSON=$(json_escape "${SMTP_HOST:-localhost}")
+SMTP_PORT_JSON=$(json_escape "${SMTP_PORT:-587}")
+SMTP_USERNAME_JSON=$(json_escape "${SMTP_USERNAME:-}")
+SMTP_PASSWORD_JSON=$(json_escape "${SMTP_PASSWORD:-}")
+SHOP_SMTP_SSL_JSON=$(json_escape "${SHOP_SMTP_SSL:-false}")
+SHOP_SMTP_STARTTLS_JSON=$(json_escape "${SHOP_SMTP_STARTTLS:-true}")
+SHOP_ADMIN_CLIENT_SECRET_JSON=$(json_escape "${SHOP_ADMIN_CLIENT_SECRET:-}")
+export SMTP_HOST_JSON SMTP_PORT_JSON SMTP_USERNAME_JSON SMTP_PASSWORD_JSON \
+	SHOP_SMTP_SSL_JSON SHOP_SMTP_STARTTLS_JSON SHOP_ADMIN_CLIENT_SECRET_JSON
+
 if [ "${#SHOP_ADMIN_CLIENT_SECRET}" -ge 32 ]; then
 	sed "s#__DOMAIN__#${DOMAIN}#g" \
 		/opt/keycloak/papo-shop-realm.json.template \
