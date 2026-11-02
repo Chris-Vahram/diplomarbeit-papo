@@ -13,8 +13,8 @@
 
 ## 3. Import (essential)
 
-- [ ] 3.1 Add optional tax-rate field and net/gross price-column option to article import mapping
-- [ ] 3.2 Convert net to gross before validation; reject invalid rates with report reason; tests
+- [x] 3.1 Add optional tax-rate field and net/gross price-column option to article import mapping
+- [x] 3.2 Convert net to gross before validation; reject invalid rates with report reason; tests
 
 ## 4. Frontend (essential)
 

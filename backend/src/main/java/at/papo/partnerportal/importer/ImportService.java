@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 
 @ApplicationScoped
 public class ImportService {
@@ -29,11 +30,19 @@ public class ImportService {
     @Transactional
     public ImportReportDto commit(ImportDefinition definition, byte[] fileBytes, String filename,
             Map<String, String> mapping) {
+        return commit(definition, fileBytes, filename, mapping, UnaryOperator.identity());
+    }
+
+    // rowTransform runs on every mapped row before validation, e.g. the net-to-gross price
+    // conversion of the article import, so the report shows the value that gets stored.
+    @Transactional
+    public ImportReportDto commit(ImportDefinition definition, byte[] fileBytes, String filename,
+            Map<String, String> mapping, UnaryOperator<Map<String, String>> rowTransform) {
         ParsedFile parsed = ImportedFileParser.parse(fileBytes, filename);
         List<ImportRowResultDto> results = new ArrayList<>();
         Set<String> seenInFile = new HashSet<>();
         List<Map<String, String>> mappedRows = parsed.rows().stream()
-                .map(fileRow -> mapRow(definition.fields(), mapping, fileRow)).toList();
+                .map(fileRow -> rowTransform.apply(mapRow(definition.fields(), mapping, fileRow))).toList();
         definition.prepare(mappedRows);
         int rowNumber = 1;
 

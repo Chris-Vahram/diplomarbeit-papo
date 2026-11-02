@@ -50,6 +50,61 @@ class ProductImportResourceTest {
     }
 
     @Test
+    void netPriceColumnIsConvertedAndInvalidTaxRateIsReported() {
+        String token = tokens.tokenFor("company-demo", "company-demo");
+        String csvText = "Artikel;Netto;USt\nImport Netto Standard;10,00;\nImport Netto Buch;10;10 %\n"
+                + "Import Netto Falsch;10;19\n";
+
+        given().auth().oauth2(token)
+                .multiPart("file", "products.csv", csvText.getBytes(StandardCharsets.UTF_8), "text/csv")
+                .multiPart("mapping", "{\"name\":\"Artikel\",\"price\":\"Netto\",\"taxRate\":\"USt\"}")
+                .multiPart("priceType", "NET")
+                .when().post("/api/company/import/products/commit")
+                .then().statusCode(200)
+                .body("acceptedCount", is(2))
+                .body("rows[0].data.price", is("12.00"))
+                .body("rows[2].accepted", is(false))
+                .body("rows[2].errors[0]", is("Steuersatz \"19\" ist ungültig (erlaubt: 20, 13, 10 oder 0 %)."));
+
+        given().auth().oauth2(token)
+                .when().get("/api/company/products")
+                .then().statusCode(200)
+                .body("find { it.name == 'Import Netto Standard' }.price", is(12.00f))
+                .body("find { it.name == 'Import Netto Standard' }.taxRatePercent", is(20.0f))
+                .body("find { it.name == 'Import Netto Buch' }.price", is(11.00f))
+                .body("find { it.name == 'Import Netto Buch' }.taxRatePercent", is(10.0f));
+    }
+
+    @Test
+    void grossPriceColumnIsStoredUnchangedAndUnknownPriceTypeIsRejected() {
+        String token = tokens.tokenFor("company-demo", "company-demo");
+        byte[] csv = "Artikel;Preis;USt\nImport Brutto Ermäßigt;11,30;13\n".getBytes(StandardCharsets.UTF_8);
+        String mapping = "{\"name\":\"Artikel\",\"price\":\"Preis\",\"taxRate\":\"USt\"}";
+
+        given().auth().oauth2(token)
+                .multiPart("file", "products.csv", csv, "text/csv")
+                .multiPart("mapping", mapping)
+                .multiPart("priceType", "BRUTTO")
+                .when().post("/api/company/import/products/commit")
+                .then().statusCode(400);
+
+        given().auth().oauth2(token)
+                .multiPart("file", "products.csv", csv, "text/csv")
+                .multiPart("mapping", mapping)
+                .multiPart("priceType", "GROSS")
+                .when().post("/api/company/import/products/commit")
+                .then().statusCode(200)
+                .body("acceptedCount", is(1));
+
+        given().auth().oauth2(token)
+                .when().get("/api/company/products")
+                .then().statusCode(200)
+                .body("find { it.name == 'Import Brutto Ermäßigt' }.price", is(11.30f))
+                .body("find { it.name == 'Import Brutto Ermäßigt' }.taxRatePercent", is(13.0f))
+                .body("find { it.name == 'Import Brutto Ermäßigt' }.netPrice", is(10.00f));
+    }
+
+    @Test
     void previewSuggestsMappingForUmlautHeader() {
         String token = tokens.tokenFor("company-demo", "company-demo");
         // "Verfügbar" must transliterate to "verfuegbar" and match the available field's alias.

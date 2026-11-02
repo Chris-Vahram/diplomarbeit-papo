@@ -3,6 +3,7 @@ package at.papo.partnerportal.importer;
 import at.papo.partnerportal.category.Category;
 import at.papo.partnerportal.category.CategoryNames;
 import at.papo.partnerportal.category.CategoryService;
+import at.papo.partnerportal.product.ArticleTax;
 import at.papo.partnerportal.product.Product;
 import at.papo.partnerportal.product.ProductImage;
 import at.papo.partnerportal.security.CurrentCompany;
@@ -38,7 +39,9 @@ public class ProductImportDefinition implements ImportDefinition {
 
     private static final List<ImportField> FIELDS = List.of(
             new ImportField("name", "Name", true, List.of("artikel", "artikelname", "bezeichnung", "produktname")),
-            new ImportField("price", "Preis", true, List.of("price", "preis netto", "verkaufspreis")),
+            new ImportField("price", "Preis", true, List.of("price", "preis netto", "preis brutto", "verkaufspreis")),
+            new ImportField("taxRate", "Steuersatz (%)", false,
+                    List.of("ust", "ust satz", "mwst", "mwst satz", "steuersatz", "steuer", "tax rate")),
             new ImportField("description", "Beschreibung", false, List.of("description", "text")),
             new ImportField("available", "Verfügbar", false, List.of("verfuegbar", "status", "aktiv")),
             new ImportField("category", "Kategorie", false, List.of("kategorie", "warengruppe", "category")),
@@ -84,6 +87,11 @@ public class ProductImportDefinition implements ImportDefinition {
             } catch (NumberFormatException e) {
                 errors.add("Preis ist keine gültige Zahl.");
             }
+        }
+
+        String taxRate = mappedValues.get("taxRate");
+        if (!isBlank(taxRate) && taxRate(taxRate) == null) {
+            errors.add("Steuersatz \"" + taxRate.trim() + "\" ist ungültig (erlaubt: 20, 13, 10 oder 0 %).");
         }
 
         String available = mappedValues.get("available");
@@ -132,6 +140,7 @@ public class ProductImportDefinition implements ImportDefinition {
         product.company = currentCompany.resolve();
         product.name = mappedValues.get("name").trim();
         product.price = parseDecimal(mappedValues.get("price"));
+        product.taxRatePercent = ArticleTax.normalized(rateOrDefault(mappedValues.get("taxRate")));
         product.description = blankToNull(mappedValues.get("description"));
         Boolean available = parseBoolean(mappedValues.get("available"));
         product.available = available == null || available;
@@ -141,6 +150,37 @@ public class ProductImportDefinition implements ImportDefinition {
                         CategoryNames.normalized(categoryName)).firstResult();
         product.imageUrl = blankToNull(mappedValues.get("imageUrl"));
         product.persist();
+    }
+
+    // Net price column: replaces the price with the gross value (row rate or 20 %) before validation.
+    // Unparseable price or rate stays as it is, so validation reports it unchanged.
+    public Map<String, String> withGrossPrice(Map<String, String> mappedValues) {
+        String price = mappedValues.get("price");
+        String taxRate = mappedValues.get("taxRate");
+        if (isBlank(price) || (!isBlank(taxRate) && taxRate(taxRate) == null)) {
+            return mappedValues;
+        }
+        try {
+            BigDecimal net = parseDecimal(price);
+            mappedValues.put("price", ArticleTax.grossFromNet(net, rateOrDefault(taxRate)).toPlainString());
+        } catch (NumberFormatException e) {
+            // reported by validateRow
+        }
+        return mappedValues;
+    }
+
+    private static BigDecimal rateOrDefault(String value) {
+        return isBlank(value) ? ArticleTax.DEFAULT_RATE : taxRate(value);
+    }
+
+    // Allowed rate or null; accepts "20", "20 %", "20,0".
+    private static BigDecimal taxRate(String value) {
+        try {
+            BigDecimal rate = parseDecimal(value.replace("%", ""));
+            return ArticleTax.isAllowed(rate) ? rate : null;
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     private String normalizedCategory(String value) {

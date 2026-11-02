@@ -44,12 +44,25 @@ public class ProductImportResource {
     @POST
     @Path("/commit")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public ImportReportDto commit(@RestForm("file") FileUpload file, @RestForm("mapping") String mappingJson)
-            throws IOException {
+    public ImportReportDto commit(@RestForm("file") FileUpload file, @RestForm("mapping") String mappingJson,
+            @RestForm("priceType") String priceType) throws IOException {
         UploadLimits.rejectIfLarger(file.uploadedFile(), UploadLimits.IMPORT_FILE_BYTES,
                 "Importdatei ist zu groß (maximal 2 MiB erlaubt).");
         Map<String, String> mapping = parseMapping(mappingJson);
-        return importService.commit(definition, Files.readAllBytes(file.uploadedFile()), file.fileName(), mapping);
+        boolean netPrices = netPrices(priceType);
+        return importService.commit(definition, Files.readAllBytes(file.uploadedFile()), file.fileName(), mapping,
+                row -> netPrices ? definition.withGrossPrice(row) : row);
+    }
+
+    // Price column content (data-import spec): GROSS is the default, NET is converted per row.
+    private static boolean netPrices(String priceType) {
+        if (priceType == null || priceType.isBlank() || priceType.equals("GROSS")) {
+            return false;
+        }
+        if (priceType.equals("NET")) {
+            return true;
+        }
+        throw new ApiException(400, "Preisart ist ungültig.");
     }
 
     private Map<String, String> parseMapping(String mappingJson) {
