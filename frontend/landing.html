@@ -48,30 +48,44 @@
             </a>
           </div>
 
-          <ol class="landing-chain" aria-label="So arbeiten die Beteiligten zusammen">
-            <li class="landing-chain__step">
-              <span class="landing-chain__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 12h4"/><path d="M10 8h4"/><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/></svg></span>
-              <span>
-                <span class="landing-chain__name">Unternehmen</span>
-                <span class="landing-chain__text">stellt Artikel und Preise bereit, legt Partner und Provision fest und wickelt die Bestellungen ab.</span>
-              </span>
-            </li>
-            <li class="landing-chain__step">
-              <span class="landing-chain__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></svg></span>
-              <span>
-                <span class="landing-chain__name">Partner</span>
-                <span class="landing-chain__text">berät seine Endkunden und bestellt für sie im Portal. Jede Bestellung ist automatisch ihm zugeordnet.</span>
-              </span>
-            </li>
-            <li class="landing-chain__step">
-              <span class="landing-chain__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
-              <span>
-                <span class="landing-chain__name">Endkunde</span>
-                <span class="landing-chain__text">erhält die Ware vom Unternehmen und kann auf Wunsch im Webshop seines Partners selbst bestellen.</span>
-              </span>
-            </li>
-          </ol>
+          <figure class="landing-ticket" aria-labelledby="ticket-title">
+            <div class="landing-ticket__head">
+              <span id="ticket-title" class="landing-ticket__title">Bestellung</span>
+              <time datetime="2026-08-25">25.08.2026</time>
+            </div>
+            <dl class="landing-ticket__route">
+              <div><dt>Partner</dt><dd>Baumarkt Weber e.U.</dd></div>
+              <div><dt>Endkunde</dt><dd>Leitner Vertrieb GmbH</dd></div>
+            </dl>
+            <dl class="landing-ticket__sums">
+              <div><dt>Wert brutto</dt><dd>229,00&nbsp;€</dd></div>
+              <div><dt>Provision</dt><dd>28,62&nbsp;€</dd></div>
+            </dl>
+            <ol class="landing-ticket__track" aria-label="Status">
+              <li>Eingereicht</li>
+              <li>Geprüft</li>
+              <li aria-current="step">Abgeschlossen</li>
+            </ol>
+            <figcaption>Eine Bestellung aus den Demo-Daten, wie sie durch PAPO läuft.</figcaption>
+          </figure>
         </div>
+        <ol class="landing-route" aria-label="So arbeiten die Beteiligten zusammen">
+          <li class="landing-route__stop area--company">
+            <span class="landing-route__node"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 12h4"/><path d="M10 8h4"/><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/></svg></span>
+            <span class="landing-route__name">Unternehmen</span>
+            <span class="landing-route__text">stellt Artikel und Preise bereit, legt Partner und Provision fest und wickelt die Bestellungen ab.</span>
+          </li>
+          <li class="landing-route__stop area--partner">
+            <span class="landing-route__node"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></svg></span>
+            <span class="landing-route__name">Partner</span>
+            <span class="landing-route__text">berät seine Endkunden und bestellt für sie im Portal. Jede Bestellung ist automatisch ihm zugeordnet.</span>
+          </li>
+          <li class="landing-route__stop">
+            <span class="landing-route__node"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+            <span class="landing-route__name">Endkunde</span>
+            <span class="landing-route__text">erhält die Ware vom Unternehmen und kann auf Wunsch im Webshop seines Partners selbst bestellen.</span>
+          </li>
+        </ol>
       </div>
     </section>
 
@@ -82,6 +96,20 @@
           <p>Wer über Partner verkauft, bekommt Bestellungen oft per E-Mail oder am Telefon. PAPO macht daraus einen festen Ablauf.</p>
         </div>
         <div>
+          <div class="landing-inbox" aria-hidden="true">
+            <div class="landing-inbox__pile">
+              <p class="landing-scrap landing-scrap--mail"><span>E-Mail</span>AW: AW: Bestellung Leitner – bitte noch 2 Stk. dazu</p>
+              <p class="landing-scrap landing-scrap--note"><span>Telefonnotiz</span>Hr. Weber, 14:20 – Bohrmaschine? Preis klären</p>
+              <p class="landing-scrap landing-scrap--file"><span>Datei</span>Provisionen_2026_final_v3.xlsx</p>
+            </div>
+            <svg class="icon landing-inbox__arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            <div class="landing-inbox__row">
+              <span class="landing-inbox__cell"><small>Partner</small>Baumarkt Weber e.U.</span>
+              <span class="landing-inbox__cell"><small>Endkunde</small>Leitner Vertrieb GmbH</span>
+              <span class="landing-inbox__cell landing-inbox__cell--num"><small>Wert brutto</small>229,00&nbsp;€</span>
+              <span class="landing-status landing-status--fulfilled">Abgeschlossen</span>
+            </div>
+          </div>
           <div class="landing-compare__labels" aria-hidden="true"><span>Bisher</span><span>Mit PAPO</span></div>
           <ul class="landing-compare" role="list">
             <li class="landing-compare__row">
@@ -112,6 +140,7 @@
         </div>
 
         <div class="landing-sides">
+          <span class="landing-seam" aria-hidden="true"><span>Dieselbe Bestellung</span></span>
           <article class="landing-side area--company" id="unternehmen" aria-labelledby="unternehmen-title">
             <h3 id="unternehmen-title">Alle Bestellungen abwickeln, ohne abzutippen.</h3>
             <p class="landing-side__text">Neue Bestellungen Ihrer Partner landen in einer Liste. Sie prüfen sie und führen sie über den Status bis zum Abschluss.</p>
