@@ -263,7 +263,7 @@ html:has(> body.public) {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
   gap: clamp(2.5rem, 6vw, 5rem);
-  align-items: start;
+  align-items: center;
 }
 
 .landing-hero h1 {
@@ -285,7 +285,37 @@ html:has(> body.public) {
 
 /* Each sentence stays whole: if the headline does not fit on one line,
    it breaks exactly between the two sentences. */
-.landing-hero__line { display: inline-block; }
+.landing-line { display: inline-block; }
+
+/* Three plain facts under the lead: hairline-separated, no cards. */
+.landing-facts {
+  display: grid;
+  max-width: 30rem;
+  margin: var(--spacing-8) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 0.0625rem solid var(--border-default);
+}
+
+.landing-facts li {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding-block: var(--spacing-3);
+  border-bottom: 0.0625rem solid var(--border-default);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+}
+
+.landing-facts li::before {
+  content: "";
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+}
 
 .landing-hero__more {
   display: inline-block;
@@ -489,17 +519,19 @@ html:has(> body.public) {
 .landing-route__stop {
   position: relative;
   display: grid;
+  justify-items: center;
   gap: var(--spacing-1);
   align-content: start;
+  text-align: center;
 }
 
-/* Dotted path from one stop's node to the next one. */
+/* Dotted path from the centre of one node to the centre of the next. */
 .landing-route__stop:not(:last-child)::after {
   content: "";
   position: absolute;
   top: 1.3125rem;
-  left: calc(2.75rem + var(--spacing-3));
-  right: calc(var(--route-gap) * -1 + var(--spacing-3));
+  left: calc(50% + 1.375rem + var(--spacing-3));
+  right: calc(-50% - var(--route-gap) + 1.375rem + var(--spacing-3));
   border-top: 0.125rem dotted var(--border-strong);
 }
 
@@ -532,6 +564,8 @@ html:has(> body.public) {
   .landing-route__stop {
     grid-template-columns: 2.75rem minmax(0, 1fr);
     column-gap: var(--spacing-4);
+    justify-items: start;
+    text-align: left;
   }
   .landing-route__node { grid-row: span 2; margin-bottom: 0; }
   .landing-route__name, .landing-route__text { grid-column: 2; }
@@ -890,16 +924,17 @@ html:has(> body.public) {
 
 /* ─── Mein Webshop ────────────────────────────────────────── */
 
-.landing-shop__head {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  gap: var(--spacing-6) clamp(2rem, 5vw, 4.5rem);
-  align-items: end;
-  margin-bottom: clamp(2.5rem, 5vw, 4rem);
-}
+.landing-shop__head { margin-bottom: clamp(2.5rem, 5vw, 4rem); }
 
-.landing-shop__head .landing-section__head { margin-bottom: 0; }
-.landing-shop__head .landing-list { margin-top: 0; }
+.landing-shop__head .landing-section__head { max-width: none; margin-bottom: 0; }
+.landing-shop__head .landing-section__head > p { max-width: 46rem; }
+
+/* Benefits as one row under the intro; stacked on phones. */
+.landing-list--row {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--spacing-4) var(--spacing-6);
+  margin-top: var(--spacing-6);
+}
 
 /* Partner builds, end customer orders: two equal frames side by side. */
 .landing-shop__shots {
@@ -932,8 +967,8 @@ html:has(> body.public) {
 .landing-endkunde strong { color: var(--text-primary); font-weight: var(--font-weight-semibold); }
 
 @media (max-width: 52rem) {
-  .landing-shop__head,
-  .landing-shop__shots { grid-template-columns: minmax(0, 1fr); }
+  .landing-shop__shots,
+  .landing-list--row { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* ─── Abschluss: Anmelden ─────────────────────────────────── */
