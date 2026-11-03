@@ -15,32 +15,32 @@ Alle Aufgaben sind **Pflicht**, außer sie sind mit *(optional)* markiert.
 
 ## 3. Gestaltung und Marke (impeccable + apple-design)
 
-- [ ] 3.1 Skills impeccable und apple-design laden; Richtung für öffentliche Seiten festlegen (Unternehmen zuerst, ruhig, sachlich, „Sie“, kein Marketington) gemäß `PRODUCT.md`/`DESIGN.md`.
+- [x] 3.1 Skills impeccable und apple-design laden; Richtung für öffentliche Seiten festlegen (Unternehmen zuerst, ruhig, sachlich, „Sie“, kein Marketington) gemäß `PRODUCT.md`/`DESIGN.md`.
 - [ ] 3.2 Neutrale Markenfarbe für öffentliche Seiten festlegen und in `DESIGN.md` mit Kontrastwerten (Text ≥ 4.5:1, UI ≥ 3:1) dokumentieren.
-- [ ] 3.3 `frontend/src/styles/public.css` anlegen (lädt nach `base.css`, Body-Klassen-Scope), gemeinsamer Kopf- und Fußbereich für Landing, Rechtsseiten und 404.
+- [x] 3.3 `frontend/src/styles/public.css` anlegen (lädt nach `base.css`, Body-Klassen-Scope), gemeinsamer Kopf- und Fußbereich für Landing, Rechtsseiten und 404.
 
 ## 4. Screenshots
 
-- [ ] 4.1 `tools/render_landing_screenshots.mjs` (Playwright, Aufbau wie `render_shop_template_thumbnails.mjs`): Demo-Login, festgelegte Ansichten (Firmen-Dashboard, Bestellliste, Neue Bestellung, Partner-Dashboard, öffentlicher Demo-Shop), WebP per Canvas nach `frontend/assets/landing/`.
+- [x] 4.1 `tools/render_landing_screenshots.mjs` (Playwright, Aufbau wie `render_shop_template_thumbnails.mjs`): Demo-Login, festgelegte Ansichten (Firmen-Dashboard, Bestellliste, Neue Bestellung, Partner-Dashboard, öffentlicher Demo-Shop), WebP per Canvas nach `frontend/assets/landing/`.
 - [ ] 4.2 Screenshots erzeugen, auf reine Demo-Daten prüfen, Aufruf in `docs/SETUP.md` dokumentieren.
 
 ## 5. Landing-Page
 
-- [ ] 5.1 `frontend/landing.html`: Kopf mit Wortmarke und „Anmelden“ (`/portal/#/login`), Inline-Weiterleitung bei vorhandener Sitzung (design.md, Entscheidung 4) vor allen Stylesheets.
-- [ ] 5.2 Inhalt: Hero (Unternehmen), Problem → Lösung, Kette Unternehmen → Partner → Endkunde, Abschnitt Unternehmen, Abschnitt Partner, Abschnitt „Mein Webshop“, Hinweis für Endkunden; Anker-Navigation; keine erfundenen Zahlen, Kunden oder Bewertungen; Begriffe Artikel/Endkunde/Bestellung/Provision.
-- [ ] 5.3 Footer: Hinweis HTL-Diplomarbeit, Kontakt `[[KONTAKT_EMAIL]]`, Links Impressum und Datenschutz.
-- [ ] 5.4 SEO-Grundlagen: `<meta name="description">`, `<link rel="canonical">`, `frontend/robots.txt` (Disallow `/portal/`, `/api/`, `/auth/`).
+- [x] 5.1 `frontend/landing.html`: Kopf mit Wortmarke und „Anmelden“ (`/portal/#/login`), Inline-Weiterleitung bei vorhandener Sitzung (design.md, Entscheidung 4) vor allen Stylesheets.
+- [x] 5.2 Inhalt: Hero (Unternehmen), Problem → Lösung, Kette Unternehmen → Partner → Endkunde, Abschnitt Unternehmen, Abschnitt Partner, Abschnitt „Mein Webshop“, Hinweis für Endkunden; Anker-Navigation; keine erfundenen Zahlen, Kunden oder Bewertungen; Begriffe Artikel/Endkunde/Bestellung/Provision.
+- [x] 5.3 Footer: Hinweis HTL-Diplomarbeit, Kontakt `[[KONTAKT_EMAIL]]`, Links Impressum und Datenschutz.
+- [x] 5.4 SEO-Grundlagen: `<meta name="description">`, `<link rel="canonical">`, `frontend/robots.txt` (Disallow `/portal/`, `/api/`, `/auth/`).
 
 ## 6. Rechtsseiten und 404
 
-- [ ] 6.1 `frontend/impressum.html` (§ 5 ECG, § 25 MedienG) mit Platzhaltern `[[MEDIENINHABER]]`, `[[ANSCHRIFT]]`, `[[KONTAKT_EMAIL]]`.
-- [ ] 6.2 `frontend/datenschutz.html` (Art. 13 DSGVO): Server-Logs, selbst gehostete Schriften, `sessionStorage` (Login), `localStorage` (Lesezeichen-Hinweis), Keycloak-Anmeldung, Betroffenenrechte, Beschwerde bei der Datenschutzbehörde; Platzhalter `[[VERANTWORTLICHER]]`, `[[HOSTING_ANBIETER]]`, `[[HOSTING_STANDORT]]`, `[[LOG_SPEICHERDAUER]]`.
-- [ ] 6.3 `frontend/404.html` mit `noindex`, kurzer deutscher Meldung und Link zur Landing.
-- [ ] 6.4 `tools/check_public_placeholders.sh`: listet verbleibende `[[…]]` in den öffentlichen Seiten, Exit-Code ≠ 0 bei Fund.
+- [x] 6.1 `frontend/impressum.html` (§ 5 ECG, § 25 MedienG) mit Platzhaltern `[[MEDIENINHABER]]`, `[[ANSCHRIFT]]`, `[[KONTAKT_EMAIL]]`.
+- [x] 6.2 `frontend/datenschutz.html` (Art. 13 DSGVO): Server-Logs, selbst gehostete Schriften, `sessionStorage` (Login), `localStorage` (Lesezeichen-Hinweis), Keycloak-Anmeldung, Betroffenenrechte, Beschwerde bei der Datenschutzbehörde; Platzhalter `[[VERANTWORTLICHER]]`, `[[HOSTING_ANBIETER]]`, `[[HOSTING_STANDORT]]`, `[[LOG_SPEICHERDAUER]]`.
+- [x] 6.3 `frontend/404.html` mit `noindex`, kurzer deutscher Meldung und Link zur Landing.
+- [x] 6.4 `tools/check_public_placeholders.sh`: listet verbleibende `[[…]]` in den öffentlichen Seiten, Exit-Code ≠ 0 bei Fund.
 
 ## 7. Prüfung
 
-- [ ] 7.1 Playwright Desktop (1440 px) und Mobil (360 px): Landing ohne seitliches Scrollen, „Anmelden“ ≥ 44 px, sichtbarer Fokus, Landing ohne JS lesbar, reduzierte Bewegung respektiert.
+- [x] 7.1 Playwright Desktop (1440 px) und Mobil (360 px): Landing ohne seitliches Scrollen, „Anmelden“ ≥ 44 px, sichtbarer Fokus, Landing ohne JS lesbar, reduzierte Bewegung respektiert.
 - [ ] 7.2 Abläufe im Browser: `/` ohne Sitzung → Landing; Login → Dashboard; `/` im selben Tab → Portal; Abmelden → Landing; abgelaufene Sitzung → `/portal/#/login`; Lesezeichen-Hinweis ausblenden und nach Reload weiter ausgeblendet.
 - [ ] 7.3 impeccable-Audit der öffentlichen Seiten (Kontrast, Hierarchie, Copy) und Funde beheben.
 - [ ] 7.4 `git diff --check`, JavaScript-Syntaxprüfung der geänderten Dateien, `openspec validate add-public-landing-page --strict`.

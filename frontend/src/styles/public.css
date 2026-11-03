@@ -1,0 +1,735 @@
+/* ============================================================
+   PAPO — public.css
+   Public pages (landing, Impressum, Datenschutz, 404). Loaded after
+   base.css, which supplies tokens and fonts; every rule here is scoped
+   to body.public so the portal is never affected.
+   ============================================================ */
+
+/* Neutral brand accent for the public pages (DESIGN.md, "Public Petrol").
+   Same token names as the role contexts, so components read it unchanged. */
+.area--public {
+  --color-accent:              var(--color-secondary-600);
+  --color-accent-hover:        var(--color-secondary-700);
+  --color-accent-light:        var(--color-secondary-50);
+  --color-accent-medium:       var(--color-secondary-100);
+  --color-accent-strong:       var(--color-secondary-700);
+  --color-accent-strong-hover: var(--color-secondary-800);
+  --border-focus:              var(--color-secondary-600);
+  --shadow-focus-ring:         0 0 0 0.1875rem rgba(89, 140, 137, 0.35);
+  --text-brand:                var(--color-secondary-700);
+
+  --public-max: 72rem;
+  --public-gutter: clamp(1rem, 4vw, 2.5rem);
+  --public-section: clamp(4rem, 9vw, 7.5rem);
+  --public-header: 4rem;
+  --public-display: 4rem; /* landing hero only; DESIGN.md "Public Display" */
+}
+
+.public {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+  scroll-padding-top: calc(var(--public-header) + 1rem);
+}
+
+html:has(> body.public) {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+.public ::selection {
+  background: var(--color-secondary-100);
+  color: var(--text-primary);
+}
+
+:where(.public) :is(h1, h2, h3) {
+  margin: 0;
+  color: var(--text-primary);
+  text-wrap: balance;
+}
+
+:where(.public) p { margin: 0; }
+
+:where(.public) a {
+  color: var(--text-brand);
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 0.0625rem;
+}
+
+:where(.public) a:hover { color: var(--color-accent-strong-hover); }
+
+:where(.public) img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.public svg.icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.public-wrap {
+  width: 100%;
+  max-width: var(--public-max);
+  margin-inline: auto;
+  padding-inline: var(--public-gutter);
+}
+
+.public-skip {
+  position: absolute;
+  left: var(--spacing-4);
+  top: -4rem;
+  z-index: 20;
+  padding: var(--spacing-2) var(--spacing-4);
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.public-skip:focus { top: var(--spacing-3); }
+
+/* ─── Buttons ─────────────────────────────────────────────── */
+
+.public-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  min-height: 2.75rem;
+  padding: 0 var(--spacing-5);
+  border-radius: var(--radius-md);
+  background: var(--color-accent-strong);
+  color: var(--text-inverse);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  transition: background var(--duration-fast) var(--ease-out),
+              transform var(--duration-fast) var(--ease-out);
+}
+
+.public a.public-button,
+.public a.public-button:hover { color: var(--text-inverse); }
+
+.public-button:hover { background: var(--color-accent-strong-hover); }
+.public-button:active { transform: scale(0.97); }
+
+.public-button--large {
+  min-height: 3rem;
+  padding: 0 var(--spacing-6);
+  font-size: var(--font-size-base);
+}
+
+.public-button svg.icon { width: 1.125rem; height: 1.125rem; }
+
+/* ─── Header ──────────────────────────────────────────────── */
+
+.public-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(246, 249, 247, 0.82);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+  border-bottom: 0.0625rem solid transparent;
+}
+
+.public-header__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-6);
+  min-height: var(--public-header);
+}
+
+.public-wordmark {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.public a.public-wordmark,
+.public a.public-wordmark:hover { color: var(--text-primary); }
+
+.public-nav {
+  display: flex;
+  gap: var(--spacing-1);
+  margin-right: auto;
+}
+
+.public-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 var(--spacing-3);
+  border-radius: var(--radius-md);
+  color: var(--text-label, var(--color-neutral-700));
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+}
+
+.public-nav a:hover {
+  background: var(--color-neutral-100);
+  color: var(--text-primary);
+}
+
+.public-header__login { margin-left: auto; }
+
+/* The hairline only appears once content scrolls under the header. */
+@supports (animation-timeline: scroll()) {
+  .public-header {
+    animation: public-header-edge linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 3rem;
+  }
+  @keyframes public-header-edge {
+    to { border-bottom-color: var(--border-default); }
+  }
+}
+
+@supports not (animation-timeline: scroll()) {
+  .public-header { border-bottom-color: var(--border-default); }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .public-header {
+    background: var(--bg-page);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (max-width: 40rem) {
+  .public-header__inner {
+    flex-wrap: wrap;
+    row-gap: 0;
+    padding-block: var(--spacing-2);
+  }
+  .public-nav {
+    order: 3;
+    width: 100%;
+    margin: 0 0 0 calc(var(--spacing-3) * -1);
+  }
+}
+
+/* ─── Hero ────────────────────────────────────────────────── */
+
+.landing-hero {
+  padding-block: clamp(3rem, 7vw, 6rem) clamp(3rem, 6vw, 5rem);
+}
+
+.landing-hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: clamp(2.5rem, 6vw, 5rem);
+  align-items: center;
+}
+
+.landing-hero h1 {
+  font-size: clamp(var(--font-size-4xl), 3.2vw + 1.25rem, var(--public-display));
+  font-weight: var(--font-weight-bold);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+}
+
+.landing-hero__lead {
+  margin-top: var(--spacing-6);
+  max-width: 36rem;
+  font-size: clamp(var(--font-size-lg), 0.3vw + 1rem, var(--font-size-xl));
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.landing-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-3) var(--spacing-5);
+  margin-top: var(--spacing-8);
+}
+
+.landing-hero__note {
+  max-width: 22rem;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  color: var(--text-secondary);
+}
+
+/* The chain Unternehmen → Partner → Endkunde as three linked stations. */
+.landing-chain {
+  position: relative;
+  margin: 0;
+  padding: var(--spacing-6);
+  list-style: none;
+  background: var(--bg-surface);
+  border: 0.0625rem solid var(--border-default);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+}
+
+.landing-chain__step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr);
+  gap: var(--spacing-4);
+  align-items: start;
+  padding-block: var(--spacing-4);
+}
+
+.landing-chain__step + .landing-chain__step {
+  border-top: 0.0625rem solid var(--border-default);
+}
+
+/* Connector between the station icons. */
+.landing-chain__step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 1.34375rem;
+  top: calc(var(--spacing-4) + 2.75rem);
+  bottom: calc(var(--spacing-4) * -1);
+  width: 0.0625rem;
+  background: var(--border-strong);
+}
+
+.landing-chain__icon {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-full);
+  background: var(--color-accent-light);
+  color: var(--text-brand);
+}
+
+.landing-chain__name {
+  display: block;
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.landing-chain__text {
+  display: block;
+  margin-top: var(--spacing-1);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  color: var(--text-secondary);
+}
+
+/* ─── Section shell ───────────────────────────────────────── */
+
+.landing-section { padding-block: var(--public-section); }
+
+.landing-section--surface {
+  background: var(--bg-surface);
+  border-block: 0.0625rem solid var(--border-default);
+}
+
+.landing-section__head {
+  max-width: 44rem;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+.landing-section__head h2 {
+  font-size: clamp(var(--font-size-3xl), 2.4vw + 1.1rem, var(--font-size-5xl));
+  font-weight: var(--font-weight-bold);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.landing-section__head p {
+  margin-top: var(--spacing-4);
+  font-size: var(--font-size-lg);
+  color: var(--text-secondary);
+}
+
+/* ─── Bisher / Mit PAPO ───────────────────────────────────── */
+
+.landing-compare {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.landing-compare__labels,
+.landing-compare__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 2.5rem minmax(0, 1fr);
+  gap: var(--spacing-4);
+  align-items: baseline;
+}
+
+.landing-compare__labels {
+  padding-bottom: var(--spacing-3);
+  border-bottom: 0.0625rem solid var(--border-strong);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wider);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.landing-compare__labels span:last-child { grid-column: 3; color: var(--text-brand); }
+
+.landing-compare__row {
+  padding-block: var(--spacing-5);
+  border-bottom: 0.0625rem solid var(--border-default);
+  font-size: clamp(var(--font-size-base), 0.3vw + 0.95rem, var(--font-size-lg));
+  line-height: 1.45;
+}
+
+.landing-compare__before { color: var(--text-secondary); }
+
+.landing-compare__arrow {
+  align-self: center;
+  justify-self: center;
+  color: var(--color-accent);
+}
+
+.landing-compare__after {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 40rem) {
+  .landing-compare__labels { display: none; }
+  .landing-compare__row {
+    grid-template-columns: 1.25rem minmax(0, 1fr);
+    gap: var(--spacing-1) var(--spacing-3);
+  }
+  .landing-compare__before { grid-column: 1 / -1; }
+  .landing-compare__arrow { grid-row: 2; align-self: start; margin-top: 0.2em; transform: rotate(90deg); }
+  .landing-compare__after { grid-row: 2; grid-column: 2; }
+}
+
+/* ─── Zwei Seiten einer Bestellung ────────────────────────── */
+
+/* Two role columns whose rows (role, heading, text, image, list, dashboard)
+   line up across the gutter via subgrid; on phones they simply stack. */
+.landing-sides {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(6, auto);
+  column-gap: clamp(2rem, 5vw, 4.5rem);
+}
+
+.landing-side {
+  display: grid;
+  grid-row: span 6;
+  grid-template-rows: subgrid;
+  row-gap: 0;
+  align-content: start;
+  scroll-margin-top: 5rem;
+}
+
+.landing-role {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-1) var(--spacing-3);
+  border-radius: var(--radius-full);
+  background: var(--color-accent-light);
+  color: var(--text-brand);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wider);
+  text-transform: uppercase;
+}
+
+.landing-role svg.icon { width: 1rem; height: 1rem; }
+
+.landing-side h3 {
+  margin-top: var(--spacing-4);
+  font-size: clamp(var(--font-size-xl), 0.6vw + 1rem, var(--font-size-2xl));
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.landing-side__text {
+  margin-top: var(--spacing-3);
+  max-width: 34rem;
+  color: var(--text-secondary);
+}
+
+.landing-shot {
+  margin: var(--spacing-8) 0 0;
+  padding: clamp(0.5rem, 1.2vw, 0.875rem);
+  border-radius: var(--radius-xl);
+  background: var(--color-accent-light);
+  border: 0.0625rem solid var(--color-accent-medium);
+}
+
+.landing-shot img {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  border: 0.0625rem solid var(--border-default);
+  box-shadow: var(--shadow-md);
+  background: var(--bg-surface);
+}
+
+.landing-shot figcaption {
+  margin-top: var(--spacing-3);
+  padding-inline: var(--spacing-1);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  color: var(--text-secondary);
+}
+
+.landing-list {
+  display: grid;
+  gap: var(--spacing-3);
+  margin: var(--spacing-8) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.landing-list li {
+  display: grid;
+  grid-template-columns: 1.25rem minmax(0, 1fr);
+  gap: var(--spacing-3);
+  align-items: start;
+  line-height: 1.5;
+}
+
+.landing-list svg.icon {
+  margin-top: 0.125rem;
+  color: var(--color-accent-strong);
+}
+
+.landing-list strong { font-weight: var(--font-weight-semibold); }
+
+.landing-shot--small { margin-top: var(--spacing-10); }
+
+@media (max-width: 52rem) {
+  .landing-sides {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    row-gap: var(--public-section);
+  }
+  .landing-side {
+    grid-row: auto;
+    grid-template-rows: none;
+  }
+}
+
+/* ─── Mein Webshop ────────────────────────────────────────── */
+
+.landing-shop {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: center;
+}
+
+.landing-shop .landing-section__head { margin-bottom: 0; }
+
+.landing-shop .landing-list { margin-top: var(--spacing-6); }
+
+.landing-shop .landing-shot { margin-top: 0; }
+
+@media (max-width: 52rem) {
+  .landing-shop { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ─── Hinweis Endkunden + Abschluss ───────────────────────── */
+
+.landing-close {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: start;
+}
+
+.landing-close h2 {
+  font-size: clamp(var(--font-size-2xl), 1vw + 1rem, var(--font-size-3xl));
+  font-weight: var(--font-weight-bold);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+.landing-close p {
+  margin-top: var(--spacing-3);
+  color: var(--text-secondary);
+  max-width: 32rem;
+}
+
+.landing-close .public-button { margin-top: var(--spacing-6); }
+
+.landing-endkunde {
+  padding: var(--spacing-6);
+  border-radius: var(--radius-xl);
+  background: var(--bg-surface);
+  border: 0.0625rem solid var(--border-default);
+}
+
+.landing-endkunde h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  font-size: var(--font-size-xl);
+  letter-spacing: -0.015em;
+}
+
+.landing-endkunde h2 svg.icon { color: var(--text-brand); }
+
+@media (max-width: 52rem) {
+  .landing-close { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ─── Footer ──────────────────────────────────────────────── */
+
+.public-footer {
+  padding-block: var(--spacing-10) var(--spacing-12);
+  border-top: 0.0625rem solid var(--border-default);
+  background: var(--bg-surface);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.public-footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-6) var(--spacing-10);
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.public-footer__about { max-width: 30rem; }
+
+.public-footer__about .public-wordmark { font-size: 1.25rem; }
+
+.public-footer__about p { margin-top: var(--spacing-3); line-height: var(--line-height-normal); }
+
+.public-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-1) var(--spacing-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.public-footer__links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 var(--spacing-2);
+  color: var(--text-label, var(--color-neutral-700));
+  font-weight: var(--font-weight-medium);
+}
+
+/* ─── Text pages (Impressum, Datenschutz, 404) ────────────── */
+
+.public-doc {
+  max-width: 46rem;
+  padding-block: clamp(3rem, 6vw, 5rem) var(--public-section);
+}
+
+.public-doc h1 {
+  font-size: clamp(var(--font-size-3xl), 1vw + 1.5rem, var(--font-size-4xl));
+  font-weight: var(--font-weight-bold);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.public-doc__lead {
+  margin-top: var(--spacing-4);
+  font-size: var(--font-size-lg);
+  color: var(--text-secondary);
+}
+
+.public-doc h2 {
+  margin-top: var(--spacing-12);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.public-doc h3 {
+  margin-top: var(--spacing-6);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.public-doc p,
+.public-doc ul,
+.public-doc dl { margin-top: var(--spacing-3); }
+
+.public-doc ul { padding-left: 1.25rem; }
+
+.public-doc li + li { margin-top: var(--spacing-2); }
+
+.public-doc dl {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--spacing-2) var(--spacing-6);
+}
+
+.public-doc dt { font-weight: var(--font-weight-semibold); }
+.public-doc dd { margin: 0; }
+
+@media (max-width: 30rem) {
+  .public-doc dl { grid-template-columns: minmax(0, 1fr); row-gap: 0; }
+  .public-doc dd + dt { margin-top: var(--spacing-3); }
+}
+
+.public-doc__updated {
+  margin-top: var(--spacing-12);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.public-doc .public-button { margin-top: var(--spacing-8); }
+
+/* ─── Motion ──────────────────────────────────────────────── */
+
+/* One authored moment: screenshots settle into place as they scroll in.
+   Content is visible by default; only browsers with scroll-driven
+   animations and no reduced-motion request get the movement. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .landing-shot {
+      animation: landing-shot-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+    @keyframes landing-shot-in {
+      from { opacity: 0.4; transform: translateY(1.5rem) scale(0.985); }
+      to   { opacity: 1;   transform: none; }
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:has(> body.public) { scroll-behavior: auto; }
+  .public-button { transition: none; }
+}
+
+/* ─── Small screens ───────────────────────────────────────── */
+
+@media (max-width: 52rem) {
+  .landing-hero__grid { grid-template-columns: minmax(0, 1fr); }
+}
