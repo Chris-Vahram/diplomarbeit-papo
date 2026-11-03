@@ -52,6 +52,6 @@ Alle Aufgaben sind **Pflicht**, außer sie sind mit *(optional)* markiert.
 
 ## 9. Freigabe
 
-- [ ] 9.1 Platzhalter in Impressum, Datenschutz und Footer ausfüllen (Daten von Tobias/Chris) oder bewusst entscheiden, mit Platzhaltern live zu gehen; `check_public_placeholders.sh` ausführen und Ergebnis festhalten.
+- [x] 9.1 Platzhalter in Impressum, Datenschutz und Footer ausfüllen (Daten von Tobias/Chris) oder bewusst entscheiden, mit Platzhaltern live zu gehen; `check_public_placeholders.sh` ausführen und Ergebnis festhalten.
 - [ ] 9.2 *(optional)* Rechtstexte von Betreuer oder Schule gegenlesen lassen.
 - [ ] 9.3 Nach dem Deploy die Prüfliste aus design.md (Migration Plan, Schritt 2) auf der VM abarbeiten.
