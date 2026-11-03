@@ -22,7 +22,7 @@ OWN-WORLD: Page Mist als Grund, weiße Flächen mit Border Sage, Petrol #456f6d 
 
 STORY: Problem (Bestellungen per E-Mail und Telefon) → PAPO als eine Stelle → Kette Unternehmen → Partner → Endkunde → beide Seiten nebeneinander → Mein Webshop als zweiter Eingang in dieselbe Abwicklung → Hinweis für Endkunden → Anmelden.
 
-FIRST VIEWPORT: Schmaler Kopf (Wortmarke PAPO links, Anker Unternehmen/Partner/Webshop, „Anmelden“ rechts als Petrol-Button). Darunter links große Headline und ein Satz, „Anmelden“; rechts bzw. darunter die Kette als drei verbundene Stationen. Unterkante des Viewports: Beginn des Vergleichs „Bisher → Mit PAPO“ auf weißer Fläche; die Doppelansicht folgt direkt darunter (Story: Problem vor Lösung).
+FIRST VIEWPORT: Weißer Kopf mit Kante (Wortmarke PAPO links, Anker Unternehmen/Partner/Webshop, kompaktes „Anmelden“ in Petrol rechts). Darunter die zweisätzige Headline über die volle Breite, Umbruch nur zwischen den Sätzen; darunter links Lead-Text und Textlink „So arbeiten Unternehmen und Partner zusammen ↓“, rechts die Kette als drei verbundene Stationen. Kein zweiter Anmelden-Button im Hero; die Seite schließt mit einem Petrol-Band „Schon eingerichtet?“ und weißem Button.
 
 FORM: „Zwei Seiten einer Bestellung“, Position 2 der eigenen Rangliste, seed:9d678b4016cb21fa. Signatur: Doppelansicht, die am Desktop zwei Spalten mit synchroner Zeilenführung (Überschrift, Text, Screenshot, je drei Aufgaben Zeile für Zeile per verschachteltem Subgrid, Dashboard) bildet und am Handy untereinander steht; Bewegung nur als dezentes Einblenden der Screenshots, aus bei reduzierter Bewegung.
 

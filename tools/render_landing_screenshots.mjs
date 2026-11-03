@@ -16,8 +16,8 @@ const BASE = process.env.FRONTEND_URL ?? "http://localhost:3000";
 // The landing shows each image only about 330-650px wide, so UI text must stay legible: narrow
 // viewports (the portal sidebar becomes a drawer below 62em) at device scale 2, cropped to the
 // content below the topbar or from a given element (`from`).
-const WIDTH = 760;
-const HEIGHT = 540;
+const WIDTH = 900;
+const HEIGHT = 560;
 const TOP = 64;
 const SCALE = 2;
 
@@ -28,13 +28,16 @@ if (!/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(BASE)) {
 }
 
 // Demo logins from DemoDataSeeder / the dev realm (docs/SETUP.md), never real accounts.
+// The landing compares company and partner side by side, so each pair shares one size.
 const VIEWS = [
   // Dashboards on "Dieses Jahr": the current month of the demo data may still be empty.
-  { name: "company-dashboard", user: "company-demo", hash: "#/company/dashboard", year: true, width: 980, height: 600 },
-  { name: "company-orders", user: "company-demo", hash: "#/company/orders", from: "table", width: 900, height: 560 },
+  { name: "company-dashboard", user: "company-demo", hash: "#/company/dashboard", year: true },
+  { name: "company-orders", user: "company-demo", hash: "#/company/orders", from: "table" },
   { name: "partner-dashboard", user: "partner-demo", hash: "#/partner/dashboard", year: true },
   { name: "partner-order-new", user: "partner-demo", hash: "#/partner/orders/new" },
-  { name: "shop", user: "partner-demo", shop: true, width: 1100, height: 690 },
+  // Shop builder (full-screen editor with live preview) and the public article page.
+  { name: "shop-editor", user: "partner-demo", hash: "#/partner/shop/editor", fullscreen: true, width: 1280, height: 760, wait: 2500 },
+  { name: "shop-article", user: "partner-demo", shop: "artikel/1", width: 900, height: 560 },
 ];
 
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE ?? "playwright-core");
@@ -86,7 +89,7 @@ for (const view of VIEWS.filter((candidate) => !wanted.length || wanted.includes
     await page.goto(`${BASE}/portal/#/partner/shop`);
     await page.waitForFunction(() => document.querySelector("#shop-kennung")?.textContent.trim());
     const kennung = (await page.textContent("#shop-kennung")).trim();
-    await page.goto(`${BASE}/shop/${encodeURIComponent(kennung)}`);
+    await page.goto(`${BASE}/shop/${encodeURIComponent(kennung)}/${view.shop}`);
     await settle(page);
     // The consent banner would cover the shop: answer it like a visitor would.
     const necessary = page.locator('.shop-consent__choice[data-choice="necessary"]').first();
@@ -102,8 +105,12 @@ for (const view of VIEWS.filter((candidate) => !wanted.length || wanted.includes
     }
   }
   await settle(page);
-  // The shop has no portal topbar; portal views drop it to show the content only.
-  let top = view.shop ? 0 : TOP;
+  if (view.wait) await page.waitForTimeout(view.wait);
+  await page.evaluate(() => Promise.all([...document.images].map((image) => image.decode().catch(() => {}))));
+  // Keep the pointer off rows and buttons so no hover state ends up in the picture.
+  await page.mouse.move(width / 2, 1);
+  // Shop and full-screen editor have no portal topbar; other views drop it.
+  let top = view.shop || view.fullscreen ? 0 : TOP;
   if (view.from) {
     await page.evaluate((selector) => {
       window.scrollTo(0, document.querySelector(selector).getBoundingClientRect().top + window.scrollY - 16);
@@ -114,8 +121,8 @@ for (const view of VIEWS.filter((candidate) => !wanted.length || wanted.includes
   const png = await page.screenshot({ clip: { x: 0, y: top, width, height } });
   await writeFile(new URL(`${view.name}.webp`, OUT), await toWebp(page, png));
   // Provenance sidecar, same convention as the shop template images.
-  const origin = view.shop ? "public demo shop of partner-demo" : `portal view ${view.hash} as ${view.user}`;
-  const photos = view.shop ? "; shows CC0 shop template photos (backend/src/main/resources/shop-templates/images)" : "";
+  const origin = view.shop ? `public demo shop of partner-demo, page "${view.shop}"` : `portal view ${view.hash} as ${view.user}`;
+  const photos = view.shop || view.fullscreen ? "; shows CC0 shop template photos (backend/src/main/resources/shop-templates/images)" : "";
   await writeFile(new URL(`${view.name}.webp.json`, OUT), `${JSON.stringify({
     prompt: `Origin: screenshot of the local PAPO demo data (DemoDataSeeder), ${origin}, ${width}x${height} CSS px at scale ${SCALE}, by tools/render_landing_screenshots.mjs${photos}`,
     createdAt: new Date().toISOString(),

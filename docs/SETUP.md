@@ -119,7 +119,7 @@ Umgebung noch deaktiviert.“
 ### Screenshots der Landing-Page neu erzeugen
 
 Die Bilder unter `frontend/assets/landing/` sind echte Aufnahmen der lokalen Demo-Daten
-(Firmen-Dashboard, Bestellliste, Neue Bestellung, Partner-Dashboard, Demo-Shop). Nach
+(Firmen-Dashboard, Bestellliste, Neue Bestellung, Partner-Dashboard, Shop-Baukasten, Artikelseite des Demo-Shops). Nach
 sichtbaren UI-Änderungen bei laufender lokaler Umgebung (Schritte 1–3) neu erzeugen:
 
 ```bash

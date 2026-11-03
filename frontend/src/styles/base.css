@@ -2764,6 +2764,15 @@ form-field {
   padding-top: var(--spacing-8);
 }
 
+.login-form h1 { margin-bottom: 0; }
+
+.login-form__intro {
+  margin: calc(var(--spacing-2) * -1) 0 var(--spacing-2);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  color: var(--text-secondary);
+}
+
 /* Dismissible bookmark hint below the submit button (add-public-landing-page). */
 .login-form__bookmark {
   display: flex;

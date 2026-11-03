@@ -24,6 +24,7 @@ class LoginPage extends HTMLElement {
     this.innerHTML = `
       <form class="login-form">
         <h1>Anmeldung</h1>
+        <p class="login-form__intro">Ihre Zugangsdaten erhalten Sie von Ihrem Unternehmen. Eine Selbstregistrierung gibt es nicht.</p>
         <label>
           Benutzername
           <input name="username" type="text" required autocomplete="username" />
