@@ -100,7 +100,7 @@ public class PartnerShopResource {
     public ShopPreviewDto preview() {
         PartnerShop shop = shopService.findOrCreate(currentPartner.resolve());
         Partner partner = shop.partner;
-        return new ShopPreviewDto(PublicShopDto.from(shop), PublicNavigationDto.of(shop, pageService),
+        return new ShopPreviewDto(PublicShopDto.from(shop, false), PublicNavigationDto.of(shop, pageService),
                 catalogService.articles(partner).stream().map(PublicArticleDto::forPreview).toList(),
                 catalogService.categories(partner));
     }

@@ -95,7 +95,8 @@ class PartnerShopResourceTest {
                 .body("kennung", is("huemer-elektro-gmbh"))
                 .body("displayName", is("Huemer Elektro GmbH"))
                 .body("reachable", is(true))
-                .body("size()", is(3));
+                .body("accountsEnabled", is(true))
+                .body("size()", is(4));
     }
 
     @Test

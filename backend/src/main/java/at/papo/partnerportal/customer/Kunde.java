@@ -8,9 +8,12 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(indexes = @Index(name = "idx_kunde_account_subject", columnList = "accountSubject"))
 public class Kunde extends PanacheEntity {
 
     @Column(nullable = false)
@@ -34,4 +37,10 @@ public class Kunde extends PanacheEntity {
     @Enumerated(EnumType.STRING)
     @Column(length = 16)
     public KundeOrigin origin = KundeOrigin.PORTAL;
+
+    // OIDC subject of the papo-shop customer account that placed the shop order
+    // (add-shop-customer-accounts); null for guests and portal customers. Cleared when the
+    // account is deleted, the Kunde itself stays as the partner's business record.
+    @Column(length = 64)
+    public String accountSubject;
 }

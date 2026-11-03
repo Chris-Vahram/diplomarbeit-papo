@@ -55,8 +55,20 @@ services:
       KC_PROXY_HEADERS: xforwarded
       KC_HTTP_ENABLED: "true"
       DOMAIN: ${DOMAIN}
+      # End-customer realm papo-shop (add-shop-customer-accounts): imported only with this
+      # secret set (render-and-start.sh). Keycloak sends verification and reset mails itself
+      # with the shared SMTP data; port 465 needs SHOP_SMTP_SSL=true and SHOP_SMTP_STARTTLS=false.
+      SHOP_ADMIN_CLIENT_SECRET: ${SHOP_ADMIN_CLIENT_SECRET:-}
+      SMTP_HOST: ${SMTP_HOST:-localhost}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SHOP_SMTP_SSL: ${SHOP_SMTP_SSL:-false}
+      SHOP_SMTP_STARTTLS: ${SHOP_SMTP_STARTTLS:-true}
     volumes:
       - ./deploy/keycloak/partnerportal-realm.prod.json.template:/opt/keycloak/partnerportal-realm.json.template:ro
+      - ./deploy/keycloak/papo-shop-realm.prod.json.template:/opt/keycloak/papo-shop-realm.json.template:ro
+      - ./deploy/keycloak/themes/papo:/opt/keycloak/themes/papo:ro
       - ./deploy/keycloak/render-and-start.sh:/opt/keycloak/render-and-start.sh:ro
     # Render the realm template with the real DOMAIN before importing it (design.md
     # Decision 4 status note: redirectUris/webOrigins/KC_HOSTNAME must come from one
@@ -89,6 +101,13 @@ services:
       # Public partner shops (/shop/*, /api/shop/*): off until the shop legal texts are live
       # (add-shop-legal-consent); enable only deliberately in .env.prod (docs/DEPLOYMENT.md).
       SHOP_PUBLIC_ENABLED: ${SHOP_PUBLIC_ENABLED:-false}
+      # Optional end-customer accounts (add-shop-customer-accounts): off until SMTP works and
+      # the papo-shop realm is imported. Tenant papo-shop only serves /api/shop-customer/*.
+      SHOP_ACCOUNTS_ENABLED: ${SHOP_ACCOUNTS_ENABLED:-false}
+      KC_SHOP_URL: http://keycloak:8080/auth/realms/papo-shop
+      KC_SHOP_ISSUER: https://${DOMAIN}/auth/realms/papo-shop
+      SHOP_ADMIN_KEYCLOAK_URL: http://keycloak:8080/auth
+      SHOP_ADMIN_CLIENT_SECRET: ${SHOP_ADMIN_CLIENT_SECRET:-}
       # staging | production (add-shop-legal-consent). production refuses shop releases and
       # takes shops offline while a company legal text is missing; staging allows placeholders.
       PAPO_ENVIRONMENT: ${PAPO_ENVIRONMENT:-staging}

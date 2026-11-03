@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -29,6 +30,8 @@ public class ShopPageService {
     public static final int MAX_PAGES = 20;
 
     private static final Pattern SEGMENT = Pattern.compile("[a-z0-9]+(-[a-z0-9]+)*");
+    // Shop routes outside the page model; a free page may not shadow them.
+    static final Set<String> RESERVED_SEGMENTS = Set.of("konto");
 
     @Inject
     ObjectMapper objectMapper;
@@ -276,6 +279,10 @@ public class ShopPageService {
         if (segment.isEmpty() || segment.length() > ShopPage.SEGMENT_MAX_LENGTH || !SEGMENT.matcher(segment).matches()) {
             throw new ApiException(400, "Die Seitenadresse darf nur Kleinbuchstaben a–z, Ziffern und einzelne "
                     + "Bindestriche enthalten.");
+        }
+        // System routes without a ShopPage of their own (add-shop-customer-accounts: "konto").
+        if (RESERVED_SEGMENTS.contains(segment)) {
+            throw new ApiException(409, "Diese Seitenadresse ist im Shop bereits vergeben.");
         }
         if (ShopPage.count("shop = ?1 and segment = ?2 and id <> ?3", shop, segment,
                 self == null ? -1L : self.id) > 0) {

@@ -17,6 +17,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.util.List;
 import java.util.Map;
@@ -53,9 +54,12 @@ public class PublicShopResource {
     @Context
     HttpServerRequest httpRequest;
 
+    @ConfigProperty(name = "papo.shop.accounts-enabled")
+    boolean accountsEnabled;
+
     @GET
     public PublicShopDto get(@PathParam("kennung") String kennung) {
-        return PublicShopDto.from(onlineShop(kennung));
+        return PublicShopDto.from(onlineShop(kennung), accountsEnabled);
     }
 
     @GET

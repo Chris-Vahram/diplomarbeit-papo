@@ -11,6 +11,12 @@
         ],
         "createdAt": "2026-10-26T19:36:14.483Z",
         "reason": "Claude: thumbnail stays hidden until the authenticated object URL has loaded (src set in #loadThumbs)"
+      },
+      {
+        "rule": "overused-font",
+        "value": "plus jakarta sans",
+        "createdAt": "2026-11-02T22:06:45.803Z",
+        "reason": "DESIGN.md: Plus Jakarta Sans is PAPO's documented brand font ('no new fonts'); Keycloak theme must match the portal"
       }
     ]
   }

@@ -254,6 +254,53 @@ Bestellungen zeigen dann „E-Mail-Versand ist nicht aktiviert“. Einschalten a
 „Abgeschlossen“ ein (Entscheidung 15.10.2026). Absender: `no-reply@paportal.at`. Änderungen an Umleitung/Aktivierung wirken auch auf wartende Mails:
 diese werden dann nicht mehr gesendet („Konfiguration geändert“).
 
+## Endkundenkonten im Shop (`add-shop-customer-accounts`)
+
+Optionale Kundenkonten liegen im **eigenen Keycloak-Realm `papo-shop`** derselben Instanz. Das
+Backend nimmt Tokens dieses Realms nur unter `/api/shop-customer/*` an (OIDC-Tenant per Pfad);
+alle Firmen- und Partner-Endpunkte lehnen sie ab, und Portal-Tokens gelten dort nicht.
+Standard: **aus** (`SHOP_ACCOUNTS_ENABLED=false`); die Gastbestellung ist davon unabhängig.
+
+0. Dateien auf die VM kopieren (siehe „Verzeichnis auf der VM“): `docker-compose.prod.yml`,
+   `deploy/keycloak/render-and-start.sh`, `deploy/keycloak/papo-shop-realm.prod.json.template`
+   und den Theme-Ordner `deploy/keycloak/themes/papo/` (PAPO-Anmeldeseiten; der Realm setzt
+   `loginTheme=papo`, ohne den Ordner zeigt Keycloak für diesen Realm keine Anmeldeseite):
+
+   ```bash
+   scp -r deploy/keycloak <vm>:~/papo-deploy/deploy/
+   scp docker-compose.prod.yml <vm>:~/papo-deploy/docker-compose.prod.yml
+   ```
+1. SMTP muss funktionieren (siehe „Bestell-E-Mails“): Keycloak verschickt Bestätigungs- und
+   Passwort-Mails selbst mit `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`; der
+   Absender ist `SMTP_USERNAME`. Für Port 465: `SHOP_SMTP_SSL=true`, `SHOP_SMTP_STARTTLS=false`.
+   `render-and-start.sh` maskiert die Werte vor dem Import (Keycloak setzt sie sonst roh ins
+   JSON; ein `"` oder `\` im Passwort hätte Keycloak samt Portal-Login nicht starten lassen).
+   Achtung: `PAPO_MAIL_REDIRECT_TO` gilt nur für Bestellmails. Bestätigungs- und Passwort-Mails
+   schickt Keycloak an die Adresse, mit der sich jemand registriert.
+2. `SHOP_ADMIN_CLIENT_SECRET` (mindestens 32 Zeichen, z. B. `openssl rand -hex 32`) in
+   `.env.prod` setzen. Nur dann importiert `render-and-start.sh` den Realm; der Service-Account
+   `papo-shop-admin` darf ausschließlich Benutzer dieses Realms verwalten (Kontolöschung).
+3. Keycloak neu starten (`--import-realm` legt fehlende Realms an, bestehende bleiben
+   unverändert — ein später geändertes Secret muss in der Admin-Konsole nachgezogen werden),
+   dann `SHOP_ACCOUNTS_ENABLED=true` setzen und das Backend mit dem aktiven Release neu starten
+   (Befehl wie oben).
+4. Prüfen: Konto im Shop unter „Anmelden“ registrieren, Bestätigungsmail öffnen, bestellen,
+   Bestellung unter „Mein Konto“ sehen, Konto löschen.
+
+Lokal geprüft am 02.11.2026 mit einem Wegwerf-Keycloak 26.0 im Produktionsmodus mit genau
+diesem Skript, diesen Vorlagen und diesem Theme: beide Realms importiert; SMTP-Login mit einem
+Passwort voller Sonderzeichen (`"`, `\`, `$`, `${…}`) gegen einen Mailserver mit Pflicht-Login
+klappt und die Bestätigungsmail kommt an; das Admin-Secret stimmt, der Service-Account erhält
+ein Token; nach einem Neustart werden beide Realms übersprungen (angelegte Benutzer bleiben);
+ohne Secret startet Keycloak nur mit `partnerportal`.
+
+Ohne importierten Realm startet das Backend trotzdem; `/api/shop-customer/*` antwortet dann 401.
+Rückweg: `SHOP_ACCOUNTS_ENABLED=false` blendet die Anmeldung aus; Gastbestellungen laufen weiter.
+Aufbewahrung von Kundendaten in Bestellungen nach einer Kontolöschung legt die Firma fest.
+Theme-Änderungen: Ordner erneut kopieren und Keycloak neu starten (Produktion cached Themes).
+Texte der Anmeldeseiten stehen in `themes/papo/login/messages/messages_de.properties`, die der
+Bestätigungsmail in `localizationTexts` des Realm-Templates.
+
 ## Rollback nach `derive-product-category-from-catalog`
 
 Ab diesem Release schreibt die App den Kategorietext nicht mehr. Vor einem Rollback auf

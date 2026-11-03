@@ -6,6 +6,7 @@ import { createPreviewApi, createShopApi } from "./shop-api.js";
 import { applyTheme } from "./shop-theme.js";
 import { CART_EVENT, cartCount } from "./shop-cart.js";
 import { renderLegalText } from "./legal-text.js";
+import { ACCOUNT_EVENT, currentCustomer } from "./shop-account.js";
 import "./shop-page-view.js";
 
 const NOT_REACHABLE = "Dieser Shop ist derzeit nicht erreichbar.";
@@ -56,7 +57,7 @@ function renderLayout(api, shop, navigation, currentPath) {
       <div class="shop-header__inner">
         <a class="shop-header__name" href="${escapeHtml(api.href())}">${escapeHtml(shop.displayName)}</a>
         <nav class="shop-nav" aria-label="Shop-Navigation"><ul>${links}</ul></nav>
-        ${api.live ? cartLinkHtml(api, currentPath) : ""}
+        ${api.live ? `<div class="shop-tools">${shop.accountsEnabled ? accountLinkHtml(api, currentPath) : ""}${cartLinkHtml(api, currentPath)}</div>` : ""}
       </div>
     </header>
     <main class="shop-main" id="shop-main" tabindex="-1"></main>
@@ -132,6 +133,25 @@ function cartLinkHtml(api, currentPath) {
     <span class="shop-cartlink__label">Warenkorb</span>
     <span class="shop-cartlink__count" data-cartcount hidden></span>
   </a>`;
+}
+
+// Customer account entry (shop-customer-accounts spec), only when the deployment offers accounts.
+function accountLinkHtml(api, currentPath) {
+  const current = currentPath === "konto" ? ' aria-current="page"' : "";
+  return `<a class="shop-cartlink shop-accountlink" href="${escapeHtml(api.href("konto"))}"${current} data-accountlink>
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+    <span class="shop-cartlink__label" data-accountlabel></span>
+    <span class="shop-accountlink__dot" data-accountdot hidden></span>
+  </a>`;
+}
+
+function updateAccountLink() {
+  const link = root.querySelector("[data-accountlink]");
+  if (!link) return;
+  const customer = currentCustomer();
+  link.querySelector("[data-accountlabel]").textContent = customer ? "Mein Konto" : "Anmelden";
+  link.querySelector("[data-accountdot]").hidden = !customer;
+  link.setAttribute("aria-label", customer ? `Mein Konto, angemeldet als ${customer.email}` : "Anmelden oder Konto erstellen");
 }
 
 function updateCartLink(kennung, { bump = false } = {}) {
@@ -243,6 +263,8 @@ async function start() {
   const main = renderLayout(api, shop, navigation, isDetail ? "artikel" : route.segment);
   installConsent(api);
   updateCartLink(api.kennung);
+  updateAccountLink();
+  window.addEventListener(ACCOUNT_EVENT, updateAccountLink);
   window.addEventListener(CART_EVENT, (event) => {
     if (event.detail?.kennung === api.kennung) updateCartLink(api.kennung, { bump: event.detail.added });
   });
@@ -253,6 +275,18 @@ async function start() {
     const render = route.segment === "warenkorb" ? renderCartPage : renderCheckoutPage;
     await render(main, { api, shop, navigation });
     trackVisit(api, route.segment);
+    return;
+  }
+
+  // Customer account and the return address of every Keycloak login.
+  if (route.segment === "konto" && !route.articleId) {
+    if (!shop.accountsEnabled) {
+      document.title = shop.displayName;
+      renderMessage(main, "Diese Seite gibt es nicht.");
+      return;
+    }
+    const { renderAccountPage } = await import("./shop-account-page.js");
+    await renderAccountPage(main, { api, shop, navigation });
     return;
   }
 

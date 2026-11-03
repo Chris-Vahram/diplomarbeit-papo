@@ -1,0 +1,74 @@
+{
+  "realm": "papo-shop",
+  "enabled": true,
+  "registrationAllowed": true,
+  "registrationEmailAsUsername": true,
+  "verifyEmail": true,
+  "resetPasswordAllowed": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "passwordPolicy": "length(10) and maxLength(128) and notUsername and notEmail",
+  "bruteForceProtected": true,
+  "failureFactor": 5,
+  "accessTokenLifespan": 300,
+  "roles": {
+    "realm": []
+  },
+  "clients": [
+    {
+      "clientId": "papo-shop-frontend",
+      "publicClient": true,
+      "enabled": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["*"],
+      "webOrigins": ["*"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
+    },
+    {
+      "clientId": "papo-shop-admin",
+      "publicClient": false,
+      "enabled": true,
+      "protocol": "openid-connect",
+      "clientAuthenticatorType": "client-secret",
+      "secret": "test-shop-admin-secret",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true
+    }
+  ],
+  "users": [
+    {
+      "username": "service-account-papo-shop-admin",
+      "enabled": true,
+      "serviceAccountClientId": "papo-shop-admin",
+      "clientRoles": {
+        "realm-management": ["manage-users", "view-users"]
+      }
+    },
+    {
+      "id": "5a0b1c2d-0000-4000-8000-000000000001",
+      "username": "kundin-eins@example.test",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "kundin-eins@example.test",
+      "firstName": "Erika",
+      "lastName": "Eins",
+      "credentials": [{ "type": "password", "value": "kundin-eins-pw", "temporary": false }]
+    },
+    {
+      "id": "5a0b1c2d-0000-4000-8000-000000000002",
+      "username": "kunde-zwei@example.test",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "kunde-zwei@example.test",
+      "firstName": "Karl",
+      "lastName": "Zwei",
+      "credentials": [{ "type": "password", "value": "kunde-zwei-pw", "temporary": false }]
+    }
+  ]
+}
