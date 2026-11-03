@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- An open portal session in this tab skips the landing page (before any stylesheet, so nothing flashes). -->
+  <script>try{if(sessionStorage.getItem("papo.auth"))location.replace("/portal/")}catch(e){}</script>
+  <title>PAPO – Bestellportal für Unternehmen und ihre Vertriebspartner</title>
+  <meta name="description" content="PAPO ersetzt Bestellungen per E-Mail und Telefon: Partner bestellen im Portal für ihre Endkunden, das Unternehmen wickelt jede Bestellung mit Status und Provision an einer Stelle ab." />
+  <link rel="canonical" href="https://paportal.at/" />
+  <meta name="theme-color" content="#f6f9f7" />
+  <link rel="preload" href="/vendor/fonts/plus-jakarta-sans-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/src/styles/base.css" />
+  <link rel="stylesheet" href="/src/styles/public.css" />
+</head>
+<body class="public area--public">
+  <a class="public-skip" href="#inhalt">Zum Inhalt springen</a>
+
+  <header class="public-header">
+    <div class="public-wrap public-header__inner">
+      <a class="public-wordmark" href="/" aria-label="PAPO, Startseite">PAPO</a>
+      <nav class="public-nav" aria-label="Abschnitte">
+        <a href="#unternehmen">Unternehmen</a>
+        <a href="#partner">Partner</a>
+        <a href="#webshop">Webshop</a>
+      </nav>
+      <a class="public-button public-header__login" href="/portal/#/login">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/></svg>
+        Anmelden
+      </a>
+    </div>
+  </header>
+
+  <main id="inhalt">
+    <section class="landing-hero" aria-labelledby="hero-title">
+      <div class="public-wrap">
+        <h1 id="hero-title"><span class="landing-line">Die Bestellungen Ihrer Partner.</span> <span class="landing-line">An einer Stelle.</span></h1>
+        <div class="landing-hero__grid">
+          <div>
+            <p class="landing-hero__lead">
+              PAPO ist ein Bestellportal für Unternehmen, die über Vertriebspartner verkaufen.
+              Ihre Partner bestellen direkt im Portal für ihre Endkunden. Sie wickeln jede Bestellung
+              mit Status und Provision ab, ohne E-Mails abzutippen.
+            </p>
+            <ul class="landing-facts">
+              <li>Läuft im Browser, ohne Installation.</li>
+              <li>Jede Rolle sieht nur ihre eigenen Daten.</li>
+              <li>Provision je Bestellung, automatisch berechnet.</li>
+            </ul>
+            <a class="landing-hero__more" href="#seiten">
+              So arbeiten Unternehmen und Partner zusammen
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+            </a>
+          </div>
+
+          <figure class="landing-ticket" aria-labelledby="ticket-title">
+            <div class="landing-ticket__head">
+              <span id="ticket-title" class="landing-ticket__title">Bestellung</span>
+              <time datetime="2026-08-25">25.08.2026</time>
+            </div>
+            <dl class="landing-ticket__route">
+              <div><dt>Partner</dt><dd>Baumarkt Weber e.U.</dd></div>
+              <div><dt>Endkunde</dt><dd>Leitner Vertrieb GmbH</dd></div>
+            </dl>
+            <dl class="landing-ticket__sums">
+              <div><dt>Wert brutto</dt><dd>229,00&nbsp;€</dd></div>
+              <div><dt>Provision</dt><dd>28,62&nbsp;€</dd></div>
+            </dl>
+            <ol class="landing-ticket__track" aria-label="Status">
+              <li>Eingereicht</li>
+              <li>Geprüft</li>
+              <li aria-current="step">Abgeschlossen</li>
+            </ol>
+            <figcaption>Eine Bestellung aus den Demo-Daten, wie sie durch PAPO läuft.</figcaption>
+          </figure>
+        </div>
+        <ol class="landing-route" aria-label="So arbeiten die Beteiligten zusammen">
+          <li class="landing-route__stop area--company">
+            <span class="landing-route__node"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 12h4"/><path d="M10 8h4"/><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/></svg></span>
+            <span class="landing-route__name">Unternehmen</span>
+            <span class="landing-route__text">stellt Artikel und Preise bereit, legt Partner und Provision fest und wickelt die Bestellungen ab.</span>
+          </li>
+          <li class="landing-route__stop area--partner">
+            <span class="landing-route__node"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></svg></span>
+            <span class="landing-route__name">Partner</span>
+            <span class="landing-route__text">berät seine Endkunden und bestellt für sie im Portal. Jede Bestellung ist automatisch ihm zugeordnet.</span>
+          </li>
+          <li class="landing-route__stop">
+            <span class="landing-route__node"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+            <span class="landing-route__name">Endkunde</span>
+            <span class="landing-route__text">erhält die Ware vom Unternehmen und kann auf Wunsch im Webshop seines Partners selbst bestellen.</span>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="landing-section landing-section--surface" aria-labelledby="warum-title">
+      <div class="public-wrap">
+        <div class="landing-section__head">
+          <h2 id="warum-title">Schluss mit Bestellungen im Postfach.</h2>
+          <p>Wer über Partner verkauft, bekommt Bestellungen oft per E-Mail oder am Telefon. PAPO macht daraus einen festen Ablauf.</p>
+        </div>
+        <div>
+          <div class="landing-inbox" aria-hidden="true">
+            <div class="landing-inbox__pile">
+              <p class="landing-scrap landing-scrap--mail"><span>E-Mail</span>AW: AW: Bestellung Leitner – bitte noch 2 Stk. dazu</p>
+              <p class="landing-scrap landing-scrap--note"><span>Telefonnotiz</span>Hr. Weber, 14:20 – Bohrmaschine? Preis klären</p>
+              <p class="landing-scrap landing-scrap--file"><span>Datei</span>Provisionen_2026_final_v3.xlsx</p>
+            </div>
+            <svg class="icon landing-inbox__arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            <div class="landing-inbox__row">
+              <span class="landing-inbox__cell"><small>Partner</small>Baumarkt Weber e.U.</span>
+              <span class="landing-inbox__cell"><small>Endkunde</small>Leitner Vertrieb GmbH</span>
+              <span class="landing-inbox__cell landing-inbox__cell--num"><small>Wert brutto</small>229,00&nbsp;€</span>
+              <span class="landing-status landing-status--fulfilled">Abgeschlossen</span>
+            </div>
+          </div>
+          <div class="landing-compare__labels" aria-hidden="true"><span>Bisher</span><span>Mit PAPO</span></div>
+          <ul class="landing-compare" role="list">
+            <li class="landing-compare__row">
+              <span class="landing-compare__before"><span class="visually-hidden">Bisher: </span>Bestellungen kommen per E-Mail und Telefon.</span>
+              <svg class="icon landing-compare__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              <span class="landing-compare__after"><span class="visually-hidden">Mit PAPO: </span>Partner erfassen ihre Bestellungen selbst im Portal.</span>
+            </li>
+            <li class="landing-compare__row">
+              <span class="landing-compare__before"><span class="visually-hidden">Bisher: </span>Jede Bestellung wird abgetippt und einem Partner zugeordnet.</span>
+              <svg class="icon landing-compare__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              <span class="landing-compare__after"><span class="visually-hidden">Mit PAPO: </span>Jede Bestellung gehört automatisch zum Partner, der sie anlegt.</span>
+            </li>
+            <li class="landing-compare__row">
+              <span class="landing-compare__before"><span class="visually-hidden">Bisher: </span>Status und Provision werden nebenher in Listen geführt.</span>
+              <svg class="icon landing-compare__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              <span class="landing-compare__after"><span class="visually-hidden">Mit PAPO: </span>Status und Provision stehen direkt an der Bestellung.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="landing-section" id="seiten" aria-labelledby="seiten-title">
+      <div class="public-wrap">
+        <div class="landing-section__head">
+          <h2 id="seiten-title">Eine Bestellung, zwei Seiten.</h2>
+          <p>Unternehmen und Partner arbeiten an denselben Bestellungen, aber jede Seite sieht nur, was ihr zusteht. Partner sehen nur ihre eigenen Endkunden, Bestellungen und Provisionen.</p>
+        </div>
+
+        <div class="landing-sides">
+          <span class="landing-seam" aria-hidden="true"><span>Dieselbe Bestellung</span></span>
+          <article class="landing-side area--company" id="unternehmen" aria-labelledby="unternehmen-title">
+            <h3 id="unternehmen-title">Alle Bestellungen abwickeln, ohne abzutippen.</h3>
+            <p class="landing-side__text">Neue Bestellungen Ihrer Partner landen in einer Liste. Sie prüfen sie und führen sie über den Status bis zum Abschluss.</p>
+            <figure class="landing-shot">
+              <p class="landing-shot__role"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 12h4"/><path d="M10 8h4"/><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/></svg>Firmenbereich</p>
+              <img src="/assets/landing/company-orders.webp" width="1800" height="1120" alt="Bestellliste im Firmenbereich mit den Spalten Datum, Partner, Endkunde, Wert brutto, Provision und Status; neue Bestellungen sind mit „Neu“ markiert." />
+              <figcaption>Bestellliste mit Filtern und Status: Eingereicht, Geprüft, Abgeschlossen.</figcaption>
+            </figure>
+            <ul class="landing-list">
+              <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>Partner und Provision:</strong> eigener Provisionssatz je Partner, die Provision entsteht je Bestellung mit dem Preis zum Bestellzeitpunkt.</span></li>
+              <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>Artikel je Partner freischalten</strong>, damit jeder Partner nur sein Sortiment sieht.</span></li>
+              <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>Excel- und CSV-Import</strong> für Partner und Artikel, mit Spaltenzuordnung und Prüfbericht.</span></li>
+            </ul>
+            <figure class="landing-shot landing-shot--small">
+              <img src="/assets/landing/company-dashboard.webp" width="1800" height="1120" loading="lazy" alt="Firmen-Dashboard für „Dieses Jahr“: Umsatz brutto, Provision, Anzahl abgeschlossener Bestellungen, durchschnittlicher Bestellwert und Umsatz nach Monat." />
+              <figcaption>Firmen-Dashboard mit Zeitraum: Woche, Monat oder Jahr.</figcaption>
+            </figure>
+          </article>
+
+          <article class="landing-side area--partner" id="partner" aria-labelledby="partner-title">
+            <h3 id="partner-title">Für Endkunden bestellen, in wenigen Schritten.</h3>
+            <p class="landing-side__text">Endkunden auswählen oder neu anlegen, Artikel und Mengen eintragen, Übersicht prüfen, absenden. Die Bestätigung kommt sofort.</p>
+            <figure class="landing-shot">
+              <p class="landing-shot__role"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></svg>Partnerbereich</p>
+              <img src="/assets/landing/partner-order-new.webp" width="1800" height="1120" loading="lazy" alt="Erster Schritt von fünf im Ablauf „Neue Bestellung“: Endkunden suchen und aus der Liste der eigenen Endkunden auswählen." />
+              <figcaption>„Neue Bestellung“: geführter Ablauf, Schritt für Schritt.</figcaption>
+            </figure>
+            <ul class="landing-list">
+              <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>Eigene Endkunden</strong> speichern und bei der nächsten Bestellung wieder auswählen. Andere Partner sehen sie nicht.</span></li>
+              <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>Mehrere Artikel in einer Bestellung</strong>, aus den für Sie freigeschalteten Artikeln.</span></li>
+              <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>Status und Provision</strong> jeder Bestellung jederzeit im Blick, ohne nachzufragen.</span></li>
+            </ul>
+            <figure class="landing-shot landing-shot--small">
+              <img src="/assets/landing/partner-dashboard.webp" width="1800" height="1120" loading="lazy" alt="Partner-Dashboard mit der Aktion „Neue Bestellung“ und den letzten Bestellungen mit Datum, Endkunde, Wert brutto und Status." />
+              <figcaption>Partner-Dashboard: „Neue Bestellung“ und die letzten Bestellungen.</figcaption>
+            </figure>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="landing-section landing-section--surface" id="webshop" aria-labelledby="webshop-title">
+      <div class="public-wrap">
+        <div class="landing-shop__head">
+          <div class="landing-section__head">
+            <h2 id="webshop-title"><span class="landing-line">Mein Webshop:</span> <span class="landing-line">ein Shop für jeden Partner.</span></h2>
+            <p>Partner gestalten im Portal einen öffentlichen Shop aus fertigen Abschnitten, mit eigenen Seiten, Farben und Bildern. Endkunden bestellen dort selbst.</p>
+            <ul class="landing-list landing-list--row">
+              <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Dieselben Artikel und Preise wie im Portal.</span></li>
+              <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Shop-Bestellungen landen in derselben Abwicklung des Unternehmens.</span></li>
+              <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Auch für Shop-Bestellungen erhält der Partner Provision.</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="landing-shop__shots">
+          <figure class="landing-shot area--partner">
+            <p class="landing-shot__role"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></svg>Im Portal: Partner gestaltet</p>
+            <img src="/assets/landing/shop-editor.webp" width="2560" height="1520" loading="lazy" alt="Shop-Baukasten im Partnerbereich: links Abschnitte zum Hinzufügen wie Hero/Banner, Bild und Artikelraster, in der Mitte die Live-Vorschau der Shop-Startseite, rechts Hinweise und Tipps zur Seite, oben „Veröffentlichen“." />
+            <figcaption>Shop-Baukasten mit Live-Vorschau am Computer oder Handy.</figcaption>
+          </figure>
+          <figure class="landing-shot">
+            <p class="landing-shot__role"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Im Shop: Endkunde bestellt</p>
+            <img src="/assets/landing/shop-article.webp" width="1800" height="1120" loading="lazy" alt="Artikelseite eines Demo-Partnershops: Bohrmaschine Profi 750W, 89,90 Euro inklusive 20 Prozent Umsatzsteuer, Mengenauswahl und Knopf „In den Warenkorb“." />
+            <figcaption>Artikelseite mit Preis inklusive Umsatzsteuer und Warenkorb.</figcaption>
+          </figure>
+        </div>
+        <aside class="landing-endkunde" aria-labelledby="endkunde-title">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"/><path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244"/><path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05"/></svg>
+          <p><strong id="endkunde-title">Sie sind Endkunde?</strong> Sie bestellen im Shop Ihres Partners; den Link dazu bekommen Sie direkt von ihm. Die Anmeldung im Portal ist nur für Unternehmen und Partner gedacht.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="landing-cta" aria-labelledby="cta-title">
+      <div class="public-wrap landing-cta__inner">
+        <div>
+          <h2 id="cta-title">Schon eingerichtet?</h2>
+          <p>Melden Sie sich mit den Zugangsdaten an, die Sie von Ihrem Unternehmen erhalten haben.</p>
+        </div>
+        <div class="landing-cta__action">
+          <a class="landing-cta__button" href="/portal/#/login"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/></svg>Zum Login</a>
+          <p class="landing-cta__bookmark">Direkt: <strong>paportal.at/portal</strong></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="public-footer">
+    <div class="public-wrap public-footer__inner">
+      <div class="public-footer__about">
+        <a class="public-wordmark" href="/">PAPO</a>
+        <p>PAPO entsteht als Diplomarbeit an der HTL Leonding (Informatik / IT-Medientechnik). Kontakt: <a href="mailto:c.vahram@students.htl-leonding.ac.at">c.vahram@students.htl-leonding.ac.at</a></p>
+      </div>
+      <ul class="public-footer__links">
+        <li><a href="/impressum">Impressum</a></li>
+        <li><a href="/datenschutz">Datenschutz</a></li>
+      </ul>
+    </div>
+  </footer>
+</body>
+</html>

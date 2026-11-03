@@ -205,7 +205,9 @@ function renderNav() {
     ++renderGeneration;
     setPartnerPortalLabel();
     logout();
-    location.hash = "#/login";
+    // Explicit logout leaves the portal for the public landing page; an expired
+    // session (api.js, route guard) stays on #/login instead.
+    location.assign("/");
   });
   menu.querySelector('[data-action="profile"]').addEventListener("click", () => {
     closeProfileMenu();
@@ -321,7 +323,7 @@ async function render() {
     return;
   }
 
-  document.title = `Partnerportal – ${route.title}`;
+  document.title = `PAPO – ${route.title}`;
   appShell.classList.toggle("app-shell--bare", path === "/login");
   appShell.classList.toggle("app-shell--fullscreen", Boolean(route.fullscreen));
   appRoot.innerHTML = "";

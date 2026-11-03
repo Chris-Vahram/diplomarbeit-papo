@@ -17,6 +17,15 @@
         "value": "plus jakarta sans",
         "createdAt": "2026-11-02T22:06:45.803Z",
         "reason": "DESIGN.md: Plus Jakarta Sans is PAPO's documented brand font ('no new fonts'); Keycloak theme must match the portal"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "frontend/landing.html"
+        ],
+        "createdAt": "2026-11-03T08:30:16.004Z",
+        "reason": "Claude, 03.11.2026: false positive; .landing-chain__step has 16px padding-block, .landing-compare__row 20px, .landing-section clamp(4rem,9vw,7.5rem); verified in .impeccable/review desktop/mobile captures"
       }
     ]
   }

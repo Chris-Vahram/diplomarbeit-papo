@@ -66,6 +66,7 @@
   --color-secondary-300: #abc7c4;
   --color-secondary-600: #598c89;
   --color-secondary-700: #456f6d;
+  --color-secondary-800: #34524f; /* public pages: hover of the petrol brand accent */
 
   /* ─── Color: Accent Blue-green — partner context ─── */
   --color-accent-50:  #eff5f6;
@@ -2763,18 +2764,73 @@ form-field {
   padding-top: var(--spacing-8);
 }
 
-.login-form__hint {
+.login-form h1 { margin-bottom: 0; }
+
+.login-form__intro {
+  margin: calc(var(--spacing-2) * -1) 0 var(--spacing-2);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  color: var(--text-secondary);
+}
+
+/* Dismissible bookmark hint below the submit button (add-public-landing-page). */
+.login-form__bookmark {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-2);
   margin: 0;
+  padding: var(--spacing-3) var(--spacing-2) var(--spacing-3) var(--spacing-3);
+  background: var(--color-accent-light);
+  border-radius: var(--radius-md);
   font-size: var(--font-size-xs);
   color: var(--text-secondary);
   line-height: var(--line-height-relaxed);
 }
 
-.login-form__hint code {
-  font-family: var(--font-mono);
-  background: var(--bg-subtle);
-  padding: 0.0625rem 0.3125rem;
-  border-radius: var(--radius-sm);
+.login-form__bookmark[hidden] { display: none; }
+
+.login-form__bookmark strong {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.login-form .login-form__bookmark-close {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  margin: -0.25rem 0 0;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+}
+
+.login-form .login-form__bookmark-close:hover {
+  background: var(--color-accent-medium);
+  color: var(--text-primary);
+}
+
+.login-form__bookmark-close svg { width: 1rem; height: 1rem; }
+
+@media (pointer: coarse) {
+  /* 44px touch target without enlarging the visual chip. */
+  .login-form .login-form__bookmark-close { position: relative; }
+  .login-form .login-form__bookmark-close::after {
+    content: "";
+    position: absolute;
+    inset: -0.5rem;
+  }
+}
+
+.login-form__about {
+  align-self: center;
+  padding: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-brand);
+  text-underline-offset: 0.2em;
 }
 
 fieldset {
