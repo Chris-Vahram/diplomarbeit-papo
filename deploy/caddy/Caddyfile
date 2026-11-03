@@ -18,10 +18,10 @@
 	}
 
 	# Public partner shops (add-partner-shop-foundation): every /shop/<kennung> path gets the
-	# separate shop.html entry, which loads no portal code. Must stay before the SPA fallback.
+	# separate shop.html entry, which loads no portal code. Must stay before the static handler.
 	# noindex is fixed here (and in shop.html) on purpose: papo.shop.indexing-enabled only
 	# covers the API; page indexing for released live shops needs its own later change.
-	# Bare /shop is included so it never falls through to the portal SPA.
+	# Bare /shop is included so it never falls through to the 404 page.
 	@shop path /shop /shop/* /shop.html
 	handle @shop {
 		root * /srv/frontend-live/current
@@ -30,12 +30,35 @@
 		file_server
 	}
 
-	# Static frontend - everything else. /srv/frontend-live is bind-mounted into the Caddy
-	# container (docker-compose.prod.yml); `current` is a symlink deploy repoints per release
-	# (ci-cd.yml), so this always serves the latest release without needing a container restart.
+	# Internal portal (add-public-landing-page): the hash-routed SPA lives under /portal/.
+	# Every /portal/* path gets index.html; assets stay absolute (/src, /vendor, /assets).
+	redir /portal /portal/ 308
+	handle /portal/* {
+		root * /srv/frontend-live/current
+		header X-Robots-Tag noindex
+		rewrite * /index.html
+		file_server
+	}
+
+	# Static frontend - public pages and files. /srv/frontend-live is bind-mounted into the
+	# Caddy container (docker-compose.prod.yml); `current` is a symlink deploy repoints per
+	# release (ci-cd.yml), so this always serves the latest release without a container restart.
+	# No SPA fallback any more: unknown paths end in handle_errors below (real 404).
 	handle {
 		root * /srv/frontend-live/current
-		try_files {path} /index.html
+		rewrite / /landing.html
+		rewrite /impressum /impressum.html
+		rewrite /datenschutz /datenschutz.html
+		try_files {path}
 		file_server
+	}
+
+	handle_errors 404 {
+		root * /srv/frontend-live/current
+		header X-Robots-Tag noindex
+		rewrite * /404.html
+		file_server {
+			status 404
+		}
 	}
 }
