@@ -4,15 +4,7 @@
 # Caddy only attempts Let's Encrypt issuance for a real hostname, so this is safe to run early.
 
 {$DOMAIN} {
-	# Access log for operation and security (frontend/datenschutz.html: max. 14 days).
-	# Rolled daily; a rolled file is deleted 13 days later, so no entry is older than 14 days.
-	# Caddy redacts Cookie and Authorization headers by default. /data is the papo-caddy-data volume.
-	log {
-		output file /data/access.log {
-			roll_interval 24h
-			roll_keep_for 13d
-		}
-	}
+	# No access log on purpose (frontend/datenschutz.html: the web server stores no access logs).
 
 	# Keycloak - KC_HTTP_RELATIVE_PATH=/auth on the keycloak service already expects the
 	# /auth prefix in the incoming path, so it must NOT be stripped here (plain `handle`,
