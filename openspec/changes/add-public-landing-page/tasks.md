@@ -10,19 +10,19 @@ Alle Aufgaben sind **Pflicht**, außer sie sind mit *(optional)* markiert.
 ## 2. Portal-Anpassungen
 
 - [x] 2.1 `frontend/index.html`: Titel „PAPO“, `<meta name="robots" content="noindex">`; `router.js` setzt `document.title` als „PAPO – <Seite>“.
-- [ ] 2.2 Logout im Profilmenü (`router.js`) führt nach `logout()` zu `/`; 401-Pfad in `api.js` und Router-Guard bleiben bei `#/login` (prüfen, dass das `/portal/#/login` ergibt).
+- [x] 2.2 Logout im Profilmenü (`router.js`) führt nach `logout()` zu `/`; 401-Pfad in `api.js` und Router-Guard bleiben bei `#/login` (prüfen, dass das `/portal/#/login` ergibt).
 - [x] 2.3 `login-page.js`: Demo-Hinweis entfernen, Link „Was ist PAPO?“ → `/`, ausblendbarer Lesezeichen-Hinweis (`papo.bookmarkHintDismissed`, `localStorage` in `try/catch`).
 
 ## 3. Gestaltung und Marke (impeccable + apple-design)
 
 - [x] 3.1 Skills impeccable und apple-design laden; Richtung für öffentliche Seiten festlegen (Unternehmen zuerst, ruhig, sachlich, „Sie“, kein Marketington) gemäß `PRODUCT.md`/`DESIGN.md`.
-- [ ] 3.2 Neutrale Markenfarbe für öffentliche Seiten festlegen und in `DESIGN.md` mit Kontrastwerten (Text ≥ 4.5:1, UI ≥ 3:1) dokumentieren.
+- [x] 3.2 Neutrale Markenfarbe für öffentliche Seiten festlegen und in `DESIGN.md` mit Kontrastwerten (Text ≥ 4.5:1, UI ≥ 3:1) dokumentieren.
 - [x] 3.3 `frontend/src/styles/public.css` anlegen (lädt nach `base.css`, Body-Klassen-Scope), gemeinsamer Kopf- und Fußbereich für Landing, Rechtsseiten und 404.
 
 ## 4. Screenshots
 
 - [x] 4.1 `tools/render_landing_screenshots.mjs` (Playwright, Aufbau wie `render_shop_template_thumbnails.mjs`): Demo-Login, festgelegte Ansichten (Firmen-Dashboard, Bestellliste, Neue Bestellung, Partner-Dashboard, öffentlicher Demo-Shop), WebP per Canvas nach `frontend/assets/landing/`.
-- [ ] 4.2 Screenshots erzeugen, auf reine Demo-Daten prüfen, Aufruf in `docs/SETUP.md` dokumentieren.
+- [x] 4.2 Screenshots erzeugen, auf reine Demo-Daten prüfen, Aufruf in `docs/SETUP.md` dokumentieren.
 
 ## 5. Landing-Page
 
@@ -41,14 +41,14 @@ Alle Aufgaben sind **Pflicht**, außer sie sind mit *(optional)* markiert.
 ## 7. Prüfung
 
 - [x] 7.1 Playwright Desktop (1440 px) und Mobil (360 px): Landing ohne seitliches Scrollen, „Anmelden“ ≥ 44 px, sichtbarer Fokus, Landing ohne JS lesbar, reduzierte Bewegung respektiert.
-- [ ] 7.2 Abläufe im Browser: `/` ohne Sitzung → Landing; Login → Dashboard; `/` im selben Tab → Portal; Abmelden → Landing; abgelaufene Sitzung → `/portal/#/login`; Lesezeichen-Hinweis ausblenden und nach Reload weiter ausgeblendet.
+- [x] 7.2 Abläufe im Browser: `/` ohne Sitzung → Landing; Login → Dashboard; `/` im selben Tab → Portal; Abmelden → Landing; abgelaufene Sitzung → `/portal/#/login`; Lesezeichen-Hinweis ausblenden und nach Reload weiter ausgeblendet.
 - [ ] 7.3 impeccable-Audit der öffentlichen Seiten (Kontrast, Hierarchie, Copy) und Funde beheben.
 - [ ] 7.4 `git diff --check`, JavaScript-Syntaxprüfung der geänderten Dateien, `openspec validate add-public-landing-page --strict`.
 
 ## 8. Doku-Sync
 
-- [ ] 8.1 `docs/SETUP.md` und `docs/DEPLOYMENT.md`: neue URLs (`/`, `/portal/`), lokale Startmeldung, Nachprüfung nach dem Deploy.
-- [ ] 8.2 `PRODUCT.md` (öffentlicher Einstieg, Login ohne Demo-Hinweis), `DESIGN.md` (öffentliche Seiten, Markenfarbe), `docs/REQUIREMENTS_TRACEABILITY.md`.
+- [x] 8.1 `docs/SETUP.md` und `docs/DEPLOYMENT.md`: neue URLs (`/`, `/portal/`), lokale Startmeldung, Nachprüfung nach dem Deploy.
+- [x] 8.2 `PRODUCT.md` (öffentlicher Einstieg, Login ohne Demo-Hinweis), `DESIGN.md` (öffentliche Seiten, Markenfarbe), `docs/REQUIREMENTS_TRACEABILITY.md`.
 
 ## 9. Freigabe
 

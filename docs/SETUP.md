@@ -80,7 +80,18 @@ Produktion `/shop/<kennung>` auf `shop.html` umleitet:
 python3 tools/dev_frontend_server.py
 ```
 
-Dann http://localhost:3000 öffnen und mit einem Demo-User anmelden.
+Die Startmeldung nennt die Adressen. Lokal gilt dieselbe Zuordnung wie in Produktion
+(`deploy/caddy/Caddyfile`):
+
+| Pfad | Inhalt |
+|---|---|
+| `/` | öffentliche Landing-Page (`landing.html`); mit offener Portal-Sitzung im selben Tab Weiterleitung nach `/portal/` |
+| `/portal/` | Portal (`index.html`, Hash-Routen wie `/portal/#/login`); `/portal` leitet um |
+| `/impressum`, `/datenschutz` | statische Rechtsseiten |
+| `/shop/<kennung>` | öffentlicher Partner-Shop (`shop.html`) |
+| andere Pfade | vorhandene Datei oder echte 404 mit `404.html` |
+
+Zum Anmelden http://localhost:3000/portal/ öffnen und einen Demo-User verwenden.
 Das Frontend spricht das Backend über `http://localhost:8080/api` an (CORS ist im
 Backend aktiviert); Login-Tokens holt es direkt vom Keycloak auf :8081.
 
@@ -104,6 +115,27 @@ Das Rate-Limit der öffentlichen Shop-API (Standard 300 Anfragen/Minute je IP; e
 Zustands lokal: `SHOP_PUBLIC_ENABLED=false ./mvnw quarkus:dev` – Shopseiten zeigen dann
 immer „nicht erreichbar“, Portal und Partner sehen „Öffentliche Shops sind auf dieser
 Umgebung noch deaktiviert.“
+
+### Screenshots der Landing-Page neu erzeugen
+
+Die Bilder unter `frontend/assets/landing/` sind echte Aufnahmen der lokalen Demo-Daten
+(Firmen-Dashboard, Bestellliste, Neue Bestellung, Partner-Dashboard, Demo-Shop). Nach
+sichtbaren UI-Änderungen bei laufender lokaler Umgebung (Schritte 1–3) neu erzeugen:
+
+```bash
+npm i --prefix /tmp/pw playwright-core
+PLAYWRIGHT_MODULE=/tmp/pw/node_modules/playwright-core/index.mjs \
+  CHROMIUM=<Pfad zu einem Chromium> node tools/render_landing_screenshots.mjs
+```
+
+Das Skript läuft nur gegen `localhost`, meldet sich mit `company-demo` und `partner-demo`
+an und schreibt je Bild ein `.webp.json` mit der Herkunft. Vor dem Commit die Bilder auf
+reine Demo-Daten ansehen.
+
+### Platzhalter in den Rechtsseiten
+
+`tools/check_public_placeholders.sh` listet alle `[[…]]`-Platzhalter in Landing,
+Impressum, Datenschutz und 404 und endet mit Fehlercode, solange einer übrig ist.
 
 ## 4. Tests
 

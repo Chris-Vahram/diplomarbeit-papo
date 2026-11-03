@@ -12,6 +12,10 @@ colors:
   partner-blue-deep: "#374e54"
   partner-blue-tint: "#eff5f6"
   calm-teal: "#abc7c4"
+  public-petrol: "#456f6d"
+  public-petrol-hover: "#34524f"
+  public-petrol-core: "#598c89"
+  public-petrol-tint: "#f0f5f5"
   page-mist: "#f6f9f7"
   surface-white: "#ffffff"
   subtle-sage: "#edf2ee"
@@ -166,6 +170,10 @@ A muted, green-tinted palette: two calm role accents over sage neutrals, with st
 ### Tertiary
 - **Calm Teal** (#abc7c4, `--color-secondary-300`): supporting surfaces only, valid in both areas. Not a role colour.
 
+### Public Petrol (public pages only)
+- **Public Petrol** (#456f6d, `--color-secondary-700`): the neutral brand accent of the public pages (landing `/`, Impressum, Datenschutz, 404), set once on `body.area--public` through the same accent tokens as the role contexts (`frontend/src/styles/public.css`). It sits between company green and partner blue, so neither role is implied before login. Strong accent / text: #456f6d, **5.6:1** on white, 5.3:1 on Page Mist, 5.1:1 on its tint. Hover #34524f (`--color-secondary-800`, the only token added for it), **8.5:1** on white. Core #598c89 (`--color-secondary-600`, 3.8:1 on white) only for rings, icons and lines, never for text. Tint #f0f5f5 (`--color-secondary-50`). Decided by Tobias 03.11.2026 (`add-public-landing-page`).
+- Inside the public pages, green and blue appear only where a section explicitly shows that role (the landing's "Eine Bestellung, zwei Seiten": `.area--company` / `.area--partner` columns with role pill and tinted screenshot frame).
+
 ### Neutral
 - **Page Mist** (#f6f9f7): page background.
 - **Surface White** (#ffffff): cards, sidebar, topbar, dialogs, tables.
@@ -178,6 +186,8 @@ A muted, green-tinted palette: two calm role accents over sage neutrals, with st
 **The One Accent Rule.** Every role-aware element reads `--color-accent`, `--color-accent-hover`, `--color-accent-light`, `--text-brand`, `--border-focus` or `--shadow-focus-ring`. A component that names `--color-primary-*` or `--color-accent-*` directly for a role colour is a bug (open in `base.css`: `.button-primary` and `.area--partner .button-primary`, task 2.1).
 
 **The Signal Not Paint Rule.** Green and blue never appear together as decoration on one screen; semantic colours appear only for their status.
+
+**The Public Accent Rule.** Public pages never use company green or partner blue as their brand colour; they read Public Petrol through `.area--public`. The portal never uses Public Petrol.
 
 **The Strong Accent Rule.** Text and fills that carry white text use the strong accent step 700 (`--color-accent-strong`: company #456851 = 6.3:1, partner #4a6870 = 6.0:1), hover step 800. The core steps (company 500, partner 600) stay for tints, rings, lines and icons, never behind white text: they fail AA (3.2:1 / 4.1:1), and green 600 still fails (4.3:1). Decided by Chris 16.10.2026 (variant comparison 1B/2C), confirmed by Tobias.
 
@@ -194,7 +204,8 @@ A muted, green-tinted palette: two calm role accents over sage neutrals, with st
 - **Metric** (700, 1.5rem, tabular figures, `--text-brand`): dashboard values.
 - **Body** (400, 0.875rem, 1.5): tables, forms, most UI text. 1rem for longer prose.
 - **Label** (600, 0.75rem, 0.05em, uppercase): table headers, status badges, sidebar role label.
-- **Wordmark** (800, 1.75rem): "PAPO" in the sidebar only.
+- **Wordmark** (800, 1.75rem): "PAPO" in the sidebar; on public pages 1.5rem in the header, 1.25rem in the footer.
+- **Public Display** (700, `clamp(2.25rem, …, 4rem)`, 1.04, −0.035em): landing hero only. Public section headings run 1.875–3rem (−0.03em), longer public prose 1rem/1.6. All other public sizes stay on the token ramp.
 
 ### Named Rules
 **The Tabular Money Rule.** Amounts, counts and percentages use `font-variant-numeric: tabular-nums`; money is formatted in German (`1.240,00 €`).
@@ -202,6 +213,9 @@ A muted, green-tinted palette: two calm role accents over sage neutrals, with st
 ## Layout
 
 App shell: fixed light sidebar (15rem) + topbar (4rem) + content (`max-width: 80rem`, padding 2rem; 1rem below 62em). Below 62em (≈992px) the sidebar becomes an off-canvas drawer with backdrop; below 48em forms and metric rows collapse to one column. Spacing scale is 0.25rem-based (`--spacing-1` … `--spacing-20`); sections are separated by 2.5rem, cards by 1.25rem. Metric rows use a 3-column grid. Desktop is the primary context (PRODUCT.md); mobile must work without horizontal page scroll. Planned (task 3.1): below 640px main lists become compact two-line cards (primary field + amount on top, date/secondary + status below; decision 5C).
+
+### Public pages
+Own layout in `frontend/src/styles/public.css`, scoped to `body.public` (base.css only supplies tokens and fonts): content max 72rem, gutter `clamp(1rem, 4vw, 2.5rem)`, section rhythm `clamp(4rem, 9vw, 7.5rem)`, alternating Page Mist and white bands with a 1px Border Sage edge. Sticky header with translucent Page Mist (`backdrop-filter`, solid under `prefers-reduced-transparency`) whose hairline only appears once content scrolls under it. Real screenshots sit in a tinted frame (accent tint, radius-xl) with a white, bordered image inside. Icons are inline Lucide SVG so the pages work without JavaScript. One motion: screenshots settle in on scroll (scroll-driven, only with `prefers-reduced-motion: no-preference`); content is visible by default. Light mode only.
 
 ## Elevation & Depth
 
@@ -265,9 +279,9 @@ Gently rounded, firm rectangles: controls 0.375rem, cards and tables 0.5rem, dia
 - **Do** respect `prefers-reduced-motion`; transitions stay at 100–250ms.
 
 ### Don't:
-- **Don't** introduce new colours, fonts, dark mode or a CSS framework.
+- **Don't** introduce new colours, fonts, dark mode or a CSS framework (Public Petrol reuses the teal ramp plus one hover step).
 - **Don't** hardcode `--color-primary-*` / `--color-accent-*` or hex values for role colour in components.
-- **Don't** use the teal secondary ramp as partner colour.
+- **Don't** use the teal secondary ramp as partner colour; its 600–800 steps belong to Public Petrol on the public pages.
 - **Don't** use Text Disabled (#8ca594) or 300/400 accent steps for readable text.
 - **Don't** add coloured side stripes or decorative gradients to containers.
 

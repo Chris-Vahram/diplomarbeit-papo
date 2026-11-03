@@ -9,8 +9,10 @@ Produktionstopologie, CI/CD-Pipeline und Rollback-Prozedur. Setup/Dev-Umgebung s
 - Vier Container über `docker-compose.prod.yml`: `backend` (Quarkus, aus GHCR), `postgres`
   (eine Instanz, zwei Datenbanken `partnerportal` + `keycloak`), `keycloak`, `caddy`
   (Reverse Proxy + automatisches HTTPS).
-- Ein Domain, pfadbasiertes Routing (Caddy): `/` → Frontend (statisch), `/api/*` → Backend,
-  `/auth/*` → Keycloak. Dadurch **kein CORS** nötig — Frontend und API sind same-origin.
+- Ein Domain, pfadbasiertes Routing (Caddy): `/` → öffentliche Landing-Page, `/portal/` → Portal
+  (`/portal` leitet um), `/impressum` und `/datenschutz` → Rechtsseiten, `/shop/*` → Shop-Einstieg,
+  `/api/*` → Backend, `/auth/*` → Keycloak, sonst vorhandene Datei oder 404 (`404.html`).
+  Dadurch **kein CORS** nötig — Frontend und API sind same-origin.
 
 ## Pipeline (`.github/workflows/ci-cd.yml`)
 
@@ -84,6 +86,21 @@ der VM (einmalig kopiert/geklont, nicht Teil der Pipeline selbst).
 > in `docker-compose.prod.yml` greifen erst, wenn der jeweilige Container neu erstellt wird
 > (nächster Deploy bzw. `docker compose -f docker-compose.prod.yml --env-file .env.prod up -d <dienst>`).
 > Danach live prüfen, z. B. `curl -sI https://<domain>/shop/test` → `X-Robots-Tag: noindex`.
+>
+> Seit `add-public-landing-page` braucht die Caddyfile `handle_errors 404` und
+> `file_server { status }` (Caddy ≥ 2.8; lokal mit 2.11 geprüft). Reihenfolge ist unkritisch:
+> Mit alter Caddyfile und neuem Frontend liefert `/` weiter das Portal, `/portal/` funktioniert
+> über den alten Fallback. Nach dem Reload prüfen:
+>
+> ```bash
+> for p in / /portal /portal/ /impressum /datenschutz /robots.txt /gibt-es-nicht /shop/test; do
+>   printf '%s ' "$p"; curl -s -o /dev/null -w '%{http_code}\n' "https://<domain>$p"
+> done
+> ```
+>
+> Erwartet: 200, 308, 200, 200, 200, 200, 404, 200. Danach im Browser anmelden und abmelden
+> (Abmelden führt zur Landing-Page). Rollback: vorherige Caddyfile zurückkopieren und erneut
+> `caddy reload`.
 > Andere Dateien unter `deploy/` (Postgres-Init, Keycloak-Template, Backup) gelten ebenso;
 > deren Wirkung hängt vom jeweiligen Dienst ab.
 

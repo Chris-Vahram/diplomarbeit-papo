@@ -39,6 +39,7 @@ Gebaut für genau diese Dreiecksbeziehung statt als allgemeiner Webshop: Der Par
 - Shop: Baukasten im Partnerbereich (Seiten, Abschnitte, Design, Bilder), öffentliche Shopseiten, Gastbestellung ohne Online-Zahlung.
 - Datenmengen beim Referenzkunden: rund 200 Partner, rund 800 Artikel.
 - BMD ist das führende Artikel-Stammsystem; PAPO arbeitet derzeit mit Importdaten. Der Datenimport bleibt Dummy, bis Firmendaten vorliegen.
+- Öffentlicher Einstieg: `paportal.at/` ist eine statische Landing-Page (zuerst Unternehmen, dann Partner, „Mein Webshop“, kurzer Hinweis für Endkunden), einzige Aktion „Anmelden“, dazu Impressum und Datenschutz. Das Portal liegt unter `paportal.at/portal/`; die Login-Seite zeigt keine Demo-Zugangsdaten mehr, sondern einen ausblendbaren Lesezeichen-Hinweis und „Was ist PAPO?“. Keine Registrierung.
 - Live-Demo auf `paportal.at` (nur Demo-Daten, kein echter Kundenbetrieb). Abnahme durch Betreuer Prof. Hammer und den Referenzkunden in Besprechungen; Tobias verantwortet das visuelle Design.
 
 ## Capabilities and Constraints
