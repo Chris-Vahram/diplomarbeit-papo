@@ -2,16 +2,16 @@ Alle Aufgaben sind **Pflicht**, außer sie sind mit *(optional)* markiert.
 
 ## 1. Routing und Einstiege
 
-- [ ] 1.1 `deploy/caddy/Caddyfile` nach Routing-Tabelle (design.md, Entscheidung 3) umbauen: `/` → `landing.html`, `/portal` → 308 `/portal/`, `/portal/*` → `index.html` mit `X-Robots-Tag noindex`, `/impressum` und `/datenschutz` → statische Seiten, sonst `try_files {path}` + `handle_errors` 404 → `404.html`; Shop, `/api`, `/auth` unverändert.
-- [ ] 1.2 `tools/dev_frontend_server.py` auf dieselbe Zuordnung und eine echte 404-Antwort (Status 404, Body `404.html`) bringen; Startmeldung um `/portal/` ergänzen.
-- [ ] 1.3 Prüfen, ob die Deploy-Pipeline eine geänderte Caddyfile neu lädt; falls nicht, Reload-Schritt in `docs/DEPLOYMENT.md` dokumentieren.
-- [ ] 1.4 Lokal per `curl -I` prüfen: `/` 200, `/portal` 308, `/portal/` 200, `/impressum` 200, `/datenschutz` 200, `/robots.txt` 200, `/gibt-es-nicht` 404, `/shop/<demo>` unverändert, Portal-Assets (`/src/…`, `/vendor/…`, `/assets/…`) 200.
+- [x] 1.1 `deploy/caddy/Caddyfile` nach Routing-Tabelle (design.md, Entscheidung 3) umbauen: `/` → `landing.html`, `/portal` → 308 `/portal/`, `/portal/*` → `index.html` mit `X-Robots-Tag noindex`, `/impressum` und `/datenschutz` → statische Seiten, sonst `try_files {path}` + `handle_errors` 404 → `404.html`; Shop, `/api`, `/auth` unverändert.
+- [x] 1.2 `tools/dev_frontend_server.py` auf dieselbe Zuordnung und eine echte 404-Antwort (Status 404, Body `404.html`) bringen; Startmeldung um `/portal/` ergänzen.
+- [x] 1.3 Prüfen, ob die Deploy-Pipeline eine geänderte Caddyfile neu lädt; falls nicht, Reload-Schritt in `docs/DEPLOYMENT.md` dokumentieren.
+- [x] 1.4 Lokal per `curl -I` prüfen: `/` 200, `/portal` 308, `/portal/` 200, `/impressum` 200, `/datenschutz` 200, `/robots.txt` 200, `/gibt-es-nicht` 404, `/shop/<demo>` unverändert, Portal-Assets (`/src/…`, `/vendor/…`, `/assets/…`) 200.
 
 ## 2. Portal-Anpassungen
 
-- [ ] 2.1 `frontend/index.html`: Titel „PAPO“, `<meta name="robots" content="noindex">`; `router.js` setzt `document.title` als „PAPO – <Seite>“.
+- [x] 2.1 `frontend/index.html`: Titel „PAPO“, `<meta name="robots" content="noindex">`; `router.js` setzt `document.title` als „PAPO – <Seite>“.
 - [ ] 2.2 Logout im Profilmenü (`router.js`) führt nach `logout()` zu `/`; 401-Pfad in `api.js` und Router-Guard bleiben bei `#/login` (prüfen, dass das `/portal/#/login` ergibt).
-- [ ] 2.3 `login-page.js`: Demo-Hinweis entfernen, Link „Was ist PAPO?“ → `/`, ausblendbarer Lesezeichen-Hinweis (`papo.bookmarkHintDismissed`, `localStorage` in `try/catch`).
+- [x] 2.3 `login-page.js`: Demo-Hinweis entfernen, Link „Was ist PAPO?“ → `/`, ausblendbarer Lesezeichen-Hinweis (`papo.bookmarkHintDismissed`, `localStorage` in `try/catch`).
 
 ## 3. Gestaltung und Marke (impeccable + apple-design)
 
