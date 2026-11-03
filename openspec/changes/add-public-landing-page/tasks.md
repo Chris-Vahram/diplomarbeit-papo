@@ -42,8 +42,8 @@ Alle Aufgaben sind **Pflicht**, außer sie sind mit *(optional)* markiert.
 
 - [x] 7.1 Playwright Desktop (1440 px) und Mobil (360 px): Landing ohne seitliches Scrollen, „Anmelden“ ≥ 44 px, sichtbarer Fokus, Landing ohne JS lesbar, reduzierte Bewegung respektiert.
 - [x] 7.2 Abläufe im Browser: `/` ohne Sitzung → Landing; Login → Dashboard; `/` im selben Tab → Portal; Abmelden → Landing; abgelaufene Sitzung → `/portal/#/login`; Lesezeichen-Hinweis ausblenden und nach Reload weiter ausgeblendet.
-- [ ] 7.3 impeccable-Audit der öffentlichen Seiten (Kontrast, Hierarchie, Copy) und Funde beheben.
-- [ ] 7.4 `git diff --check`, JavaScript-Syntaxprüfung der geänderten Dateien, `openspec validate add-public-landing-page --strict`.
+- [x] 7.3 impeccable-Audit der öffentlichen Seiten (Kontrast, Hierarchie, Copy) und Funde beheben.
+- [x] 7.4 `git diff --check`, JavaScript-Syntaxprüfung der geänderten Dateien, `openspec validate add-public-landing-page --strict`.
 
 ## 8. Doku-Sync
 

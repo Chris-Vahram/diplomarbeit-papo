@@ -13,8 +13,13 @@ import { writeFile, mkdir } from "node:fs/promises";
 const ROOT = new URL("../", import.meta.url);
 const OUT = new URL("frontend/assets/landing/", ROOT);
 const BASE = process.env.FRONTEND_URL ?? "http://localhost:3000";
-const WIDTH = 1280;
-const HEIGHT = 800;
+// The landing shows each image only about 330-650px wide, so UI text must stay legible: narrow
+// viewports (the portal sidebar becomes a drawer below 62em) at device scale 2, cropped to the
+// content below the topbar or from a given element (`from`).
+const WIDTH = 760;
+const HEIGHT = 540;
+const TOP = 64;
+const SCALE = 2;
 
 // Only demo data may end up on the public page: refuse anything but a local environment.
 if (!/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(BASE)) {
@@ -25,11 +30,11 @@ if (!/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(BASE)) {
 // Demo logins from DemoDataSeeder / the dev realm (docs/SETUP.md), never real accounts.
 const VIEWS = [
   // Dashboards on "Dieses Jahr": the current month of the demo data may still be empty.
-  { name: "company-dashboard", user: "company-demo", hash: "#/company/dashboard", year: true },
-  { name: "company-orders", user: "company-demo", hash: "#/company/orders" },
+  { name: "company-dashboard", user: "company-demo", hash: "#/company/dashboard", year: true, width: 980, height: 600 },
+  { name: "company-orders", user: "company-demo", hash: "#/company/orders", from: "table", width: 900, height: 560 },
   { name: "partner-dashboard", user: "partner-demo", hash: "#/partner/dashboard", year: true },
   { name: "partner-order-new", user: "partner-demo", hash: "#/partner/orders/new" },
-  { name: "shop", user: "partner-demo", shop: true },
+  { name: "shop", user: "partner-demo", shop: true, width: 1100, height: 690 },
 ];
 
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE ?? "playwright-core");
@@ -45,7 +50,7 @@ async function settle(page) {
 }
 
 async function loggedInPage(user) {
-  const context = await browser.newContext({ viewport: { width: WIDTH, height: HEIGHT }, deviceScaleFactor: 1, locale: "de-AT" });
+  const context = await browser.newContext({ viewport: { width: WIDTH, height: HEIGHT + TOP }, deviceScaleFactor: SCALE, locale: "de-AT" });
   const page = await context.newPage();
   await page.goto(`${BASE}/portal/#/login`);
   await page.fill('input[name="username"]', user);
@@ -57,16 +62,16 @@ async function loggedInPage(user) {
 
 async function toWebp(page, png) {
   // Encode in the browser: Chromium writes WebP, so no image tool is needed.
-  const base64 = await page.evaluate(async ({ png, width, height }) => {
+  const base64 = await page.evaluate(async ({ png }) => {
     const image = new Image();
     image.src = `data:image/png;base64,${png}`;
     await image.decode();
     const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
     canvas.getContext("2d").drawImage(image, 0, 0);
     return canvas.toDataURL("image/webp", 0.86).split(",")[1];
-  }, { png: png.toString("base64"), width: WIDTH, height: HEIGHT });
+  }, { png: png.toString("base64") });
   return Buffer.from(base64, "base64");
 }
 
@@ -74,6 +79,9 @@ const pages = new Map();
 for (const view of VIEWS.filter((candidate) => !wanted.length || wanted.includes(candidate.name))) {
   if (!pages.has(view.user)) pages.set(view.user, await loggedInPage(view.user));
   const page = pages.get(view.user);
+  const width = view.width ?? WIDTH;
+  const height = view.height ?? HEIGHT;
+  await page.setViewportSize({ width, height: height + TOP });
   if (view.shop) {
     await page.goto(`${BASE}/portal/#/partner/shop`);
     await page.waitForFunction(() => document.querySelector("#shop-kennung")?.textContent.trim());
@@ -90,17 +98,26 @@ for (const view of VIEWS.filter((candidate) => !wanted.length || wanted.includes
       await page.click("#period-button");
       await page.click('[data-preset="year"]');
       await page.keyboard.press("Escape");
-      await page.mouse.click(5, HEIGHT - 5);
+      await page.mouse.click(5, height - 5);
     }
   }
   await settle(page);
-  const png = await page.screenshot({ clip: { x: 0, y: 0, width: WIDTH, height: HEIGHT } });
+  // The shop has no portal topbar; portal views drop it to show the content only.
+  let top = view.shop ? 0 : TOP;
+  if (view.from) {
+    await page.evaluate((selector) => {
+      window.scrollTo(0, document.querySelector(selector).getBoundingClientRect().top + window.scrollY - 16);
+    }, view.from);
+    await page.waitForTimeout(200);
+    top = 0;
+  }
+  const png = await page.screenshot({ clip: { x: 0, y: top, width, height } });
   await writeFile(new URL(`${view.name}.webp`, OUT), await toWebp(page, png));
   // Provenance sidecar, same convention as the shop template images.
   const origin = view.shop ? "public demo shop of partner-demo" : `portal view ${view.hash} as ${view.user}`;
   const photos = view.shop ? "; shows CC0 shop template photos (backend/src/main/resources/shop-templates/images)" : "";
   await writeFile(new URL(`${view.name}.webp.json`, OUT), `${JSON.stringify({
-    prompt: `Origin: screenshot of the local PAPO demo data (DemoDataSeeder), ${origin}, ${WIDTH}x${HEIGHT}, by tools/render_landing_screenshots.mjs${photos}`,
+    prompt: `Origin: screenshot of the local PAPO demo data (DemoDataSeeder), ${origin}, ${width}x${height} CSS px at scale ${SCALE}, by tools/render_landing_screenshots.mjs${photos}`,
     createdAt: new Date().toISOString(),
   }, null, 2)}\n`);
   console.log(`${view.name}.webp geschrieben`);

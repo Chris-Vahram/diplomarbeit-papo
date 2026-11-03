@@ -172,7 +172,7 @@ A muted, green-tinted palette: two calm role accents over sage neutrals, with st
 
 ### Public Petrol (public pages only)
 - **Public Petrol** (#456f6d, `--color-secondary-700`): the neutral brand accent of the public pages (landing `/`, Impressum, Datenschutz, 404), set once on `body.area--public` through the same accent tokens as the role contexts (`frontend/src/styles/public.css`). It sits between company green and partner blue, so neither role is implied before login. Strong accent / text: #456f6d, **5.6:1** on white, 5.3:1 on Page Mist, 5.1:1 on its tint. Hover #34524f (`--color-secondary-800`, the only token added for it), **8.5:1** on white. Core #598c89 (`--color-secondary-600`, 3.8:1 on white) only for rings, icons and lines, never for text. Tint #f0f5f5 (`--color-secondary-50`). Decided by Tobias 03.11.2026 (`add-public-landing-page`).
-- Inside the public pages, green and blue appear only where a section explicitly shows that role (the landing's "Eine Bestellung, zwei Seiten": `.area--company` / `.area--partner` columns with role pill and tinted screenshot frame).
+- Inside the public pages, green and blue appear only where a section explicitly shows that role (the landing's "Eine Bestellung, zwei Seiten": `.area--company` / `.area--partner` columns whose screenshot frame carries the tint and a sentence-case role label „Firmenbereich“ / „Partnerbereich“; no eyebrow above headings). Missing legal facts render as `.public-placeholder` (warning tint, mono) until filled in.
 
 ### Neutral
 - **Page Mist** (#f6f9f7): page background.
