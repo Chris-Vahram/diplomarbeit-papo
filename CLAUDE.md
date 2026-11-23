@@ -1,6 +1,10 @@
 # CLAUDE.md – Partnerportal (Diplomarbeit)
 
-### Vorrangiger Next-Session-Orchesterstand — 31.10.2026
+### Vorrangiger Next-Session-Orchesterstand — 23.11.2026
+
+- Einstieg: `Specification/CONTINUATION_PROMPT.md`, Abschnitt „Stand 23.11.2026 — hier einsteigen“. **Lokale Umgebung ist heruntergefahren** (Docker Desktop aus): vor lokaler Arbeit Docker starten, `docker compose up -d`, `./mvnw quarkus:dev`, `python3 tools/dev_frontend_server.py`. Firmen-Rückmeldung vom 03.11. ausgewertet in `Specification/FIRMENFEEDBACK_2026-11-03.md` (Originale nur lokal in `private/`, Repo ist öffentlich). Firmen-Priorität: DOI, Artikelstammdaten, Provisionsgrundlagen; gesperrte Provisions-/Kundenfeld-Entscheidungen sind dadurch neu zu beschließen.
+
+### Vorheriger Orchesterstand — 31.10.2026
 
 - Einstieg: `Specification/CONTINUATION_PROMPT.md`, Abschnitt „Stand 31.10.2026 — hier einsteigen“. Mandantenfähigkeit A+B live und archiviert (2 Firmen auf der VM), nächtliches Backup läuft, Bestell-Mails werden zugestellt (Umleitung an bis echte Daten). Nächster Kandidat: `add-article-tax-rate`; Checkliste „Vor echten Daten“ im Handoff. Antworten an Chris kurz, ein Befehl pro Codeblock (`/i-have-adhd`).
 
@@ -31,8 +35,8 @@ der Handoff trennt davon menschliche Thesis-/UI-Abnahme und die SSH-Negativmatri
 
 ## Aktueller Orchesterstatus — 25.09.2026
 
-Aktive OpenSpec-Changes (Stand 31.10.2026; `add-company-tenancy` am 30.10. archiviert): `send-order-emails` 5/6 (wartet auf echte Empfänger), `add-article-tax-rate` 0/17,
-`complete-thesis-documentation` 4/6, `decouple-partner-number-from-login` 0/4, `add-unique-bmd-article-number` 0/6, dazu Tobias' 9 offene Shop-Changes (`add-shop-page-renderer` und `add-shop-builder-editor` am 20.10. archiviert).
+Aktive OpenSpec-Changes (Stand 23.11.2026; `add-article-tax-rate` und Tobias' Shop-Changes am 02./03.11. archiviert): `add-public-landing-page` 27/29, `send-order-emails` 5/6 (wartet auf echte Empfänger),
+`complete-thesis-documentation` 4/6, `decouple-partner-number-from-login` 0/4, `add-unique-bmd-article-number` 0/6.
 `harden-tax-identifier-rollout` ist vollständig und archiviert. Die vollständige offene Liste, Protokollauswertung und der Startprompt stehen in
 `Specification/CONTINUATION_PROMPT.md`. Chris hat Push auf `main` samt Deploy für
 den geprüften Stand erlaubt. VM-Demo-Status ist geklärt; kein echter
@@ -46,7 +50,7 @@ Web-based, extensible **B2B partner-ordering platform** for partner-driven sales
 
 ## Authoritative documents (read in this order for deep work)
 1. `Specification/CONTINUATION_PROMPT.md` — **self-contained current operational handoff**; read it fully in every fresh session, then verify volatile Git/OpenSpec claims.
-2. `Documentation/Besprechungsprotokolle/` — newer meeting notes override older documents when they conflict; newest is `Besprechungsprotokoll_12.10.md`.
+2. `Documentation/Besprechungsprotokolle/` — newer meeting notes override older documents when they conflict; newest is `Besprechungsprotokoll_16_11.md`.
 3. `Specification/functional_specification_document_partnerportal_final.md` — authoritative baseline for the implemented internal ordering stage (FR-01..FR-25) until synchronized with newer decisions.
 4. `Specification/phase2_backlog.md` — deferred features **B-01..B-08** + decisions log. Honor it; do not silently promote future directions.
 5. `Specification/ROADMAP_2026-08-25.md` — persisted future plan, updated through 31.08.2026; planning context, not implemented behavior.

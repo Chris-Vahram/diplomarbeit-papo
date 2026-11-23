@@ -95,3 +95,6 @@ deploy/rclone.conf
 ### Local scratch / rendered research files ###
 /tmp/
 /.scratch/
+
+### Private Firmenunterlagen (Repo ist öffentlich) ###
+/private/
