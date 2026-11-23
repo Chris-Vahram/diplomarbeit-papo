@@ -1,11 +1,62 @@
 # PAPO – Next-Session-Context
 
-**Stand:** 31.10.2026. Operative Übergabe; volatile Angaben beim Start prüfen.
+**Stand:** 23.11.2026. Operative Übergabe; volatile Angaben beim Start prüfen.
 Stabile Regeln stehen in `AGENTS.md` und `CLAUDE.md`. Der beschlossene/noch zu
 beschließende Ausbau ist in [PRODUCT_COMPLETION_PLAN.md](PRODUCT_COMPLETION_PLAN.md)
 geordnet. Dieses Dokument bleibt der einzige operative Session-Handoff.
 
-## Stand 31.10.2026 — hier einsteigen (Handoff-Liste abgearbeitet)
+## Stand 23.11.2026 — hier einsteigen (Firmen-Rückmeldung ausgewertet)
+
+**Lokale Umgebung ist komplett heruntergefahren** (Chris braucht CPU für anderes): alle
+Docker-Container gestoppt, Docker Desktop beendet, kein Backend/Frontend-Server läuft. Vor jeder
+lokalen Arbeit/Playwright-Prüfung zuerst wieder hochfahren (Details `docs/SETUP.md`):
+
+1. Docker Desktop starten (`open -a Docker`), warten bis `docker info` antwortet.
+2. Im Repo-Root: `docker compose up -d` (Postgres + Keycloak + Mailpit). Achtung Port 5432:
+   alte Fremd-Container (`my_postgres`, `case-claused-*`, `keycloak`, `native_backend`) **nicht**
+   starten, die gehören zu anderen Projekten.
+3. `cd backend && ./mvnw quarkus:dev`
+4. Zweites Terminal: `python3 tools/dev_frontend_server.py` → http://localhost:3000
+Tests brauchen das alles nicht (`./mvnw test` nutzt Dev Services).
+
+**Seit 31.10. gemergt und live (PR #75–#84):** Shop-Changes von Tobias (Design-Assistent, Templates,
+Anfragen, Gast-Checkout, Rechtstexte/Einwilligung, Statistik, Kundenkonten) und `add-article-tax-rate`
+(alle am 02./03.11. archiviert), öffentliche Landingpage (PR #83), Besprechungsprotokoll 16.11. (PR #84).
+
+**Offene OpenSpec-Changes:** `add-public-landing-page` 27/29 (9.2 optional Rechtstexte gegenlesen,
+9.3 VM-Prüfliste nach Deploy), `send-order-emails` 5/6 (wartet auf echte Daten),
+`decouple-partner-number-from-login` 0/4 und `add-unique-bmd-article-number` 0/6 (BMD-Daten),
+`complete-thesis-documentation` 4/6.
+
+**Neu: Firmen-Rückmeldung zum ersten Test (03.11., bei Chris 22.11.).** Vollständige Auswertung mit
+Ranking und Code-Befund: [FIRMENFEEDBACK_2026-11-03.md](FIRMENFEEDBACK_2026-11-03.md). Originale
+(Test-/Änderungsliste Punkte 1–17, Gesamtpflichtenheft V1.2.SH vom 07.08.2026, Mail-Notiz) nur lokal
+in `private/firmenfeedback-2026-11-03/` (gitignored, Repo ist **öffentlich** → Firmenname, Personen,
+Provisionssätze nie committen). Kernaussagen:
+- Firmen-Priorität jetzt: **DOI-Verfahren**, **vollständige Artikelstammdaten** (BMD-Nr., PP, QP,
+  AT/DE-Preise, MwSt 20/10 AT + 19/7 DE), **Provisionsgrundlagen** (PP-basiert, Karrierestufen,
+  Einschulungsbonus); dazu Partnerfelder (Anrede, Titel, Vor-/Nachname getrennt) + UID optional.
+- Gesperrte Entscheidungen „Provision = ein `commissionPercent`“ und „Kunde: Pflicht nur Nachname +
+  Adresse“ sind fachlich überholt → mit Chris neu beschließen, bevor geplant wird.
+- Partnerwebsite: kein freier Baukasten mehr gewünscht; fertige Seite, Partner pflegt nur Bild,
+  Kontakt, Begrüßungstext, jede Änderung mit Freigabe durch die Firma. Tobias informieren.
+- Besprechung 16.11. ergänzt: Partner-Eigenbestellung bei jedem Partner automatisch anlegen (zu Punkt 1).
+
+**Nächster Schritt (Vorschlag, Chris bestätigt):**
+1. Quick-Fix Punkt 2 (Dialog transparent: `var(--surface-primary)` → `var(--bg-surface)` in
+   `frontend/src/styles/base.css` ~2208), Punkt 10 (UID im Formular optional prüfen), Punkt 7
+   (gewählten Zeitraum an der Karte „Top-Endkunden“ anzeigen) — ein kleiner Change/PR.
+2. Antwort an die Firma (Stichpunkte im Feedback-Dokument) mit Chris abstimmen, Versand über Prof. Hammer.
+3. OpenSpec-Proposals in dieser Reihenfolge: DOI + Ermächtigung → Bestell-Checkboxen/AGB →
+   Artikelstamm (mit `add-unique-bmd-article-number` zusammenführen) → Partner-Stammdaten → Provision
+   (erst nach gemeinsamem Termin mit der Firma). Pro Feature ein Change.
+4. Scope mit Team + Prof. Hammer klären: was gehört noch in die Diplomarbeit.
+
+**Lokal nicht committet (gehört nicht zu diesem Handoff, Chris fragen):** gestagte
+`.agents/skills/*` und `Documentation/KI-Nachweise/prompt-register.md`, ungetrackte
+`output/playwright/*`-Screenshots, `offeneFragen.txt.save`.
+
+## Stand 31.10.2026 — vorheriger Stand (Handoff-Liste abgearbeitet)
 
 **Live auf paportal.at (alles geprüft):**
 - Mandantenfähigkeit A+B archiviert (PR #66/#71/#72). Firma 1 „Huemer GmbH“ (`company-demo`,
